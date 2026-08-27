@@ -1,0 +1,10 @@
+{
+  "name": "saas-im-proto",
+  "private": true,
+  "version": "1.0.0",
+  "description": "通讯录独立原型（STR-SAAS-003）——复用父工程 node_modules 与 src，hash 路由供 GitHub Pages 子路径部署",
+  "scripts": {
+    "dev": "vite --port 5177 --strictPort",
+    "build": "vite build"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "saas-audit-proto",
+  "private": true,
+  "version": "1.0.0",
+  "description": "内容审查独立原型（STR-SAAS-001）——复用父工程 node_modules 与 src/handoff+src/pages，与通讯录/直播流量隔离",
+  "scripts": {
+    "dev": "vite --port 5176 --strictPort",
+    "build": "vite build"
+  }
+}

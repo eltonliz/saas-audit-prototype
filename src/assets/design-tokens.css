@@ -1,0 +1,173 @@
+/**
+ * SaaS-Class UI Design Tokens（全局 CSS 变量）
+ * 来源：UI设计规范-V1.0.0.md
+ * 用法：在组件中用 var(--color-primary) 等引用
+ */
+
+:root {
+  /* ── 主色（品牌绿 #12B76A·统一 PC/APP） ── */
+  --color-primary: #12B76A;
+  --color-primary-dark: #0E9C5C;
+  --color-primary-light: #E6F9F1;
+
+  /* ── 品牌色（与主色一致·绿） ── */
+  --color-brand: #12B76A;
+  --color-brand-light: #E6F9F1;
+
+  /* ── 状态色 ── */
+  --color-success: #12B76A;
+  --color-success-light: #E6F9F1;
+  --color-warning: #F79009;
+  --color-danger: #F04438;
+  --color-info: #667085;
+
+  /* ── 蓝色（信息/链接辅助色·保留作次强调） ── */
+  --color-info-blue: #1890FF;
+  --color-info-blue-light: #E8F4FF;
+
+  /* ── 背景色 ── */
+  --bg-page: #F9FAFB;
+  --bg-card: #FFFFFF;
+  --bg-sidebar: #1F2C3E;
+  --bg-header: #FFFFFF;
+
+  /* ── 文字色 ── */
+  --text-primary: #1F2C3E;
+  --text-secondary: #667085;
+  --text-placeholder: #98A2B3;
+  --text-on-dark: #FFFFFF;
+
+  /* ── 边框色 ── */
+  --border-main: #EAECF0;
+  --border-light: #F9FAFB;
+  --border-dark: #3A4858;
+
+  /* ── 圆角 ── */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 12px;
+  --radius-xxl: 16px;
+  --radius-pill: 999px;
+
+  /* ── 间距 ── */
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+
+  /* ── 字号 ── */
+  --font-h1: 24px;
+  --font-h2: 18px;
+  --font-h3: 16px;
+  --font-body: 14px;
+  --font-body-sm: 13px;
+  --font-caption: 12px;
+  --font-caption-xs: 10px;
+
+  /* ── 字重 ── */
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+
+  /* ── 阴影 ── */
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+  /* ── 字体族 ── */
+  --font-family: "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
+}
+
+/* ── 全局重置 ── */
+body {
+  font-family: var(--font-family);
+  color: var(--text-primary);
+  background: var(--bg-page);
+}
+
+/* ── PC 端 Element Plus 主色覆盖（统一品牌绿·过渡期保留） ── */
+.el-button--primary {
+  --el-color-primary: #12B76A;
+  --el-color-primary-light-3: #4CC893;
+  --el-color-primary-light-5: #7DD9AF;
+  --el-color-primary-light-7: #B0E8CC;
+  --el-color-primary-light-9: #E6F9F1;
+  --el-color-primary-dark-2: #0E9C5C;
+}
+
+/* ── TDesign 品牌绿主题变量覆盖（CSS Variables 方案） ── */
+:root {
+  --td-brand-color: #12B76A;
+  --td-brand-color-1: #E6F9F1;
+  --td-brand-color-2: #B0E8CC;
+  --td-brand-color-3: #7DD9AF;
+  --td-brand-color-4: #4CC893;
+  --td-brand-color-5: #12B76A;
+  --td-brand-color-6: #0E9C5C;
+  --td-brand-color-7: #0B7F4A;
+  --td-brand-color-8: #08643A;
+  --td-brand-color-9: #05492B;
+  --td-brand-color-10: #032F1C;
+  --td-brand-color-light: #E6F9F1;
+  --td-brand-color-focus: #12B76A;
+  --td-brand-color-disabled: #B0E8CC;
+  --td-brand-color-hover: #0E9C5C;
+  --td-brand-color-active: #0B7F4A;
+}
+
+/* ── APP 端通用样式类 ── */
+.app-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  font-size: var(--font-h3);
+  color: var(--text-primary);
+}
+
+/* ── 复刻对照模式：抽屉容器收窄到原型主区 ──
+   右侧需求面板（.replica-req-panel，z-index 3000）存在时，t-drawer 的 fixed 容器
+   与遮罩若仍占满视口，会切进面板并压暗顶栏。--req-panel-w 由需求面板实时同步，
+   面板不存在时本规则自动失效（:has 不匹配），抽屉恢复全宽。 */
+body:has(.replica-req-panel) .t-drawer {
+  left: 0;
+  right: var(--req-panel-w, 320px);
+  width: auto;
+}
+
+.app-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 14px;
+  margin-bottom: var(--space-sm);
+  border: 1px solid var(--border-main);
+}
+
+.app-section-title {
+  font-size: var(--font-h3);
+  font-weight: var(--fw-semibold);
+  color: var(--text-primary);
+  margin: var(--space-md) 0 var(--space-sm);
+}
+
+.app-cta-btn {
+  width: 100%;
+  height: 44px;
+  background: var(--color-brand);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-lg);
+  font-size: var(--font-h3);
+  font-weight: var(--fw-semibold);
+  cursor: pointer;
+}
+
+.app-empty {
+  text-align: center;
+  color: var(--text-placeholder);
+  padding: 40px;
+  font-size: var(--font-body);
+}

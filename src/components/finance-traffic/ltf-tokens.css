@@ -1,0 +1,57 @@
+/* 直播流量域 — Design Tokens（严格对齐 Axure 原型风格：绿色主调 + 浅灰底 + 白卡细边）
+   消费规则：组件只允许 var(--ltf-*)，禁止散落硬编码（O-07） */
+.ltf-page {
+  /* Axure 绿色主色（对齐原型「搜索/购买/确认」按钮与文字链接） */
+  --ltf-primary: #00b42a;
+  --ltf-primary-dark: #009626;
+  --ltf-primary-soft: #e8f9ee;
+  /* Element Plus 主色覆盖（本模块作用域） */
+  --el-color-primary: #00b42a;
+  --el-color-primary-dark-2: #009626;
+  --el-color-primary-light-3: #4dcc6d;
+  --el-color-primary-light-5: #85e09b;
+  --el-color-primary-light-7: #b8eec6;
+  --el-color-primary-light-8: #d1f4dc;
+  --el-color-primary-light-9: #e8f9ee;
+  --el-color-success: #00b42a;
+
+  --ltf-success: #00b42a;
+  --ltf-warning: #ff7d00;
+  --ltf-error: #f53f3f;
+  --ltf-text-main: #1d2129;
+  --ltf-text-secondary: #4e5969;
+  --ltf-text-caption: #86909c;
+  --ltf-bg-card: #ffffff;
+  --ltf-bg-page: #f5f6f7;
+  --ltf-bg-table-head: #f2f3f5;
+  --ltf-bg-warning-soft: #fff7e8;
+  --ltf-bg-error-soft: #ffece8;
+  --ltf-border: #e5e6eb;
+  --ltf-metric-hero-size: 36px;
+  --ltf-metric-sub-size: 24px;
+  --ltf-caption-size: 12px;
+  --ltf-card-radius: 4px;
+  --ltf-card-padding: 20px;
+  --ltf-card-gap: 16px;
+  --ltf-shadow-card: none;
+}
+
+/* Axure 表格风格：浅灰表头 + 细边框 */
+.ltf-page .el-table th.el-table__cell {
+  background: var(--ltf-bg-table-head);
+  color: var(--ltf-text-secondary);
+  font-weight: 500;
+}
+.ltf-page .el-table .el-table__cell {
+  border-bottom: 1px solid var(--ltf-border);
+}
+
+/* Axure 卡片风格：白底细边弱阴影 */
+.ltf-page .hero-card,
+.ltf-page .sub-card,
+.ltf-page .tab-card,
+.ltf-page .pkg-card,
+.ltf-page .debug-bar {
+  border: 1px solid var(--ltf-border);
+  box-shadow: none;
+}
