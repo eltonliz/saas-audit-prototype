@@ -134,6 +134,8 @@ export const CampSchema = z.object({
   mode: CampModeEnum,
   /** 是否允许售货（D4·保留字段本期不启用·默认false） */
   allow_products: z.boolean().default(false),
+  /** 方案A：营期级报名审核开关（默认关闭=报名后直接生成订单支付入营；开启=走报名→审核→支付流程） */
+  require_review: z.boolean().default(false),
 
   /** 营期日期 */
   start_date: z.string(),   // YYYY-MM-DD
@@ -495,6 +497,7 @@ export const CreateCampInputSchema = CampSchema.pick({
   title: true, description: true, cover_url: true,
   series_id: true, series_name: true,
   mode: true, allow_products: true,
+  require_review: true,
   start_date: true, end_date: true, total_days: true,
   price: true, is_paid: true,
   commission_enabled: true,

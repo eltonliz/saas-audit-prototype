@@ -179,7 +179,8 @@ const detailTab = ref('介绍');
 function enroll() {
   try {
     store.createEnrollment({ camp_id: campId, student_id: 'STU-001', student_name: '王五', student_phone: '13800000001', channel: 'direct' } as any);
-    MessagePlugin.success('报名成功，等待审核');
+    const needReview = camp.value?.require_review === true;
+    MessagePlugin.success(needReview ? '报名成功，等待审核' : (camp.value?.is_paid ? '报名成功，请完成支付' : '报名成功，已加入营期'));
   } catch (e: any) { MessagePlugin.warning(e.message); }
 }
 function enrollWithCode() {
@@ -191,7 +192,9 @@ function enrollWithCode() {
       channel = code.code_type === 'qr' ? 'assistant_qr' : 'camp_password'; assistantId = code.assistant_id; codeId = code.id;
     }
     store.createEnrollment({ camp_id: campId, student_id: 'STU-001', student_name: '王五', student_phone: '13800000001', channel, assistant_id: assistantId, invite_code_id: codeId } as any);
-    MessagePlugin.success('报名成功，等待审核'); showInviteInput.value = false;
+    const needReview = camp.value?.require_review === true;
+    MessagePlugin.success(needReview ? '报名成功，等待审核' : (camp.value?.is_paid ? '报名成功，请完成支付' : '报名成功，已加入营期'));
+    showInviteInput.value = false;
   } catch (e: any) { MessagePlugin.warning(e.message); }
 }
 function resubmit() {

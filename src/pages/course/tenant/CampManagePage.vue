@@ -174,6 +174,10 @@
         <t-form-item label="报名截止时间">
           <t-date-picker v-model="enrollDeadline" enable-time-picker placeholder="选择报名截止时间" style="width:100%" />
         </t-form-item>
+        <t-form-item label="报名需审核" help="关闭：学员报名后直接生成订单支付入营（推荐）；开启：报名进入审核队列，通过后生成订单">
+          <t-switch v-model="f.require_review" size="large" />
+          <span class="form-tip-inline">{{ f.require_review ? '需审核（定向/免费营期适用）' : '免审核·报名即支付' }}</span>
+        </t-form-item>
         <t-form-item label="主讲" required-mark>
           <t-select v-model="f.main_lecturer_id" placeholder="请选择主讲" style="width:100%">
             <t-option v-for="l in lecturers" :key="l.id" :label="l.name" :value="l.id" />
@@ -400,7 +404,7 @@ const columns = [
   { colKey: 'op', title: '操作', width: 360, fixed: 'right' },
 ];
 
-const f = ref<{ title: string; description: string; mode: 'live' | 'recorded'; is_paid: boolean; commission_enabled: boolean; main_lecturer_id: string; capacity: number }>({ title: '', description: '', mode: 'live', is_paid: false, commission_enabled: false, main_lecturer_id: '', capacity: 0 });
+const f = ref<{ title: string; description: string; mode: 'live' | 'recorded'; is_paid: boolean; commission_enabled: boolean; main_lecturer_id: string; capacity: number; require_review: boolean }>({ title: '', description: '', mode: 'live', is_paid: false, commission_enabled: false, main_lecturer_id: '', capacity: 0, require_review: false });
 
 const lecturerRate = ref(60);
 const assistantRate = ref(20);
@@ -414,7 +418,7 @@ function onPaidChange() {
 function openCreate() {
   notifyModalOpen('camp-create');
   editingCamp.value = null;
-  f.value = { title: '', description: '', mode: 'live', is_paid: false, commission_enabled: false, main_lecturer_id: '', capacity: 0 };
+  f.value = { title: '', description: '', mode: 'live', is_paid: false, commission_enabled: false, main_lecturer_id: '', capacity: 0, require_review: false };
   priceYuan.value = 0; lecturerRate.value = 60; assistantRate.value = 20; platformRate.value = 20; dateRange.value = []; enrollDeadline.value = null;
   showCreate.value = true;
 }
@@ -440,6 +444,7 @@ function doSave() {
     platform_rate: (f.value.is_paid && f.value.commission_enabled) ? platformRate.value / 100 : 0.2,
     main_lecturer_id: f.value.main_lecturer_id, main_lecturer_name: lec?.name ?? '',
     capacity: f.value.capacity,
+      require_review: f.value.require_review,
     enroll_deadline: enrollDeadline.value ? Math.floor(enrollDeadline.value.getTime() / 1000) : Math.floor(Date.now() / 1000) + 86400 * 7,
     daily_red_packet_mode: 'by_course',
   } as any;
@@ -479,7 +484,7 @@ function delCamp(row: any) {
 function openEdit(row: any) {
   notifyModalOpen('camp-edit');
   editingCamp.value = row;
-  f.value = { title: row.title, description: row.description ?? '', mode: row.mode, is_paid: row.is_paid, commission_enabled: row.commission_enabled, main_lecturer_id: row.main_lecturer_id, capacity: row.capacity || 0 };
+  f.value = { title: row.title, description: row.description ?? '', mode: row.mode, is_paid: row.is_paid, commission_enabled: row.commission_enabled, main_lecturer_id: row.main_lecturer_id, capacity: row.capacity || 0, require_review: row.require_review === true };
   priceYuan.value = row.is_paid ? row.price / 100 : 0;
   lecturerRate.value = row.commission_enabled ? Math.round(row.lecturer_rate * 100) : 60;
   assistantRate.value = row.commission_enabled ? Math.round((row.assistant_rate ?? 0.2) * 100) : 20;
