@@ -98,6 +98,7 @@ export const REPLICA_REQUIREMENTS: Record<string, ReplicaPageRequirement> = {
       ],
       dataFlow: '总部创建代理节点 → 代理继续发展下级 → 末级销售终端挂接门店与店员 → 邀请码按节点归属派发 → 订单业绩沿归属链路结算。',
       impact: '上游：「课程库/营期」讲师/助教下拉引用本页档案。下游：讲师/助教建档即被课程域引用（资质审核暂缓）；解绑影响在授课程需先移交。',
+      // 原型说明：本页成员数据为静态示意；真实实现中成员档案与课程域（lecturerStore）同源，讲师/助教改名、解绑实时同步课程库与营期下拉。
       fields: [
         { name: '组织节点', desc: '总部、代理、销售终端三类', tag: '线上原有' },
         { name: '业务类型/合作类型', desc: '节点经营属性标注', tag: '线上原有' },
@@ -2509,6 +2510,7 @@ export const REPLICA_REQUIREMENTS: Record<string, ReplicaPageRequirement> = {
       rules: [
         '通过操作幂等：已通过的报名不会重复生成订单。',
         '免费营期通过后零元订单自动完成支付。',
+        '报名侧名额拦截：营期名额已满时，APP 营期详情报名入口关闭并显示「名额已满」；已提交的报名不受影响。',
         '审核驳回不产生订单。',
       ],
       businessFlow: [
@@ -2767,6 +2769,7 @@ export const REPLICA_REQUIREMENTS: Record<string, ReplicaPageRequirement> = {
         '到期归档。',
       ],
       exceptions: [
+        { scene: '免费营期不产生合同', handle: '合同仅由付费订单支付成功后生成；免费营期学员直接学习，无需签署' },
         { scene: '学员支付后拒签合同', handle: '营期已加入但无法开始学习；退款走「营期售后」按已支付全额退' },
       ],
     },
