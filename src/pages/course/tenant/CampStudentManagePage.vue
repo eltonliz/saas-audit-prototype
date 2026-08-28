@@ -289,7 +289,7 @@ const store = useCampStore();
 const payStore = useCampPaymentStore();
 const lecturerStore = useLecturerStore();
 // 从页面导航直入时默认落到第一个营期，避免空名单
-const campId = (route.query.campId as string) || campStore.camps[0]?.id || '';
+const campId = (route.query.campId as string) || store.camps[0]?.id || '';
 
 const camp = computed(() => store.loadCamp(campId));
 const campEnrollments = computed(() => store.loadEnrollmentsByCamp(campId));
@@ -301,7 +301,7 @@ const campAssistants = computed(() => store.loadCampLecturersByCamp(campId).filt
 const campAllLecturers = computed(() => store.loadCampLecturersByCamp(campId));
 const availableLecturers = computed(() => {
   const existing = new Set(campAllLecturers.value.map(l => l.lecturer_id));
-  return lecturerStore.loadStoreClerks().filter(l => !existing.has(l.id));
+  return lecturerStore.loadLecturerList().filter(l => !existing.has(l.id));
 });
 const showAddAssistant = ref(false);
 const newAssistant = ref({ lecturer_id: '', role_type: '助教' });
