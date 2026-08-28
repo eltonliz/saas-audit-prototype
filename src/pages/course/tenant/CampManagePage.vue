@@ -205,7 +205,7 @@
             <t-tag theme="primary" variant="light">{{ row.code }}</t-tag>
             <template v-if="row.code_type === 'qr'">
               <div class="qr-row">
-                <img :src="'https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=' + encodeURIComponent(row.code)" alt="QR" class="qr-img" @click="qrPreviewCode = row" />
+                <img v-if="qrDataUrls[row.code]" :src="qrDataUrls[row.code]" alt="QR" class="qr-img" @click="qrPreviewCode = row" />
                 <div class="qr-actions">
                   <t-button variant="text" size="small" @click="qrPreviewCode = row">放大</t-button>
                   <t-button variant="text" size="small" @click="downloadQr(row)">下载</t-button>
@@ -259,7 +259,7 @@
     <!-- QR 预览 Dialog -->
     <t-dialog v-model:visible="qrPreviewVisible" header="二维码预览" width="400px">
       <div v-if="qrPreviewCode" class="qr-preview">
-        <img :src="'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + encodeURIComponent(qrPreviewCode.code)" alt="QR" class="qr-preview-img" />
+        <img v-if="qrDataUrls[qrPreviewCode.code]" :src="qrDataUrls[qrPreviewCode.code]" alt="QR" class="qr-preview-img" />
         <div class="qr-preview-row"><t-text theme="secondary">码值：</t-text><t-tag theme="primary" variant="light">{{ qrPreviewCode.code }}</t-tag></div>
         <div class="qr-preview-row"><t-text theme="secondary">归属讲师：</t-text><t-tag theme="warning" variant="light" size="small">{{ qrPreviewCode.assistant_name }}</t-tag></div>
       </div>
@@ -336,7 +336,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { DialogPlugin, MessagePlugin } from 'tdesign-vue-next';
 import { useCampStore } from '../../../stores/camp-store';
 import { notifyModalOpen } from '../../../utils/modal-spec-bridge';
@@ -570,11 +570,20 @@ function doCreateInviteCode() {
   inviteModalVisible.value = false;
 }
 function copyCode(code: string) { navigator.clipboard.writeText(code); MessagePlugin.success('码值已复制'); }
+// 二维码本地生成（不依赖外网 QR 服务）
+const qrDataUrls = ref<Record<string, string>>({});
+import QRCode from 'qrcode';
+async function renderQr(code: string) {
+  if (qrDataUrls.value[code]) return;
+  try { qrDataUrls.value[code] = await QRCode.toDataURL(code, { width: 300, margin: 1 }); } catch { /* ignore */ }
+}
+watch(currentCampInviteCodes, (codes) => { codes.forEach(c => { if (c.code_type === 'qr') renderQr(c.code); }); }, { immediate: true });
 function downloadQr(row: any) {
   if (!row) return;
   const link = document.createElement('a');
-  link.href = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + encodeURIComponent(row.code);
-  link.download = 'invite-qr-' + row.code + '.png'; link.target = '_blank'; link.click();
+  link.href = qrDataUrls.value[row.code] || '';
+  link.download = 'invite-qr-' + row.code + '.png';
+  if (link.href) link.click(); else MessagePlugin.warning('二维码生成中，请稍后再试');
 }
 
 // ===== 营期详情 Drawer（三 Tab） =====

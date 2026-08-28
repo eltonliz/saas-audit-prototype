@@ -239,9 +239,7 @@
             </div>
           </div>
         </div>
-        <t-table :data="lecturerStatRows" :columns="lecturerStatColumns" bordered size="small" hover row-key="name">
-          <template #ls_rate="{ row }"><span>{{ row.rate }}</span></template>
-        </t-table>
+        <t-table :data="lecturerStatRows" :columns="lecturerStatColumns" bordered size="small" hover row-key="name" :pagination="statPager" />
       </div>
 
       <!-- ═══ Tab3 助教统计 ═══ -->
@@ -281,7 +279,7 @@
             </div>
           </div>
         </div>
-        <t-table :data="assistantRows" :columns="assistantColumns" bordered size="small" hover row-key="name" />
+        <t-table :data="assistantRows" :columns="assistantColumns" bordered size="small" hover row-key="name" :pagination="statPager" />
       </div>
 
       <!-- ═══ Tab4 会员统计 ═══ -->
@@ -317,7 +315,7 @@
             <div class="big-stat">{{ memberCompleteTotal }}<span class="big-stat-sub">次</span></div>
           </div>
         </div>
-        <t-table :data="memberRows" :columns="memberColumns" bordered size="small" hover row-key="name" />
+        <t-table :data="memberRows" :columns="memberColumns" bordered size="small" hover row-key="name" :pagination="statPager" />
       </div>
 
       <!-- ═══ Tab5 营期统计 ═══ -->
@@ -345,7 +343,7 @@
             </div>
           </div>
         </div>
-        <t-table row-key="id" :data="filteredCamps" :columns="columns" bordered size="small" hover stripe>
+        <t-table row-key="id" :data="filteredCamps" :columns="campStatColumns" bordered size="small" hover stripe :pagination="statPager">
           <template #title="{ row }">
             <div class="camp-cell">
               <span class="camp-title">{{ row.title }}</span>
@@ -359,7 +357,6 @@
           </template>
           <template #schedule="{ row }">{{ row.schedule_count }}</template>
           <template #price="{ row }">{{ row.is_paid ? '¥' + (row.price / 100).toFixed(2) : '免费' }}</template>
-          <template #status="{ row }"><t-tag size="small" :theme="statusTheme(row.status)" variant="light">{{ statusLabel(row.status) }}</t-tag></template>
         </t-table>
       </div>
 
@@ -388,7 +385,7 @@
             </div>
           </div>
         </div>
-        <t-table :data="courseStatRows" :columns="courseStatColumns" bordered size="small" hover row-key="id" stripe />
+        <t-table :data="courseStatRows" :columns="courseStatColumns" bordered size="small" hover row-key="id" stripe :pagination="statPager" />
       </div>
     </t-card>
 
@@ -536,19 +533,22 @@ const quizDonut = computed(() => {
   const rate = quiz > 0 ? Math.round((correct / quiz) * 100) : 0;
   return { deg: Math.round(rate * 3.6), rateText: rate + '%', wrong };
 });
-// 主讲统计行（扩观看次数维度）
+// 主讲统计行（字段与助教统计完全对齐：关联营期数/学员数/完课率/红包维度一致）
 const lecturerStatRows = ref([
-  { name: '张三', courses: 2, viewers: 5, completed: 5, view_times: 27, quiz_users: 0, rate: '0.0%' },
-  { name: '李四', courses: 1, viewers: 2, completed: 2, view_times: 13, quiz_users: 0, rate: '0.0%' },
+  { name: '张三', camps: 2, students: 120, viewers: 86, completed: 79, view_times: 176, completion_rate: '91.9%', quiz_users: 40, correct_users: 38, rate: '95.0%', red_packets: 2, red_amount: '0.20' },
+  { name: '李四', camps: 1, students: 56, viewers: 38, completed: 29, view_times: 102, completion_rate: '76.3%', quiz_users: 12, correct_users: 11, rate: '91.7%', red_packets: 0, red_amount: '0.00' },
 ]);
 const lecturerStatColumns = [
   { colKey: 'name', title: '主讲', width: 100 },
-  { colKey: 'courses', title: '直播课程数', width: 95 },
+  { colKey: 'camps', title: '关联营期数', width: 95 },
+  { colKey: 'students', title: '学员数', width: 85 },
   { colKey: 'viewers', title: '观看人数', width: 90 },
   { colKey: 'completed', title: '完播人数', width: 90 },
-  { colKey: 'view_times', title: '观看次数', width: 90 },
+  { colKey: 'completion_rate', title: '完课率', width: 85 },
   { colKey: 'quiz_users', title: '答题人数', width: 90 },
-  { colKey: 'ls_rate', title: '正确率', width: 80 },
+  { colKey: 'rate', title: '正确率', width: 80 },
+  { colKey: 'red_packets', title: '答题红包个数', width: 110 },
+  { colKey: 'red_amount', title: '红包金额(元)', width: 100 },
 ];
 // 助教统计（原群管统计维度）
 const assistantRows = ref([
@@ -667,7 +667,17 @@ const courseStatColumns = [
   { colKey: 'viewers', title: '观看人数', width: 90 },
   { colKey: 'completed', title: '完播人数', width: 90 },
   { colKey: 'completion_rate', title: '完课率', width: 85 },
-  { colKey: 'status', title: '状态', width: 90 },
+];
+// 统计表通用分页器（每页5条，数据少时单页展示）
+const statPager = { defaultPageSize: 5, defaultCurrent: 1 };
+// 营期统计表（纯报表：与列表页列解耦，不含状态列）
+const campStatColumns = [
+  { colKey: 'title', title: '营期名称', minWidth: 180, ellipsis: true },
+  { colKey: 'mode', title: '授课模式', width: 90 },
+  { colKey: 'time', title: '营期时间', width: 180 },
+  { colKey: 'enroll', title: '报名情况', width: 200 },
+  { colKey: 'schedule', title: '排课数', width: 80 },
+  { colKey: 'price', title: '价格', width: 80 },
 ];
 const totalEnrolled = computed(() => filteredCamps.value.reduce((s, c: any) => s + (Number(c.enrolled_count) || 0), 0));
 const totalApproved = computed(() => filteredCamps.value.reduce((s, c: any) => s + (Number(c.approved_count) || 0), 0));

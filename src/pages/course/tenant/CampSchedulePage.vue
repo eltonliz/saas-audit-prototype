@@ -6,6 +6,9 @@
           <div class="title-row">
             <t-icon name="calendar" />
             <span class="title">营期排课</span>
+            <t-select v-model="campId" size="small" style="width: 240px" :borderless="false">
+              <t-option v-for="c in campStore.camps" :key="c.id" :value="c.id" :label="c.title + ' · ' + (c.mode === 'live' ? '直播' : '录播') + ' · ' + campStatusLabel(c.status)" />
+            </t-select>
             <template v-if="camp">
               <t-tag :theme="camp.mode === 'live' ? 'danger' : 'primary'" size="small">
                 {{ camp.mode === 'live' ? '直播授课' : '录播授课' }}
@@ -278,14 +281,14 @@ const route = useRoute();
 const campStore = useCampStore();
 const courseStore = useCourseStore();
 // 从页面导航直入时无 campId 参数：优先落到「未锁定」的营期（可编辑演示排课），避免空页面与只读态
-const campId = (route.query.campId as string)
+const campId = ref<string>((route.query.campId as string)
   || campStore.camps.find((c: any) => !['published', 'enrolling', 'in_progress', 'ended'].includes(c.status))?.id
   || campStore.camps[0]?.id
-  || '';
+  || '');
 
-const camp = computed(() => campStore.loadCamp(campId));
+const camp = computed(() => campStore.loadCamp(campId.value));
 const campSchedules = computed(() =>
-  campStore.loadSchedulesByCamp(campId).sort((a, b) => a.day_number - b.day_number || a.sort_order - b.sort_order)
+  campStore.loadSchedulesByCamp(campId.value).sort((a, b) => a.day_number - b.day_number || a.sort_order - b.sort_order)
 );
 
 // 排课锁定：审核通过后（published/enrolling/in_progress/ended）不可编辑
@@ -293,6 +296,7 @@ const isLocked = computed(() => {
   const s = camp.value?.status;
   return s === 'published' || s === 'enrolling' || s === 'in_progress' || s === 'ended';
 });
+const campStatusLabel = (s: string): string => ({ draft: '草稿·可排课', pending_review: '待审核', published: '已发布', enrolling: '报名中', in_progress: '进行中', ended: '已结束', offline: '已下架', rejected: '已驳回' }[s] ?? s);
 
 // 按营期mode过滤课程（只显示与营期授课方式一致的课程）
 const filteredCourses = computed(() => {
@@ -348,7 +352,7 @@ async function doOneClick() {
     const existingDayMax = Math.max(0, ...campSchedules.value.map(s => s.day_number));
     const result = campStore.createSchedulesForCourse({
       course_id: oneClickCourseId.value,
-      camp_id: campId,
+      camp_id: campId.value,
       start_day_number: existingDayMax + 1,
       start_sort_order: 1,
     });
@@ -410,7 +414,7 @@ function doBatch() {
       const currentCount = (dayCountMap.get(row.day_number) || 0) + 1;
       dayCountMap.set(row.day_number, currentCount);
       return {
-        camp_id: campId,
+        camp_id: campId.value,
         day_number: row.day_number,
         sort_order: currentCount,
         schedule_type: 'course',
@@ -482,7 +486,7 @@ function doAdd() {
   const dayScheds = campSchedules.value.filter(s => s.day_number === addForm.value.day_number);
   const mode = camp.value?.mode === 'live' ? 'live' : 'recorded';
   campStore.createSchedule({
-    camp_id: campId,
+    camp_id: campId.value,
     day_number: addForm.value.day_number,
     sort_order: dayScheds.length + 1,
     schedule_type: 'course',
@@ -594,7 +598,7 @@ async function doOneClickFromAdd() {
     const existingDayMax = Math.max(0, ...campSchedules.value.map(s => s.day_number));
     const result = campStore.createSchedulesForCourse({
       course_id: addForm.value.course_id,
-      camp_id: campId,
+      camp_id: campId.value,
       start_day_number: existingDayMax + 1,
       start_sort_order: 1,
     });

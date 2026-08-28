@@ -72,12 +72,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { MessagePlugin } from 'tdesign-vue-next';
+import { ref, computed, h } from 'vue';
+import { MessagePlugin, Tooltip as TTooltip, Icon as TIcon } from 'tdesign-vue-next';
 import { useCourseCommerceStore } from '../../../stores/course-commerce-store';
 
 const store = useCourseCommerceStore();
 const search = ref(''); const participantFilter = ref(''); const statusFilter = ref(''); const paymentFilter = ref('');
+
+// 分成字段口径：表头问号悬浮解释（与需求面板口径一致）
+function helpTitle(text: string, tip: string) {
+  return () => h('span', { class: 'hdr-help-wrap' }, [
+    text,
+    h(TTooltip, { content: tip }, { default: () => h(TIcon, { name: 'help-circle', class: 'field-help' }) }),
+  ]);
+}
 
 const filteredRecords = computed(() => store.shareRecords.filter((r: any) =>
   (!search.value || r.course_title.includes(search.value) || r.order_no.includes(search.value)) &&
@@ -92,10 +100,10 @@ const columns = [
   { colKey: 'course_title', title: '课程', minWidth: 140, ellipsis: true },
   { colKey: 'participant', title: '参与方', width: 80 },
   { colKey: 'share_rate', title: '比例', width: 70 },
-  { colKey: 'share_base', title: '分成基数', width: 100 },
-  { colKey: 'share_amount', title: '应分金额', width: 100 },
-  { colKey: 'adjustment_amount', title: '调整金额', width: 100 },
-  { colKey: 'net_amount', title: '净应分', width: 100 },
+  { colKey: 'share_base', title: helpTitle('分成基数', '本笔订单的可分佣金额 = 订单实付金额 − 支付渠道手续费 − 积分抵扣部分（积分抵扣不参与分成）。三方各自的应分金额均以它为基数按比例计算。'), width: 100 },
+  { colKey: 'share_amount', title: helpTitle('应分金额', '该参与方按配置比例分得的原始金额 = 分成基数 × 参与方分成比例（如讲师60% × 分成基数）。'), width: 100 },
+  { colKey: 'adjustment_amount', title: helpTitle('调整金额', '退款/售后引发的负向冲减或人工调账。已打款后发生退款时生成负向调整，从该参与方后续收益中追回，或在下一批结算中抵扣。'), width: 100 },
+  { colKey: 'net_amount', title: helpTitle('净应分', '实际可结算金额 = 应分金额 + 调整金额（调整为负时扣减）。结算、提现与线下打款一律以净应分为准。'), width: 100 },
   { colKey: 'status', title: '分成状态', width: 90 },
   { colKey: 'offline_payment_status', title: '打款状态', width: 90 },
   { colKey: 'op', title: '操作', width: 140, fixed: 'right' },
@@ -153,4 +161,7 @@ function doPayment() {
 .filter-bar { display: flex; gap: 12px; flex-wrap: wrap; }
 .table-card { border-radius: 8px; }
 .adjustment-tip { display: flex; align-items: center; gap: 8px; margin-top: 16px; padding: 12px; background: #FFF7E6; border-radius: 8px; font-size: 13px; color: #D46B08; }
+/* 字段口径问号提示：hover 变亮引导悬停 */
+.field-help { font-size: 13px; color: #98A2B3; cursor: help; vertical-align: -2px; margin-left: 2px; }
+.field-help:hover { color: #0D9488; }
 </style>

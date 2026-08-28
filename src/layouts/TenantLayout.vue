@@ -414,8 +414,22 @@ body.with-replica-panel .el-overlay {
   height: 40px;
   line-height: 40px;
 }
-.layout-menu :deep(.el-sub-menu__title) {
+/* 一级模块标题（页面导航·el-menu 直接子级）最醒目：加粗放大 */
+.layout-menu :deep(> .el-sub-menu > .el-sub-menu__title) {
+  font-weight: 700;
+  font-size: 15px;
+  height: 46px;
+  line-height: 46px;
+  letter-spacing: 1px;
+  color: #F2F5F7;
+}
+/* 二级模块标题（内容管理/营期管理/复刻对照）稍收敛 */
+.layout-menu :deep(.el-menu--inline > .el-sub-menu > .el-sub-menu__title) {
   font-weight: 600;
+  font-size: 13.5px;
+  height: 40px;
+  line-height: 40px;
+  color: #CBD5E1;
 }
 .layout-menu :deep(.el-sub-menu .el-menu-item) {
   padding-left: 48px !important;
