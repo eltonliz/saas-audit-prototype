@@ -1245,7 +1245,7 @@ pending（待审核）→ approved（已通过，触发4项回滚）
 | department | string? | 科室/领域 |
 | title | string? | 职称 |
 | bio | string? | 简介 |
-| review_status | LecturerReviewStatus | 资质审核状态 |
+| review_status | LecturerReviewStatus | 资质审核状态（**暂不启用**：讲师/助教建档即 approved，字段保留供后续开启审核） |
 | status | LecturerStatus | 状态（active/suspended/left，D16 快照锁定） |
 | total_courses | number | 累计课程数（聚合） |
 | total_camps | number | 累计营期数（聚合） |
@@ -2346,8 +2346,8 @@ Store 采用 Pinia 多 store 分域，action 名 1:1 对齐 SugarMate（zustand�
 | updateLecturer | (id, patch) => Lecturer | 更新讲师 |
 | loadLecturerList | () => Lecturer[] | 加载讲师列表 |
 | loadLecturer | (id) => Lecturer | 加载单讲师 |
-| approveLecturer | (id, reviewerId) => void | 资质审核通过 |
-| rejectLecturer | (id, reviewerId, remark) => void | 资质审核驳回 |
+| approveLecturer | (id, reviewerId) => void | 资质审核通过（**暂不启用**：建档即 approved，方法保留） |
+| rejectLecturer | (id, reviewerId, remark) => void | 资质审核驳回（**暂不启用**：方法保留） |
 | transitionLecturerStatus | (id, target) => void | 讲师状态流转（active→suspended→left，D16 快照锁定） |
 | createAssistantRelation | (input) => LecturerAssistantRelation | 建立讲师-助教归属 |
 | terminateAssistantRelation | (id, reason) => void | 解除归属 |
@@ -2448,9 +2448,9 @@ Store 采用 Pinia 多 store 分域，action 名 1:1 对齐 SugarMate（zustand�
 | **用例名** | 讲师库管理 |
 | **参与者** | 管理员 |
 | **前置条件** | 管理员已登录 PC 后台 |
-| **主流程** | 1.进入讲师库管理页 → 2.查看讲师列表 → 3.新增讲师（表单填写）/ 从成员管理导入 → 4.资质审核（通过/驳回）→ 5.讲师状态流转（在职/暂停/离职）→ 6.建立讲师-助教归属 → 7.配置红包规则 |
-| **后置条件** | 讲师创建成功，资质审核通过后可被课程引用 |
-| **异常流** | 手机号格式校验失败/资质审核驳回填备注/离职讲师不可被新营期引用为主讲 |
+| **主流程** | 1.进入讲师库管理页 → 2.查看讲师列表 → 3.新增讲师（表单填写）/ 从成员管理导入 → 4.讲师状态流转（在职/暂停/离职）→ 5.建立讲师-助教归属 → 6.配置红包规则。<br/>**业务调整（v1.4.0）：讲师/助教资质审核流程暂不启用——建档即生效（review_status 恒为 approved），可直接被课程库与营期引用；字段与状态机保留，后续按业务需要再开启审核。** |
+| **后置条件** | 讲师创建成功即被课程引用（无需资质审核） |
+| **异常流** | 手机号格式校验失败/离职讲师不可被新营期引用为主讲 |
 
 ### UC-COURSE-PC-002 课程中心 CRUD
 
@@ -2458,7 +2458,7 @@ Store 采用 Pinia 多 store 分域，action 名 1:1 对齐 SugarMate（zustand�
 |----|------|
 | **用例名** | 课程中心 CRUD |
 | **参与者** | 管理员 |
-| **前置条件** | 讲师库已有审核通过的讲师 |
+| **前置条件** | 讲师库已有讲师档案（建档即生效，无需审核） |
 | **主流程** | 1.进入课程中心 → 2.新增课程（填写基本信息+分类+讲师+红包配置）→ 3.提交审核 → 4.审核通过（published）→ 5.课程可被营期引用/APP展示 |
 | **后置条件** | 课程发布成功，camp_ref_count 可递增 |
 | **异常流** | 审核驳回填 review_remark/camp_only 课程 APP 不独立展示/讲师离职后课程 lecturer_name 快照不失效 |

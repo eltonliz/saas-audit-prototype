@@ -6,8 +6,8 @@ import ReplicaMarker from '../../../components/replica/ReplicaMarker.vue'
 const tableData = ref([
   { "成员编号": "AGT260818000001", "成员名称": "测试代理", "所属组织": "hhh代理", "组织身份": "一级代理", "业务类型": "招募渠道", "主体类型": "企业", "主体名称": "测试", "提交时间": "2026-08-18 22:09:07", "审核时间": "-", "审核人": "-", "状态": "待审核" },
   { "成员编号": "AGT260622000001", "成员名称": "cc代理", "所属组织": "hhh代理", "组织身份": "一级代理", "业务类型": "招募渠道", "主体类型": "企业", "主体名称": "hhh企业", "提交时间": "2026-06-22 10:21:03", "审核时间": "2026-06-22 10:21:10", "审核人": "-", "状态": "已通过" },
-  { "成员编号": "AGT260825000001", "成员名称": "李讲师", "所属组织": "hhh企业", "组织身份": "讲师", "业务类型": "课程合作", "主体类型": "企业", "主体名称": "李讲师教育公司", "提交时间": "2026-08-25 09:00:00", "审核时间": "-", "审核人": "-", "状态": "待审核" },
-  { "成员编号": "AGT260825000002", "成员名称": "王助教", "所属组织": "hhh企业", "组织身份": "助教", "业务类型": "课程助教", "主体类型": "个体户", "主体名称": "王助教工作室", "提交时间": "2026-08-25 14:30:00", "审核时间": "-", "审核人": "-", "状态": "待审核" }
+  { "成员编号": "AGT260825000001", "成员名称": "李讲师", "所属组织": "hhh企业", "组织身份": "讲师", "业务类型": "课程合作", "主体类型": "企业", "主体名称": "李讲师教育公司", "提交时间": "2026-08-25 09:00:00", "审核时间": "2026-08-25 09:05:00", "审核人": "admin", "状态": "已通过" },
+  { "成员编号": "AGT260825000002", "成员名称": "王助教", "所属组织": "hhh企业", "组织身份": "助教", "业务类型": "课程助教", "主体类型": "个体户", "主体名称": "王助教工作室", "提交时间": "2026-08-25 14:30:00", "审核时间": "2026-08-25 14:35:00", "审核人": "admin", "状态": "已通过" }
 ])
 </script>
 
@@ -29,13 +29,6 @@ const tableData = ref([
         <el-option label="全部" value="" />
         <el-option label="企业" value="company" />
         <el-option label="个体户" value="individual" />
-      </el-select>
-      <span class="filter-label">资质状态：</span>
-      <el-select v-model="qualStatus" placeholder="请选择" size="small" style="width:120px">
-        <el-option label="全部" value="" />
-        <el-option label="待审核" value="pending" />
-        <el-option label="已通过" value="approved" />
-        <el-option label="已驳回" value="rejected" />
       </el-select>
       <el-button type="primary" size="small">查询</el-button>
       <el-button size="small">重置</el-button>
@@ -86,10 +79,10 @@ const tableData = ref([
     <div class="modal-prototypes">
       <div class="modal-section-title">↓ 以下为涉及改动的模态框原型（放在主页面下方空白处）</div>
 
-      <!-- 弹窗：审核详情（编号①②③） -->
+      <!-- 弹窗：成员详情（资质审核流程暂不启用，仅查看） -->
       <div class="modal-box">
         <div class="modal-header">
-          <span class="modal-title">弹窗：审核详情</span>
+          <span class="modal-title">弹窗：成员详情</span>
           <ReplicaMarker :no="[1, 2, 3]" label="编号①②③" />
         </div>
         <div class="modal-body">
@@ -109,20 +102,17 @@ const tableData = ref([
               <div>· 课程视频样片 <el-button link type="primary" size="small">查看</el-button></div>
               <div>· 学历证明 <el-button link type="primary" size="small">查看</el-button></div>
             </div>
-            <ReplicaMarker :no="2" title="新增讲师/助教资质材料类型" />
+            <ReplicaMarker :no="2" title="讲师/助教资质材料（选填归档，不做审核门槛）" />
           </div>
-          <div class="form-row"><span class="form-label">审核状态：</span><span style="color:#fa8c16;font-size:13px">待审核</span></div>
-          <div class="form-row"><span class="form-label">审核人：</span><span style="color:#666;font-size:13px">-</span></div>
-          <div class="form-row">
-            <span class="form-label">审核意见：</span>
-            <el-input placeholder="驳回必填，不超过200字" type="textarea" :rows="3" size="small" style="width:300px" />
+          <div class="form-row"><span class="form-label">审核状态：</span><span style="color:#0D9488;font-size:13px">已通过（建档即生效，资质审核流程暂不启用）</span></div>
+          <div class="form-row"><span class="form-label">审核人：</span><span style="color:#666;font-size:13px">admin</span></div>
+          <div class="form-row"><span class="form-label">审核时间：</span><span style="color:#666;font-size:13px">2026-08-25 09:05:00</span></div>
+          <div style="font-size:12px;color:#909399;line-height:1.8;margin-top:8px">
+            业务说明：讲师/助教资质审核流程暂不启用，成员建档后即生效，可直接被课程库与营期引用；后续按业务需要再开启审核。
           </div>
-          <div class="form-row"><span class="form-label">审核时间：</span><span style="color:#666;font-size:13px">-</span></div>
         </div>
         <div class="modal-footer">
-          <el-button size="small">取消</el-button>
-          <el-button type="danger" size="small">驳回</el-button>
-          <el-button type="primary" size="small">通过<ReplicaMarker :no="3" title="讲师资质审核规则" /></el-button>
+          <el-button size="small">关闭</el-button>
         </div>
       </div>
     </div>

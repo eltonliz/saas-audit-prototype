@@ -441,16 +441,16 @@ import { LIVE_SESSIONS } from '../../../adapters/sim/sim-fixtures';
 const store = useCourseStore();
 const campStore = useCampStore();
 const lecturerStore = useLecturerStore();
-// 讲师/助教选项与组织管理同源（审核通过的讲师）——流程闭环：先有讲师才能建课选讲师
+// 讲师/助教选项与组织管理同源——建档即可选（资质审核流程暂不启用）
 const lecturerOptions = computed(() => {
   const map = new Map<string, string>();
-  lecturerStore.loadLecturerList().filter((l: any) => l.review_status === 'approved').forEach((l: any) => map.set(l.id, l.name));
+  lecturerStore.loadLecturerList().forEach((l: any) => map.set(l.id, l.name));
   store.courses.forEach((c: any) => { if (c.lecturer_id && c.lecturer_name) map.set(c.lecturer_id, c.lecturer_name); });
   return Array.from(map.entries()).map(([id, name]) => ({ id, name }));
 });
 const assistantOptions = computed(() => {
   const map = new Map<string, string>();
-  lecturerStore.loadLecturerList().filter((l: any) => l.review_status === 'approved').forEach((l: any) => map.set(l.id, l.name));
+  lecturerStore.loadLecturerList().forEach((l: any) => map.set(l.id, l.name));
   return Array.from(map.entries()).map(([id, name]) => ({ id, name }));
 });
 const liveRooms = LIVE_SESSIONS;
@@ -710,8 +710,8 @@ function openEditDrawer(row: any) {
 function doSave() {
   if (!form.value.title) { MessagePlugin.warning('请填写课程名称'); return; }
   if (!form.value.category_name) { MessagePlugin.warning('请选择所属分类'); return; }
-  // 流程闭环：必须先在「组织管理」有审核通过的讲师，才能创建课程（不静默兜底）
-  if (!form.value.lecturer_id || !form.value.lecturer_name) { MessagePlugin.warning('请选择讲师（需先在组织管理中新增并通过审核）'); return; }
+  // 流程闭环：必须先在「组织管理」新增讲师档案，才能创建课程（不静默兜底）
+  if (!form.value.lecturer_id || !form.value.lecturer_name) { MessagePlugin.warning('请选择讲师（需先在组织管理中新增讲师档案）'); return; }
   if (form.value.commission_enabled && (form.value.lecturer_rate + form.value.assistant_rate) >= 100) { MessagePlugin.warning('讲师+助教比例之和须<100%'); return; }
   const price = Math.round((Number(form.value.price) || 0) * 100);
   const isPaid = form.value.sale_type === 'paid';
