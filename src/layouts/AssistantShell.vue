@@ -19,9 +19,9 @@ const route = useRoute();
 const router = useRouter();
 const tabs = [
   { path: '/app/assistant/workbench', icon: 'tools', label: '工作台' },
-  { path: '/app/assistant/recruit', icon: 'aim', label: '招生' },
-  { path: '/app/assistant/qa', icon: 'chat', label: '答疑' },
-  { path: '/app/assistant/live', icon: 'play-circle', label: '助播' },
+  { path: '/app/assistant/courses', icon: 'book', label: '课程' },
+  { path: '/app/assistant/live', icon: 'play-circle', label: '直播' },
+  { path: '/app/assistant/students', icon: 'usergroup', label: '学员' },
   { path: '/app/assistant/mine', icon: 'user', label: '我的' },
 ];
 function isActive(t: { path: string }) { return route.path.startsWith(t.path); }

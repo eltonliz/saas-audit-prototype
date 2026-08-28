@@ -21,7 +21,7 @@ const tabs = [
   { path: '/app/lecturer/workbench', icon: 'tools', label: '工作台' },
   { path: '/app/lecturer/courses', icon: 'book', label: '课程' },
   { path: '/app/lecturer/live', icon: 'play-circle', label: '直播' },
-  { path: '/app/lecturer/income', icon: 'money-circle', label: '分成' },
+  { path: '/app/lecturer/students', icon: 'usergroup', label: '学员' },
   { path: '/app/lecturer/mine', icon: 'user', label: '我的' },
 ];
 function isActive(t: { path: string }) { return route.path.startsWith(t.path); }

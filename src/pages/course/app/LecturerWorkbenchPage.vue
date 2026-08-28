@@ -2,18 +2,22 @@
   <div class="workbench">
     <header class="banner-area">
       <div class="banner-row">
-        <div class="avatar"><EmojiIcon emoji="👨‍🏫" :size="28" /></div>
-        <div class="banner-info"><div class="banner-name">张三 讲师</div><div class="banner-role">讲师 · 已认证</div></div>
-        <div class="banner-stats"><div class="stat-num">128</div><div class="stat-label">累计直播</div></div>
+        <div class="avatar"><EmojiIcon :emoji="ownerEmoji" :size="28" /></div>
+        <div class="banner-info"><div class="banner-name">{{ ownerName }}</div><div class="banner-role">{{ ownerRole }}</div></div>
+        <div class="banner-stats"><div class="stat-num">{{ ownerStatNum }}</div><div class="stat-label">{{ ownerStat }}</div></div>
       </div>
     </header>
+    <div class="camp-selector">
+      <span v-for="c in myCamps" :key="c.id" class="camp-chip" :class="{ active: activeCampId === c.id }" @click="activeCampId = c.id">{{ c.title }}</span>
+      <span class="section-more" style="padding:6px 8px" @click="router.push(P('/camps'))">全部 ›</span>
+    </div>
     <div class="quick-grid">
       <div class="quick-item" v-for="q in quickItems" :key="q.label" @click="q.handler">
         <div class="quick-icon"><EmojiIcon :emoji="q.icon" :size="24" /></div><div class="quick-label">{{ q.label }}</div>
       </div>
     </div>
     <div class="section">
-      <div class="section-title"><EmojiIcon emoji="📅" :size="16" /><span>今日排课</span><span class="section-more" @click="router.push('/app/lecturer/camps?tab=schedule')">查看全部 ›</span></div>
+      <div class="section-title"><EmojiIcon emoji="📅" :size="16" /><span>今日排课</span><span class="section-more" @click="router.push(P('/camps?tab=schedule'))">查看全部 ›</span></div>
       <div v-if="todaySchedules.length === 0" class="empty-mini">今日无排课</div>
       <div v-for="s in todaySchedules" :key="s.id" class="sched-item">
         <div class="sched-time">{{ formatTime(s.unlock_time) }}</div>
@@ -22,7 +26,7 @@
       </div>
     </div>
     <div class="section">
-      <div class="section-title"><EmojiIcon emoji="🎯" :size="16" /><span>我的营期</span><span class="section-more" @click="router.push('/app/lecturer/camps')">查看全部 ›</span></div>
+      <div class="section-title"><EmojiIcon emoji="🎯" :size="16" /><span>我的营期</span><span class="section-more" @click="router.push(P('/camps'))">查看全部 ›</span></div>
       <div v-for="c in myCamps" :key="c.id" class="camp-item">
         <div class="camp-cover"><EmojiIcon :emoji="c.mode === 'live' ? '📺' : '📹'" :size="22" /></div>
         <div class="camp-info"><div class="camp-title">{{ c.title }}</div><div class="camp-meta">{{ c.enrolled_count }}人已报 · {{ c.joined_count }}人已加入</div></div>
@@ -30,7 +34,7 @@
       </div>
     </div>
     <div class="section">
-      <div class="section-title"><EmojiIcon emoji="📖" :size="16" /><span>我的课程</span><span class="section-more" @click="router.push('/app/lecturer/courses')">查看全部 ›</span></div>
+      <div class="section-title"><EmojiIcon emoji="📖" :size="16" /><span>我的课程</span><span class="section-more" @click="router.push(P('/courses'))">查看全部 ›</span></div>
       <div v-for="c in myCourses" :key="c.id" class="course-item" @click="router.push('/app/student/course/' + c.id)">
         <div class="course-cover"><EmojiIcon :emoji="c.mode === 'live' ? '📺' : '📖'" :size="22" /></div>
         <div class="course-info"><div class="course-title">{{ c.title }}</div><div class="course-meta">{{ c.category_name }} · {{ c.lesson_count }}课时</div></div>
@@ -38,7 +42,7 @@
       </div>
     </div>
     <div class="section">
-      <div class="section-title"><EmojiIcon emoji="🔗" :size="16" /><span>我的邀请码</span><span class="section-more" @click="router.push('/app/lecturer/invite-codes')">查看全部 ›</span></div>
+      <div class="section-title"><EmojiIcon emoji="🔗" :size="16" /><span>我的邀请码</span><span class="section-more" @click="router.push(P('/invite-codes'))">查看全部 ›</span></div>
       <div v-for="c in myCodes.slice(0, 3)" :key="c.id" class="invite-item">
         <div class="invite-info"><div class="invite-code">{{ c.code }}</div><div class="invite-meta">{{ c.code_type === 'qr' ? '扫码' : '口令' }} · 使用{{ c.used_count }}次 · 报名{{ c.enrolled_count }}</div></div>
         <button class="share-btn" @click="copyCode(c.code)">分享</button>
@@ -61,7 +65,7 @@
       <div class="conversion">转化率：{{ conversionRate }}%</div>
     </div>
     <div class="section">
-      <div class="section-title"><EmojiIcon emoji="💰" :size="16" /><span>分成统计</span></div>
+      <div class="section-title"><EmojiIcon emoji="💰" :size="16" /><span>分成统计</span><span style="font-size:10px;color:#999">[dbg bills={{ myBills.length }} owner={{ ownerId }} isLec={{ isLecturer }} total={{ commissionStore.commissionBills.length }}]</span></div>
       <div class="commission-stats">
         <div class="cs-box"><div class="cs-num">¥{{ pendingAmount }}</div><div class="cs-label">待结算</div></div>
         <div class="cs-box"><div class="cs-num">¥{{ settledAmount }}</div><div class="cs-label">已结算</div></div>
@@ -86,7 +90,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { MessagePlugin } from 'tdesign-vue-next';
 import EmojiIcon from './EmojiIcon.vue';
 import { useCourseStore } from '../../../stores/course-store';
@@ -94,22 +98,37 @@ import { useCampStore } from '../../../stores/camp-store';
 import { useCommissionStore } from '../../../stores/commission-store';
 
 const router = useRouter();
+const route = useRoute();
 const courseStore = useCourseStore();
 const campStore = useCampStore();
 const commissionStore = useCommissionStore();
-const lecturerId = 'LECT-202608-00001';
+// 分成统计（按角色归属过滤）
+const myBills = computed(() => commissionStore.commissionBills.filter((b: any) => b.lecturer_id === ownerId || b.assistant_id === ownerId));
+const myAmt = (b: any) => (isLecturer ? (b.lecturer_amount ?? 0) : (b.assistant_amount ?? 0));
+const pendingAmount = computed(() => '¥' + (myBills.value.filter((b: any) => b.status === 'pending_settlement').reduce((s2, b: any) => s2 + myAmt(b), 0) / 100).toFixed(2));
+const settledAmount = computed(() => '¥' + (myBills.value.filter((b: any) => b.status === 'settled').reduce((s2, b: any) => s2 + myAmt(b), 0) / 100).toFixed(2));
+const totalAmount = computed(() => '¥' + (myBills.value.reduce((s2, b: any) => s2 + myAmt(b), 0) / 100).toFixed(2));
+// 双角色工作台：讲师/助教共用（功能一致，仅身份与分成不同）
+const isLecturer = route.path.startsWith('/app/lecturer');
+const ownerId = isLecturer ? 'LECT-202608-00001' : 'LECT-202608-00003';
+const ownerName = isLecturer ? '张三 讲师' : '王助教';
+const ownerRole = isLecturer ? '讲师 · 已认证' : '资深助教 · 已认证';
+const ownerEmoji = isLecturer ? '👨‍🏫' : '🤝';
+const ownerStat = isLecturer ? '累计直播' : '协助直播';
+const ownerStatNum = isLecturer ? '128' : '96';
+const P = (p: string) => (isLecturer ? '/app/lecturer' : '/app/assistant') + p;
+const lecturerId = ownerId;
 const quickItems = [
-  { label: '立即开播', icon: '📺', handler: () => router.push('/app/student/live/LIVE-202608-00002') },
-  { label: '答疑提醒', icon: '💬', handler: () => router.push('/app/student/camp/CAMP-202608-00001') },
-  { label: '邀请码', icon: '🔗', handler: () => router.push('/app/lecturer/invite-codes') },
-  { label: '学员数据', icon: '📊', handler: () => router.push('/app/lecturer/students') },
+  isLecturer
+    ? { label: '立即开播', icon: '📺', handler: () => router.push('/app/student/live/LIVE-202608-00002') }
+    : { label: '助播', icon: '🎧', handler: () => router.push(P('/live')) },
+  { label: '答疑区', icon: '💬', handler: () => router.push('/app/student/camp-qa/CAMP-202608-00001') },
+  { label: '邀请码', icon: '🔗', handler: () => router.push(P('/invite-codes')) },
+  { label: '学员数据', icon: '📊', handler: () => router.push(P('/students')) },
 ];
 const myCamps = computed(() => campStore.campLecturers.filter(l => l.lecturer_id === lecturerId && l.is_active).map(l => ({ ...l, ...campStore.camps.find(c => c.id === l.camp_id) })));
 const myCourses = computed(() => courseStore.courses.filter(c => c.lecturer_id === lecturerId));
-const myBills = computed(() => commissionStore.commissionBills.filter(b => b.lecturer_id === lecturerId));
-const pendingAmount = computed(() => (myBills.value.filter(b => b.status === 'pending_settlement').reduce((s, b) => s + b.lecturer_amount, 0) / 100).toFixed(2));
-const settledAmount = computed(() => (myBills.value.filter(b => b.status === 'settled' || b.status === 'withdrawn').reduce((s, b) => s + b.lecturer_amount, 0) / 100).toFixed(2));
-const totalAmount = computed(() => (myBills.value.filter(b => b.status !== 'cancelled').reduce((s, b) => s + b.lecturer_amount, 0) / 100).toFixed(2));
+const activeCampId = ref(myCamps.value[0]?.id || '');
 const myCampIds = computed(() => campStore.campLecturers.filter(l => l.lecturer_id === lecturerId && l.is_active).map(l => l.camp_id));
 const myCodes = computed(() => campStore.inviteCodes.filter(c => c.assistant_id === lecturerId));
 function copyCode(code: string) { MessagePlugin.success(`已复制：${code}`); }
