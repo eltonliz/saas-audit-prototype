@@ -280,9 +280,11 @@ import type { CourseSchedule } from '../../../contracts/schemas/camp-schemas';
 const route = useRoute();
 const campStore = useCampStore();
 const courseStore = useCourseStore();
-// 从页面导航直入时无 campId 参数：优先落到「未锁定」的营期（可编辑演示排课），避免空页面与只读态
+// 从页面导航直入时无 campId 参数：优先落到「未锁定」的直播草稿营期（可编辑演示排课），避免空页面与只读态
+const editable = (c: any) => !['published', 'enrolling', 'in_progress', 'ended'].includes(c.status);
 const campId = ref<string>((route.query.campId as string)
-  || campStore.camps.find((c: any) => !['published', 'enrolling', 'in_progress', 'ended'].includes(c.status))?.id
+  || campStore.camps.find((c: any) => c.mode === 'live' && editable(c))?.id
+  || campStore.camps.find((c: any) => editable(c))?.id
   || campStore.camps[0]?.id
   || '');
 
