@@ -11,14 +11,6 @@
           <div class="entry-icon">🎓</div>
           <div class="entry-name">学员端</div>
         </button>
-        <button class="role-entry lecturer" @click="enterRole('lecturer')">
-          <div class="entry-icon">👨‍🏫</div>
-          <div class="entry-name">讲师端</div>
-        </button>
-        <button class="role-entry assistant" @click="enterRole('assistant')">
-          <div class="entry-icon">🛠️</div>
-          <div class="entry-name">助教端</div>
-        </button>
         <router-link to="/tenant/course/courses" class="role-entry pc">
           <div class="entry-icon">📊</div>
           <div class="entry-name">PC 后台</div>
@@ -56,7 +48,5 @@ function enterRole(role: 'student' | 'lecturer' | 'assistant') {
 .role-entry .entry-icon { font-size: 36px; }
 .role-entry .entry-name { font-size: 16px; font-weight: 700; color: #303133; }
 .role-entry.student { border-top: 3px solid #12B76A; }
-.role-entry.lecturer { border-top: 3px solid #722ED1; }
-.role-entry.assistant { border-top: 3px solid #1890FF; }
 .role-entry.pc { border-top: 3px solid #F79009; }
 </style>

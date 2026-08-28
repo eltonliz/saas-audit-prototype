@@ -131,41 +131,6 @@ const routes: RouteRecordRaw[] = [
     ],
   },
 
-  // ─── APP-课程与营期域 · 讲师端（/app/lecturer/**）───
-  {
-    path: '/app/lecturer',
-    component: () => import('../layouts/LecturerShell.vue'),
-    children: [
-      { path: '', redirect: '/app/lecturer/workbench' },
-      { path: 'workbench', name: 'AppLecturerWorkbench', component: () => import('../pages/course/app/LecturerWorkbenchPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-012'], role: 'lecturer' } },
-      { path: 'courses', name: 'AppLecturerCourses', component: () => import('../pages/course/app/LecturerCoursesPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-012'], role: 'lecturer' } },
-      { path: 'camps', name: 'AppLecturerCamps', component: () => import('../pages/course/app/RoleCampsPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-012'], role: 'lecturer' } },
-      { path: 'dashboard', name: 'AppLecturerDashboard', component: () => import('../pages/course/app/TeachingDashboardPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-012'], role: 'lecturer' } },
-      { path: 'students', name: 'AppLecturerStudents', component: () => import('../pages/course/app/RoleStudentsPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-012'], role: 'lecturer' } },
-      { path: 'invite-codes', name: 'AppLecturerInviteCodes', component: () => import('../pages/course/app/InviteCodesPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-012'], role: 'lecturer' } },
-      { path: 'live', name: 'AppLecturerLive', component: () => import('../pages/course/app/LecturerLivePage.vue'), meta: { terminal: 'app', fn: ['FN-APP-012'], role: 'lecturer' } },
-      { path: 'income', name: 'AppLecturerIncome', component: () => import('../pages/course/app/LecturerIncomePage.vue'), meta: { terminal: 'app', fn: ['FN-APP-012'], role: 'lecturer' } },
-      { path: 'mine', name: 'AppLecturerMine', component: () => import('../pages/course/app/LecturerMinePage.vue'), meta: { terminal: 'app', fn: ['FN-APP-012'], role: 'lecturer' } },
-    ],
-  },
-
-  // ─── APP-课程与营期域 · 助教端（/app/assistant/**）───
-  {
-    path: '/app/assistant',
-    component: () => import('../layouts/AssistantShell.vue'),
-    children: [
-      { path: '', redirect: '/app/assistant/workbench' },
-      { path: 'workbench', name: 'AppAssistantWorkbench', component: () => import('../pages/course/app/LecturerWorkbenchPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-008'], role: 'assistant' } },
-      { path: 'dashboard', name: 'AppAssistantDashboard', component: () => import('../pages/course/app/TeachingDashboardPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-008'], role: 'assistant' } },
-      { path: 'students', name: 'AppAssistantStudents', component: () => import('../pages/course/app/RoleStudentsPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-008'], role: 'assistant' } },
-      { path: 'camps', name: 'AppAssistantCamps', component: () => import('../pages/course/app/RoleCampsPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-008'], role: 'assistant' } },
-      { path: 'invite-codes', name: 'AppAssistantInviteCodes', component: () => import('../pages/course/app/InviteCodesPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-008'], role: 'assistant' } },
-      { path: 'recruit', name: 'AppAssistantRecruit', component: () => import('../pages/course/app/AssistantRecruitPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-008'], role: 'assistant' } },
-      { path: 'qa', name: 'AppAssistantQA', component: () => import('../pages/course/app/AssistantQaPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-008'], role: 'assistant' } },
-      { path: 'live', name: 'AppAssistantLive', component: () => import('../pages/course/app/AssistantLivePage.vue'), meta: { terminal: 'app', fn: ['FN-APP-008'], role: 'assistant' } },
-      { path: 'mine', name: 'AppAssistantMine', component: () => import('../pages/course/app/AssistantMinePage.vue'), meta: { terminal: 'app', fn: ['FN-APP-008'], role: 'assistant' } },
-    ],
-  },
 
   // ─── 旧路由兼容重定向（/app/course/** → 门户）───
   { path: '/app/course', redirect: '/' },
@@ -185,7 +150,6 @@ const routes: RouteRecordRaw[] = [
       { path: 'camp-students', name: 'CampStudentManage', component: () => import('../pages/course/tenant/CampStudentManagePage.vue'), meta: { terminal: 'pc-tenant', fn: ['FN-PC-007'] } },
       { path: 'orders', redirect: '/tenant/orders?businessType=knowledge' },
       { path: 'aftersale', name: 'CampAftersale', component: () => import('../pages/course/tenant/CampAftersalePage.vue'), meta: { terminal: 'pc-tenant' } },
-      { path: 'commission', redirect: '/tenant/course/share-records' },
       { path: 'withdraw', name: 'WithdrawReview', component: () => import('../pages/course/tenant/WithdrawReviewPage.vue'), meta: { terminal: 'pc-tenant' } },
       { path: 'reviews', name: 'CourseReviewManage', component: () => import('../pages/course/tenant/CourseReviewManagePage.vue'), meta: { terminal: 'pc-tenant', fn: ['FN-PC-014'] } },
       { path: 'contracts', name: 'ContractManage', component: () => import('../pages/course/tenant/ContractManagePage.vue'), meta: { terminal: 'pc-tenant' } },
@@ -272,14 +236,10 @@ const routes: RouteRecordRaw[] = [
 const router = createRouter({ history: createWebHashHistory(), routes });
 
 // APP 课程域三角色路由级权限守卫
-// - 讲师页面（/app/lecturer/**）仅讲师可访问
-// - 助教页面（/app/assistant/**）仅助教可访问
 // - 学员主属页面（/app/student/** 非 shared）仅学员可访问
 // - 共享页面（meta.shared）所有角色可访问（直播间/营期/课时/合同/退款/评价等）
 const ROLE_HOME: Record<string, string> = {
   student: '/app/student/home',
-  lecturer: '/app/lecturer/workbench',
-  assistant: '/app/assistant/workbench',
 };
 router.beforeEach((to) => {
   // 三屏联动查看工具：embed=1 时放行所有角色页面（iframe 嵌入场景，避免角色守卫重定向）
@@ -288,9 +248,7 @@ router.beforeEach((to) => {
   // 共享页面：所有角色放行
   if (to.meta?.shared) return true;
   // 讲师页面：仅讲师
-  if (to.path.startsWith('/app/lecturer') && role !== 'lecturer') return ROLE_HOME[role] || '/app/student/home';
   // 助教页面：仅助教
-  if (to.path.startsWith('/app/assistant') && role !== 'assistant') return ROLE_HOME[role] || '/app/student/home';
   // 学员页面（非共享）：仅学员
   if (to.path.startsWith('/app/student') && role !== 'student') return ROLE_HOME[role] || '/app/student/home';
   return true;

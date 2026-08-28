@@ -151,6 +151,10 @@ export const useCampStore = defineStore('camp', () => {
   };
 
   // 报名 D12
+
+  // 动态获取钱包 store（避免循环依赖）
+  function await_import_wallet() { return import('./wallet-store'); }
+
   function createEnrollment(input: CreateEnrollmentInput): CampEnrollment {
     const exists = enrollments.value.find(e => e.camp_id === input.camp_id && e.student_id === input.student_id && ['pending','approved','enrolled'].includes(e.status));
     if (exists) throw new Error('已报名，不可重复');
@@ -165,20 +169,20 @@ export const useCampStore = defineStore('camp', () => {
       if (code.max_usage > 0 && code.used_count >= code.max_usage) throw new Error('邀请码使用次数已用尽');
       code.used_count++; code.updated_at = now();
     }
-    const enr = { ...input, id: genId('ENR'), enrollment_no: genId('ENR'), camp_title: camp?.title ?? '', status: 'pending', camp_order_id: null, enrolled_at: now(), joined_at: null, created_at: now(), updated_at: now() } as CampEnrollment;
-    enrollments.value.push(enr); if (camp) { camp.enrolled_count++; camp.updated_at = now(); }
-    // 方案A：营期级报名审核开关——require_review=true 走审核流；false 建档即生效（直接生成订单：付费待支付/免费零元支付入营）
-    if (camp && camp.require_review !== true) {
-      enr.status = 'approved'; enr.reviewer_id = 'system'; enr.reviewed_at = now();
-      camp.approved_count = (camp.approved_count ?? 0) + 1;
-      import('./camp-payment-store').then(({ useCampPaymentStore }) => {
-        const payStore = useCampPaymentStore();
-        if (!payStore.enrollmentOrders.find(o => o.enrollment_id === enr.id)) {
-          const order = payStore.createEnrollmentOrder({ enrollment_id: enr.id, camp_id: enr.camp_id, camp_title: camp.title, student_id: enr.student_id, student_name: enr.student_name, student_phone: enr.student_phone ?? '' });
-          if (camp && !camp.is_paid && order) { payStore.onPaySuccess(order.id, 'FREE-AUTO'); }
-        }
-      }).catch(() => {});
-    }
+    // 2026-08-28 大改（全免费模式）：报名即加入——无审核、无支付；同步生成 0 元虚拟订单（类型=营期订单）并发放积分
+    const enr = { ...input, id: genId('ENR'), enrollment_no: genId('ENR'), camp_title: camp?.title ?? '', status: 'enrolled', camp_order_id: null, enrolled_at: now(), joined_at: now(), created_at: now(), updated_at: now() } as CampEnrollment;
+    enrollments.value.push(enr);
+    if (camp) { camp.enrolled_count++; camp.approved_count = (camp.approved_count ?? 0) + 1; camp.joined_count = (camp.joined_count ?? 0) + 1; camp.updated_at = now(); }
+    // 生成 0 元虚拟订单（订单管理可查，类型=营期订单）
+    import('./camp-payment-store').then(({ useCampPaymentStore }) => {
+      const payStore = useCampPaymentStore();
+      if (!payStore.enrollmentOrders.find(o => o.enrollment_id === enr.id)) {
+        const order = payStore.createEnrollmentOrder({ enrollment_id: enr.id, camp_id: enr.camp_id, camp_title: camp?.title ?? '', student_id: enr.student_id, student_name: enr.student_name, student_phone: enr.student_phone ?? '' });
+        if (order) { order.status = 'paid'; order.paid_at = now(); order.updated_at = now(); }
+      }
+    }).catch(() => {});
+    // 报名成功发放积分（+10·SaaS 积分规则）
+    try { const { useWalletStore } = await_import_wallet(); const w = useWalletStore(); w.awardStudentPoints(enr.student_id, 10, '报名成功'); } catch { /* wallet 未就绪则跳过 */ }
     return enr;
   }
   async function approveEnrollment(id: string, r: string): Promise<boolean> { const e = enrollments.value.find(e => e.id === id); if (!e || !validateEnrollmentTransition(e.status, 'approved')) return false; e.status = 'approved'; e.reviewer_id = r; e.reviewed_at = now(); e.updated_at = now(); const c = camps.value.find(c => c.id === e.camp_id); if (c) { c.approved_count++; c.updated_at = now(); }

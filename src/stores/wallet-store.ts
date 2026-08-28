@@ -23,6 +23,21 @@ export const useWalletStore = defineStore('wallet', () => {
   const wallets = ref<Wallet[]>([...SEED_WALLETS]);
   const walletTransactions = ref<WalletTransaction[]>([...SEED_WALLET_TRANSACTIONS]);
 
+  // ── 学员积分与成长值（2026-08-28 大改：全免费模式，报名/学习按 SaaS 规则发放）──
+  const studentPoints = ref<Record<string, { points: number; growth: number; records: Array<{ id: string; points: number; growth: number; reason: string; created_at: number }> }>>({});
+
+  /** 发放积分与成长值（报名/完课/答题等触发） */
+  function awardStudentPoints(studentId: string, points: number, reason: string, growth = points): void {
+    const cur = studentPoints.value[studentId] || { points: 0, growth: 0, records: [] };
+    cur.points += points; cur.growth += growth;
+    cur.records.unshift({ id: genId('PT'), points, growth, reason, created_at: now() });
+    studentPoints.value[studentId] = cur;
+  }
+  /** 查询学员积分（含明细） */
+  function loadStudentPoints(studentId: string) {
+    return studentPoints.value[studentId] || { points: 0, growth: 0, records: [] };
+  }
+
   // ── 红包规则 Action ──
 
   function createRedPacketRule(input: CreateRedPacketRuleInput): RedPacketRule {
@@ -31,6 +46,7 @@ export const useWalletStore = defineStore('wallet', () => {
     return rule;
   }
 
+  function awardStudentPointsInner() {}
   function loadRedPacketRules(ownerId?: string): RedPacketRule[] {
     return ownerId ? redPacketRules.value.filter(r => r.owner_id === ownerId) : redPacketRules.value;
   }
@@ -200,7 +216,7 @@ export const useWalletStore = defineStore('wallet', () => {
   return {
     redPacketRules, redPacketRecords, wallets, walletTransactions,
     createRedPacketRule, loadRedPacketRules, updateRedPacketRule,
-    grantRedPacket, retryRedPacket, loadRedPacketRecords,
+    awardStudentPoints, loadStudentPoints, grantRedPacket, retryRedPacket, loadRedPacketRecords,
     rechargeWallet, loadWalletByOwner, loadWalletTransactions,
     withdrawStudent, approveWithdraw, rejectWithdraw,
   };

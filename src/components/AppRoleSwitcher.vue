@@ -1,5 +1,5 @@
 <template>
-  <!-- APP 端角色切换浮窗：学员 / 讲师 / 助教 三档，写入 app-role 后跳对应角色首页 -->
+  <!-- APP 端角色切换浮窗：学员 / 讲师 / 助教 仅学员端（讲师/助教角色已移除·2026-08-28） -->
   <div class="app-role-switcher">
     <button
       v-for="r in roles"
@@ -22,14 +22,10 @@ const router = useRouter();
 
 const roles = [
   { key: 'student', icon: '🎓', label: '学员', home: '/app/student/home' },
-  { key: 'lecturer', icon: '👨‍🏫', label: '讲师', home: '/app/lecturer/workbench' },
-  { key: 'assistant', icon: '🧑‍💼', label: '助教', home: '/app/assistant/workbench' },
 ];
 
 const current = computed(() => {
   const p = route.path;
-  if (p.startsWith('/app/lecturer')) return 'lecturer';
-  if (p.startsWith('/app/assistant')) return 'assistant';
   return 'student';
 });
 

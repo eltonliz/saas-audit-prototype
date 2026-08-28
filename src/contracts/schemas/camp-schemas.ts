@@ -134,30 +134,23 @@ export const CampSchema = z.object({
   mode: CampModeEnum,
   /** 是否允许售货（D4·保留字段本期不启用·默认false） */
   allow_products: z.boolean().default(false),
-  /** 方案A：营期级报名审核开关（默认关闭=报名后直接生成订单支付入营；开启=走报名→审核→支付流程） */
-  require_review: z.boolean().default(false),
+  /** 2026-08-28 大改：全免费模式——require_review/commission/is_paid 相关字段移除（详见 PRD v2.0） */
 
   /** 营期日期 */
   start_date: z.string(),   // YYYY-MM-DD
   end_date: z.string(),
   total_days: z.number().int().min(1),
 
-  /** 价格（分·D9统一为分） */
+  /** 价格（分·全免费模式下恒为0，字段保留兼容订单链路） */
   price: z.number().int().min(0).default(0),
   is_paid: z.boolean().default(false),
 
-  /** 分成配置（D10·营期配置·默认0.6/0.2/0.2） */
-  commission_enabled: z.boolean().default(false),
-  lecturer_rate: z.number().min(0).max(1).default(0.6),
-  assistant_rate: z.number().min(0).max(1).default(0.2),
-  platform_rate: z.number().min(0).max(1).default(0.2),
+  /** 归属门店（讲师/助教移除后，营期归属门店；会员归属与直播场次随之落到门店） */
+  store_id: z.string().default(''),
+  store_name: z.string().default(''),
 
   /** 证书打卡阈值（D8·默认0.8） */
   certificate_checkin_threshold: z.number().min(0).max(1).default(0.8),
-
-  /** 主讲师（D16·快照锁定） */
-  main_lecturer_id: z.string(),
-  main_lecturer_name: z.string(),
 
   /** 报名配置 */
   capacity: z.number().int().min(0).default(0),  // 0=不限
@@ -497,15 +490,10 @@ export const CreateCampInputSchema = CampSchema.pick({
   title: true, description: true, cover_url: true,
   series_id: true, series_name: true,
   mode: true, allow_products: true,
-  require_review: true,
   start_date: true, end_date: true, total_days: true,
-  price: true, is_paid: true,
-  commission_enabled: true,
-  lecturer_rate: true, assistant_rate: true, platform_rate: true,
+  store_id: true, store_name: true,
   certificate_checkin_threshold: true,
-  main_lecturer_id: true, main_lecturer_name: true,
   capacity: true, enroll_deadline: true,
-  daily_red_packet_mode: true,
 });
 export type CreateCampInput = z.infer<typeof CreateCampInputSchema>;
 

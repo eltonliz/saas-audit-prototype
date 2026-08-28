@@ -82,6 +82,15 @@ export interface PageSpec {
   exceptions?: { scene: string, handle: string }[]
 }
 
+/**
+ * 2026-08-28 v2.0.0 商业模式简化（评审定稿）：
+ * ①全免费：课程/营期不走付费，发布后 C 端即可观看；支付/合同链路下线，0元虚拟订单保留（类型=课程订单/营期订单）
+ * ②报名极简：点报名直接加入营期（无审核无支付）；保留价值=容量占位+招生名单+开营节奏
+ * ③讲师/助教移除：营期归属门店（store_id/store_name），会员归属走店长/店员（门店体系）；教学者端（/app/lecturer、/app/assistant）路由下线
+ * ④分成/提现移除；积分回归（报名/学习按 SaaS 规则发放，不可抵扣）
+ * ⑤范围：答疑/合同/证书/分成/提现本期不做；数据看板保留全量视角；学员管理纳入 SaaS 客户列表
+ * 注：以下 store_id/main_lecturer 等历史字段与 seed 逐步清理中，以本注释为准。
+ */
 export const REPLICA_REQUIREMENTS: Record<string, ReplicaPageRequirement> = {
   // 组织管理
   '/tenant/replica/org': {

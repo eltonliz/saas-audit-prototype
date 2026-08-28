@@ -123,15 +123,6 @@ export const PAGE_REGISTRY: ModuleRegItem[] = [
         ],
       },
       {
-        key: 'share-records', title: '分成记录', route: '/tenant/course/share-records', modals: [] },
-      {
-        key: 'withdraw', title: '分成提现审核', route: '/tenant/course/withdraw',
-        modals: [
-          { key: 'withdraw-review', title: '提现审核（填写凭证号）', chain: ['通过'] },
-          { key: 'withdraw-batch', title: '批量提现', chain: ['批量提现'] },
-        ],
-      },
-      {
         key: 'dashboard', title: '数据看板', route: '/tenant/course/dashboard', modals: [] },
     ],
   },
@@ -164,8 +155,6 @@ export const PAGE_REGISTRY: ModuleRegItem[] = [
         key: 'replica-audit', title: '审核管理', route: '/tenant/replica/audit', modals: [] },
       {
         key: 'replica-wallet', title: '钱包', route: '/tenant/replica/wallet', modals: [] },
-      {
-        key: 'replica-withdraw', title: '提现审核', route: '/tenant/replica/withdraw', modals: [] },
       {
         key: 'replica-live-recorded', title: '直播录播', route: '/tenant/replica/live-recorded',
         modals: [

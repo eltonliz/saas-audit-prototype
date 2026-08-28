@@ -143,28 +143,7 @@
             <t-radio :value="true">付费</t-radio>
           </t-radio-group>
         </t-form-item>
-        <t-form-item v-if="f.is_paid" label="价格(元)" required-mark><t-input-number v-model="priceYuan" :min="0" style="width:160px" /></t-form-item>
-
-        <t-divider align="left">分成配置</t-divider>
-        <t-form-item label="启用分成">
-          <t-switch v-model="f.commission_enabled" :disabled="!f.is_paid" />
-          <span v-if="!f.is_paid" class="form-tip-inline">仅付费营期可启用</span>
-        </t-form-item>
-        <template v-if="f.is_paid && f.commission_enabled">
-          <t-form-item label="讲师比例(%)">
-            <t-input-number v-model="lecturerRate" :min="1" :max="99" style="width:160px" @change="calcPlatformRate" />
-            <span class="form-tip-inline">讲师分成比例</span>
-          </t-form-item>
-          <t-form-item label="助教比例(%)">
-            <t-input-number v-model="assistantRate" :min="0" :max="99" style="width:160px" @change="calcPlatformRate" />
-            <span class="form-tip-inline">助教分成比例</span>
-          </t-form-item>
-          <t-form-item label="平台比例(%)">
-            <t-input-number v-model="platformRate" :min="0" :max="99" disabled style="width:160px" />
-            <span class="form-tip-inline">自动计算（100 - 讲师 - 助教）</span>
-          </t-form-item>
-          <div v-if="lecturerRate + assistantRate >= 100" class="form-error">提示：讲师+助教比例之和须&lt;100%，请重新设置</div>
-        </template>
+        <t-form-item v-if="false" label="价格(元)" required-mark><t-input-number v-model="priceYuan" :min="0" style="width:160px" /></t-form-item>
 
         <t-divider align="left">高级配置</t-divider>
         <t-form-item label="报名人数上限">
@@ -174,13 +153,9 @@
         <t-form-item label="报名截止时间">
           <t-date-picker v-model="enrollDeadline" enable-time-picker placeholder="选择报名截止时间" style="width:100%" />
         </t-form-item>
-        <t-form-item label="报名需审核" help="关闭：学员报名后直接生成订单支付入营（推荐）；开启：报名进入审核队列，通过后生成订单">
-          <t-switch v-model="f.require_review" size="large" />
-          <span class="form-tip-inline">{{ f.require_review ? '需审核（定向/免费营期适用）' : '免审核·报名即支付' }}</span>
-        </t-form-item>
-        <t-form-item label="主讲" required-mark>
-          <t-select v-model="f.main_lecturer_id" placeholder="请选择主讲" style="width:100%">
-            <t-option v-for="l in lecturers" :key="l.id" :label="l.name" :value="l.id" />
+        <t-form-item label="归属门店" required-mark>
+          <t-select v-model="f.store_id" placeholder="请选择归属门店" style="width:100%">
+            <t-option v-for="st in storeOptions" :key="st.id" :label="st.name" :value="st.id" />
           </t-select>
         </t-form-item>
         <t-form-item label="营期简介"><t-textarea v-model="f.description" placeholder="营期简介（选填）" :autosize="{ minRows: 2, maxRows: 4 }" /></t-form-item>
@@ -343,12 +318,15 @@
 import { ref, computed, watch } from 'vue';
 import { DialogPlugin, MessagePlugin } from 'tdesign-vue-next';
 import { useCampStore } from '../../../stores/camp-store';
+import { useHomeStore } from '../../../stores/home-store';
 import { notifyModalOpen } from '../../../utils/modal-spec-bridge';
 import { useLecturerStore } from '../../../stores/lecturer-store';
 import { useCourseStore } from '../../../stores/course-store';
 import CampStudentDrawerPage from './CampStudentDrawerPage.vue';
 
 const store = useCampStore();
+const homeStore = useHomeStore();
+const storeOptions = homeStore.loadStores();
 const lecturerStore = useLecturerStore();
 const courseStore = useCourseStore();
 const lecturers = computed(() => lecturerStore.loadLecturerList().filter(l => l.review_status === 'approved' && l.can_be_main));
@@ -395,7 +373,7 @@ const columns = [
   { colKey: 'camp_no', title: '营期编号', width: 160, ellipsis: true },
   { colKey: 'title', title: '营期名称', minWidth: 160, ellipsis: true },
   { colKey: 'mode', title: '授课模式', width: 100 },
-  { colKey: 'main_lecturer_name', title: '主讲', width: 80 },
+  { colKey: 'store_name', title: '归属门店', width: 110 },
   { colKey: 'time', title: '营期时间', width: 180 },
   { colKey: 'price', title: '价格', width: 80 },
   { colKey: 'enroll', title: '报名情况', width: 180 },
@@ -404,7 +382,7 @@ const columns = [
   { colKey: 'op', title: '操作', width: 360, fixed: 'right' },
 ];
 
-const f = ref<{ title: string; description: string; mode: 'live' | 'recorded'; is_paid: boolean; commission_enabled: boolean; main_lecturer_id: string; capacity: number; require_review: boolean }>({ title: '', description: '', mode: 'live', is_paid: false, commission_enabled: false, main_lecturer_id: '', capacity: 0, require_review: false });
+const f = ref<{ title: string; description: string; mode: 'live' | 'recorded'; capacity: number; store_id: string }>({ title: '', description: '', mode: 'live', capacity: 0, store_id: '' });
 
 const lecturerRate = ref(60);
 const assistantRate = ref(20);
@@ -412,24 +390,19 @@ const platformRate = ref(20);
 function calcPlatformRate() { platformRate.value = Math.max(0, 100 - lecturerRate.value - assistantRate.value); }
 // 付费模式切换联动：切到免费时关闭分成
 function onPaidChange() {
-  if (!f.value.is_paid) { f.value.commission_enabled = false; }
 }
 
 function openCreate() {
   notifyModalOpen('camp-create');
   editingCamp.value = null;
-  f.value = { title: '', description: '', mode: 'live', is_paid: false, commission_enabled: false, main_lecturer_id: '', capacity: 0, require_review: false };
+  f.value = { title: '', description: '', mode: 'live', capacity: 0, store_id: (storeOptions[0] || { id: 'STORE-001' }).id };
   priceYuan.value = 0; lecturerRate.value = 60; assistantRate.value = 20; platformRate.value = 20; dateRange.value = []; enrollDeadline.value = null;
   showCreate.value = true;
 }
 
 function doSave() {
-  if (!f.value.title || !(dateRange.value && dateRange.value.length === 2) || !f.value.main_lecturer_id) { MessagePlugin.warning('请填写完整信息'); return; }
+  if (!f.value.title || !(dateRange.value && dateRange.value.length === 2) || !f.value.store_id) { MessagePlugin.warning('请填写完整信息'); return; }
   if (daysBetween(dateRange.value[0], dateRange.value[1]) > 90) { MessagePlugin.warning('营期最长90天（行业约束）'); return; }
-  if (f.value.is_paid && f.value.commission_enabled) {
-    if (lecturerRate.value + assistantRate.value >= 100) { MessagePlugin.warning('讲师+助教比例之和须<100%，请重新设置'); return; }
-  }
-  const lec = lecturers.value.find(l => l.id === f.value.main_lecturer_id);
   const data = {
     title: f.value.title, description: f.value.description ?? '', cover_url: '',
     series_id: 'SERIES-001', series_name: '默认系列',
@@ -437,14 +410,10 @@ function doSave() {
     start_date: dateRange.value[0].toISOString().slice(0, 10),
     end_date: dateRange.value[1].toISOString().slice(0, 10),
     total_days: Math.ceil((dateRange.value[1].getTime() - dateRange.value[0].getTime()) / 86400000) + 1,
-    price: f.value.is_paid ? priceYuan.value * 100 : 0, is_paid: f.value.is_paid,
-    commission_enabled: f.value.is_paid && f.value.commission_enabled,
-    lecturer_rate: (f.value.is_paid && f.value.commission_enabled) ? lecturerRate.value / 100 : 0.6,
-    assistant_rate: (f.value.is_paid && f.value.commission_enabled) ? assistantRate.value / 100 : 0.2,
-    platform_rate: (f.value.is_paid && f.value.commission_enabled) ? platformRate.value / 100 : 0.2,
-    main_lecturer_id: f.value.main_lecturer_id, main_lecturer_name: lec?.name ?? '',
+    price: 0, is_paid: false,
+    store_id: f.value.store_id,
+    store_name: (storeOptions.find(st => st.id === f.value.store_id) || { name: '' }).name,
     capacity: f.value.capacity,
-      require_review: f.value.require_review,
     enroll_deadline: enrollDeadline.value ? Math.floor(enrollDeadline.value.getTime() / 1000) : Math.floor(Date.now() / 1000) + 86400 * 7,
     daily_red_packet_mode: 'by_course',
   } as any;
@@ -484,7 +453,7 @@ function delCamp(row: any) {
 function openEdit(row: any) {
   notifyModalOpen('camp-edit');
   editingCamp.value = row;
-  f.value = { title: row.title, description: row.description ?? '', mode: row.mode, is_paid: row.is_paid, commission_enabled: row.commission_enabled, main_lecturer_id: row.main_lecturer_id, capacity: row.capacity || 0, require_review: row.require_review === true };
+  f.value = { title: row.title, description: row.description ?? '', mode: row.mode, capacity: row.capacity || 0, store_id: row.store_id || (storeOptions[0] || { id: 'STORE-001' }).id };
   priceYuan.value = row.is_paid ? row.price / 100 : 0;
   lecturerRate.value = row.commission_enabled ? Math.round(row.lecturer_rate * 100) : 60;
   assistantRate.value = row.commission_enabled ? Math.round((row.assistant_rate ?? 0.2) * 100) : 20;
