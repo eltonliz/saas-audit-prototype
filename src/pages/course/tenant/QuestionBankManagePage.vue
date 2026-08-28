@@ -128,8 +128,8 @@ const filtered = computed(() => enrichedQuestions.value.filter(q =>
 ));
 
 function onSelChange(_keys: any[], ctx: any) { selected.value = ctx?.selectedRowData ?? []; }
-function doFilter() { page.value = 1; }
-function reset() { dateRange.value = []; search.value = ''; categoryFilter.value = ''; typeFilter.value = ''; page.value = 1; }
+function doFilter() { page.value = 1; MessagePlugin.success('已按当前条件筛选'); }
+function reset() { dateRange.value = []; search.value = ''; categoryFilter.value = ''; typeFilter.value = ''; page.value = 1; MessagePlugin.success('已重置筛选条件'); }
 function openCreate() { editing.value = null; form.value = defaultForm(); showCreate.value = true; notifyModalOpen('question-create'); }
 function openEdit(row: any) {
   editing.value = row;

@@ -478,8 +478,7 @@ function resetDailyRange() {
   const days: string[] = [];
   for (let i = 6; i >= 0; i--) {
     const d = new Date(Date.now() - i * 86400000);
-    days.push(d.toISOString().slice(0, 10));
-  }
+    days.push(d.toISOString().slice(0, 10)); MessagePlugin.success('已重置为近7天'); }
   dailyRange.value = [days[0], days[6]] as any;
 }
 resetDailyRange();

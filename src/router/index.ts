@@ -140,6 +140,7 @@ const routes: RouteRecordRaw[] = [
       { path: 'workbench', name: 'AppLecturerWorkbench', component: () => import('../pages/course/app/LecturerWorkbenchPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-012'], role: 'lecturer' } },
       { path: 'courses', name: 'AppLecturerCourses', component: () => import('../pages/course/app/LecturerCoursesPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-012'], role: 'lecturer' } },
       { path: 'camps', name: 'AppLecturerCamps', component: () => import('../pages/course/app/RoleCampsPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-012'], role: 'lecturer' } },
+      { path: 'dashboard', name: 'AppLecturerDashboard', component: () => import('../pages/course/app/TeachingDashboardPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-012'], role: 'lecturer' } },
       { path: 'students', name: 'AppLecturerStudents', component: () => import('../pages/course/app/RoleStudentsPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-012'], role: 'lecturer' } },
       { path: 'invite-codes', name: 'AppLecturerInviteCodes', component: () => import('../pages/course/app/InviteCodesPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-012'], role: 'lecturer' } },
       { path: 'live', name: 'AppLecturerLive', component: () => import('../pages/course/app/LecturerLivePage.vue'), meta: { terminal: 'app', fn: ['FN-APP-012'], role: 'lecturer' } },
@@ -155,6 +156,7 @@ const routes: RouteRecordRaw[] = [
     children: [
       { path: '', redirect: '/app/assistant/workbench' },
       { path: 'workbench', name: 'AppAssistantWorkbench', component: () => import('../pages/course/app/LecturerWorkbenchPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-008'], role: 'assistant' } },
+      { path: 'dashboard', name: 'AppAssistantDashboard', component: () => import('../pages/course/app/TeachingDashboardPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-008'], role: 'assistant' } },
       { path: 'students', name: 'AppAssistantStudents', component: () => import('../pages/course/app/RoleStudentsPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-008'], role: 'assistant' } },
       { path: 'camps', name: 'AppAssistantCamps', component: () => import('../pages/course/app/RoleCampsPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-008'], role: 'assistant' } },
       { path: 'invite-codes', name: 'AppAssistantInviteCodes', component: () => import('../pages/course/app/InviteCodesPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-008'], role: 'assistant' } },

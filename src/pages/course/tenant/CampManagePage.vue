@@ -388,7 +388,7 @@ const filtered = computed(() =>
   store.camps.filter(c => (!search.value || c.title.includes(search.value)) && (!modeFilter.value || c.mode === modeFilter.value) && (!statusFilter.value || c.status === statusFilter.value))
 );
 
-function resetFilter() { search.value = ''; modeFilter.value = ''; statusFilter.value = ''; }
+function resetFilter() { search.value = ''; modeFilter.value = ''; statusFilter.value = ''; MessagePlugin.success('已重置筛选条件'); }
 
 // 表格列定义
 const columns = [

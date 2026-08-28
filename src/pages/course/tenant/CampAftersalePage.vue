@@ -49,7 +49,7 @@
           </t-select>
         </div>
         <div class="filter-actions">
-          <t-button @click="search='';methodFilter='';campStatusFilter=''"><template #icon><t-icon name="refresh" /></template>重置</t-button>
+          <t-button @click="search='';methodFilter='';campStatusFilter='';MessagePlugin.success('已重置筛选条件')"><template #icon><t-icon name="refresh" /></template>重置</t-button>
         </div>
       </div>
     </div>

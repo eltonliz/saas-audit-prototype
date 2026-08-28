@@ -125,6 +125,7 @@ const quickItems = [
   { label: '答疑区', icon: '💬', handler: () => router.push('/app/student/camp-qa/CAMP-202608-00001') },
   { label: '邀请码', icon: '🔗', handler: () => router.push(P('/invite-codes')) },
   { label: '学员数据', icon: '📊', handler: () => router.push(P('/students')) },
+  { label: '数据看板', icon: '📈', handler: () => router.push(P('/dashboard')) },
 ];
 const myCamps = computed(() => campStore.campLecturers.filter(l => l.lecturer_id === lecturerId && l.is_active).map(l => ({ ...l, ...campStore.camps.find(c => c.id === l.camp_id) })));
 const myCourses = computed(() => courseStore.courses.filter(c => c.lecturer_id === lecturerId));

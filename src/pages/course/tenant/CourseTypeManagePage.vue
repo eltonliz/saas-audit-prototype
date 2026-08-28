@@ -113,8 +113,8 @@ function relatedQuestions(cid: string) {
 }
 function relatedCourses(cid: string) { return store.courses.filter(c => c.category_id === cid).length; }
 function onSelChange(_keys: any[], ctx: any) { selected.value = ctx?.selectedRowData ?? []; }
-function doFilter() { page.value = 1; }
-function reset() { dateRange.value = []; search.value = ''; page.value = 1; }
+function doFilter() { page.value = 1; MessagePlugin.success('已按当前条件筛选'); }
+function reset() { dateRange.value = []; search.value = ''; page.value = 1; MessagePlugin.success('已重置筛选条件'); }
 function openEdit(row: any) { editing.value = row; form.value = { name: row.name, cover_url: row.cover_url || '', description: row.description || '', status: row.status }; showCreate.value = true; notifyModalOpen('course-type-edit'); }
 function doSave() {
   if (!form.value.name) { MessagePlugin.warning('请填写分类名称'); return; }
