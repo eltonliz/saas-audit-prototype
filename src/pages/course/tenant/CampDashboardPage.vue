@@ -21,15 +21,11 @@
         <div class="metric-value">{{ totalCamps }}</div>
         <div class="metric-foot"><t-icon name="layers" /> 直播 {{ liveCount }} · 录播 {{ recordedCount }}</div>
       </div>
-      <div class="metric-card metric-brand">
-        <div class="metric-label">报名总数</div>
-        <div class="metric-value">{{ totalEnrolled }}</div>
-        <div class="metric-foot"><t-icon name="user-add" /> 已通过 {{ totalApproved }} · 已加入 {{ totalJoined }}</div>
-      </div>
+      <!-- V2·0829 用户裁决：报名总数与学员总数卡片冲突，仅保留学员总数 -->
       <div class="metric-card metric-success">
-        <div class="metric-label">累计收入</div>
-        <div class="metric-value">¥{{ totalRevenue }}</div>
-        <div class="metric-foot"><t-icon name="money" /> 待结算 {{ pendingSettlement }} 单</div>
+        <div class="metric-label">学员总数</div>
+        <div class="metric-value">{{ totalJoined }}</div>
+        <div class="metric-foot"><t-icon name="user" /> 已报名学员</div>
       </div>
       <div class="metric-card metric-warning">
         <div class="metric-label">进行中营期</div>
@@ -43,51 +39,7 @@
       </div>
     </div>
 
-    <!-- 图表区 -->
-    <div class="chart-row">
-      <!-- 报名漏斗 -->
-      <t-card :bordered="false" class="panel">
-        <template #header><span class="panel-title">报名转化漏斗</span></template>
-        <div class="funnel">
-          <div class="funnel-stage" :style="{ width: '100%' }">
-            <div class="funnel-bar" style="background: #12B76A"><span>报名 {{ totalEnrolled }}</span></div>
-          </div>
-          <div class="funnel-stage" :style="{ width: funnelApprovedPct + '%' }">
-            <div class="funnel-bar" style="background: #1890FF"><span>通过 {{ totalApproved }}</span></div>
-          </div>
-          <div class="funnel-stage" :style="{ width: funnelJoinedPct + '%' }">
-            <div class="funnel-bar" style="background: #F79009"><span>加入 {{ totalJoined }}</span></div>
-          </div>
-        </div>
-        <div class="funnel-note">
-          报名→通过转化率 <b>{{ convApproved }}</b> · 通过→加入转化率 <b>{{ convJoined }}</b>
-        </div>
-      </t-card>
-
-      <!-- 状态分布 -->
-      <t-card :bordered="false" class="panel">
-        <template #header><span class="panel-title">营期状态分布</span></template>
-        <div class="status-list">
-          <div v-for="it in statusChart" :key="it.label" class="status-row">
-            <span class="status-label">{{ it.label }}</span>
-            <div class="status-track"><div class="status-fill" :style="{ width: it.percent + '%', background: it.color }"></div></div>
-            <span class="status-num">{{ it.count }}</span>
-          </div>
-        </div>
-      </t-card>
-
-      <!-- 排课完成率 -->
-      <t-card :bordered="false" class="panel">
-        <template #header><span class="panel-title">排课完成率</span></template>
-        <div v-if="scheduledCamps.length === 0" class="panel-empty">暂无已排课营期</div>
-        <div v-else class="completion-list">
-          <div v-for="c in scheduledCamps" :key="c.id" class="completion-row">
-            <span class="completion-name" :title="c.title">{{ c.title }}</span>
-            <t-progress :percentage="Math.round(avgCompletionRate(c.id) * 100)" :stroke-width="8" theme="line" />
-          </div>
-        </div>
-      </t-card>
-    </div>
+    <!-- V2·0829 用户裁决：报名转化漏斗/营期状态分布/排课完成率图表删除（无实际用途） -->
 
     <!-- 数据报表（整合外部数据报表·平台统计；经销商→主讲，群管→助教，会员=普通用户） -->
     <t-card :bordered="false" class="table-card daily-stat-card">
@@ -95,8 +47,6 @@
         <div class="daily-header">
           <t-radio-group v-model="reportTab" variant="default-filled" size="small">
             <t-radio-button value="daily">每日统计</t-radio-button>
-            <t-radio-button value="lecturer">主讲统计</t-radio-button>
-            <t-radio-button value="assistant">助教统计</t-radio-button>
             <t-radio-button value="member">会员统计</t-radio-button>
             <t-radio-button value="camp">营期统计</t-radio-button>
             <t-radio-button value="course">课程统计</t-radio-button>
@@ -112,7 +62,7 @@
 
       <!-- ═══ Tab1 每日统计：图表 + 明细表 ═══ -->
       <div v-if="reportTab === 'daily'">
-        <div class="chart-grid">
+        <div class="chart-grid two">
           <div class="chart-box">
             <div class="chart-title">
               观看与完播人数趋势
@@ -120,11 +70,11 @@
             </div>
             <svg :viewBox="'0 0 ' + dailyBar.W + ' ' + dailyBar.H" class="chart-svg">
               <line v-for="(gy, gi) in dailyBar.grid" :key="'g' + gi" :x1="dailyBar.padL" :x2="dailyBar.W - 8" :y1="gy" :y2="gy" stroke="#EAECF0" stroke-width="1" />
-              <text v-for="(gy, gi) in dailyBar.grid" :key="'gt' + gi" :x="dailyBar.padL - 6" :y="gy + 3" text-anchor="end" class="axis-num">{{ Math.round(dailyBar.maxV * (1 - gi / (dailyBar.grid.length - 1))) }}</text>
+              <text v-for="(gy, gi) in dailyBar.grid" :key="'gt' + gi" :x="dailyBar.padL - 6" :y="gy + 3" text-anchor="end" class="axis-num">{{ Math.round(dailyBar.maxV * (gi / (dailyBar.grid.length - 1))) }}</text>
               <g v-for="(b, bi) in dailyBar.bars" :key="'b' + bi">
-                <rect :x="b.x1" :y="b.y1" :width="13" :height="Math.max(b.h1, 2)" rx="2" fill="url(#gradView)" class="bar"><title>{{ b.label }} 观看人数：{{ b.viewers }}</title></rect>
-                <rect :x="b.x2" :y="b.y2" :width="13" :height="Math.max(b.h2, 2)" rx="2" fill="url(#gradDone)" class="bar"><title>{{ b.label }} 完播人数：{{ b.completed }}</title></rect>
-                <text :x="b.cx" :y="b.baseY + 14" text-anchor="middle" class="axis-label">{{ b.label }}</text>
+                <rect :x="b.x1" :y="b.y1" :width="22" :height="Math.max(b.h1, 2)" rx="4" fill="url(#gradView)" class="bar"><title>{{ b.label }} 观看人数：{{ b.viewers }}</title></rect>
+                <rect :x="b.x2" :y="b.y2" :width="22" :height="Math.max(b.h2, 2)" rx="4" fill="url(#gradDone)" class="bar"><title>{{ b.label }} 完播人数：{{ b.completed }}</title></rect>
+                <text :x="b.cx" :y="b.baseY + 22" text-anchor="middle" class="axis-label">{{ b.label }}</text>
               </g>
               <defs>
                 <linearGradient id="gradView" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2DD4BF" /><stop offset="1" stop-color="#0D9488" /></linearGradient>
@@ -136,9 +86,9 @@
             <div class="chart-title">完播率趋势</div>
             <svg :viewBox="'0 0 ' + dailyBar.W + ' ' + dailyBar.H" class="chart-svg">
               <line v-for="(gy, gi) in dailyBar.grid" :key="'lg' + gi" :x1="dailyBar.padL" :x2="dailyBar.W - 8" :y1="gy" :y2="gy" stroke="#EAECF0" stroke-width="1" />
-              <text v-for="(gy, gi) in dailyBar.grid" :key="'lgt' + gi" :x="dailyBar.padL - 6" :y="gy + 3" text-anchor="end" class="axis-num">{{ Math.round(dailyBar.maxRate * (1 - gi / (dailyBar.grid.length - 1))) }}%</text>
-              <polyline :points="dailyLine.points" fill="none" stroke="#F79009" stroke-width="2.5" stroke-linejoin="round" />
-              <circle v-for="(p, pi) in dailyLine.dots" :key="'d' + pi" :cx="p.x" :cy="p.y" r="4" fill="#fff" stroke="#F79009" stroke-width="2.5" class="dot"><title>{{ p.label }} 完播率：{{ p.rate }}</title></circle>
+              <text v-for="(gy, gi) in dailyBar.grid" :key="'lgt' + gi" :x="dailyBar.padL - 6" :y="gy + 3" text-anchor="end" class="axis-num">{{ Math.round(dailyBar.maxRate * (gi / (dailyBar.grid.length - 1))) }}%</text>
+              <polyline :points="dailyLine.points" fill="none" stroke="#F79009" stroke-width="3" stroke-linejoin="round" />
+              <circle v-for="(p, pi) in dailyLine.dots" :key="'d' + pi" :cx="p.x" :cy="p.y" r="5" fill="#fff" stroke="#F79009" stroke-width="3" class="dot"><title>{{ p.label }} 完播率：{{ p.rate }}</title></circle>
             </svg>
           </div>
           <div class="chart-box donut-box">
@@ -173,9 +123,6 @@
         :max-height="420"
         hover
       >
-        <template #lecturer_stat="{ row }">
-          <t-button variant="text" size="small" theme="primary" @click="openLecturerStat(row)">主讲统计</t-button>
-        </template>
         <template #serial="{ rowIndex }"><span>{{ rowIndex + 1 }}</span></template>
         <template #rate="{ row }"><span>{{ row.watch_rate }}</span></template>
         <template #quiz_rate="{ row }"><span>{{ row.quiz_rate }}</span></template>
@@ -184,7 +131,6 @@
       <!-- 合计行 -->
       <div class="daily-total-row">
         <span class="dt-label">本表合计</span>
-        <span>新增会员 {{ dailyTotal.new_members }}</span>
         <span>直播课 {{ dailyTotal.live_courses }}</span>
         <span>观看 {{ dailyTotal.viewers }}</span>
         <span>完播 {{ dailyTotal.completed }}</span>
@@ -202,117 +148,56 @@
       </div>
       </div>
 
-      <!-- ═══ Tab2 主讲统计 ═══ -->
-      <div v-else-if="reportTab === 'lecturer'">
-        <div class="chart-grid">
-          <div class="chart-box">
-            <div class="chart-title">各主讲完播人数对比</div>
-            <svg viewBox="0 0 300 170" class="chart-svg">
-              <line x1="34" x2="292" y1="140" y2="140" stroke="#EAECF0" />
-              <g v-for="(l, li) in lecturerStatRows" :key="'lb' + li">
-                <rect :x="70 + li * 120" :y="140 - l.completed * 12" width="46" :height="l.completed * 12" rx="4" fill="url(#gradLb)" class="bar"><title>{{ l.name }} 完播人数：{{ l.completed }}</title></rect>
-                <text :x="93 + li * 120" :y="136 - l.completed * 12" text-anchor="middle" class="axis-num">{{ l.completed }}</text>
-                <text :x="93 + li * 120" :y="156" text-anchor="middle" class="axis-label">{{ l.name }}</text>
-              </g>
-              <defs><linearGradient id="gradLb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2DD4BF" /><stop offset="1" stop-color="#0D9488" /></linearGradient></defs>
-            </svg>
-          </div>
-          <div class="chart-box">
-            <div class="chart-title">各主讲观看人数对比</div>
-            <div class="hbar-list">
-              <div v-for="l in lecturerStatRows" :key="'v' + l.name" class="hbar-row">
-                <span class="hbar-name">{{ l.name }}</span>
-                <div class="hbar-track"><div class="hbar-fill teal" :style="{ width: Math.min(100, l.viewers * 10) + '%' }"></div></div>
-                <span class="hbar-num">{{ l.viewers }}</span>
-              </div>
-            </div>
-          </div>
-          <div class="chart-box">
-            <div class="chart-title">观看人数占比</div>
-            <div class="donut-wrap">
-              <div class="donut" :style="{ background: lecturerDonut }">
-                <div class="donut-hole"><div class="donut-num">{{ lecturerStatRows.length }}</div><div class="donut-sub">主讲</div></div>
-              </div>
-              <div class="donut-legend">
-                <div v-for="l in lecturerStatRows" :key="'dl' + l.name" class="dl-row"><i class="lg" :style="{ background: l.name === '张三' ? '#0D9488' : '#84E1BC' }"></i>{{ l.name }} · {{ l.viewers }} 人</div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <t-table :data="lecturerStatRows" :columns="lecturerStatColumns" bordered size="small" hover row-key="name" :pagination="statPager" />
-      </div>
-
-      <!-- ═══ Tab3 助教统计 ═══ -->
-      <div v-else-if="reportTab === 'assistant'">
-        <div class="chart-grid">
-          <div class="chart-box">
-            <div class="chart-title">各助教学员数对比</div>
-            <svg viewBox="0 0 300 170" class="chart-svg">
-              <line x1="34" x2="292" y1="140" y2="140" stroke="#EAECF0" />
-              <g v-for="(a, ai) in assistantRows" :key="'ab' + ai">
-                <rect :x="70 + ai * 120" :y="140 - a.students * 1.1" width="46" :height="a.students * 1.1" rx="4" fill="url(#gradAs)" class="bar"><title>{{ a.name }} 学员数：{{ a.students }}</title></rect>
-                <text :x="93 + ai * 120" :y="136 - a.students * 1.1" text-anchor="middle" class="axis-num">{{ a.students }}</text>
-                <text :x="93 + ai * 120" :y="156" text-anchor="middle" class="axis-label">{{ a.name }}</text>
-              </g>
-              <defs><linearGradient id="gradAs" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2DD4BF" /><stop offset="1" stop-color="#0D9488" /></linearGradient></defs>
-            </svg>
-          </div>
-          <div class="chart-box">
-            <div class="chart-title">答题正确率对比</div>
-            <div class="hbar-list">
-              <div v-for="a in assistantRows" :key="'q' + a.name" class="hbar-row">
-                <span class="hbar-name">{{ a.name }}</span>
-                <div class="hbar-track"><div class="hbar-fill" :style="{ width: a.rate.replace('%', '') + '%' }"></div></div>
-                <span class="hbar-num">{{ a.rate }}</span>
-              </div>
-            </div>
-          </div>
-          <div class="chart-box">
-            <div class="chart-title">学员数占比</div>
-            <div class="donut-wrap">
-              <div class="donut" :style="{ background: assistantDonut }">
-                <div class="donut-hole"><div class="donut-num">{{ assistantTotal }}</div><div class="donut-sub">学员</div></div>
-              </div>
-              <div class="donut-legend">
-                <div v-for="(a, ai) in assistantRows" :key="'adl' + a.name" class="dl-row"><i class="lg" :style="{ background: ['#0D9488', '#84E1BC'][ai % 2] }"></i>{{ a.name }} · {{ a.students }}</div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <t-table :data="assistantRows" :columns="assistantColumns" bordered size="small" hover row-key="name" :pagination="statPager" />
-      </div>
+      <!-- V2·0829 用户裁决：主讲统计/助教统计 Tab 已删除（讲师/助教角色下线） -->
 
       <!-- ═══ Tab4 会员统计 ═══ -->
       <div v-else-if="reportTab === 'member'">
         <div class="chart-grid">
           <div class="chart-box">
-            <div class="chart-title">会员观看次数对比</div>
+            <!-- V2·0829 用户裁决：逐人柱状图在会员量大时不可行，改为按观看次数区间分桶（桶数固定与人数无关） -->
+            <div class="chart-title">会员观看次数分布</div>
             <svg viewBox="0 0 360 170" class="chart-svg">
               <line x1="30" x2="352" y1="140" y2="140" stroke="#EAECF0" />
-              <g v-for="(mb, mi) in memberRows" :key="'mb' + mi">
-                <rect :x="34 + mi * 82" :y="140 - mb.view_times * 9" width="44" :height="mb.view_times * 9" rx="4" fill="url(#gradMb)" class="bar"><title>{{ mb.name }} 观看次数：{{ mb.view_times }}</title></rect>
-                <text :x="56 + mi * 82" :y="136 - mb.view_times * 9" text-anchor="middle" class="axis-num">{{ mb.view_times }}</text>
-                <text :x="56 + mi * 82" :y="156" text-anchor="middle" class="axis-label">{{ mb.name }}</text>
+              <g v-for="(b, bi) in memberViewDistBars" :key="'vd' + bi">
+                <rect :x="30 + bi * 54" :y="140 - b.h" width="40" :height="b.h" rx="4" fill="url(#gradMb)" class="bar"><title>{{ b.label }}：{{ b.count }} 人</title></rect>
+                <text :x="50 + bi * 54" :y="136 - b.h" text-anchor="middle" class="axis-num">{{ b.count }}</text>
+                <text :x="50 + bi * 54" :y="156" text-anchor="middle" class="axis-label">{{ b.label }}</text>
               </g>
               <defs><linearGradient id="gradMb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F79009" /><stop offset="1" stop-color="#D46B08" /></linearGradient></defs>
             </svg>
           </div>
-          <div class="chart-box">
-            <div class="chart-title">红包领取分布</div>
-            <div class="donut-wrap">
-              <div class="donut" :style="{ background: memberRedDonut }">
-                <div class="donut-hole"><div class="donut-num">{{ memberRedTotal }}</div><div class="donut-sub">红包</div></div>
+          <!-- V2·0829 用户裁决：红包为自动发放，区间分布无意义，改为金额统计；KPI 卡统一样式（图标徽章+大数字） -->
+          <div class="chart-box kpi-panel">
+            <div class="kpi-grid">
+              <div class="kpi-card kpi-orange">
+                <div class="kpi-icon"><t-icon name="money" /></div>
+                <div class="kpi-body">
+                  <div class="kpi-label">红包领取总金额</div>
+                  <div class="kpi-value">¥{{ memberRedAmountTotal }}<span class="kpi-unit">元</span></div>
+                </div>
               </div>
-              <div class="donut-legend">
-                <div v-for="(mb, mi) in memberRows" :key="'mdl' + mb.name" class="dl-row"><i class="lg" :style="{ background: ['#F79009', '#12B76A', '#0D9488', '#84E1BC'][mi % 4] }"></i>{{ mb.name }} · {{ mb.red_packets }} 个</div>
+              <div class="kpi-card kpi-teal">
+                <div class="kpi-icon"><t-icon name="gift" /></div>
+                <div class="kpi-body">
+                  <div class="kpi-label">领取红包个数</div>
+                  <div class="kpi-value">{{ memberRedTotal }}<span class="kpi-unit">个</span></div>
+                </div>
+              </div>
+              <div class="kpi-card kpi-green">
+                <div class="kpi-icon"><t-icon name="play-circle" /></div>
+                <div class="kpi-body">
+                  <div class="kpi-label">会员观看次数合计</div>
+                  <div class="kpi-value">{{ memberViewTotal }}<span class="kpi-unit">次</span></div>
+                </div>
+              </div>
+              <div class="kpi-card kpi-blue">
+                <div class="kpi-icon"><t-icon name="check-circle" /></div>
+                <div class="kpi-body">
+                  <div class="kpi-label">完播次数合计</div>
+                  <div class="kpi-value">{{ memberCompleteTotal }}<span class="kpi-unit">次</span></div>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="chart-box">
-            <div class="chart-title">会员观看次数合计</div>
-            <div class="big-stat">{{ memberViewTotal }}<span class="big-stat-sub">次</span></div>
-            <div class="chart-title" style="margin-top:14px">完播次数合计</div>
-            <div class="big-stat">{{ memberCompleteTotal }}<span class="big-stat-sub">次</span></div>
           </div>
         </div>
         <t-table :data="memberRows" :columns="memberColumns" bordered size="small" hover row-key="name" :pagination="statPager" />
@@ -322,26 +207,16 @@
       <div v-else-if="reportTab === 'camp'">
         <div class="chart-grid">
           <div class="chart-box">
-            <div class="chart-title">各营期预计收入对比（元）</div>
+            <div class="chart-title">各营期报名人数对比</div>
             <div class="hbar-list">
               <div v-for="c in campRevenueRows" :key="c.title" class="hbar-row">
                 <span class="hbar-name" style="width:120px">{{ c.title }}</span>
                 <div class="hbar-track"><div class="hbar-fill" :style="{ width: c.pct + '%' }"></div></div>
-                <span class="hbar-num">¥{{ c.revenue }}</span>
+                <span class="hbar-num">{{ c.revenue }}</span>
               </div>
             </div>
           </div>
-          <div class="chart-box">
-            <div class="chart-title">营期状态分布</div>
-            <div class="donut-wrap">
-              <div class="donut" :style="{ background: campStatusDonut }">
-                <div class="donut-hole"><div class="donut-num">{{ filteredCamps.length }}</div><div class="donut-sub">营期</div></div>
-              </div>
-              <div class="donut-legend">
-                <div v-for="it in statusChart" :key="'cdl' + it.label" class="dl-row"><i class="lg" :style="{ background: it.color }"></i>{{ it.label }} · {{ it.count }}</div>
-              </div>
-            </div>
-          </div>
+          <!-- V2·0829 用户裁决：营期状态分布图删除 -->
         </div>
         <t-table row-key="id" :data="filteredCamps" :columns="campStatColumns" bordered size="small" hover stripe :pagination="statPager">
           <template #title="{ row }">
@@ -353,10 +228,9 @@
           <template #mode="{ row }"><t-tag size="small" :theme="row.mode === 'live' ? 'danger' : 'success'" variant="light">{{ row.mode === 'live' ? '直播' : '录播' }}</t-tag></template>
           <template #time="{ row }">{{ row.start_date }} ~ {{ row.end_date }}</template>
           <template #enroll="{ row }">
-            <span class="enroll-cell">已加入 {{ row.joined_count }} · 通过 {{ row.approved_count }} · 报名 {{ row.enrolled_count }}</span>
+            <span class="enroll-cell">已报名 {{ row.enrolled_count }}</span>
           </template>
           <template #schedule="{ row }">{{ row.schedule_count }}</template>
-          <template #price="{ row }">{{ row.is_paid ? '¥' + (row.price / 100).toFixed(2) : '免费' }}</template>
         </t-table>
       </div>
 
@@ -389,14 +263,6 @@
       </div>
     </t-card>
 
-    <!-- 主讲统计下钻弹窗 -->
-    <t-dialog v-model:visible="lecturerStatVisible" :header="'主讲统计 · ' + lecturerStatDate" width="640px" :footer="false">
-      <t-table :data="lecturerStatRows" :columns="lecturerStatColumns" bordered size="small" hover row-key="name">
-        <template #ls_rate="{ row }"><span>{{ row.rate }}</span></template>
-      </t-table>
-      <div class="drawer-tip" style="margin-top:8px">按当日该主讲所授课程的观看、完播与答题数据汇总。</div>
-    </t-dialog>
-
   </div>
 </template>
 
@@ -405,12 +271,10 @@ import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { MessagePlugin } from 'tdesign-vue-next';
 import { useCampStore } from '../../../stores/camp-store';
-import { useCommissionStore } from '../../../stores/commission-store';
 import { useCourseStore } from '../../../stores/course-store';
 
 const router = useRouter();
 const campStore = useCampStore();
-const commissionStore = useCommissionStore();
 
 const selectedCampId = ref('');
 
@@ -434,7 +298,7 @@ const avgCompletion = computed(() => {
 // ─── 数据报表（整合外部"数据报表·平台统计"；字段适配：经销商→主讲、群管→助教、去上线率与新会员红包） ───
 const reportTab = ref('daily');
 interface DailyRow {
-  date: string; lecturer_total: number; member_total: number; new_members: number;
+  date: string; member_total: number; new_members: number;
   live_courses: number; viewers: number; completed: number; completion_rate: string;
   quiz_users: number; correct_users: number; quiz_rate: string;
   quiz_red_packets: number; quiz_red_amount: string;
@@ -442,13 +306,13 @@ interface DailyRow {
 }
 /** 近7天演示数据（口径与外部系统一致；实际运行时由观看/答题/红包记录按日聚合） */
 const DAILY_SEED: DailyRow[] = [
-  { date: '2026-08-27', lecturer_total: 2, member_total: 76, new_members: 2, live_courses: 1, viewers: 0, completed: 0, completion_rate: '0.0%', quiz_users: 0, correct_users: 0, quiz_rate: '0.0%', quiz_red_packets: 0, quiz_red_amount: '0.00', view_times: 0, complete_times: 0, video_rate: '0.0%' },
-  { date: '2026-08-26', lecturer_total: 2, member_total: 74, new_members: 1, live_courses: 3, viewers: 0, completed: 0, completion_rate: '0.0%', quiz_users: 0, correct_users: 0, quiz_rate: '0.0%', quiz_red_packets: 0, quiz_red_amount: '0.00', view_times: 0, complete_times: 0, video_rate: '0.0%' },
-  { date: '2026-08-25', lecturer_total: 2, member_total: 75, new_members: 0, live_courses: 1, viewers: 0, completed: 0, completion_rate: '0.0%', quiz_users: 0, correct_users: 0, quiz_rate: '0.0%', quiz_red_packets: 0, quiz_red_amount: '0.00', view_times: 0, complete_times: 0, video_rate: '0.0%' },
-  { date: '2026-08-24', lecturer_total: 2, member_total: 75, new_members: 0, live_courses: 3, viewers: 0, completed: 0, completion_rate: '0.0%', quiz_users: 0, correct_users: 0, quiz_rate: '0.0%', quiz_red_packets: 0, quiz_red_amount: '0.00', view_times: 0, complete_times: 0, video_rate: '0.0%' },
-  { date: '2026-08-23', lecturer_total: 2, member_total: 75, new_members: 4, live_courses: 2, viewers: 0, completed: 0, completion_rate: '0.0%', quiz_users: 0, correct_users: 0, quiz_rate: '0.0%', quiz_red_packets: 0, quiz_red_amount: '0.00', view_times: 0, complete_times: 0, video_rate: '0.0%' },
-  { date: '2026-08-22', lecturer_total: 2, member_total: 73, new_members: 1, live_courses: 1, viewers: 5, completed: 5, completion_rate: '100.0%', quiz_users: 0, correct_users: 0, quiz_rate: '0.0%', quiz_red_packets: 0, quiz_red_amount: '0.00', view_times: 27, complete_times: 13, video_rate: '48.1%' },
-  { date: '2026-08-21', lecturer_total: 2, member_total: 73, new_members: 0, live_courses: 4, viewers: 0, completed: 0, completion_rate: '0.0%', quiz_users: 0, correct_users: 0, quiz_rate: '0.0%', quiz_red_packets: 0, quiz_red_amount: '0.00', view_times: 0, complete_times: 0, video_rate: '0.0%' },
+  { date: '2026-08-27', member_total: 91, new_members: 3, live_courses: 2, viewers: 128, completed: 96, completion_rate: '75.0%', quiz_users: 32, correct_users: 27, quiz_rate: '84.4%', quiz_red_packets: 12, quiz_red_amount: '6.00', view_times: 386, complete_times: 254, video_rate: '65.8%' },
+  { date: '2026-08-26', member_total: 89, new_members: 2, live_courses: 3, viewers: 156, completed: 118, completion_rate: '75.6%', quiz_users: 41, correct_users: 33, quiz_rate: '80.5%', quiz_red_packets: 16, quiz_red_amount: '8.00', view_times: 512, complete_times: 336, video_rate: '65.6%' },
+  { date: '2026-08-25', member_total: 87, new_members: 1, live_courses: 1, viewers: 94, completed: 71, completion_rate: '75.5%', quiz_users: 22, correct_users: 17, quiz_rate: '77.3%', quiz_red_packets: 9, quiz_red_amount: '4.50', view_times: 296, complete_times: 188, video_rate: '63.5%' },
+  { date: '2026-08-24', member_total: 86, new_members: 2, live_courses: 3, viewers: 172, completed: 124, completion_rate: '72.1%', quiz_users: 45, correct_users: 34, quiz_rate: '75.6%', quiz_red_packets: 18, quiz_red_amount: '9.00', view_times: 548, complete_times: 342, video_rate: '62.4%' },
+  { date: '2026-08-23', member_total: 84, new_members: 4, live_courses: 2, viewers: 139, completed: 97, completion_rate: '69.8%', quiz_users: 36, correct_users: 26, quiz_rate: '72.2%', quiz_red_packets: 13, quiz_red_amount: '6.50', view_times: 447, complete_times: 271, video_rate: '60.6%' },
+  { date: '2026-08-22', member_total: 80, new_members: 1, live_courses: 1, viewers: 76, completed: 52, completion_rate: '68.4%', quiz_users: 18, correct_users: 12, quiz_rate: '66.7%', quiz_red_packets: 7, quiz_red_amount: '3.50', view_times: 238, complete_times: 141, video_rate: '59.2%' },
+  { date: '2026-08-21', member_total: 79, new_members: 0, live_courses: 4, viewers: 163, completed: 108, completion_rate: '66.3%', quiz_users: 39, correct_users: 25, quiz_rate: '64.1%', quiz_red_packets: 15, quiz_red_amount: '7.50', view_times: 494, complete_times: 293, video_rate: '59.3%' },
 ];
 const dailyRange = ref([]);
 const filteredDailyRows = computed(() => {
@@ -474,19 +338,22 @@ const dailyTotal = computed(() => {
     video_rate: pct(sum('complete_times'), sum('view_times')),
   };
 });
-function resetDailyRange() {
+function resetDailyRange(silent = false) {
   const days: string[] = [];
   for (let i = 6; i >= 0; i--) {
     const d = new Date(Date.now() - i * 86400000);
-    days.push(d.toISOString().slice(0, 10)); MessagePlugin.success('已重置为近7天'); }
+    days.push(d.toISOString().slice(0, 10));
+  }
   dailyRange.value = [days[0], days[6]] as any;
+  // 修复：提示仅在用户点击「近7天」按钮时弹一次（此前误入循环内导致连弹7条）
+  if (!silent) MessagePlugin.success('已重置为近7天');
 }
-resetDailyRange();
+resetDailyRange(true);
 function onDailyRangeChange(v: any) { dailyRange.value = v; }
 function exportDailyCsv() {
   const rows = filteredDailyRows.value;
-  const head = ['日期', '主讲总数', '会员总数', '新增会员', '直播课程数', '观看人数', '完播人数', '完播率', '答题人数', '正确人数', '正确率', '答题红包个数', '答题红包金额(元)', '观看次数', '完播次数', '视频完播率'];
-  const lines = [head.join(',')].concat(rows.map(r => [r.date, r.lecturer_total, r.member_total, r.new_members, r.live_courses, r.viewers, r.completed, r.completion_rate, r.quiz_users, r.correct_users, r.quiz_rate, r.quiz_red_packets, r.quiz_red_amount, r.view_times, r.complete_times, r.video_rate].join(',')));
+  const head = ['日期', '直播课程数', '观看人数', '完播人数', '完播率', '答题人数', '正确人数', '正确率', '答题红包个数', '答题红包金额(元)', '观看次数', '完播次数', '视频完播率'];
+  const lines = [head.join(',')].concat(rows.map(r => [r.date, r.live_courses, r.viewers, r.completed, r.completion_rate, r.quiz_users, r.correct_users, r.quiz_rate, r.quiz_red_packets, r.quiz_red_amount, r.view_times, r.complete_times, r.video_rate].join(',')));
   const blob = new Blob(['\ufeff' + lines.join('\n')], { type: 'text/csv;charset=utf-8' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
@@ -497,27 +364,32 @@ function exportDailyCsv() {
 
 // 图表计算：分组柱状图（观看 vs 完播）与完播率折线
 const dailyBar = computed(() => {
-  const rows = filteredDailyRows.value;
-  const W = 560, H = 210, padL = 40, padB = 26, padT = 14;
-  const innerW = W - padL - 12, innerH = H - padT - padB;
-  const maxV = Math.max(1, ...rows.map(r => Math.max(r.viewers, r.completed)));
+  // 图表 X 轴时间从左到右递增（表格保持最新在前，图表侧升序排列）
+  const rows = [...filteredDailyRows.value].sort((a, b) => a.date.localeCompare(b.date));
+  const W = 640, H = 300, padL = 52, padB = 34, padT = 20;
+  const innerW = W - padL - 16, innerH = H - padT - padB;
+  // Y 轴取整刻度：档位覆盖到万级观看量（1万+观看也能取到合理刻度）
+  const rawMax = Math.max(1, ...rows.map(r => Math.max(r.viewers, r.completed)));
+  const niceSteps = [50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000];
+  const maxV = niceSteps.find(v => v >= rawMax) ?? rawMax;
   const step = rows.length ? innerW / rows.length : innerW;
   const bars = rows.map((r, i) => {
     const cx = padL + step * i + step / 2;
     const h1 = (r.viewers / maxV) * innerH;
     const h2 = (r.completed / maxV) * innerH;
     return {
-      x1: cx - 15, y1: padT + innerH - h1, h1: Math.max(h1, r.viewers > 0 ? 3 : 0),
-      x2: cx + 2, y2: padT + innerH - h2, h2: Math.max(h2, r.completed > 0 ? 3 : 0),
+      x1: cx - 25, y1: padT + innerH - h1, h1: Math.max(h1, r.viewers > 0 ? 3 : 0),
+      x2: cx + 3, y2: padT + innerH - h2, h2: Math.max(h2, r.completed > 0 ? 3 : 0),
       cx, baseY: padT + innerH, label: r.date.slice(5),
       viewers: r.viewers, completed: r.completed,
     };
   });
-  const maxRate = Math.max(10, ...rows.map(r => parseFloat(r.completion_rate) || 0));
+  // 完播率 Y 轴上限固定 90%（V2·0829 用户裁决）
+  const maxRate = 90;
   return { W, H, padL, padT, padB, innerH, maxV, maxRate, step, bars, grid: [0, 0.25, 0.5, 0.75, 1].map(p => padT + innerH * (1 - p)) };
 });
 const dailyLine = computed(() => {
-  const rows = filteredDailyRows.value;
+  const rows = [...filteredDailyRows.value].sort((a, b) => a.date.localeCompare(b.date));
   const b = dailyBar.value;
   const pts = rows.map((r, i) => {
     const rate = parseFloat(r.completion_rate) || 0;
@@ -532,40 +404,7 @@ const quizDonut = computed(() => {
   const rate = quiz > 0 ? Math.round((correct / quiz) * 100) : 0;
   return { deg: Math.round(rate * 3.6), rateText: rate + '%', wrong };
 });
-// 主讲统计行（字段与助教统计完全对齐：关联营期数/学员数/完课率/红包维度一致）
-const lecturerStatRows = ref([
-  { name: '张三', camps: 2, students: 120, viewers: 86, completed: 79, view_times: 176, completion_rate: '91.9%', quiz_users: 40, correct_users: 38, rate: '95.0%', red_packets: 2, red_amount: '0.20' },
-  { name: '李四', camps: 1, students: 56, viewers: 38, completed: 29, view_times: 102, completion_rate: '76.3%', quiz_users: 12, correct_users: 11, rate: '91.7%', red_packets: 0, red_amount: '0.00' },
-]);
-const lecturerStatColumns = [
-  { colKey: 'name', title: '主讲', width: 100 },
-  { colKey: 'camps', title: '关联营期数', width: 95 },
-  { colKey: 'students', title: '学员数', width: 85 },
-  { colKey: 'viewers', title: '观看人数', width: 90 },
-  { colKey: 'completed', title: '完播人数', width: 90 },
-  { colKey: 'completion_rate', title: '完课率', width: 85 },
-  { colKey: 'quiz_users', title: '答题人数', width: 90 },
-  { colKey: 'rate', title: '正确率', width: 80 },
-  { colKey: 'red_packets', title: '答题红包个数', width: 110 },
-  { colKey: 'red_amount', title: '红包金额(元)', width: 100 },
-];
-// 助教统计（原群管统计维度）
-const assistantRows = ref([
-  { name: '王助教', camps: 2, students: 120, viewers: 86, completed: 79, completion_rate: '91.9%', quiz_users: 40, correct_users: 38, rate: '95.0%', red_packets: 2, red_amount: '0.20' },
-  { name: '刘助教', camps: 1, students: 56, viewers: 38, completed: 29, completion_rate: '76.3%', quiz_users: 12, correct_users: 11, rate: '91.7%', red_packets: 0, red_amount: '0.00' },
-]);
-const assistantColumns = [
-  { colKey: 'name', title: '助教', width: 100 },
-  { colKey: 'camps', title: '关联营期数', width: 95 },
-  { colKey: 'students', title: '学员数', width: 85 },
-  { colKey: 'viewers', title: '观看人数', width: 90 },
-  { colKey: 'completed', title: '完播人数', width: 90 },
-  { colKey: 'completion_rate', title: '完课率', width: 85 },
-  { colKey: 'quiz_users', title: '答题人数', width: 90 },
-  { colKey: 'rate', title: '正确率', width: 80 },
-  { colKey: 'red_packets', title: '答题红包个数', width: 110 },
-  { colKey: 'red_amount', title: '红包金额(元)', width: 100 },
-];
+// V2·0829 用户裁决：主讲统计/助教统计数据已删除（讲师/助教角色下线）
 // 会员统计（普通用户维度）
 const memberRows = ref([
   { name: '王五', phone: '138****0001', view_times: 12, complete_times: 9, quiz_times: 3, correct_times: 3, red_packets: 1, red_amount: '0.10' },
@@ -587,9 +426,7 @@ const memberColumns = [
 const dailyColumns = [
   { colKey: 'serial', title: '序号', width: 60 },
   { colKey: 'date', title: '日期', width: 105 },
-  { colKey: 'lecturer_total', title: '主讲总数', width: 85 },
-  { colKey: 'member_total', title: '会员总数', width: 85 },
-  { colKey: 'new_members', title: '新增会员', width: 85 },
+  // V2·0829 用户裁决：会员总数/新增会员列删除（数据在会员等级已有）
   { colKey: 'live_courses', title: '直播课程数', width: 90 },
   { colKey: 'viewers', title: '观看人数', width: 85 },
   { colKey: 'completed', title: '完播人数', width: 85 },
@@ -602,20 +439,13 @@ const dailyColumns = [
   { colKey: 'view_times', title: '观看次数', width: 85 },
   { colKey: 'complete_times', title: '完播次数', width: 85 },
   { colKey: 'video_rate', title: '视频完播率', width: 90 },
-  { colKey: 'lecturer_stat', title: '操作', width: 90, fixed: 'right' },
 ];
-// 主讲统计下钻（按主讲维度汇总当日数据）
-const lecturerStatVisible = ref(false);
-const lecturerStatDate = ref('');
-function openLecturerStat(row: DailyRow) {
-  lecturerStatDate.value = row.date;
-  lecturerStatVisible.value = true;
-}
-// ─── Tab5 营期统计：收入对比 + 状态环形 ───
+// V2·0829：主讲统计下钻已删除
+// ─── Tab5 营期统计：报名对比 + 状态环形（V2·0829 全免费，无收入维度）───
 const campRevenueRows = computed(() => {
   const rows = filteredCamps.value.map((c: any) => ({
     title: c.title.length > 8 ? c.title.slice(0, 8) + '…' : c.title,
-    revenue: Math.round((c.price / 100) * (c.approved_count || 0)),
+    revenue: Number(c.enrolled_count) || 0,
   }));
   const max = Math.max(1, ...rows.map(r => r.revenue));
   return rows.map(r => ({ ...r, pct: Math.max(4, Math.round(r.revenue / max * 100)) }));
@@ -636,9 +466,24 @@ const categoryChart = computed(() => {
   return Array.from(map.entries()).map(([name, count], i) => ({ name, count, color: COURSE_COLORS[i % COURSE_COLORS.length] }));
 });
 const categoryDonut = computed(() => donutStyle(categoryChart.value.map(c => ({ value: c.count, color: c.color }))));
-const assistantDonut = computed(() => donutStyle(assistantRows.value.map((a, i) => ({ value: a.students, color: ['#0D9488', '#84E1BC'][i % 2] }))));
-const assistantTotal = computed(() => assistantRows.value.reduce((s, a) => s + a.students, 0));
-const memberRedDonut = computed(() => donutStyle(memberRows.value.map((mb, i) => ({ value: mb.red_packets, color: ['#F79009', '#12B76A', '#0D9488', '#84E1BC'][i % 4] }))));
+// V2·0829 用户裁决：会员图表改分桶统计——桶数固定，人数上万也可渲染
+// 观看次数分布（等宽 5 次一档，桶数固定与人数无关）
+const memberViewDistBars = computed(() => {
+  const rows = memberRows.value;
+  const buckets = [
+    { label: '0次', test: (n: number) => n === 0 },
+    { label: '1-5次', test: (n: number) => n >= 1 && n <= 5 },
+    { label: '6-10次', test: (n: number) => n >= 6 && n <= 10 },
+    { label: '11-15次', test: (n: number) => n >= 11 && n <= 15 },
+    { label: '16-20次', test: (n: number) => n >= 16 && n <= 20 },
+    { label: '>20次', test: (n: number) => n > 20 },
+  ];
+  const counts = buckets.map(b => rows.filter(r => b.test(r.view_times)).length);
+  const max = Math.max(1, ...counts);
+  return buckets.map((b, i) => ({ label: b.label, count: counts[i], h: Math.round(counts[i] / max * 110) + (counts[i] > 0 ? 4 : 0) }));
+});
+// 红包领取总金额（V2·0829：红包自动发放，区间分布换为金额合计）
+const memberRedAmountTotal = computed(() => memberRows.value.reduce((s, mb) => s + (parseFloat(mb.red_amount) || 0), 0).toFixed(2));
 const memberRedTotal = computed(() => memberRows.value.reduce((s, mb) => s + mb.red_packets, 0));
 const memberViewTotal = computed(() => memberRows.value.reduce((s, mb) => s + mb.view_times, 0));
 const memberCompleteTotal = computed(() => memberRows.value.reduce((s, mb) => s + mb.complete_times, 0));
@@ -653,7 +498,7 @@ const courseViewTop = computed(() => {
 const courseStatRows = computed(() => courseStore.courses.map((c: any, i: number) => {
   const lessons = courseStore.loadLessonsByCourse(c.id).length;
   return {
-    id: c.id, title: c.title, category: c.category_name, lecturer: c.lecturer_name || '—',
+    id: c.id, title: c.title, category: c.category_name,
     lessons: lessons || c.course_count || 0, status: c.status,
     viewers: 300 - i * 15, completed: 260 - i * 14, completion_rate: Math.max(55, 96 - i * 2) + '%',
   };
@@ -661,7 +506,6 @@ const courseStatRows = computed(() => courseStore.courses.map((c: any, i: number
 const courseStatColumns = [
   { colKey: 'title', title: '课程名称', minWidth: 170, ellipsis: true },
   { colKey: 'category', title: '所属分类', width: 100 },
-  { colKey: 'lecturer', title: '主讲', width: 90 },
   { colKey: 'lessons', title: '课时数', width: 80 },
   { colKey: 'viewers', title: '观看人数', width: 90 },
   { colKey: 'completed', title: '完播人数', width: 90 },
@@ -676,18 +520,12 @@ const campStatColumns = [
   { colKey: 'time', title: '营期时间', width: 180 },
   { colKey: 'enroll', title: '报名情况', width: 200 },
   { colKey: 'schedule', title: '排课数', width: 80 },
-  { colKey: 'price', title: '价格', width: 80 },
 ];
 const totalEnrolled = computed(() => filteredCamps.value.reduce((s, c: any) => s + (Number(c.enrolled_count) || 0), 0));
 const totalApproved = computed(() => filteredCamps.value.reduce((s, c: any) => s + (Number(c.approved_count) || 0), 0));
 const totalJoined = computed(() => filteredCamps.value.reduce((s, c: any) => s + (Number(c.joined_count) || 0), 0));
 
-const bills = computed(() => commissionStore.commissionBills);
-const totalRevenue = computed(() => {
-  const amount = bills.value.reduce((s, b) => s + (b.order_amount || 0), 0);
-  return (amount / 100).toFixed(0);
-});
-const pendingSettlement = computed(() => bills.value.filter(b => b.status === 'pending_settlement').length);
+// V2·0829 本期不做交易：分成账单统计已删除
 
 const funnelApprovedPct = computed(() => totalEnrolled.value ? Math.max(5, Math.round(totalApproved.value / totalEnrolled.value * 100)) : 0);
 const funnelJoinedPct = computed(() => totalEnrolled.value ? Math.max(5, Math.round(totalJoined.value / totalEnrolled.value * 100)) : 0);
@@ -728,7 +566,7 @@ const columns = [
 ];
 
 function goSchedule(row: any) { router.push({ path: '/tenant/course/camp-schedule', query: { campId: row.id } }); }
-function goStudents(row: any) { router.push({ path: '/tenant/course/camp-students', query: { campId: row.id } }); }
+// V2·0829 用户裁决：学员管理整体去除（复用 SaaS 客户列表），goStudents 已删
 </script>
 
 <style scoped>
@@ -771,10 +609,25 @@ function goStudents(row: any) { router.push({ path: '/tenant/course/camp-student
 .chart-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 14px; }
 .chart-grid.two { grid-template-columns: repeat(2, 1fr); }
 .chart-box { background: #FAFAFA; border: 1px solid #EEF2F6; border-radius: 8px; padding: 12px; }
+/* ── KPI 统计卡（图标徽章 + 大数字，对齐看板 teal/green/orange 体系） ── */
+.kpi-panel { grid-column: span 2; align-self: start; }
+.kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.kpi-card { display: flex; align-items: center; gap: 10px; padding: 12px; background: #FFFFFF; border: 1px solid #EAECF0; border-radius: 10px; transition: box-shadow 0.2s ease, border-color 0.2s ease; }
+.kpi-card:hover { box-shadow: 0 4px 12px rgba(16, 24, 40, 0.08); border-color: #D0D5DD; }
+.kpi-icon { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.kpi-orange .kpi-icon { background: #FEF3E7; color: #F79009; }
+.kpi-teal .kpi-icon { background: #E6F5F1; color: #0D9488; }
+.kpi-green .kpi-icon { background: #E8F8F0; color: #12B76A; }
+.kpi-blue .kpi-icon { background: #EEF4FF; color: #2E90FA; }
+.kpi-body { flex: 1; min-width: 0; }
+.kpi-label { font-size: 12px; color: #667085; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.kpi-value { font-size: 22px; font-weight: 700; color: #1F2C3E; line-height: 1.2; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.kpi-unit { font-size: 12px; font-weight: 500; color: #98A2B3; margin-left: 4px; }
 .chart-title { font-size: 13px; font-weight: 600; color: #1F2C3E; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
 .chart-legend { font-size: 11px; font-weight: 400; color: #667085; display: inline-flex; align-items: center; gap: 6px; }
 .chart-svg { width: 100%; height: auto; display: block; }
-.axis-num { font-size: 10px; fill: #98A2B3; }
+.axis-num { font-size: 12px; fill: #667085; }
+.axis-label { font-size: 12px; fill: #667085; }
 .axis-label { font-size: 10px; fill: #98A2B3; }
 .bar { cursor: pointer; transition: opacity 0.15s; }
 .bar:hover { opacity: 0.75; }

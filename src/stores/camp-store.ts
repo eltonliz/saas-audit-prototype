@@ -4,14 +4,13 @@
  */
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import type { Camp, CampEnrollment, DailyCheckin, CampInviteCode, CourseSchedule, CampLecturer, CampGroup, CampFinalQuiz, LearningRecord, QA, CampCertificate, Series, CertTemplate, CreateCampInput, CreateEnrollmentInput, CreateScheduleInput, CreateInviteCodeInput, CreateCheckinInput } from '../contracts/schemas/camp-schemas';
-import { SEED_CAMPS, SEED_ENROLLMENTS, SEED_CHECKINS, SEED_INVITE_CODES, SEED_SCHEDULES, SEED_CAMP_LECTURERS, SEED_CAMP_GROUPS, SEED_FINAL_QUIZZES, SEED_LEARNING_RECORDS, SEED_QAS, SEED_CERTIFICATES, SEED_SERIES, SEED_CERT_TEMPLATES } from '../adapters/sim/camp-sim-data';
+import type { Camp, CampEnrollment, DailyCheckin, CourseSchedule, CampLecturer, CampGroup, CampFinalQuiz, LearningRecord, QA, CampCertificate, Series, CertTemplate, CreateCampInput, CreateEnrollmentInput, CreateScheduleInput, CreateCheckinInput } from '../contracts/schemas/camp-schemas';
+import { SEED_CAMPS, SEED_ENROLLMENTS, SEED_CHECKINS, SEED_SCHEDULES, SEED_CAMP_LECTURERS, SEED_CAMP_GROUPS, SEED_FINAL_QUIZZES, SEED_LEARNING_RECORDS, SEED_QAS, SEED_CERTIFICATES, SEED_SERIES, SEED_CERT_TEMPLATES } from '../adapters/sim/camp-sim-data';
 import { validateCampTransition, validateEnrollmentTransition } from '../contracts/state-machine/course-state-machine';
 import { validateCampCalendarNoOverlap } from '../contracts/schemas/camp-schemas';
 import { templateRowsToScheduleInputs, type ScheduleTemplateRow } from '../contracts/constants/schedule-templates';
 import { useCourseStore } from './course-store';
 import { useLiveStore } from './live-store';
-import { useCommissionStore } from './commission-store';
 
 const now = () => Math.floor(Date.now() / 1000);
 const genId = (p: string) => `${p}-${new Date().toISOString().slice(0,7).replace('-','')}-${String(Math.floor(Math.random()*99999)).padStart(5,'0')}`;
@@ -25,7 +24,6 @@ export const useCampStore = defineStore('camp', () => {
   const camps = ref<Camp[]>([...SEED_CAMPS]);
   const enrollments = ref<CampEnrollment[]>([...SEED_ENROLLMENTS]);
   const checkins = ref<DailyCheckin[]>([...SEED_CHECKINS]);
-  const inviteCodes = ref<CampInviteCode[]>([...SEED_INVITE_CODES]);
   const schedules = ref<CourseSchedule[]>([...SEED_SCHEDULES]);
   const campLecturers = ref<CampLecturer[]>([...SEED_CAMP_LECTURERS]);
   const campGroups = ref<CampGroup[]>([...SEED_CAMP_GROUPS]);
@@ -56,8 +54,6 @@ export const useCampStore = defineStore('camp', () => {
 
   // 状态流转 D15
   function transitionCampStatus(id: string, target: Camp['status']): boolean { const c = camps.value.find(c => c.id === id); if (!c || !validateCampTransition(c.status, target)) return false; c.status = target; c.updated_at = now();
-    // P1: 下架时取消待结算账单
-    if (target === 'offline') { try { const cs = useCommissionStore(); cs.commissionBills.filter(b => b.camp_id === id && b.status === 'pending_settlement').forEach(b => cs.cancelCommissionBill(b.id, '营期下架')); } catch {} }
     return true; }
   const submitCampForReview = (id: string) => transitionCampStatus(id, 'pending_review');
   const approveCamp = (id: string, r: string) => {
@@ -104,12 +100,7 @@ export const useCampStore = defineStore('camp', () => {
   const endCamp = (id: string) => {
     const ok = transitionCampStatus(id, 'ended');
     if (ok) {
-      // P0-2: 营期结束自动结算分成账单（对齐 SugarMate settleCommissionBillsOnCampEnd）
-      try {
-        const cs = useCommissionStore();
-        const bills = cs.commissionBills.filter(b => b.camp_id === id && b.status === 'pending_settlement');
-        bills.forEach(b => cs.settleCommissionBill(b.id));
-      } catch (e) { console.error('[endCamp] 自动结算分成失败:', e); }
+      // V2·0829 本期不做交易：营期结束不再结算分成（下期再议）
       // P0-3: 营期结束自动发证书（对齐 SugarMate issueCertificatesOnCampEnd）
       try {
         // 流程闭环：必须存在启用中的证书模板（优先关联该营期，其次通用模板）才允许发证
@@ -154,6 +145,8 @@ export const useCampStore = defineStore('camp', () => {
 
   // 动态获取钱包 store（避免循环依赖）
   function await_import_wallet() { return import('./wallet-store'); }
+  // 动态获取直播 store（V2·0829 结合件③：直播排课落 LiveSession）
+  function await_import_live() { return import('./live-store'); }
 
   function createEnrollment(input: CreateEnrollmentInput): CampEnrollment {
     const exists = enrollments.value.find(e => e.camp_id === input.camp_id && e.student_id === input.student_id && ['pending','approved','enrolled'].includes(e.status));
@@ -161,45 +154,23 @@ export const useCampStore = defineStore('camp', () => {
     const camp = camps.value.find(c => c.id === input.camp_id);
     // 报名截止校验
     if (camp && camp.enroll_deadline && now() > camp.enroll_deadline) throw new Error('报名已截止');
-    // 邀请码有效性校验
-    if (input.invite_code_id) {
-      const code = inviteCodes.value.find(c => c.id === input.invite_code_id);
-      if (!code || !code.is_active) throw new Error('邀请码无效或已停用');
-      if (code.expire_at && now() > code.expire_at) throw new Error('邀请码已过期');
-      if (code.max_usage > 0 && code.used_count >= code.max_usage) throw new Error('邀请码使用次数已用尽');
-      code.used_count++; code.updated_at = now();
-    }
-    // 2026-08-28 大改（全免费模式）：报名即加入——无审核、无支付；同步生成 0 元虚拟订单（类型=营期订单）并发放积分
+    // V2·0829 用户裁决：全免费模式——报名即加入，无审核、无支付、不生成订单、无邀请码；红包/积分激励保留
     const enr = { ...input, id: genId('ENR'), enrollment_no: genId('ENR'), camp_title: camp?.title ?? '', status: 'enrolled', camp_order_id: null, enrolled_at: now(), joined_at: now(), created_at: now(), updated_at: now() } as CampEnrollment;
     enrollments.value.push(enr);
     if (camp) { camp.enrolled_count++; camp.approved_count = (camp.approved_count ?? 0) + 1; camp.joined_count = (camp.joined_count ?? 0) + 1; camp.updated_at = now(); }
-    // 生成 0 元虚拟订单（订单管理可查，类型=营期订单）
-    import('./camp-payment-store').then(({ useCampPaymentStore }) => {
-      const payStore = useCampPaymentStore();
-      if (!payStore.enrollmentOrders.find(o => o.enrollment_id === enr.id)) {
-        const order = payStore.createEnrollmentOrder({ enrollment_id: enr.id, camp_id: enr.camp_id, camp_title: camp?.title ?? '', student_id: enr.student_id, student_name: enr.student_name, student_phone: enr.student_phone ?? '' });
-        if (order) { order.status = 'paid'; order.paid_at = now(); order.updated_at = now(); }
-      }
-    }).catch(() => {});
     // 报名成功发放积分（+10·SaaS 积分规则）
     try { const { useWalletStore } = await_import_wallet(); const w = useWalletStore(); w.awardStudentPoints(enr.student_id, 10, '报名成功'); } catch { /* wallet 未就绪则跳过 */ }
+    // ═══ V2·0829 结合件①：报名落客户——同步 SaaS 客户列表（课程报名来源·幂等）═══
+    import('./saas-replica/customer-replica-store').then(({ useCustomerStore }) => {
+      useCustomerStore().upsertCustomerFromEnrollment({
+        student_id: enr.student_id, student_name: enr.student_name,
+        student_phone: enr.student_phone ?? '', camp_title: camp?.title ?? '',
+      });
+    }).catch(() => {});
     return enr;
   }
   async function approveEnrollment(id: string, r: string): Promise<boolean> { const e = enrollments.value.find(e => e.id === id); if (!e || !validateEnrollmentTransition(e.status, 'approved')) return false; e.status = 'approved'; e.reviewer_id = r; e.reviewed_at = now(); e.updated_at = now(); const c = camps.value.find(c => c.id === e.camp_id); if (c) { c.approved_count++; c.updated_at = now(); }
-    // P1: 回写邀请码 enrolled_count
-    if (e.invite_code_id) { const code = inviteCodes.value.find(c => c.id === e.invite_code_id); if (code) { code.enrolled_count++; code.updated_at = now(); } }
-    // P0-2: 自动生成订单（幂等），金额从营期 price 取，免费营期自动加入
-    try {
-      const { useCampPaymentStore } = await import('./camp-payment-store');
-      const payStore = useCampPaymentStore();
-      const existing = payStore.enrollmentOrders.find(o => o.enrollment_id === id);
-      if (!existing) {
-        const camp = camps.value.find(c => c.id === e.camp_id);
-        const order = payStore.createEnrollmentOrder({ enrollment_id: id, camp_id: e.camp_id, camp_title: camp?.title ?? '', student_id: e.student_id, student_name: e.student_name, student_phone: e.student_phone ?? '' });
-        // 免费营期自动支付成功（0元订单分支 BR-077）
-        if (camp && !camp.is_paid && order) { payStore.onPaySuccess(order.id, 'FREE-AUTO'); }
-      }
-    } catch (err) { console.error('[approveEnrollment] 自动生成订单失败:', err); }
+    // V2·0829 本期不做交易：审核通过即加入，不再生成订单
     return true; }
   function rejectEnrollment(id: string, r: string, m: string): boolean { const e = enrollments.value.find(e => e.id === id); if (!e || !validateEnrollmentTransition(e.status, 'rejected')) return false;
     // 计数回退：pending→rejected 时 enrolled_count--
@@ -228,6 +199,25 @@ export const useCampStore = defineStore('camp', () => {
     schedules.value.push(s);
     const c = camps.value.find(c => c.id === input.camp_id);
     if (c) { c.schedule_count++; c.updated_at = now(); }
+
+    // ═══ V2·0829 结合件③：直播课时落 LiveSession——直播排课自动创建直播场次并回填 ID ═══
+    if (s.schedule_type === 'course' && s.schedule_mode === 'live') {
+      await_import_live().then(({ useLiveStore }) => {
+        const live = useLiveStore();
+        const anchor = live.loadAnchors()[0];
+        const session = live.createSession({
+          title: `[${camp?.title ?? '营期'}] ${s.title}`,
+          anchor_id: anchor?.id ?? 'ANCHOR-001',
+          anchor_name: anchor?.name ?? '未指定',
+          camp_id: s.camp_id, camp_title: camp?.title ?? null,
+          course_id: s.course_id ?? null, lesson_id: s.lesson_id ?? null, schedule_id: s.id,
+          source: 'camp_schedule',
+          planned_start_at: s.unlock_time ?? now() + 86400,
+          planned_end_at: (s.unlock_time ?? now() + 86400) + 7200,
+        } as any);
+        s.live_session_id = session.id;
+      }).catch(() => {});
+    }
 
     // P1: 递增课程 camp_ref_count
     if (s.schedule_type === 'course' && input.course_id) {
@@ -377,10 +367,7 @@ export const useCampStore = defineStore('camp', () => {
   function createCheckin(input: CreateCheckinInput): DailyCheckin { const exists = checkins.value.find(c => c.camp_id === input.camp_id && c.student_id === input.student_id && c.checkin_date === input.checkin_date && c.status === 'completed'); if (exists) throw new Error('当日已打卡'); const c = { ...input, id: genId('CHECKIN'), status: 'completed', checked_at: now(), created_at: now(), updated_at: now() } as DailyCheckin; checkins.value.push(c); const s = schedules.value.find(s => s.id === input.schedule_id); if (s) { s.completed_count++; s.updated_at = now(); } return c; }
   function loadCheckinsByStudent(sid: string, campId?: string): DailyCheckin[] { return checkins.value.filter(c => c.student_id === sid && (!campId || c.camp_id === campId)); }
 
-  // 邀请码 D17（页面传入 code 优先·否则自动生成）
-  function createInviteCode(input: CreateInviteCodeInput): CampInviteCode { const c = { ...input, id: genId('INVITE'), code: (input as any).code || (genId('CODE') + input.assistant_id), used_count: 0, enrolled_count: 0, is_active: true, created_at: now(), updated_at: now() } as CampInviteCode; inviteCodes.value.push(c); return c; }
-  function useInviteCode(codeStr: string): CampInviteCode | null { const c = inviteCodes.value.find(c => c.code === codeStr && c.is_active); if (!c) return null; if (c.max_usage > 0 && c.used_count >= c.max_usage) return null; c.used_count++; c.updated_at = now(); return c; }
-  function loadInviteCodesByCamp(campId: string): CampInviteCode[] { return inviteCodes.value.filter(c => c.camp_id === campId); }
+  // V2·0829 用户裁决：邀请码/口令体系整体下线（报名统一由 SaaS 门店成员关系承接）
 
   // 营期讲师
   function addCampLecturer(input: { camp_id: string; lecturer_id: string; lecturer_name: string; role_type: string; camp_role: 'main_lecturer' | 'assistant' }): CampLecturer { const cl = { ...input, id: genId('CAMPLECT'), can_assistant_broadcast: false, can_answer_qa: true, can_create_question: true, student_count: 0, joined_at: now(), left_at: null, is_active: true, created_at: now(), updated_at: now() } as CampLecturer; campLecturers.value.push(cl); return cl; }
@@ -445,7 +432,6 @@ export const useCampStore = defineStore('camp', () => {
     if (e.status === 'enrolled') {
       // enrolled→refunded（状态机合法）
       const c = camps.value.find(c => c.id === e.camp_id); if (c && c.joined_count > 0) { c.joined_count--; c.updated_at = now(); }
-      if (e.invite_code_id) { const code = inviteCodes.value.find(c => c.id === e.invite_code_id); if (code && code.enrolled_count > 0) { code.enrolled_count--; code.updated_at = now(); } }
       e.status = 'refunded';
     } else {
       // approved→cancelled（状态机合法，approved→refunded 非法）
@@ -463,8 +449,6 @@ export const useCampStore = defineStore('camp', () => {
   function decrementCampRef(courseId: string): void { const c = getCourseStore().courses.find(c => c.id === courseId); if (c && (c as any).camp_ref_count > 0) { (c as any).camp_ref_count--; c.updated_at = now(); } }
   // 通用报名更新
   function updateEnrollment(id: string, patch: Partial<CampEnrollment>): void { const e = enrollments.value.find(e => e.id === id); if (e) { Object.assign(e, patch, { updated_at: now() }); } }
-  // 邀请码 enrolled_count 回写
-  function updateInviteCodeEnrolledCount(codeId: string, delta: number): void { const c = inviteCodes.value.find(c => c.id === codeId); if (c) { c.enrolled_count += delta; c.updated_at = now(); } }
   // 证书补发/更正
   function reissueCertificate(certId: string): void { const c = certificates.value.find(c => c.id === certId); if (c) { c.is_revoked = false; c.revoked_at = null; c.revoke_reason = undefined; } }
   function correctCertificate(certId: string, patch: Partial<CampCertificate>): void { const c = certificates.value.find(c => c.id === certId); if (c) { Object.assign(c, patch); } }
@@ -486,11 +470,11 @@ export const useCampStore = defineStore('camp', () => {
     console.log(msgs[event] || `[SAAS联动] ${event}`, data);
   }
 
-  return { camps, enrollments, checkins, inviteCodes, schedules, campLecturers, campGroups, finalQuizzes, learningRecords, qas, certificates, certTemplates, seriesList,
+  return { camps, enrollments, checkins, schedules, campLecturers, campGroups, finalQuizzes, learningRecords, qas, certificates, certTemplates, seriesList,
     createCamp, updateCamp, deleteCamp, loadCampList, loadCamp, transitionCampStatus, submitCampForReview, approveCamp, rejectCamp, openEnrollment, startCamp, endCamp,
     createEnrollment, approveEnrollment, rejectEnrollment, cancelEnrollment, loadEnrollmentsByCamp, loadEnrollmentsByStudent, transitionEnrollmentToEnrolled, rollbackEnrollmentOnRefund, updateEnrollment,
     createSchedule, updateSchedule, deleteSchedule, loadSchedulesByCamp, loadSchedulesByDay, batchCreateSchedules, createSchedulesForCourse, applyScheduleTemplate, incrementCampRef, decrementCampRef,
-    createCheckin, loadCheckinsByStudent, createInviteCode, useInviteCode, loadInviteCodesByCamp, updateInviteCodeEnrolledCount,
+    createCheckin, loadCheckinsByStudent,
     addCampLecturer, removeCampLecturer, loadCampLecturersByCamp, createCampGroup, deleteCampGroup, updateStudentBelong,
     createFinalQuiz, createQA, createQAReply, loadQAsByCamp, issueCertificate, revokeCertificate, reissueCertificate, correctCertificate, loadCertificates, loadCampsBySeries,
     createCertTemplate, updateCertTemplate, deleteCertTemplate, resolveCertTemplateForCamp };

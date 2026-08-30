@@ -11,7 +11,7 @@ const hourLater = (n: number) => now() + n * 3600;
 export const SEED_LIVE_SESSIONS: LiveSession[] = [
   {
     id: 'LIVE-202608-00001', session_no: 'LIVE-202608-00001', title: '7天高效学习营·开营直播',
-    description: '开营仪式+课程基础知识', lecturer_id: 'LECT-202608-00001', lecturer_name: '张三',
+    description: '开营仪式+课程基础知识', anchor_id: 'ANCHOR-001', anchor_name: '陈晨',
     camp_id: 'CAMP-202608-00001', camp_title: '7天高效学习营',
     course_id: 'COURSE-202608-00001', lesson_id: null, schedule_id: 'SCHEDULE-202608-00001',
     source: 'camp_schedule', room_id: 'ROOM-202608-00001', status: 'ended',
@@ -24,7 +24,7 @@ export const SEED_LIVE_SESSIONS: LiveSession[] = [
   },
   {
     id: 'LIVE-202608-00002', session_no: 'LIVE-202608-00002', title: '职场沟通训练营·答疑直播',
-    description: 'Day2 营养答疑', lecturer_id: 'LECT-202608-00001', lecturer_name: '张三',
+    description: 'Day2 营养答疑', anchor_id: 'ANCHOR-001', anchor_name: '陈晨',
     camp_id: 'CAMP-202608-00002', camp_title: '职场沟通训练营',
     course_id: 'COURSE-202608-00002', lesson_id: null, schedule_id: 'SCHEDULE-202608-00002',
     source: 'camp_schedule', room_id: 'ROOM-202608-00001', status: 'live',
@@ -37,7 +37,7 @@ export const SEED_LIVE_SESSIONS: LiveSession[] = [
   },
   {
     id: 'LIVE-202608-00003', session_no: 'LIVE-202608-00003', title: '运动康复公开课',
-    description: '独立直播课', lecturer_id: 'LECT-202608-00002', lecturer_name: '李四',
+    description: '独立直播课', anchor_id: 'ANCHOR-002', anchor_name: '林一舟',
     camp_id: null, camp_title: null, course_id: 'COURSE-202608-00003', lesson_id: null, schedule_id: null,
     source: 'course_lesson', room_id: 'ROOM-202608-00002', status: 'not_started',
     planned_start_at: hourLater(24), planned_end_at: hourLater(25),
@@ -52,14 +52,14 @@ export const SEED_LIVE_SESSIONS: LiveSession[] = [
 export const SEED_LIVE_ROOMS: LiveRoom[] = [
   {
     id: 'ROOM-202608-00001', room_no: 'ROOM-001', name: '张三直播间',
-    lecturer_id: 'LECT-202608-00001', lecturer_name: '张三',
+    anchor_id: 'ANCHOR-001', anchor_name: '陈晨',
     status: 'live', push_url: 'rtmp://push.example.com/live/LIVE-002', pull_url: 'https://pull.example.com/live/LIVE-002.m3u8',
     resolution: '720p', beauty_enabled: true, record_enabled: true,
     current_session_id: 'LIVE-202608-00002', created_at: dayAgo(20), updated_at: now() - 600,
   },
   {
     id: 'ROOM-202608-00002', room_no: 'ROOM-002', name: '李四直播间',
-    lecturer_id: 'LECT-202608-00002', lecturer_name: '李四',
+    anchor_id: 'ANCHOR-002', anchor_name: '林一舟',
     status: 'idle', push_url: '', pull_url: '',
     resolution: '1080p', beauty_enabled: true, record_enabled: true,
     current_session_id: null, created_at: dayAgo(15), updated_at: dayAgo(1),

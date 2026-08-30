@@ -28,7 +28,7 @@
           <t-select v-model="visibilityFilter" placeholder="是否公开" clearable style="width:110px"><t-option label="公开" value="public" /><t-option label="仅营期内" value="camp_only" /></t-select>
         </div>
         <div class="filter-item">
-          <span class="filter-label">归属</span>
+          <span class="filter-label">课程范围</span>
           <t-select v-model="inCampFilter" placeholder="是否属于营期" clearable style="width:120px"><t-option label="独立课程" value="standalone" /><t-option label="营期课程" value="in_camp" /></t-select>
         </div>
         <div class="filter-actions">
@@ -52,6 +52,9 @@
         <template #video="{ row }">
           <t-button variant="text" theme="primary" size="small" @click="showVideoDialog(row)"><template #icon><t-icon name="play-circle" /></template>查看视频</t-button>
         </template>
+        <template #audio="{ row }">
+          <t-button variant="text" theme="primary" size="small" @click="showAudioDialog(row)"><template #icon><t-icon name="sound" /></template>查看音频</t-button>
+        </template>
         <template #qb="{ row }"><t-button variant="text" theme="primary" size="small" @click="showQuestionDialog(row)"><template #icon><t-icon name="file" /></template>查看题库</t-button></template>
         <template #created="{ row }">{{ new Date(row.created_at * 1000).toLocaleString() }}</template>
         <template #status="{ row }">
@@ -62,14 +65,10 @@
         </template>
         <template #op="{ row }">
           <t-button variant="text" size="small" theme="primary" @click="openEditDrawer(row)">编辑</t-button>
-          <t-button variant="text" size="small" theme="primary" @click="openLessonDrawer(row)">课时</t-button>
-          <t-button variant="text" size="small" theme="primary" @click="openQuestionDrawer(row)">题库</t-button>
           <t-button variant="text" size="small" theme="primary" @click="openStudentDrawer(row)">学员</t-button>
           <t-button v-if="row.status === 'draft' || row.status === 'rejected'" variant="text" size="small" theme="primary" @click="submitForReview(row)">提交审核</t-button>
           <t-button v-if="row.status === 'pending_review'" variant="text" size="small" theme="success" @click="approveCourse(row)">审核通过</t-button>
           <t-button v-if="row.status === 'pending_review'" variant="text" size="small" theme="danger" @click="rejectCourse(row)">驳回</t-button>
-          <t-button v-if="row.status === 'published'" variant="text" size="small" theme="warning" @click="toggleStatus(row)">停售</t-button>
-          <t-button v-if="row.status === 'offline'" variant="text" size="small" theme="success" @click="toggleStatus(row)">重新上架</t-button>
           <t-button v-if="row.status === 'draft'" variant="text" size="small" theme="danger" @click="delCourse(row)">删除</t-button>
         </template>
       </t-table>
@@ -160,80 +159,51 @@
             <div v-else class="live-tip"><t-icon name="info-circle" /> 直播课程无需上传视频，场次/中控在 SAAS 平台「直播」模块管理</div>
           </div>
 
-          <!-- 区块3：商品信息【红框=相对SaaS线上新增】 -->
+          <!-- 区块3：展示设置（V2·D2-1 本期不做交易：售卖配置改为展示开关） -->
           <div class="section-card saas-new-box" data-saas-no="3">
-            <div class="section-header"><t-icon name="cart" class="section-icon" /><span>商品信息</span><ReplicaMarker :no="3" label="编号③ 新增·售卖设置" /></div>
-            <t-form-item label="售卖方式">
-              <t-radio-group v-model="form.sale_type">
-                <t-radio value="free">免费</t-radio>
-                <t-radio value="paid">付费</t-radio>
+            <div class="section-header"><t-icon name="cart" class="section-icon" /><span>展示设置</span><ReplicaMarker :no="3" label="编号③ 展示开关" /></div>
+            <t-form-item label="有效期">
+              <t-radio-group v-model="form.validity_type">
+                <t-radio value="long">长期有效</t-radio>
+                <t-radio value="custom">自定义时间</t-radio>
               </t-radio-group>
+              <t-date-picker v-if="form.validity_type === 'custom'" v-model="form.validity_custom_date" enable-time-picker placeholder="选择失效时间" style="width:220px;margin-left:12px" />
             </t-form-item>
-            <template v-if="form.sale_type === 'paid'">
-              <t-form-item label="商品价格(元)" required-mark><t-input v-model="form.price" placeholder="请输入价格，最低为1" style="width:240px" /></t-form-item>
-              <t-form-item label="划线价格(元)"><t-input v-model="form.original_price" placeholder="选填，最低为1" style="width:240px" /></t-form-item>
-              <t-form-item label="有效期">
-                <t-radio-group v-model="form.validity_type">
-                  <t-radio value="long">长期有效</t-radio>
-                  <t-radio value="custom">自定义时长</t-radio>
-                  <t-radio value="fixed">固定时长</t-radio>
-                </t-radio-group>
-              </t-form-item>
-              <t-form-item v-if="form.validity_type === 'custom'" label="自定义到期时间"><t-date-picker v-model="form.validity_custom_date" enable-time-picker placeholder="选择日期时间" style="width:240px" /></t-form-item>
-              <t-form-item v-if="form.validity_type === 'fixed'" label="有效天数"><div class="fixed-days-row">自购买后 <t-input-number v-model="form.validity_fixed_days" :min="1" :max="3650" style="width:120px" /> 天内有效</div></t-form-item>
-            </template>
-            <t-form-item v-if="form.sale_type === 'free'" label="有效期"><span class="validity-static">长期有效</span></t-form-item>
-          </div>
-
-          <!-- 区块4：教学人员【红框=相对SaaS线上新增】 -->
-          <div class="section-card saas-new-box" data-saas-no="2">
-            <div class="section-header"><t-icon name="user-circle" class="section-icon" /><span>教学人员</span><ReplicaMarker :no="2" label="编号② 新增·讲师/助教" /></div>
-            <t-form-item label="讲师" required-mark>
-              <t-select v-model="form.lecturer_id" placeholder="请选择讲师" filterable clearable style="width:240px" @change="(v: any, ctx: any) => { form.lecturer_name = v ? (ctx?.option?.label ?? '') : ''; }">
-                <t-option v-for="l in lecturerOptions" :key="l.id" :label="l.name" :value="l.id" />
-              </t-select>
-            </t-form-item>
-            <t-form-item label="助教">
-              <t-select v-model="form.assistant_id" placeholder="请选择助教（选填）" filterable clearable style="width:240px">
-                <t-option v-for="a in assistantOptions" :key="a.id" :label="a.name" :value="a.id" />
-              </t-select>
+            <t-form-item label="C端展示">
+              <t-switch v-model="form.show_in_app" />
+              <span class="form-tip" style="margin-left:8px">开启后课程在 APP 端课程列表/推荐位展示，关闭则仅通过链接访问</span>
             </t-form-item>
           </div>
 
-          <!-- 区块5：分成设置【红框=相对SaaS线上新增】 -->
-          <div class="section-card saas-new-box" data-saas-no="4">
-            <div class="section-header"><t-icon name="money" class="section-icon" /><span>分成设置</span><ReplicaMarker :no="4" label="编号④ 新增·分成配置" /></div>
-            <t-form-item label="启用分成"><t-switch v-model="form.commission_enabled" :disabled="!form.is_paid" /><span class="form-tip" style="margin-left:8px">仅付费课程可启用</span></t-form-item>
-            <template v-if="form.commission_enabled">
-              <t-form-item label="讲师比例(%)"><t-input-number v-model="form.lecturer_rate" :min="0" :max="99" style="width:160px" /></t-form-item>
-              <t-form-item label="助教比例(%)"><t-input-number v-model="form.assistant_rate" :min="0" :max="99" :disabled="!form.assistant_id" style="width:160px" /><span v-if="!form.assistant_id" class="form-tip" style="margin-left:8px">未选择助教时比例为0</span></t-form-item>
-              <t-form-item label="平台比例(%)"><span class="validity-static">{{ platformRate }}%</span><span class="form-tip" style="margin-left:8px">自动兜底（100 - 讲师 - 助教）</span></t-form-item>
-              <div v-if="form.lecturer_rate + form.assistant_rate >= 100" class="form-error"><t-icon name="error-circle" /> 提示：讲师+助教比例之和须&lt;100%</div>
-            </template>
-          </div>
+          <!-- V2·0829 用户裁决：主讲人字段去除；分成设置区块已移除（本期不做交易） -->
 
-          <!-- D35 红包奖励配置【红框=课程业务新增】 -->
+          <!-- D35 红包奖励配置【红框=课程业务新增】V2·0829：仅保留完课奖励（答题奖励在内容管理课时行已有添加奖励入口）；奖励类型现金红包+积分可同选 -->
           <div class="section-card saas-new-box">
-            <div class="section-header"><t-icon name="gift" class="section-icon" /><span>红包奖励配置</span><ReplicaMarker :no="7" label="编号⑦ 新增·D35红包配置" /></div>
-            <t-form-item label="完课奖励红包">
+            <div class="section-header"><t-icon name="gift" class="section-icon" /><span>完课奖励配置</span><ReplicaMarker :no="7" label="编号⑦ 新增·D35完课奖励" /></div>
+            <t-form-item label="完课奖励">
               <t-switch v-model="form.completion_reward_enabled" />
               <span class="form-tip" style="margin-left:8px">学员完成全部课时后自动发放（D35）</span>
             </t-form-item>
-            <t-form-item label="答题奖励红包">
-              <t-switch v-model="form.answer_reward_enabled" />
-              <span class="form-tip" style="margin-left:8px">答题正确后按红包规则发放</span>
-            </t-form-item>
-            <template v-if="form.completion_reward_enabled || form.answer_reward_enabled">
-              <t-form-item label="奖励类型">
-                <t-radio-group v-model="form.reward_type"><t-radio value="cash">现金红包</t-radio><t-radio value="points">积分</t-radio></t-radio-group>
+            <template v-if="form.completion_reward_enabled">
+              <t-form-item label="现金红包">
+                <t-switch v-model="form.reward_cash_enabled" />
+                <template v-if="form.reward_cash_enabled">
+                  <t-input-number v-model="form.reward_amount" :min="0.01" :step="0.5" style="width:120px;margin-left:12px" /><span class="form-tip" style="margin-left:8px">元</span>
+                </template>
               </t-form-item>
-              <t-form-item label="奖励金额"><t-input-number v-model="form.reward_amount" :min="0.01" :step="0.5" style="width:140px" /><span class="form-tip" style="margin-left:8px">元</span></t-form-item>
-              <t-form-item label="红包规则">
+              <t-form-item v-if="form.reward_cash_enabled" label="红包规则">
                 <t-select v-model="form.red_packet_rule_id" placeholder="选择红包规则（营销中心）" clearable style="width:240px">
                   <t-option label="XJHB260806000009 · ¥1等分" value="XJHB260806000009" />
                   <t-option label="XJHB260805000005 · ¥500拼手气" value="XJHB260805000005" />
                 </t-select>
               </t-form-item>
+              <t-form-item label="积分">
+                <t-switch v-model="form.reward_points_enabled" />
+                <template v-if="form.reward_points_enabled">
+                  <t-input-number v-model="form.reward_points" :min="1" :step="10" style="width:120px;margin-left:12px" /><span class="form-tip" style="margin-left:8px">分</span>
+                </template>
+              </t-form-item>
+              <t-form-item v-if="!form.reward_cash_enabled && !form.reward_points_enabled"><span class="form-tip">现金红包与积分至少开启一项，否则完课无奖励</span></t-form-item>
             </template>
           </div>
 
@@ -276,24 +246,10 @@
               <t-form-item label="禁止倍速播放"><t-switch v-model="form.forbid_speed" /><span class="form-tip" style="margin-left:8px">未学完时禁止倍速</span></t-form-item>
               <t-form-item label="防录屏跑马灯"><t-switch v-model="form.watermark_horse" /><span class="form-tip" style="margin-left:8px">播放页展示用户名/ID防录屏</span></t-form-item>
               <t-form-item label="开启水印"><t-switch v-model="form.watermark_text" /><span class="form-tip" style="margin-left:8px">视频区右上角显示水印</span></t-form-item>
-              <t-form-item label="允许试看"><t-switch v-model="form.allow_preview" /><span class="form-tip" style="margin-left:8px">开启后可免费试看第1节课（v1.4.0 §10A.2）</span></t-form-item>
             </div>
           </div>
 
-          <!-- 区块7：上架设置 -->
-          <div class="section-card">
-            <div class="section-header"><t-icon name="unfold-more" class="section-icon" /><span>上架设置</span></div>
-            <t-form-item label="是否上架" required-mark>
-              <t-radio-group v-model="form.on_shelf">
-                <t-radio value="immediate">立即上架</t-radio>
-                <t-radio value="scheduled">定时上架</t-radio>
-                <t-radio value="takedown">下架</t-radio>
-              </t-radio-group>
-            </t-form-item>
-            <t-form-item v-if="form.on_shelf === 'scheduled'" label="定时上架时间"><t-date-picker v-model="form.scheduled_time" enable-time-picker placeholder="选择日期时间" style="width:240px" /></t-form-item>
-            <t-form-item v-if="form.on_shelf === 'immediate' || form.on_shelf === 'scheduled'" label="定时下架时间"><t-date-picker v-model="form.takedown_time" enable-time-picker placeholder="选择日期时间" style="width:240px" /></t-form-item>
-            <div class="shelf-tip"><t-icon name="info-circle" /> 课程上架后，可在店铺主页显示；下架时隐藏，下架后学员无法学习该内容。</div>
-          </div>
+          <!-- V2·0829 用户裁决：上架设置整体去除（无收费/免费区分操作）；允许试看去除 -->
         </t-form>
 
         <div class="drawer-footer">
@@ -325,6 +281,30 @@
         </div>
       </div>
       <template #footer><t-button @click="videoDialogVisible = false">取消</t-button><t-button theme="primary">确认</t-button></template>
+    </t-dialog>
+
+    <!-- 查看音频弹窗（V2·0829 用户裁决：补充查看音频入口） -->
+    <t-dialog v-model:visible="audioDialogVisible" header="查看音频" width="640px">
+      <div class="video-player" v-if="currentCourse">
+        <div class="player-area" style="display:flex;align-items:center;justify-content:center;min-height:120px">
+          <t-icon name="sound" style="font-size:48px;color:#0D9488" />
+        </div>
+        <div class="player-controls">
+          <t-icon name="play" class="ctrl" />
+          <t-icon name="sound" class="ctrl" />
+          <div class="progress-bar"><div class="progress-fill"></div></div>
+          <span class="time">00:00 / {{ formatDuration(currentCourse.video_duration || 600) }}</span>
+        </div>
+        <div class="video-meta">
+          <p><span>所属分类：</span>{{ currentCourse.category_name }}</p>
+          <p><span>音频名称：</span>{{ currentCourse.title }}</p>
+          <p><span>文件名称：</span>{{ currentCourse.course_no }}.mp3</p>
+          <p><span>文件格式：</span>audio/mp3</p>
+          <p><span>文件大小：</span>30.00MB</p>
+          <p><span>音频时长：</span>{{ formatDuration(currentCourse.video_duration || 600) }}</p>
+        </div>
+      </div>
+      <template #footer><t-button @click="audioDialogVisible = false">取消</t-button><t-button theme="primary">确认</t-button></template>
     </t-dialog>
 
     <!-- 查看题库弹窗 -->
@@ -402,10 +382,7 @@
       <template #footer><t-button theme="primary" @click="quizDetailVisible = false">关闭</t-button></template>
     </t-dialog>
 
-    <!-- 课时管理抽屉（PC-003·含直播转课时） -->
-    <LessonDrawerPage v-model="lessonDrawerVisible" :course-id="lessonDrawerCourseId" />
-    <!-- 题库管理抽屉（PC-004） -->
-    <QuestionDrawerPage v-model="questionDrawerVisible" :course-id="questionDrawerCourseId" />
+    <!-- V2·0829 用户裁决：课时管理/题库管理抽屉入口已随操作列按钮删除（相关操作统一在编辑模块内完成） -->
 
     <!-- 课程学员查看抽屉（PC-002.5） -->
     <t-drawer v-model:visible="studentDrawerVisible" :header="`课程学员 · ${studentDrawerCourse?.title ?? ''}`" size="720px" placement="right">
@@ -414,13 +391,11 @@
         { colKey: 'no', title: '学员编号', width: 150 },
         { colKey: 'name', title: '学员', width: 80 },
         { colKey: 'phone', title: '手机号', width: 110 },
-        { colKey: 'pay', title: '支付方式', width: 90 },
-        { colKey: 'amount', title: '实付', width: 80 },
         { colKey: 'time', title: '开通时间', width: 130 },
         { colKey: 'status', title: '学习状态', width: 85 },
         { colKey: 'progress', title: '进度', width: 65 },
       ]" bordered size="small">
-        <template #amount="{ row }">{{ row.amount > 0 ? '¥' + row.amount : '免费' }}</template>
+        <!-- V2·0829 用户裁决：支付方式/实付列删除（全免费） -->
         <template #status="{ row }"><t-tag size="small" :theme="row.status === '已完成' ? 'success' : 'primary'" variant="light">{{ row.status }}</t-tag></template>
       </t-table>
     </t-drawer>
@@ -432,7 +407,6 @@ import { ref, computed } from 'vue';
 import { MessagePlugin } from 'tdesign-vue-next';
 import { useCourseStore } from '../../../stores/course-store';
 import { useCampStore } from '../../../stores/camp-store';
-import { useLecturerStore } from '../../../stores/lecturer-store';
 import ReplicaMarker from '../../../components/replica/ReplicaMarker.vue';
 import { notifyModalOpen } from '../../../utils/modal-spec-bridge';
 import { COURSE_CATEGORIES } from '../../../contracts/constants/course-constants';
@@ -440,19 +414,7 @@ import { LIVE_SESSIONS } from '../../../adapters/sim/sim-fixtures';
 
 const store = useCourseStore();
 const campStore = useCampStore();
-const lecturerStore = useLecturerStore();
-// 讲师/助教选项与组织管理同源——建档即可选（资质审核流程暂不启用）
-const lecturerOptions = computed(() => {
-  const map = new Map<string, string>();
-  lecturerStore.loadLecturerList().forEach((l: any) => map.set(l.id, l.name));
-  store.courses.forEach((c: any) => { if (c.lecturer_id && c.lecturer_name) map.set(c.lecturer_id, c.lecturer_name); });
-  return Array.from(map.entries()).map(([id, name]) => ({ id, name }));
-});
-const assistantOptions = computed(() => {
-  const map = new Map<string, string>();
-  lecturerStore.loadLecturerList().forEach((l: any) => map.set(l.id, l.name));
-  return Array.from(map.entries()).map(([id, name]) => ({ id, name }));
-});
+// V2·D2-2 去掉讲师/助教角色：不再从组织档案选择，主讲人为课程内容属性（纯文本）
 const liveRooms = LIVE_SESSIONS;
 const dateRange = ref<any>([]);
 const search = ref(''); const searchNo = ref(''); const catFilter = ref(''); const modeFilter = ref(''); const visibilityFilter = ref(''); const inCampFilter = ref('');
@@ -470,31 +432,27 @@ const coverPresets = [
   { url: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=225&fit=crop', label: '封面3' },
   { url: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&h=225&fit=crop', label: '封面4' },
 ];
-const platformRate = computed(() => Math.max(0, 100 - (form.value.lecturer_rate || 0) - (form.value.assistant_rate || 0)));
 
 function defaultForm() {
   return {
     title: '', category_name: '', description: '', mode: 'recorded' as 'recorded' | 'live', visibility: 'public' as 'public' | 'camp_only',
     cover_url: '', videos: [] as any[],
     live_session_id: '' as string,
-    // 商品信息（对齐视频课程）
-    sale_type: 'free' as 'free' | 'paid', price: '' as string | number, original_price: '' as string | number,
+    // V2·D2-1 本期不做交易：售卖配置固定免费，仅保留 C 端展示开关
+    show_in_app: true,
     validity_type: 'long' as 'long' | 'custom' | 'fixed', validity_custom_date: null as Date | null, validity_fixed_days: 365,
-    // 教学人员
-    lecturer_id: '', lecturer_name: '', assistant_id: '',
-    // 分成配置
-    commission_enabled: false, lecturer_rate: 70, assistant_rate: 10,
+    // V2·0829 用户裁决：主讲人/上架设置/允许试看/答题奖励红包字段已去除
+    commission_enabled: false,
     // 课程设置（SaaS 线上 1:1 六项配置）
     show_intro: true, virtual_viewers: true, virtual_min: 1, virtual_max: 100,
     comment_enabled: true, comment_max_words: 50,
     show_progress: 'allow' as 'allow' | 'disallow', allow_pause: 'disallow' as 'allow' | 'disallow', completion_percent: 100,
-    // D35 课程级红包奖励配置（业务新增）
-    completion_reward_enabled: false, answer_reward_enabled: false,
-    reward_type: 'cash' as 'cash' | 'points', reward_amount: 1, red_packet_rule_id: '',
+    // D35 完课奖励配置（业务新增·现金红包与积分可同选）
+    completion_reward_enabled: false,
+    reward_cash_enabled: true, reward_amount: 1, red_packet_rule_id: '',
+    reward_points_enabled: false, reward_points: 20,
     // 课程设置（课程业务新增·内容保护）
-    forbid_seek: false, forbid_speed: false, watermark_horse: false, watermark_text: false, allow_preview: false,
-    // 上架设置
-    on_shelf: 'immediate' as 'immediate' | 'scheduled' | 'takedown', scheduled_time: null as Date | null, takedown_time: null as Date | null,
+    forbid_seek: false, forbid_speed: false, watermark_horse: false, watermark_text: false,
   };
 }
 
@@ -505,6 +463,7 @@ const columns = computed(() => {
     { colKey: 'title', title: '课程名称', minWidth: 160, ellipsis: true },
     { colKey: 'category_name', title: '分类名称', width: 100 },
     { colKey: 'video', title: '查看视频', width: 100 },
+    { colKey: 'audio', title: '查看音频', width: 100 },
     { colKey: 'qb', title: '查看题库', width: 100 },
     { colKey: 'created', title: '创建时间', width: 180 },
     { colKey: 'status', title: '状态', width: 80 },
@@ -697,46 +656,53 @@ function openEditDrawer(row: any) {
     cover_url: row.cover_url || coverPresets[0].url,
     live_session_id: row.source_live_session_id || '',
     videos: row.mode === 'live' ? [] : lessons.map((l: any) => ({ video_no: l.lesson_no, name: l.title, format: l.content_type === 'audio' ? 'audio/mp3' : 'video/mp4', size: l.content_type === 'audio' ? '30.00MB' : '500.00MB', duration: formatDuration(l.video_duration), category: row.category_name || '未分组', ctype: l.content_type || 'video', has_quiz: !!l.question_bank_id, files_count: 1, file_name: l.title, reward: null })),
-    sale_type: row.is_paid ? 'paid' : 'free', price: (row.price ?? 0) / 100, original_price: '',
+    sale_type: 'free' as 'free' | 'paid', price: 0, original_price: '',
     validity_type: 'long', validity_custom_date: null, validity_fixed_days: 365,
-    lecturer_id: row.lecturer_id || '', lecturer_name: row.lecturer_name || '', assistant_id: '',
-    commission_enabled: row.commission_enabled ?? false, lecturer_rate: Math.round((row.lecturer_rate ?? 0.7) * 100), assistant_rate: Math.round((row.assistant_rate ?? 0.1) * 100),
+    commission_enabled: false,
+    show_in_app: (row as any).show_in_app ?? true,
     show_intro: true, virtual_viewers: true, virtual_min: 1, virtual_max: 100, comment_enabled: true, comment_max_words: 50, show_progress: 'allow', allow_pause: 'disallow', completion_percent: 100,
-    forbid_seek: false, forbid_speed: false, watermark_horse: false, watermark_text: false, allow_preview: false,
-    on_shelf: row.status === 'published' ? 'immediate' : row.status === 'offline' ? 'takedown' : 'immediate', scheduled_time: null, takedown_time: null,
+    forbid_seek: false, forbid_speed: false, watermark_horse: false, watermark_text: false,
+    completion_reward_enabled: false, reward_cash_enabled: true, reward_amount: 1, red_packet_rule_id: '', reward_points_enabled: false, reward_points: 20,
   };
   drawerVisible.value = true;
 }
 function doSave() {
   if (!form.value.title) { MessagePlugin.warning('请填写课程名称'); return; }
   if (!form.value.category_name) { MessagePlugin.warning('请选择所属分类'); return; }
-  // 流程闭环：必须先在「组织管理」新增讲师档案，才能创建课程（不静默兜底）
-  if (!form.value.lecturer_id || !form.value.lecturer_name) { MessagePlugin.warning('请选择讲师（需先在组织管理中新增讲师档案）'); return; }
-  if (form.value.commission_enabled && (form.value.lecturer_rate + form.value.assistant_rate) >= 100) { MessagePlugin.warning('讲师+助教比例之和须<100%'); return; }
-  const price = Math.round((Number(form.value.price) || 0) * 100);
-  const isPaid = form.value.sale_type === 'paid';
+  // V2·D2-1 本期不做交易：全部免费，价格固定 0；D2-2 主讲人为选填文本，不做讲师档案校验
+  const price = 0;
+  const isPaid = false;
   if (editing.value) {
-    store.updateCourse(editing.value.id, { title: form.value.title, category_name: form.value.category_name, description: form.value.description, mode: form.value.mode, visibility: form.value.visibility, cover_url: form.value.cover_url, is_paid: isPaid, price, commission_enabled: form.value.commission_enabled, lecturer_rate: form.value.lecturer_rate / 100, assistant_rate: form.value.assistant_rate / 100, platform_rate: platformRate.value / 100 });
+    store.updateCourse(editing.value.id, { title: form.value.title, category_name: form.value.category_name, description: form.value.description, mode: form.value.mode, visibility: form.value.visibility, cover_url: form.value.cover_url, is_paid: isPaid, price, commission_enabled: false, show_in_app: form.value.show_in_app, lecturer_id: '', lecturer_name: '' } as any);
     if (form.value.mode === 'recorded') {
       form.value.videos.forEach((v: any) => {
         const existing = store.lessons.find((l: any) => l.lesson_no === v.video_no);
         if (!existing) {
-          store.createLesson({ course_id: editing.value.id, content_type: v.ctype === 'audio' ? 'audio' : 'video', sort_order: store.loadLessonsByCourse(editing.value.id).length + 1, title: v.name, description: '', mode: 'recorded', video_url: '', video_duration: v.ctype === 'audio' ? 1200 : 3036, live_session_id: null, question_bank_id: v.has_quiz ? (store.courses.find(c => c.id === editing.value.id)?.question_bank_id ?? null) : null, is_free_preview: false } as any);
+          store.createLesson({ course_id: editing.value.id, content_type: v.ctype === 'audio' ? 'audio' : 'video', sort_order: store.loadLessonsByCourse(editing.value.id).length + 1, title: v.name, description: '', mode: 'recorded', video_url: '', video_duration: v.ctype === 'audio' ? 1200 : 3036, live_session_id: null, question_bank_id: v.has_quiz ? (store.courses.find(c => c.id === editing.value.id)?.question_bank_id ?? null) : null, is_free_preview: false, reward: v.reward ?? null } as any);
+        } else if (v.reward) {
+          // V2·0829：课时行「添加奖励」同步到 lesson（C 端答题激励数据源）
+          store.updateLesson(existing.id, { reward: v.reward } as any);
         }
       });
     }
     MessagePlugin.success('课程已更新');
   } else {
-    store.createCourse({ title: form.value.title, description: form.value.description, cover_url: form.value.cover_url, category_id: 'cat-' + Date.now(), category_name: form.value.category_name, tags: [], lecturer_id: form.value.lecturer_id, lecturer_name: form.value.lecturer_name, source: 'upload', mode: form.value.mode, source_live_session_id: null, visibility: form.value.visibility, price, is_paid: isPaid, commission_enabled: form.value.commission_enabled, lecturer_rate: form.value.lecturer_rate / 100, assistant_rate: form.value.assistant_rate / 100, platform_rate: platformRate.value / 100 } as any);
+    store.createCourse({ title: form.value.title, description: form.value.description, cover_url: form.value.cover_url, category_id: 'cat-' + Date.now(), category_name: form.value.category_name, tags: [], lecturer_id: '', lecturer_name: '', source: 'upload', mode: form.value.mode, source_live_session_id: null, visibility: form.value.visibility, price, is_paid: isPaid, commission_enabled: false, show_in_app: form.value.show_in_app } as any);
     MessagePlugin.success('课程已新增');
+  }
+  // D35 完课奖励同步营销域复刻观看奖励页（真实系统：课程表单保存→营销中心创建红包规则）；积分奖励走积分事件不建红包规则
+  if (form.value.completion_reward_enabled && form.value.reward_cash_enabled) {
+    import('../../../stores/saas-replica/marketing-replica-store').then(({ useMarketingReplicaStore }) => {
+      const mk = useMarketingReplicaStore();
+      const name = `完课红包·${form.value.title}`;
+      const existed = mk.rules.find(r => r.rule_name === name);
+      if (existed) { existed.amount_yuan = form.value.reward_amount; return; }
+      mk.rules.unshift({ id: 'WR-' + Date.now(), rule_no: 'HB' + Date.now().toString().slice(-9), rule_name: name, reward_type: '完课红包', bind_scene: '营期', scene_name: form.value.title, amount_yuan: form.value.reward_amount, total_count: 500, issued_count: 0, received_count: 0, status: 'enabled', created_at: Math.floor(Date.now() / 1000) });
+    });
   }
   drawerVisible.value = false; editing.value = null; form.value = defaultForm();
 }
-function toggleStatus(row: any) {
-  if (row.status === 'published') { store.offlineCourse(row.id); MessagePlugin.success('已停售'); }
-  else if (row.status === 'offline') { store.republishCourse(row.id); MessagePlugin.success('已重新上架'); }
-  else { MessagePlugin.warning('当前状态不可直接上下架，需先通过审核'); }
-}
+// V2·0829 用户裁决：停售/重新上架按钮已去除（相关操作统一在编辑模块内完成）
 // 课程状态 5 状态：draft(草稿) → pending_review(待审核) → published(已发布) → offline(已下架) / rejected(已驳回)
 function statusLabel(s: string): string {
   const m: Record<string, string> = { draft: '草稿', pending_review: '待审核', published: '已发布', offline: '已下架', rejected: '已驳回' };
@@ -782,10 +748,7 @@ function openStudentDrawer(row: any) { studentDrawerCourse.value = row; studentD
 // ─── 课时/题库抽屉（PC-003/PC-004 入口） ───
 import LessonDrawerPage from './LessonDrawerPage.vue';
 import QuestionDrawerPage from './QuestionDrawerPage.vue';
-const lessonDrawerVisible = ref(false); const lessonDrawerCourseId = ref('');
-const questionDrawerVisible = ref(false); const questionDrawerCourseId = ref('');
-function openLessonDrawer(row: any) { lessonDrawerCourseId.value = row.id; lessonDrawerVisible.value = true; notifyModalOpen('lesson-drawer'); }
-function openQuestionDrawer(row: any) { questionDrawerCourseId.value = row.id; questionDrawerVisible.value = true; notifyModalOpen('question-bank-drawer'); }
+// V2·0829 用户裁决：课时/题库抽屉及其入口已删除
 function approveCourse(row: any) {
   if (row.status !== 'pending_review') { MessagePlugin.warning('仅待审核课程可通过'); return; }
   store.approveCourse(row.id, 'admin-001');
@@ -798,6 +761,8 @@ function rejectCourse(row: any) {
   MessagePlugin.warning('课程已驳回');
 }
 function showVideoDialog(row: any) { currentCourse.value = row; videoDialogVisible.value = true; notifyModalOpen('course-view-video'); }
+const audioDialogVisible = ref(false);
+function showAudioDialog(row: any) { currentCourse.value = row; audioDialogVisible.value = true; notifyModalOpen('course-view-audio'); }
 function showQuestionDialog(row: any) { currentCourse.value = row; questionDialogVisible.value = true; notifyModalOpen('course-view-quiz'); }
 </script>
 

@@ -37,9 +37,9 @@
         <div class="course-cover"><span class="cover-emoji">{{ c.cover_emoji }}</span><span v-if="c.mode === 'live'" class="live-corner">直播</span></div>
         <div class="course-info">
           <div class="course-name">{{ c.title }}</div>
-          <div class="course-meta">{{ c.lecturer_name }} · {{ c.lesson_count }}课时</div>
+          <div class="course-meta">{{ c.lesson_count }}课时</div>
           <div class="course-bottom">
-            <span class="course-price">{{ c.is_paid ? '¥' + (c.price / 100).toFixed(0) : '免费' }}</span>
+            <span class="course-price free">免费</span>
             <button class="buy-btn" @click.stop="goCourse(c.id)">报名</button>
           </div>
         </div>
@@ -120,7 +120,8 @@ function tabPlaceholder() { MessagePlugin.info('敬请期待'); }
 .course-name { font-size: 14px; font-weight: 600; color: #1F2C3E; }
 .course-meta { font-size: 11px; color: #98A2B3; margin-top: 4px; }
 .course-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
-.course-price { font-size: 15px; font-weight: 700; color: #F04438; }
+.course-price { font-size: 15px; font-weight: 700; color: #12B76A; }
+.course-price.free { color: #12B76A; }
 .buy-btn { padding: 4px 14px; background: #12B76A; color: #fff; border: none; border-radius: 12px; font-size: 11px; }
 
 .store-tabbar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 375px; height: 56px; background: #fff; border-top: 1px solid #EAECF0; display: flex; z-index: 100; }

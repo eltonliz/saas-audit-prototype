@@ -55,7 +55,7 @@
       <t-descriptions v-if="current" :column="2" bordered>
         <t-descriptions-item label="场次编号">{{ current.session_no }}</t-descriptions-item>
         <t-descriptions-item label="直播类型">{{ current.source_label }}</t-descriptions-item>
-        <t-descriptions-item label="主播名称">{{ current.lecturer_name }}</t-descriptions-item>
+        <t-descriptions-item label="主播名称">{{ current.anchor_name }}</t-descriptions-item>
         <t-descriptions-item label="开始时间">{{ current.planned_start_at }}</t-descriptions-item>
         <t-descriptions-item label="结束时间">{{ current.planned_end_at }}</t-descriptions-item>
         <t-descriptions-item label="场次状态">{{ current.status }}</t-descriptions-item>
@@ -91,7 +91,7 @@ const fmtTime = (ts: number | null) => ts ? new Date(ts * 1000).toLocaleString()
 
 const columns = [
   { colKey: 'row-select', type: 'multiple', width: 50 },
-  { colKey: 'lecturer_name', title: '主播名称', width: 90 },
+  { colKey: 'anchor_name', title: '主播名称', width: 90 },
   { colKey: 'session_no', title: '场次编号', width: 120 },
   { colKey: 'source_label', title: '直播类型', width: 100 },
   { colKey: 'planned_start_at', title: '场次开始时间', width: 160 },
@@ -108,7 +108,7 @@ const tableRows = computed(() => liveStore.sessions.map(s => {
   const room = s.room_id ? liveStore.loadRoom(s.room_id) : null;
   return {
     id: s.id,
-    lecturer_name: s.lecturer_name,
+    anchor_name: s.anchor_name,
     session_no: s.session_no,
     source: s.source,
     source_label: sourceLabel(s.source),

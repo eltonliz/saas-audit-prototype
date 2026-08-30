@@ -12,10 +12,24 @@ import { SEED_LIVE_SESSIONS, SEED_LIVE_ROOMS, SEED_LIVE_PRODUCTS } from '../adap
 
 const now = () => Math.floor(Date.now() / 1000);
 
+// V2·0829 用户裁决：讲师/助教角色下线——直播域使用独立主播库（本地模拟，与课程讲师档案解耦）
+export interface LiveAnchor {
+  id: string; no: string; name: string; type: 'real' | 'virtual'; gender: 'male' | 'female' | 'secret';
+  bio: string; fans_count: number; cert_status: 'approved' | 'pending' | 'none'; status: 'active' | 'inactive';
+}
+const SEED_ANCHORS: LiveAnchor[] = [
+  { id: 'ANCHOR-001', no: 'ZB-2026001', name: '陈晨', type: 'real', gender: 'female', bio: '健康生活分享博主', fans_count: 12800, cert_status: 'approved', status: 'active' },
+  { id: 'ANCHOR-002', no: 'ZB-2026002', name: '林一舟', type: 'real', gender: 'male', bio: '运动营养讲师', fans_count: 8600, cert_status: 'approved', status: 'active' },
+  { id: 'ANCHOR-003', no: 'ZB-2026003', name: '苏晚', type: 'real', gender: 'female', bio: '养生课堂主播', fans_count: 5300, cert_status: 'pending', status: 'active' },
+  { id: 'ANCHOR-004', no: 'ZB-2026004', name: '小助手·虚拟主播', type: 'virtual', gender: 'secret', bio: '7x24 无人直播', fans_count: 0, cert_status: 'none', status: 'inactive' },
+];
+
 export const useLiveStore = defineStore('live', () => {
   const sessions = ref<LiveSession[]>([...SEED_LIVE_SESSIONS]);
   const rooms = ref<LiveRoom[]>([...SEED_LIVE_ROOMS]);
   const products = ref<LiveProduct[]>([...SEED_LIVE_PRODUCTS]);
+  const anchors = ref<LiveAnchor[]>([...SEED_ANCHORS]);
+  function loadAnchors() { return anchors.value.filter(a => a.status === 'active'); }
 
   // ── 直播场次 Action ──
 
@@ -66,8 +80,8 @@ export const useLiveStore = defineStore('live', () => {
   }
 
   // ── 直播间 Action ──
-  function createRoom(input: { name: string; lecturer_id: string; lecturer_name: string; resolution?: string }): LiveRoom {
-    const r: LiveRoom = { id: generateLiveId('ROOM'), room_no: generateLiveId('ROOM'), name: input.name, lecturer_id: input.lecturer_id, lecturer_name: input.lecturer_name, status: 'idle', push_url: '', pull_url: '', resolution: input.resolution ?? '720p', beauty_enabled: true, record_enabled: true, current_session_id: null, created_at: now(), updated_at: now() };
+  function createRoom(input: { name: string; anchor_id: string; anchor_name: string; resolution?: string }): LiveRoom {
+    const r: LiveRoom = { id: generateLiveId('ROOM'), room_no: generateLiveId('ROOM'), name: input.name, anchor_id: input.anchor_id, anchor_name: input.anchor_name, status: 'idle', push_url: '', pull_url: '', resolution: input.resolution ?? '720p', beauty_enabled: true, record_enabled: true, current_session_id: null, created_at: now(), updated_at: now() };
     rooms.value.push(r); return r;
   }
   function updateRoom(id: string, patch: Partial<LiveRoom>): void { const idx = rooms.value.findIndex(r => r.id === id); if (idx >= 0) rooms.value[idx] = { ...rooms.value[idx], ...patch, updated_at: now() }; }
@@ -95,7 +109,7 @@ export const useLiveStore = defineStore('live', () => {
     const p = products.value.find(x => x.id === id); if (p) { p.is_explaining = true; p.updated_at = now(); }
   }
 
-  return { sessions, rooms, products,
+  return { sessions, rooms, products, anchors, loadAnchors,
     createSession, updateSession, deleteSession, loadSession, loadSessionsByCamp, loadSessionsByCourse, startSession, endSession,
     createRoom, updateRoom, loadRoom,
     addProduct, updateProduct, removeProduct, loadProducts, shelfProduct, unshelfProduct, pinProduct, setExplaining };

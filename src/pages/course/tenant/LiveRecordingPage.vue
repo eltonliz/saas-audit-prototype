@@ -64,41 +64,11 @@
             </div>
             <t-table :data="controlCourses" row-key="seq" :columns="controlCourseColumns" bordered size="small" style="margin-top: 12px">
               <template #cover><div class="cover-placeholder"><t-icon name="image" /></div></template>
-              <template #script="{ row }"><t-button variant="text" size="small" theme="primary" @click="row.hasScript = true">{{ row.hasScript ? '已配置' : '配置脚本' }}</t-button></template>
             </t-table>
           </t-tab-panel>
-          <t-tab-panel value="product" label="商品">
-            <div class="tab-toolbar">
-              <t-button theme="primary" size="small" @click="showAddProduct = true"><template #icon><t-icon name="add" /></template>添加商品</t-button>
-            </div>
-            <t-table :data="controlProducts" row-key="spu_no" :columns="controlProductColumns" bordered size="small" style="margin-top: 12px">
-              <template #product_type="{ row }"><t-tag :theme="row.product_type === 'course' ? 'primary' : 'default'" variant="light" size="small">{{ row.product_type === 'course' ? '课程' : '实物' }}</t-tag></template>
-              <template #op="{ row }">
-                <t-button variant="text" size="small" theme="primary" @click="openScript(row)">配置脚本</t-button>
-                <t-button variant="text" size="small" theme="danger" @click="removeProduct(row)">移除</t-button>
-              </template>
-            </t-table>
-          </t-tab-panel>
+          <!-- V2·0829 用户裁决：商品相关整体下线，商品 tab/添加商品/商品脚本已删除 -->
         </t-tabs>
       </div>
-    </t-dialog>
-
-    <!-- 添加商品弹窗 -->
-    <t-dialog v-model:visible="showAddProduct" header="添加商品" width="500px" :confirm-btn="{ content: '添加', theme: 'primary' }" :cancel-btn="{ content: '取消' }">
-      <t-table :data="availableProducts" row-key="id" :columns="availableColumns" bordered size="small">
-        <template #product_type="{ row }"><t-tag :theme="row.product_type === 'course' ? 'primary' : 'default'" variant="light" size="small">{{ row.product_type === 'course' ? '课程' : '实物' }}</t-tag></template>
-      </t-table>
-    </t-dialog>
-
-    <!-- 配置脚本弹窗 -->
-    <t-dialog v-model:visible="scriptVisible" header="配置商品脚本" width="480px" :on-confirm="doSaveScript" :confirm-btn="{ content: '保存', theme: 'primary' }" :cancel-btn="{ content: '取消' }">
-      <t-form label-width="120px">
-        <t-form-item label="商品名称"><span>{{ scriptForm.productName }}</span></t-form-item>
-        <t-form-item label="触发时间(秒)" required-mark><t-input-number v-model="scriptForm.triggerTime" :min="0" style="width: 160px" /></t-form-item>
-        <t-form-item label="展示时长(秒)" required-mark><t-input-number v-model="scriptForm.displayDuration" :min="1" style="width: 160px" /></t-form-item>
-        <t-form-item label="展示顺序" required-mark><t-input-number v-model="scriptForm.displayOrder" :min="1" style="width: 160px" /></t-form-item>
-        <div class="script-hint">脚本绑定 SPU，不直接绑定课程。停售后脚本保留但前台不弹出购买卡片。</div>
-      </t-form>
     </t-dialog>
   </div>
 </template>
@@ -107,11 +77,10 @@
 import { ref, computed } from 'vue';
 import { MessagePlugin } from 'tdesign-vue-next';
 import { useLiveStore } from '../../../stores/live-store';
-import { useCourseCommerceStore } from '../../../stores/course-commerce-store';
 
+// V2·0829：直播商品车数据源 = 直播域商品，不再依赖课程商品
 const liveStore = useLiveStore();
-const commerceStore = useCourseCommerceStore();
-const roomFilter = ref(''); const showCreate = ref(false); const controlVisible = ref(false); const controlTab = ref('course'); const showAddProduct = ref(false);
+const roomFilter = ref(''); const showCreate = ref(false); const controlVisible = ref(false); const controlTab = ref('course');
 const currentRecording = ref<any>(null);
 const form = ref<any>({ title: '', sourceType: 'live', courseId: '' });
 
@@ -126,7 +95,6 @@ const columns = [
   { colKey: 'duration', title: '录播总时长', width: 90 },
   { colKey: 'viewers', title: '累计观看人数', width: 100 },
   { colKey: 'peak', title: '峰值在线人数', width: 100 },
-  { colKey: 'orders', title: '商品订单', width: 80 },
   { colKey: 'startTime', title: '开始时间', width: 130 },
   { colKey: 'endTime', title: '结束时间', width: 130 },
   { colKey: 'status', title: '状态', width: 80 },
@@ -137,45 +105,14 @@ const controlCourseColumns = [
   { colKey: 'seq', title: '序号', width: 60 },
   { colKey: 'cover', title: '视频封面', width: 60 },
   { colKey: 'title', title: '课程名称', minWidth: 200 },
-  { colKey: 'script', title: '商品脚本', width: 120 },
 ];
 
-// 控制面板商品列从 commerceStore.products 读取
-const controlProductColumns = [
-  { colKey: 'seq', title: '序号', width: 60 },
-  { colKey: 'name', title: '商品名', minWidth: 160 },
-  { colKey: 'spu_no', title: '商品编号', width: 120 },
-  { colKey: 'product_type', title: '商品类型', width: 80 },
-  { colKey: 'status', title: '状态', width: 80 },
-  { colKey: 'op', title: '操作', width: 130 },
-];
-
-const availableColumns = [
-  { colKey: 'row-select', type: 'multiple', width: 50 },
-  { colKey: 'name', title: '商品名', minWidth: 140 },
-  { colKey: 'spu_no', title: '商品编号', width: 120 },
-  { colKey: 'product_type', title: '商品类型', width: 80 },
-  { colKey: 'status', title: '状态', width: 80 },
-];
-
-const scriptVisible = ref(false);
-const scriptForm = ref({ productName: '', triggerTime: 0, displayDuration: 30, displayOrder: 1 });
-function openScript(row: any) {
-  scriptForm.value = { productName: row.name, triggerTime: (row.script?.triggerTime) || 0, displayDuration: (row.script?.displayDuration) || 30, displayOrder: (row.script?.displayOrder) || 1 };
-  scriptVisible.value = true;
-}
-function doSaveScript() {
-  if (scriptForm.value.triggerTime < 0) { MessagePlugin.warning('触发时间不能为负'); return; }
-  if (scriptForm.value.displayDuration < 1) { MessagePlugin.warning('展示时长至少1秒'); return; }
-  MessagePlugin.success('商品脚本已保存');
-  scriptVisible.value = false;
-}
+// V2·0829 用户裁决：商品相关（商品列/商品脚本/添加商品）已整体删除
 
 // 从 liveStore.sessions 映射录播行（所有 ended 或有 replay_url 的场次）
 const recordings = computed(() => liveStore.sessions
   .filter(s => s.status === 'ended' || s.replay_url)
   .map(s => {
-    const products = liveStore.loadProducts(s.id);
     return {
       id: s.id,
       no: 'PBLR-' + s.session_no.slice(-6),
@@ -183,51 +120,23 @@ const recordings = computed(() => liveStore.sessions
       duration: s.replay_duration ? Math.floor(s.replay_duration / 60) + '分' : '—',
       viewers: s.total_viewers,
       peak: s.peak_viewers,
-      orders: s.total_orders,
       startTime: s.actual_start_at ? new Date(s.actual_start_at * 1000).toLocaleDateString() : new Date(s.planned_start_at * 1000).toLocaleDateString(),
       endTime: s.actual_end_at ? new Date(s.actual_end_at * 1000).toLocaleDateString() : '—',
       status: statusLabel(s.status),
       raw_status: s.status,
-      _products: products,
     };
   })
 );
 
 const filteredRecordings = computed(() => recordings.value.filter(r => !roomFilter.value || r.no === roomFilter.value));
 
-// 控制面板数据从 store 派生
-const controlProducts = computed(() => {
-  if (!currentRecording.value) return [];
-  const bindings = commerceStore.liveBindings.filter((b: any) => b.live_session_id === currentRecording.value.id);
-  return bindings.map((b: any, idx: number) => {
-    const product = commerceStore.products.find((p: any) => p.id === b.course_product_id);
-    return {
-      seq: idx + 1,
-      id: b.course_product_id,
-      name: product?.name || '未知商品',
-      spu_no: product?.spu_no || '—',
-      product_type: product?.product_type || '—',
-      status: product?.status || '—',
-    };
-  });
-});
-
-const availableProducts = computed(() => commerceStore.products.filter((p: any) => p.status === 'published'));
-
 // 录播控制-课程 Tab 数据（从当前场次关联的课程模拟）
 const controlCourses = computed(() => {
   if (!currentRecording.value) return [];
   const session = liveStore.loadSession(currentRecording.value.id);
   if (!session || !session.course_id) return [];
-  return [{ seq: 1, title: session.title, hasScript: false }];
+  return [{ seq: 1, title: session.title }];
 });
-
-function removeProduct(row: any) {
-  if (!currentRecording.value) return;
-  const binding = commerceStore.liveBindings.find((b: any) => b.live_session_id === currentRecording.value.id && b.course_product_id === row.id);
-  if (binding) commerceStore.removeLiveBinding(binding.id);
-  MessagePlugin.success('商品已移除');
-}
 
 function showControl(row: any) { currentRecording.value = row; controlTab.value = 'course'; controlVisible.value = true; }
 function stopRecording(row: any) {

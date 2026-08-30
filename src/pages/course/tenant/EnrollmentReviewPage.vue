@@ -49,10 +49,9 @@ import { ref, computed } from 'vue';
 import { DialogPlugin, MessagePlugin } from 'tdesign-vue-next';
 import { useCampStore } from '../../../stores/camp-store';
 import { notifyModalOpen } from '../../../utils/modal-spec-bridge';
-import { useCampPaymentStore } from '../../../stores/camp-payment-store';
 
 const store = useCampStore();
-const payStore = useCampPaymentStore();
+// V2·D2-1 本期不做交易：审核通过即加入，无订单链路
 const campStore = store;
 const search = ref(''); const statusFilter = ref(''); const campFilter = ref(''); const selected = ref<any[]>([]);
 const selectedKeys = computed(() => selected.value.map((r: any) => r.id));
@@ -67,7 +66,6 @@ const columns = [
   { colKey: 'camp_title', title: '营期', minWidth: 140 },
   { colKey: 'student_name', title: '学员', width: 80 },
   { colKey: 'channel', title: '通道', width: 100 },
-  { colKey: 'assistant_name', title: '归属助教', width: 80 },
   { colKey: 'status', title: '状态', width: 90 },
   { colKey: 'op', title: '操作', width: 160, fixed: 'right' },
 ];

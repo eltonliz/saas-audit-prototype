@@ -114,12 +114,10 @@ export const CourseSchema = z.object({
   /** 课程标签 */
   tags: z.array(z.string()).default([]),
 
-  /** 讲师ID·关联Lecturer.id（快照锁定·D16·讲师离职后课程不失效） */
-  lecturer_id: z.string(),
-  /** 讲师姓名·快照（D16） */
-  lecturer_name: z.string(),
-  /** 讲师角色类型快照（D1 通用化·展示用） */
-  lecturer_role_type: z.string().optional(),
+  /** 主讲人ID（V2·0829：讲师/助教角色下线，仅作为课程内容属性文本，选填） */
+  lecturer_id: z.string().optional(),
+  /** 主讲人姓名（V2·0829：内容属性快照，选填） */
+  lecturer_name: z.string().optional(),
 
   /** 课程来源（D3保留直播回放转课程） */
   source: CourseSourceEnum,
@@ -132,11 +130,6 @@ export const CourseSchema = z.object({
 
   /** 已发布课时的总视频时长（秒·聚合字段·从课时累加·只读） */
   total_video_duration: z.number().int().min(0).default(0),
-
-  /** 课程价格（分·D9统一为分） */
-  price: z.number().int().min(0).default(0),
-  /** 是否付费课程（true时price才生效） */
-  is_paid: z.boolean().default(false),
 
   /** 课时数（聚合字段·R-10父子关系·子单变化时聚合） */
   lesson_count: z.number().int().min(0).default(0),
@@ -499,8 +492,6 @@ export const CreateCourseInputSchema = CourseSchema.pick({
   source_live_session_id: true,
   mode: true,
   visibility: true,
-  price: true,
-  is_paid: true,
 }).extend({
   question_bank_id: z.string().optional(),
   status: CourseStatusEnum.optional(),

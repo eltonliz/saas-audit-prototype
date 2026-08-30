@@ -1,10 +1,6 @@
 <template>
   <div>
-    <h2>课程类型<span class="saas-align-tag">1:1 对齐 SaaS 线上 · 2026-08-27 实测</span></h2>
-    <div class="saas-new-note">
-      <ReplicaMarker :no="1" title="点击查看：本页与线上的对齐说明" />
-      本页筛选/按钮/9 列结构与 SaaS 线上 (#/classroom/courseType) 一致；<b style="color:#f56c6c">红框为课程业务新增项</b>。
-    </div>
+    <h2>课程类型</h2>
     <div class="filter-bar">
       <span class="filter-label">创建时间</span>
       <t-date-range-picker v-model="dateRange" clearable :placeholder="['开始日期', '结束日期']" style="width:260px" />
@@ -40,20 +36,11 @@
             <div style="text-align:right;font-size:12px;color:#98A2B3;margin-top:4px">{{ form.name.length }} / 30</div>
           </div>
         </t-form-item>
-        <t-form-item label="类目介绍" class="saas-new-box" @click.stop>
-          <div style="width:100%">
-            <t-textarea v-model="form.description" placeholder="请输入类目介绍" :autosize="{ minRows: 3 }" maxlength="200" />
-            <div style="text-align:right;font-size:12px;color:#98A2B3;margin-top:4px">{{ (form.description || '').length }} / 200</div>
-            <div class="saas-new-line"><ReplicaMarker :no="2" /> <b>类目介绍【新增·课程业务】</b>：SaaS 线上新建类目仅 分类名称* + 分类图标。</div>
-          </div>
-        </t-form-item>
+        <!-- V2·0829 用户裁决：类目介绍去除（无实际用途）；禁用保护去除 -->
         <t-form-item label="类目图标">
           <t-upload :auto-upload="false" :show-file-list="false" @select="handleIconUpload">
             <t-button variant="outline">上传</t-button>
           </t-upload>
-        </t-form-item>
-        <t-form-item label="禁用保护">
-          <div class="saas-rule-line"><ReplicaMarker :no="3" /> 被课程/题库引用中的分类不可删除、仅可禁用，禁用需二次确认【新增·课程业务】</div>
         </t-form-item>
       </t-form>
       <template #footer><t-button @click="showCreate=false">取消</t-button><t-button theme="primary" @click="doSave">保存</t-button></template>
@@ -73,7 +60,7 @@ const dateRange = ref<any>([]);
 const search = ref(''); const batchMode = ref(false); const selected = ref<any[]>([]);
 const page = ref(1); const pageSize = ref(10);
 const showCreate = ref(false); const editing = ref<any>(null);
-const form = ref({ name: '', cover_url: '', description: '', status: 'active' });
+const form = ref({ name: '', cover_url: '', status: 'active' });
 
 const columns = computed(() => {
   const cols: any[] = [
@@ -115,7 +102,7 @@ function relatedCourses(cid: string) { return store.courses.filter(c => c.catego
 function onSelChange(_keys: any[], ctx: any) { selected.value = ctx?.selectedRowData ?? []; }
 function doFilter() { page.value = 1; MessagePlugin.success('已按当前条件筛选'); }
 function reset() { dateRange.value = []; search.value = ''; page.value = 1; MessagePlugin.success('已重置筛选条件'); }
-function openEdit(row: any) { editing.value = row; form.value = { name: row.name, cover_url: row.cover_url || '', description: row.description || '', status: row.status }; showCreate.value = true; notifyModalOpen('course-type-edit'); }
+function openEdit(row: any) { editing.value = row; form.value = { name: row.name, cover_url: row.cover_url || '', status: row.status }; showCreate.value = true; notifyModalOpen('course-type-edit'); }
 function doSave() {
   if (!form.value.name) { MessagePlugin.warning('请填写分类名称'); return; }
   // 编辑：同步更新该分类下所有课程的 category_name

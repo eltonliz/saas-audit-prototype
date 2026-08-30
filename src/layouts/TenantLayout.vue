@@ -58,18 +58,21 @@
           <el-menu-item index="/tenant/course/camps">营期列表</el-menu-item>
           <el-menu-item index="/tenant/course/enrollments">报名审核</el-menu-item>
           <el-menu-item index="/tenant/course/student-insight">学员管理</el-menu-item>
+          <!-- V2·0828 会议：答疑/测验推下期；V2·D2-1 合同/分成下线
           <el-menu-item index="/tenant/course/camp-qas">答疑管理</el-menu-item>
           <el-menu-item index="/tenant/course/camp-quizzes">营期测验</el-menu-item>
           <el-menu-item index="/tenant/course/contracts">合同管理</el-menu-item>
+          -->
         </el-sub-menu>
 
-        <!-- 证书 -->
+        <!-- V2·0828 会议：证书推下期
         <el-menu-item v-if="SHOW_LEGACY_MENU" index="/tenant/course/certificates">
           <el-icon><Medal /></el-icon>
           <span>证书管理</span>
         </el-menu-item>
+        -->
 
-        <!-- 交易（仅课程域独立功能，复用SaaS的不重复列） -->
+        <!-- V2·D2-1 本期不做交易：分成记录下线
         <el-sub-menu v-if="SHOW_LEGACY_MENU" index="trade">
           <template #title>
             <el-icon><Wallet /></el-icon>
@@ -77,6 +80,7 @@
           </template>
           <el-menu-item index="/tenant/course/share-records">分成记录</el-menu-item>
         </el-sub-menu>
+        -->
 
         <!-- 页面导航：全站"点得动"的页面全量拆分，与菜单一一对应（弹窗项点击=跳宿主页+自动打开） -->
         <el-sub-menu index="page-nav">
@@ -101,22 +105,20 @@
           </el-sub-menu>
         </el-sub-menu>
 
-        <!-- 复刻对照（SaaS线上1:1复刻+课程业务红色标记） -->
-        <el-sub-menu v-if="!isAuditRoute && SHOW_LEGACY_MENU" index="replica">
+        <!-- V2·0829：复刻对照菜单整体移除（复刻页面已删除，直播功能以真实后台为准） -->
+
+        <!-- ═══ 课程结合（V2·0829 结合件：SaaS 页面 1:1 复刻 + 课程域修改·红框标注）═══ -->
+        <el-sub-menu index="glue">
           <template #title>
-            <el-icon><Wallet /></el-icon>
-            <span>复刻对照</span>
+            <el-icon><Aim /></el-icon>
+            <span>课程结合</span>
           </template>
-          <el-menu-item index="/tenant/replica/order">订单管理（复刻）</el-menu-item>
-          <el-menu-item index="/tenant/replica/store">门店管理（复刻）</el-menu-item>
-          <el-menu-item index="/tenant/replica/store-member">门店成员（复刻）</el-menu-item>
-          <el-menu-item index="/tenant/replica/org">组织管理（复刻）</el-menu-item>
-          <el-menu-item index="/tenant/replica/account">账户管理（复刻）</el-menu-item>
-          <el-menu-item index="/tenant/replica/audit">审核管理（复刻）</el-menu-item>
-          <el-menu-item index="/tenant/replica/wallet">钱包（复刻）</el-menu-item>
-          <el-menu-item index="/tenant/replica/withdraw">提现审核（复刻）</el-menu-item>
-          <el-menu-item index="/tenant/replica/live-recorded">直播录播（复刻）</el-menu-item>
-          <el-menu-item index="/tenant/replica/live-goods">直播商品（复刻）</el-menu-item>
+          <el-menu-item index="/tenant/replica/customer">客户列表（复刻+学习数据）</el-menu-item>
+          <el-menu-item index="/tenant/replica/marketing/watch-reward">观看奖励（复刻+课程红包）</el-menu-item>
+          <el-menu-item index="/tenant/replica/marketing/red-packet-records">红包记录（复刻+课程事件）</el-menu-item>
+          <el-menu-item index="/tenant/replica/marketing/points-task">积分任务（复刻+课程任务）</el-menu-item>
+          <el-menu-item index="/tenant/replica/marketing/points-records">积分记录（复刻+课程事件）</el-menu-item>
+          <el-menu-item index="/tenant/replica/live/sessions">场次管理（复刻+排课来源）</el-menu-item>
         </el-sub-menu>
         </template>
       </el-menu>

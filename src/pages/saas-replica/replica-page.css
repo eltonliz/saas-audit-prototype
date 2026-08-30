@@ -1,0 +1,18 @@
+/* SaaS 复刻页公共样式（replica-page.css）——供 marketing/customer/live 等复刻页共享 */
+.replica-page, .customer-replica-page { padding: 20px 24px; background: #F5F7FA; min-height: 100%; }
+.page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; }
+.header-left { display: flex; flex-direction: column; gap: 4px; }
+.page-title { font-size: 20px; font-weight: 700; color: #1F2C3E; }
+.page-sub { font-size: 12px; color: #98A2B3; }
+.toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+.filter-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin-bottom: 14px; }
+.fg-item { display: flex; flex-direction: column; gap: 4px; }
+.fg-label { font-size: 12px; color: #667085; }
+.batch-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.main-card { background: #fff; border-radius: 10px; padding: 16px; }
+.points-stats, .points-filter { display: flex; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+.ps-item { background: #fff; border-radius: 10px; padding: 12px 20px; min-width: 120px; }
+.ps-label { font-size: 12px; color: #98A2B3; margin-top: 2px; }
+.mono { font-family: 'SF Mono', Menlo, Consolas, monospace; font-size: 12px; }
+.link { color: #3B82F6; cursor: pointer; }
+a { text-decoration: none; }

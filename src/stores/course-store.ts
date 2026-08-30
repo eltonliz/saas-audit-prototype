@@ -146,8 +146,7 @@ export const useCourseStore = defineStore('course', () => {
     if (ok) { const c = courses.value.find(c => c.id === id); if (c) { c.reviewer_id = reviewerId; c.review_remark = remark; c.reviewed_at = now(); } }
     return ok;
   }
-  function offlineCourse(id: string): boolean { return transitionCourseStatus(id, 'offline'); }
-  function republishCourse(id: string): boolean { return transitionCourseStatus(id, 'published'); }
+  // V2·0829 用户裁决：停售/重新上架操作已删除（状态流转保留 pending_review→published 审核链）
 
   // ── 课时 Action ──
 
@@ -581,23 +580,23 @@ export const useCourseStore = defineStore('course', () => {
 
   // ── 内容池（视频课程/音频课程模块管理的独立内容，供课程库选择引用）──
   const contentPool = ref<any[]>([
-    // seed：来自视频课程页（status: on=已上架/published, off=已下架, draft=草稿）
-    { id: 'VC-101', content_type: 'video', title: '高效学习方法论·第1讲：番茄工作法入门', description: '介绍番茄工作法的基本原理与实操', duration: 1935, sale_mode: 'paid', price: 9900, is_standalone_sale: true, status: 'published', lecturer_id: 'LECT-202608-00001', lecturer_name: '张三', created_at: 1755234600, updated_at: 1755234600 },
-    { id: 'VC-102', content_type: 'video', title: '高效学习方法论·第2讲：康奈尔笔记法', description: '康奈尔笔记法的三栏结构与记录技巧', duration: 1722, sale_mode: 'paid', price: 9900, is_standalone_sale: true, status: 'published', lecturer_id: 'LECT-202608-00001', lecturer_name: '张三', created_at: 1755321000, updated_at: 1755321000 },
-    { id: 'VC-103', content_type: 'video', title: '职场沟通技巧·第1讲：结构化表达', description: 'PREP 模型与金字塔原理在沟通中的应用', duration: 2708, sale_mode: 'free', price: 0, is_standalone_sale: false, status: 'published', lecturer_id: 'LECT-202608-00002', lecturer_name: '李四', created_at: 1755488400, updated_at: 1755488400 },
-    { id: 'VC-104', content_type: 'video', title: '运动健康指南·第3讲：科学跑步', description: '跑步姿势、心率区间与恢复策略', duration: 2180, sale_mode: 'paid', price: 12900, is_standalone_sale: true, status: 'offline', lecturer_id: 'LECT-202608-00004', lecturer_name: '赵讲师', created_at: 1755117900, updated_at: 1755117900 },
-    { id: 'VC-105', content_type: 'video', title: '数据分析入门·导学课', description: '课程概览与学习路径规划', duration: 930, sale_mode: 'free', price: 0, is_standalone_sale: false, status: 'draft', lecturer_id: 'LECT-202608-00005', lecturer_name: '刘讲师', created_at: 1755661200, updated_at: 1755661200 },
+    // seed：来自视频课程页（status: on=已上架/published, off=已下架, draft=草稿）·V2·0829 去售卖/讲师字段
+    { id: 'VC-101', content_type: 'video', title: '高效学习方法论·第1讲：番茄工作法入门', description: '介绍番茄工作法的基本原理与实操', duration: 1935, status: 'published', lecturer_name: '张三', created_at: 1755234600, updated_at: 1755234600 },
+    { id: 'VC-102', content_type: 'video', title: '高效学习方法论·第2讲：康奈尔笔记法', description: '康奈尔笔记法的三栏结构与记录技巧', duration: 1722, status: 'published', lecturer_name: '张三', created_at: 1755321000, updated_at: 1755321000 },
+    { id: 'VC-103', content_type: 'video', title: '职场沟通技巧·第1讲：结构化表达', description: 'PREP 模型与金字塔原理在沟通中的应用', duration: 2708, status: 'published', lecturer_name: '李四', created_at: 1755488400, updated_at: 1755488400 },
+    { id: 'VC-104', content_type: 'video', title: '运动健康指南·第3讲：科学跑步', description: '跑步姿势、心率区间与恢复策略', duration: 2180, status: 'offline', lecturer_name: '赵讲师', created_at: 1755117900, updated_at: 1755117900 },
+    { id: 'VC-105', content_type: 'video', title: '数据分析入门·导学课', description: '课程概览与学习路径规划', duration: 930, status: 'draft', lecturer_name: '刘讲师', created_at: 1755661200, updated_at: 1755661200 },
     // seed：来自音频课程页
-    { id: 'AC-201', content_type: 'audio', title: '职场沟通·晨间能量朗读', description: '每日 5 分钟正念朗读，开启高效一天', duration: 312, sale_mode: 'free', price: 0, is_standalone_sale: false, status: 'published', lecturer_id: 'LECT-202608-00002', lecturer_name: '李四', created_at: 1755148800, updated_at: 1755148800 },
-    { id: 'AC-202', content_type: 'audio', title: '高效学习·睡前复盘冥想', description: '复盘当日学习内容，巩固记忆', duration: 645, sale_mode: 'paid', price: 5900, is_standalone_sale: true, status: 'published', lecturer_id: 'LECT-202608-00001', lecturer_name: '张三', created_at: 1755235200, updated_at: 1755235200 },
-    { id: 'AC-203', content_type: 'audio', title: '运动健康·拉伸放松引导', description: '训练后 10 分钟全身拉伸音频', duration: 600, sale_mode: 'free', price: 0, is_standalone_sale: false, status: 'published', lecturer_id: 'LECT-202608-00004', lecturer_name: '赵讲师', created_at: 1755408000, updated_at: 1755408000 },
+    { id: 'AC-201', content_type: 'audio', title: '职场沟通·晨间能量朗读', description: '每日 5 分钟正念朗读，开启高效一天', duration: 312, status: 'published', lecturer_name: '李四', created_at: 1755148800, updated_at: 1755148800 },
+    { id: 'AC-202', content_type: 'audio', title: '高效学习·睡前复盘冥想', description: '复盘当日学习内容，巩固记忆', duration: 645, status: 'published', lecturer_name: '张三', created_at: 1755235200, updated_at: 1755235200 },
+    { id: 'AC-203', content_type: 'audio', title: '运动健康·拉伸放松引导', description: '训练后 10 分钟全身拉伸音频', duration: 600, status: 'published', lecturer_name: '赵讲师', created_at: 1755408000, updated_at: 1755408000 },
   ]);
 
-  /** 内容池新增（视频课程/音频课程模块） */
-  function addContent(input: { content_type: 'video' | 'audio'; title: string; description?: string; duration?: number; sale_mode?: 'free' | 'paid'; price?: number; is_standalone_sale?: boolean; status?: 'draft' | 'published' | 'offline'; lecturer_id?: string; lecturer_name?: string }): any {
+  /** 内容池新增（视频课程/音频课程模块）·V2·0829 去售卖字段 */
+  function addContent(input: { content_type: 'video' | 'audio'; title: string; description?: string; duration?: number; status?: 'draft' | 'published' | 'offline'; lecturer_name?: string }): any {
     const nowTs = Math.floor(Date.now() / 1000);
     const prefix = input.content_type === 'video' ? 'VC' : 'AC';
-    const item = { id: `${prefix}-${Date.now() % 100000}`, content_type: input.content_type, title: input.title, description: input.description || '', duration: input.duration || 0, sale_mode: input.sale_mode || 'free', price: input.price || 0, is_standalone_sale: input.is_standalone_sale ?? false, status: input.status || 'published', lecturer_id: input.lecturer_id || '', lecturer_name: input.lecturer_name || '', created_at: nowTs, updated_at: nowTs };
+    const item = { id: `${prefix}-${Date.now() % 100000}`, content_type: input.content_type, title: input.title, description: input.description || '', duration: input.duration || 0, status: input.status || 'published', lecturer_name: input.lecturer_name || '', created_at: nowTs, updated_at: nowTs };
     contentPool.value.unshift(item);
     return item;
   }
@@ -641,7 +640,7 @@ export const useCourseStore = defineStore('course', () => {
     reviews, reviewReplies, learningRecords,
     // 课程 Action
     createCourse, updateCourse, deleteCourse, loadCourseList, reloadCourseList, loadCourse,
-    transitionCourseStatus, submitCourseForReview, approveCourse, rejectCourse, offlineCourse, republishCourse,
+    transitionCourseStatus, submitCourseForReview, approveCourse, rejectCourse,
     // 课时 Action
     createLesson, updateLesson, deleteLesson, loadLessonsByCourse, transitionLessonStatus,
     // 排课联动：只读课时生成/删除

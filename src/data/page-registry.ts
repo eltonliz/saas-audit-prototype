@@ -28,7 +28,7 @@ export const PAGE_REGISTRY: ModuleRegItem[] = [
           { key: 'course-create', title: '新增课程（抽屉）', chain: ['新增课程'] },
           { key: 'course-edit', title: '编辑课程（抽屉）', chain: ['编辑'] },
           { key: 'course-students', title: '课程学员（抽屉）', chain: ['学员'] },
-          { key: 'lesson-drawer', title: '课时管理（抽屉·含直播转课时）', chain: ['课时'] },
+          // V2·0829 用户裁决：课时管理菜单项删除（操作统一在编辑模块内）
           { key: 'course-view-video', title: '查看视频', chain: ['查看视频'] },
           { key: 'course-view-quiz', title: '查看题库', chain: ['查看题库'] },
         ],
@@ -49,7 +49,7 @@ export const PAGE_REGISTRY: ModuleRegItem[] = [
         key: 'questions', title: '题目库', route: '/tenant/course/questions',
         modals: [
           { key: 'question-create', title: '新增题目', chain: ['新增'] },
-          { key: 'question-bank-drawer', title: '题库管理（抽屉·在课程库行内）', route: '/tenant/course/courses', chain: ['题库'] },
+          // V2·0829 用户裁决：题库管理菜单项删除（操作统一在编辑模块内）
         ],
       },
       {
@@ -70,10 +70,10 @@ export const PAGE_REGISTRY: ModuleRegItem[] = [
         modals: [
           { key: 'camp-create', title: '新增营期', chain: ['新增营期'] },
           { key: 'camp-edit', title: '编辑营期', chain: ['编辑'] },
-          { key: 'camp-invite-drawer', title: '邀请码管理（抽屉）', chain: ['邀请码'] },
-          { key: 'camp-invite-create', title: '生成邀请码', chain: ['邀请码', '生成邀请码'] },
+          // V2·0829：邀请码管理/生成邀请码弹窗已删除（邀请码体系下线）
           { key: 'camp-detail-drawer', title: '营期详情（抽屉）', chain: ['详情'] },
           { key: 'camp-reject', title: '驳回营期', chain: ['驳回'] },
+          { key: 'camp-student-drawer', title: '学员列表（抽屉·按营期）', chain: ['学员'] },
         ],
       },
       {
@@ -85,97 +85,35 @@ export const PAGE_REGISTRY: ModuleRegItem[] = [
           { key: 'schedule-quick-course', title: '快捷新建课程', chain: ['快捷新建'] },
         ],
       },
-      {
-        key: 'enrollments', title: '报名审核', route: '/tenant/course/enrollments',
-        modals: [
-          { key: 'enrollment-approve', title: '审核通过', chain: ['通过'] },
-          { key: 'enrollment-reject', title: '审核驳回', chain: ['驳回'] },
-        ],
-      },
-      {
-        key: 'camp-students', title: '学员管理', route: '/tenant/course/camp-students',
-        modals: [
-          { key: 'camp-student-drawer', title: '学员管理（抽屉·按营期）', route: '/tenant/course/camps', chain: ['学员'] },
-        ],
-      },
-      {
-        key: 'camp-aftersale', title: '营期售后', route: '/tenant/course/aftersale',
-        modals: [
-          { key: 'camp-aftersale-detail', title: '退款详情', chain: ['详情'] },
-        ],
-      },
-      {
-        key: 'camp-qas', title: '答疑管理', route: '/tenant/course/camp-qas', modals: [] },
-      {
-        key: 'camp-quizzes', title: '营期测验', route: '/tenant/course/camp-quizzes', modals: [] },
-      {
-        key: 'contracts', title: '合同管理', route: '/tenant/course/contracts',
-        modals: [
-          { key: 'contract-detail', title: '合同详情', chain: ['详情'] },
-        ],
-      },
-      {
-        key: 'certificates', title: '证书管理', route: '/tenant/course/certificates',
-        modals: [
-          { key: 'cert-create', title: '新建证书（跳编辑页）', chain: ['新建证书'] },
-          { key: 'cert-edit', title: '编辑证书（跳编辑页）', chain: ['编辑'] },
-          { key: 'cert-detail', title: '证书详情', chain: ['详情'] },
-        ],
-      },
+      // ── V2·0829 用户裁决 下线：报名审核（环节去除）、学员管理（复用 SaaS 客户列表）──
+      // ── V2·D2-1/0828 会议 下线：营期售后/答疑/测验/合同/证书（路由已注释，导航同步移除）──
+      // {
+      //   key: 'camp-aftersale', title: '营期售后', route: '/tenant/course/aftersale',
+      //   modals: [
+      //
+      //   ],
+      // },
+      //
+      //
+      // {
+      //   key: 'contracts', title: '合同管理', route: '/tenant/course/contracts',
+      //   modals: [
+      //     { key: 'contract-detail', title: '合同详情', chain: ['详情'] },
+      //   ],
+      // },
+      // {
+      //   key: 'certificates', title: '证书管理', route: '/tenant/course/certificates',
+      //   modals: [
+      //     { key: 'cert-create', title: '新建证书（跳编辑页）', chain: ['新建证书'] },
+      //     { key: 'cert-edit', title: '编辑证书（跳编辑页）', chain: ['编辑'] },
+      //     { key: 'cert-detail', title: '证书详情', chain: ['详情'] },
+      //   ],
+      // },
       {
         key: 'dashboard', title: '数据看板', route: '/tenant/course/dashboard', modals: [] },
     ],
   },
-  {
-    key: 'replica', title: '复刻对照（SaaS 1:1）',
-    pages: [
-      {
-        key: 'replica-order', title: '订单管理', route: '/tenant/replica/order',
-        modals: [
-          { key: 'replica-order-detail', title: '订单详情', chain: ['详情'] },
-        ],
-      },
-      {
-        key: 'replica-store', title: '门店管理', route: '/tenant/replica/store',
-        modals: [],
-      },
-      {
-        key: 'replica-store-member', title: '门店成员', route: '/tenant/replica/store-member',
-        modals: [],
-      },
-      {
-        key: 'replica-org', title: '组织管理', route: '/tenant/replica/org',
-        modals: [
-          { key: 'replica-org-create', title: '新建组织', chain: ['新建'] },
-        ],
-      },
-      {
-        key: 'replica-account', title: '账户管理', route: '/tenant/replica/account', modals: [] },
-      {
-        key: 'replica-audit', title: '审核管理', route: '/tenant/replica/audit', modals: [] },
-      {
-        key: 'replica-wallet', title: '钱包', route: '/tenant/replica/wallet', modals: [] },
-      {
-        key: 'replica-live-recorded', title: '直播录播', route: '/tenant/replica/live-recorded',
-        modals: [
-          { key: 'replica-live-create', title: '创建录播（弹窗①）', chain: ['新增录播'] },
-          { key: 'replica-live-scope', title: '设置客户范围', chain: ['修改可见范围'] },
-        ],
-      },
-      {
-        key: 'replica-live-recorded-control', title: '录播控制（独立页）', route: '/tenant/replica/live-recorded-control/PBLR000297',
-        modals: [
-          { key: 'replica-control-addcourse', title: '添加课程', chain: ['+ 课程'] },
-        ],
-      },
-      {
-        key: 'replica-live-goods', title: '直播商品', route: '/tenant/replica/live-goods',
-        modals: [
-          { key: 'replica-livegoods-add', title: '添加商品', chain: ['添加商品'] },
-        ],
-      },
-    ],
-  },
+  // V2·0829：复刻对照（SaaS 1:1）分组整体移除——复刻页面已删除，直播功能以真实后台为准
 ];
 
 /** 统计：页面数 / 弹窗数 */

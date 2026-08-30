@@ -83,79 +83,28 @@
             <span class="section-sub">以下配置将应用于全部 {{ selectedVideos.length }} 个视频</span>
           </div>
         </div>
-        <div class="field">
-          <div class="field-label">详情设置</div>
-          <div class="radios-inline">
-            <t-radio :checked="batchForm.detail_mode === 'full'" @change="batchForm.detail_mode = 'full'">购买前查看完整视频详情</t-radio>
-            <t-radio :checked="batchForm.detail_mode === 'brief'" @change="batchForm.detail_mode = 'brief'">购买前仅查看课节介绍</t-radio>
-          </div>
-        </div>
+        <!-- V2·0829 用户裁决：详情设置（购买前两选项）删除 -->
         <div class="field">
           <div class="field-label">视频详情（统一简介）</div>
           <RichEditor v-model="batchForm.description" placeholder="为全部视频设置统一的简介描述" :max-length="50000" />
         </div>
       </t-card>
 
+      <!-- V2·0829 用户裁决：商品信息区块删除（全免费无售卖），仅保留有效期 -->
       <t-card :bordered="false" class="section">
         <div class="section-head">
           <span class="section-badge"><t-icon name="cart" /></span>
           <div class="section-title-wrap">
-            <h3 class="section-title">商品信息</h3>
-            <span class="section-sub">统一售卖方式与价格</span>
+            <h3 class="section-title">有效期</h3>
           </div>
         </div>
         <div class="field">
-          <div class="field-label">售卖方式</div>
-          <t-radio-group v-model="batchForm.sale_type">
-            <t-radio value="free">免费</t-radio>
-            <t-radio value="paid">付费</t-radio>
-            <t-radio value="member">会员专享</t-radio>
-          </t-radio-group>
-        </div>
-
-        <div v-if="batchForm.sale_type === 'member'" class="member-panel">
-          <div class="field">
-            <div class="field-label"><span class="req">*</span>会员可享等级</div>
-            <t-radio-group v-model="batchForm.member_scope">
-              <t-radio value="all">所有等级会员可享</t-radio>
-              <t-radio value="specific">指定会员等级可享</t-radio>
-            </t-radio-group>
-          </div>
-          <div v-if="batchForm.member_scope === 'specific'" class="field">
-            <div class="field-label">选择会员等级</div>
-            <t-select v-model="batchForm.member_levels" multiple placeholder="请选择会员等级" style="width: 100%; max-width: 480px">
-              <t-option label="黄金会员" value="gold" />
-              <t-option label="钻石会员" value="diamond" />
-              <t-option label="星耀会员" value="star" />
-              <t-option label="至尊会员" value="supreme" />
-            </t-select>
-          </div>
-        </div>
-        <div v-if="batchForm.sale_type === 'paid'" class="paid-panel">
-          <div class="field">
-            <div class="field-label"><span class="req">*</span>统一售价（元）</div>
-            <t-input v-model="batchForm.price" placeholder="请输入价格，最低为1" style="width: 280px" />
-          </div>
-          <div class="field">
-            <div class="field-label">划线价格（元）</div>
-            <t-input v-model="batchForm.original_price" placeholder="选填" style="width: 280px" />
-          </div>
-          <div class="field">
-            <div class="field-label">有效期</div>
-            <div class="validity-options">
-              <t-radio :checked="batchForm.paid_validity === 'long'" @change="batchForm.paid_validity = 'long'">长期有效</t-radio>
-              <t-radio :checked="batchForm.paid_validity === 'custom'" @change="batchForm.paid_validity = 'custom'">自定义时长</t-radio>
-              <t-radio :checked="batchForm.paid_validity === 'fixed'" @change="batchForm.paid_validity = 'fixed'">固定到期时间</t-radio>
-            </div>
-            <t-date-picker v-if="batchForm.paid_validity === 'custom'" v-model="batchForm.paid_custom_date" enable-time-picker placeholder="选择日期时间" style="margin-top: 8px" />
-            <div v-if="batchForm.paid_validity === 'fixed'" class="fixed-days-row">
-              自购买后 <t-input-number v-model="batchForm.paid_fixed_days" :min="1" :max="3650" style="width: 120px" /> 天内有效
-            </div>
-          </div>
-        </div>
-        <div v-if="batchForm.sale_type === 'free'" class="field">
           <div class="field-label">有效期</div>
-          <span class="validity-static">长期有效</span>
+          <t-radio-group v-model="batchForm.validity_type" style="margin-right:12px">
+            <t-radio value="long">长期有效</t-radio>
+            <t-radio value="custom">自定义时间</t-radio>
+          </t-radio-group>
+          <t-date-picker v-if="batchForm.validity_type === 'custom'" v-model="batchForm.validity_custom_date" enable-time-picker placeholder="选择失效时间" style="width:220px" />
         </div>
       </t-card>
 
@@ -177,37 +126,7 @@
           <div class="switch-row"><t-switch v-model="batchForm.watermark_horse" /><span class="switch-text">开启防录屏跑马灯</span></div>
           <div class="switch-row"><t-switch v-model="batchForm.watermark_text" /><span class="switch-text">开启水印</span></div>
         </div>
-        <div class="field">
-          <div class="field-label">允许试看</div>
-          <div class="switch-row"><t-switch v-model="batchForm.allow_preview" /><span class="switch-text">开启后学员可免费试看前 3 分钟</span></div>
-        </div>
-      </t-card>
-
-      <t-card :bordered="false" class="section">
-        <div class="section-head">
-          <span class="section-badge"><t-icon name="upload" /></span>
-          <div class="section-title-wrap">
-            <h3 class="section-title">上架设置</h3>
-            <span class="section-sub">统一上架策略</span>
-          </div>
-        </div>
-        <div class="field">
-          <div class="field-label"><span class="req">*</span>是否上架</div>
-          <t-radio-group v-model="batchForm.on_shelf">
-            <t-radio value="immediate">立即上架</t-radio>
-            <t-radio value="scheduled">定时上架</t-radio>
-            <t-radio value="takedown">下架</t-radio>
-          </t-radio-group>
-        </div>
-        <div v-if="batchForm.on_shelf === 'scheduled'" class="field">
-          <div class="field-label">定时上架时间</div>
-          <t-date-picker v-model="batchForm.scheduled_time" enable-time-picker placeholder="选择日期时间" />
-        </div>
-        <div v-if="batchForm.on_shelf === 'immediate' || batchForm.on_shelf === 'scheduled'" class="field">
-          <div class="field-label">定时下架时间</div>
-          <t-date-picker v-model="batchForm.takedown_time" enable-time-picker placeholder="选择日期时间" />
-        </div>
-        <div class="shelf-tip">视频上架后，可在店铺主页显示；下架时隐藏，下架后学员无法学习该内容。</div>
+        <!-- V2·0829 用户裁决：允许试看/上架设置删除 -->
       </t-card>
     </div>
 
@@ -335,28 +254,18 @@ function onLocalUpload() { MessagePlugin.info('原型演示：模拟本地上传
 function removeSelected(item: any) { selectedVideos.value = selectedVideos.value.filter(v => v.id !== item.id); }
 
 const batchForm = ref({
-  detail_mode: 'full' as 'full' | 'brief',
   description: '',
-  sale_type: 'free' as 'free' | 'paid' | 'member',
-  price: '',
-  original_price: '',
-  member_scope: 'all' as 'all' | 'specific',
-  member_levels: [] as string[],
-  paid_validity: 'long' as 'long' | 'custom' | 'fixed',
-  paid_custom_date: null as Date | null,
-  paid_fixed_days: 365,
+  validity_type: 'long' as 'long' | 'custom',
+  validity_custom_date: null as Date | null,
   forbid_seek: false,
   forbid_speed: false,
   watermark_horse: false,
   watermark_text: false,
-  allow_preview: false,
-  on_shelf: 'immediate' as 'immediate' | 'scheduled' | 'takedown',
-  scheduled_time: null as Date | null,
-  takedown_time: null as Date | null,
+  // V2·0829 用户裁决：售卖/会员/试看/上架/详情模式字段已删除
 });
 
 function doSave() {
-  if (batchForm.value.sale_type === 'paid' && (!batchForm.value.price || Number(batchForm.value.price) < 1)) { MessagePlugin.warning('请填写正确的售价'); return; }
+  // V2·0829：全免费无售卖校验
   submitting.value = true;
   setTimeout(() => {
     submitting.value = false;

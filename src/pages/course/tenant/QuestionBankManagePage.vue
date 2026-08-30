@@ -37,9 +37,7 @@
         <t-form-item label="所属分类">
           <t-select v-model="form.category_name" placeholder="请选择所属分类" style="width:100%"><t-option v-for="c in categories" :key="c" :label="c" :value="c" /></t-select>
         </t-form-item>
-        <t-form-item label="题目介绍" class="saas-new-box">
-          <t-textarea v-model="form.intro" placeholder="请输入题目介绍" :autosize="{ minRows: 2 }" />
-        </t-form-item>
+        <!-- V2·0829 用户裁决：题目介绍字段删除（多余字段） -->
         <t-form-item label="题目名称" required-mark><t-textarea v-model="form.content" placeholder="请输入题目名称" :autosize="{ minRows: 2 }" /></t-form-item>
         <t-form-item label="题目类型">
           <t-radio-group v-model="form.question_type">
@@ -85,7 +83,7 @@ const form = ref<any>(defaultForm());
 
 function defaultForm() {
   return {
-    content: '', intro: '', question_type: 'single', category_name: '',
+    content: '', question_type: 'single', category_name: '',
     options: [
       { key: 'A', content: '' },
       { key: 'B', content: '' },
@@ -134,7 +132,7 @@ function openCreate() { editing.value = null; form.value = defaultForm(); showCr
 function openEdit(row: any) {
   editing.value = row;
   form.value = {
-    content: row.content, intro: row.intro || '', question_type: row.question_type, category_name: store.courses.find(c => c.question_bank_id === row.bank_id)?.category_name || '',
+    content: row.content, question_type: row.question_type, category_name: store.courses.find(c => c.question_bank_id === row.bank_id)?.category_name || '',
     options: row.options.map((o: any) => ({ key: o.key, content: o.content })),
     correct_answer: Array.isArray(row.correct_answer) ? [...row.correct_answer] : (row.correct_answer ? [row.correct_answer] : []),
   };
@@ -160,12 +158,12 @@ function doSave() {
   const correct = form.value.correct_answer;
   const options = form.value.options.map((o: any) => ({ key: o.key, content: o.content, correct: correct.includes(o.key) }));
   if (editing.value) {
-    Object.assign(editing.value, { content: form.value.content, intro: form.value.intro, question_type: form.value.question_type, options, correct_answer: correct });
+    Object.assign(editing.value, { content: form.value.content, intro: '', question_type: form.value.question_type, options, correct_answer: correct });
     MessagePlugin.success('已更新');
   } else {
     let bankId = store.questionBanks[0]?.id;
     if (!bankId) { const b = store.createQuestionBank({ course_id: store.courses[0]?.id ?? 'COURSE-202608-00001', title: '通用题库', description: '', creator_id: 'admin-001', creator_role: 'main_lecturer' }); bankId = b.id; }
-    store.createQuestion({ bank_id: bankId, sort_order: enrichedQuestions.value.length + 1, question_type: form.value.question_type, content: form.value.content, intro: form.value.intro, image_url: '', options, correct_answer: correct, explanation: '', score: form.value.question_type === 'single' ? 1 : 2, trigger_type: 'inline_at_completion', trigger_time: undefined, trigger_threshold: 0.9 } as any);
+    store.createQuestion({ bank_id: bankId, sort_order: enrichedQuestions.value.length + 1, question_type: form.value.question_type, content: form.value.content, intro: '', image_url: '', options, correct_answer: correct, explanation: '', score: form.value.question_type === 'single' ? 1 : 2, trigger_type: 'inline_at_completion', trigger_time: undefined, trigger_threshold: 0.9 } as any);
     MessagePlugin.success('已新增');
   }
   showCreate.value = false; editing.value = null; form.value = defaultForm();

@@ -22,7 +22,7 @@
       <t-table :data="filteredList" row-key="id" :columns="columns" bordered hover>
         <template #lecturer_name="{ row }">
           <div class="anchor-cell">
-            <span class="anchor-name">{{ row.lecturer_name }}</span>
+            <span class="anchor-name">{{ row.anchor_name }}</span>
           </div>
         </template>
         <template #status="{ row }">
@@ -46,7 +46,7 @@
     <t-dialog v-model:visible="showQuickCreate" header="快速创建直播" width="500px" :confirm-btn="{ content: '创建', theme: 'primary' }" :cancel-btn="{ content: '取消' }" :on-confirm="doCreate">
       <t-form :data="form" label-width="100px">
         <t-form-item label="直播名称" required-mark><t-input v-model="form.name" placeholder="请输入直播名称" /></t-form-item>
-        <t-form-item label="选择主播"><t-select v-model="form.anchorId" style="width:100%"><t-option v-for="l in lecturerStore.lecturers" :key="l.id" :label="l.name + ' (' + l.lecturer_no + ')'" :value="l.id" /></t-select></t-form-item>
+        <t-form-item label="选择主播"><t-select v-model="form.anchorId" style="width:100%"><t-option v-for="l in liveStore.anchors" :key="l.id" :label="l.name + ' (' + l.no + ')'" :value="l.id" /></t-select></t-form-item>
         <t-form-item label="开始时间"><t-date-picker enable-time-picker placeholder="选择开始时间" style="width:100%" /></t-form-item>
       </t-form>
     </t-dialog>
@@ -67,10 +67,9 @@
 import { ref, computed } from 'vue';
 import { MessagePlugin } from 'tdesign-vue-next';
 import { useLiveStore } from '../../../stores/live-store';
-import { useLecturerStore } from '../../../stores/lecturer-store';
 
+// V2·0829：主播为直播域独立角色（本地主播库），不再关联课程讲师档案
 const liveStore = useLiveStore();
-const lecturerStore = useLecturerStore();
 const search = ref(''); const showQuickCreate = ref(false); const configVisible = ref(false);
 const configForm = ref<any>({ roomName: '', hasCart: false, muted: false, allowReplay: true }); const configTarget = ref<any>(null);
 const form = ref<any>({ name: '', anchorId: '', });
@@ -99,7 +98,7 @@ const filteredList = computed(() => {
     const hasCart = liveStore.loadProducts(s.id).length > 0;
     return {
       id: s.id,
-      lecturer_name: s.lecturer_name,
+      anchor_name: s.anchor_name,
       session_no: s.session_no,
       status: statusLabel(s.status),
       room_no: room?.room_no ?? '—',
@@ -116,11 +115,11 @@ const filteredList = computed(() => {
 
 function doCreate() {
   if (!form.value.name) { MessagePlugin.warning('请填写直播名称'); return; }
-  const lecturer = lecturerStore.lecturers.find((l: any) => l.id === form.value.anchorId);
+  const lecturer = liveStore.anchors.find((l: any) => l.id === form.value.anchorId);
   liveStore.createSession({
     title: form.value.name,
-    lecturer_id: form.value.anchorId || 'LECT-202608-00001',
-    lecturer_name: lecturer?.name || '未指定',
+    anchor_id: form.value.anchorId || 'ANCHOR-001',
+    anchor_name: lecturer?.name || '未指定',
     camp_id: null, camp_title: null, course_id: null, lesson_id: null, schedule_id: null,
     source: 'standalone',
     planned_start_at: Math.floor(Date.now() / 1000) + 3600,

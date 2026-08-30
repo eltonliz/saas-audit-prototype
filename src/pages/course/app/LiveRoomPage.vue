@@ -11,23 +11,13 @@
         <span class="live-badge"><t-icon name="record-stop" :size="12" /> 直播中</span>
         <span class="viewer-count"><t-icon name="usergroup" :size="14" /> {{ session?.peak_viewers ?? 88 }}</span>
         <div v-if="currentState === 'cleared'" class="cleared-tip">已清屏</div>
-        <div v-if="currentState === 'sold_out'" class="overlay-tip">商品已售罄</div>
       </div>
 
-      <!-- 右侧操作图标 -->
+      <!-- 右侧操作图标（V2·0829 用户裁决：商品相关整体下线，购物车入口已删） -->
       <div class="side-actions">
         <button class="side-btn" @click="$router.back()">❌</button>
         <button class="side-btn" @click="toggleMute">{{ muted ? '🔇' : '🎙️' }}</button>
-        <button class="side-btn" @click="showCart = true">🛒</button>
         <button class="side-btn" @click="showMore = true">⋯</button>
-      </div>
-
-      <!-- 左侧商品讲解卡 -->
-      <div v-if="currentState === 'product'" class="product-explainer">
-        <div class="explain-tag">📢 讲解中</div>
-        <div class="explain-name">{{ explainingProduct?.product_name ?? '商品讲解' }}</div>
-        <div class="explain-price">¥{{ ((explainingProduct?.live_price ?? 0) / 100).toFixed(0) }}</div>
-        <button class="explain-buy" @click="buy(explainingProduct)">抢购</button>
       </div>
     </div>
 
@@ -38,7 +28,7 @@
       <div v-else-if="currentState === 'cleared'" class="chat-off-tip">已清屏</div>
       <div v-else v-for="c in comments" :key="c.id" class="comment-item"><span class="c-name">{{ c.name }}：</span>{{ c.text }}</div>
     </div>
-    <div class="comment-input" v-if="currentState === 'normal' || currentState === 'product'">
+    <div class="comment-input" v-if="currentState === 'normal'">
       <input v-model="commentText" placeholder="说点什么..." @keyup.enter="sendComment" />
       <button @click="sendComment">发送</button>
     </div>
@@ -46,32 +36,6 @@
       <input disabled :placeholder="inputPlaceholder" />
       <button disabled>发送</button>
     </div>
-
-    <!-- 购物车弹层 -->
-    <transition name="fade">
-      <div v-if="showCart" class="modal-overlay" @click.self="showCart = false">
-        <div class="modal-card">
-          <div class="modal-title">🛒 直播商品（{{ products.length }}）</div>
-          <div v-for="p in products" :key="p.id" class="cart-item">
-            <div class="cart-info">
-              <div class="cart-name">{{ p.product_name }}</div>
-              <div class="cart-meta">
-                <span class="prod-type-tag" :class="p.product_type">{{ prodTypeLabel(p.product_type) }}</span>
-                <span v-if="p.product_type === 'course'" class="course-meta">学习有效期：永久</span>
-                <span v-else>库存{{ p.stock }}</span>
-              </div>
-            </div>
-            <div class="cart-right">
-              <span class="cart-price">¥{{ (p.live_price / 100).toFixed(0) }}</span>
-              <button v-if="p.product_type === 'course' && isCoursePurchased(p)" class="cart-buy go-learn" @click="goLearn">去学习</button>
-              <button v-else-if="p.product_type === 'course'" class="cart-buy" :disabled="!isCourseOnSale(p)" @click="buy(p)">{{ isCourseOnSale(p) ? '抢购' : '不可购' }}</button>
-              <button v-else class="cart-buy" :disabled="p.stock <= 0" @click="buy(p)">{{ p.stock <= 0 ? '售罄' : '抢购' }}</button>
-            </div>
-          </div>
-          <button class="modal-close" @click="showCart = false">关闭</button>
-        </div>
-      </div>
-    </transition>
 
     <!-- 更多弹层 -->
     <transition name="fade">
@@ -93,67 +57,37 @@ import { ref, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { MessagePlugin } from 'tdesign-vue-next';
 import { useLiveStore } from '../../../stores/live-store';
-import { useCourseCommerceStore } from '../../../stores/course-commerce-store';
 
 const route = useRoute();
 const router = useRouter();
 const store = useLiveStore();
-const commerceStore = useCourseCommerceStore();
 const sessionId = route.params.id as string;
 const session = computed(() => store.loadSession(sessionId));
-const products = computed(() => store.loadProducts(sessionId).filter(p => p.status === 'on_shelf'));
-const explainingProduct = computed(() => store.loadProducts(sessionId).find(p => p.is_explaining));
 
 const states = [
   { key: 'normal', label: '正常' },
-  { key: 'sold_out', label: '已售罄' },
   { key: 'chat_off', label: '未开启聊天' },
   { key: 'muted_user', label: '单用户禁言' },
   { key: 'cleared', label: '清屏' },
-  { key: 'product', label: '商品详情' },
 ];
 const currentState = ref('normal');
 const muted = ref(false);
-const showCart = ref(false);
 const showMore = ref(false);
 const commentText = ref('');
 const comments = ref<any[]>([
   { id: 1, name: '王五', text: '老师讲得很清楚' },
-  { id: 2, name: '赵六', text: '这个商品有优惠吗？' },
-  { id: 3, name: '孙七', text: '已下单支持' },
+  { id: 2, name: '赵六', text: '收获很大' },
 ]);
 
 const inputPlaceholder = computed(() => {
   if (currentState.value === 'chat_off') return '未开启聊天功能';
   if (currentState.value === 'muted_user') return '你已被禁言';
   if (currentState.value === 'cleared') return '已清屏';
-  if (currentState.value === 'sold_out') return '商品已售罄';
   return '';
 });
 
-const prodTypeLabel = (t: string) => ({ course: '课程', camp: '营期', goods: '实物' }[t] ?? t);
-function isCoursePurchased(p: any) {
-  if (p.product_type !== 'course') return false;
-  return commerceStore.entitlements.some((e: any) => e.course_id === (p.course_id || p.id) && e.student_id === 'STU-001' && e.status === 'ACTIVE');
-}
-function isCourseOnSale(p: any) {
-  if (p.product_type !== 'course') return true;
-  const product = commerceStore.products.find((pr: any) => pr.course_id === (p.course_id || p.id));
-  return product?.offer_status === 'ON_SALE';
-}
-function goLearn() { router.push('/app/student/course/v-101'); }
+// V2·0829 用户裁决：商品相关整体下线，购物车/讲解卡/抢购逻辑已删除
 function toggleMute() { muted.value = !muted.value; }
-function buy(p: any) {
-  if (!p) return;
-  if (p.product_type === 'course') {
-    // 课程商品购买 → 生成主订单 + 权益
-    const order = commerceStore.createPaidOrder(p.id, 'LIVE_ROOM', 'STU-001', '王五');
-    commerceStore.grantEntitlement({ student_id: 'STU-001', student_name: '王五', course_id: p.id, course_title: p.product_name, order_id: order.id, order_no: order.order_no });
-    MessagePlugin.success(`已购买课程：${p.product_name}`);
-  } else {
-    MessagePlugin.success(`已抢购：${p.product_name} ¥${(p.live_price / 100).toFixed(0)}`);
-  }
-}
 function sendComment() { if (!commentText.value) return; comments.value.push({ id: comments.value.length + 1, name: '我', text: commentText.value }); commentText.value = ''; }
 </script>
 

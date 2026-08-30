@@ -49,25 +49,20 @@ const routes: RouteRecordRaw[] = [
       { path: 'live-control', name: 'LiveControlAudit', component: LiveControlAuditPanel, meta: { terminal: 'pc-tenant', system: 'SAAS租户后台', fn: ['FN-AUDIT-PC-002', 'FN-AUDIT-PC-003'], page: 'PG-AUDIT-PC-002' } },
       { path: 'live/:streamId/violations', name: 'ViolationsPanel', component: ViolationsPanel, meta: { terminal: 'pc-tenant', system: 'SAAS租户后台', fn: ['FN-AUDIT-PC-002', 'FN-AUDIT-PC-003'], page: 'PG-AUDIT-PC-004' } },
       { path: 'live/:streamId/replay', name: 'ReplayDetailAudit', component: ReplayDetailAudit, meta: { terminal: 'pc-tenant', system: 'SAAS租户后台', fn: ['FN-AUDIT-PC-004'], page: 'PG-AUDIT-PC-003' } },
-      { path: 'orders', name: 'TenantOrders', component: () => import('../pages/course/tenant/CampOrderManagePage.vue'), meta: { terminal: 'pc-tenant', system: 'SAAS租户后台', page: 'PG-PROTO-007' } },
-      { path: 'live/goods', name: 'TenantLiveGoods', component: () => import('../pages/course/tenant/LiveGoodsPage.vue'), meta: { terminal: 'pc-tenant', system: 'SAAS租户后台', page: 'PG-PROTO-008' } },
+      // V2·0829 用户裁决：商品相关整体下线（直播商品页删除）
       { path: 'live/recordings', name: 'TenantLiveRecordings', component: () => import('../pages/course/tenant/LiveRecordingPage.vue'), meta: { terminal: 'pc-tenant', system: 'SAAS租户后台', page: 'PG-PROTO-009' } },
       // STR-SAAS-002：财务 → 直播流量
       { path: 'finance/live-traffic', name: 'LiveTrafficHome', component: () => import('../pages/finance-traffic/tenant/LiveTrafficHome.vue'), meta: { terminal: 'pc-tenant', system: 'SAAS租户后台', page: 'PG-LTF-PC-001' } },
       { path: 'finance/live-traffic/recharge', name: 'TrafficRecharge', component: () => import('../pages/finance-traffic/tenant/TrafficRecharge.vue'), meta: { terminal: 'pc-tenant', system: 'SAAS租户后台', page: 'PG-LTF-PC-002' } },
-      // ─── SaaS 线上系统复刻（合入TenantLayout菜单）───
-      { path: 'replica/order', name: 'ReplicaOrder', component: () => import('../pages/saas-replica/order/OrderManagePage.vue'), meta: { terminal: 'pc-tenant' } },
-      { path: 'replica/store', name: 'ReplicaStore', component: () => import('../pages/saas-replica/store/StoreManagePage.vue'), meta: { terminal: 'pc-tenant' } },
-      { path: 'replica/store-member', name: 'ReplicaStoreMember', component: () => import('../pages/saas-replica/store/StoreMemberPage.vue'), meta: { terminal: 'pc-tenant' } },
-      { path: 'replica/aftersale', name: 'ReplicaAftersale', component: () => import('../pages/saas-replica/aftersale/AftersaleManagePage.vue'), meta: { terminal: 'pc-tenant' } },
-      { path: 'replica/org', name: 'ReplicaOrg', component: () => import('../pages/saas-replica/organization/OrganizationManagePage.vue'), meta: { terminal: 'pc-tenant' } },
-      { path: 'replica/account', name: 'ReplicaAccount', component: () => import('../pages/saas-replica/organization/AccountManagePage.vue'), meta: { terminal: 'pc-tenant' } },
-      { path: 'replica/audit', name: 'ReplicaAudit', component: () => import('../pages/saas-replica/organization/AuditManagePage.vue'), meta: { terminal: 'pc-tenant' } },
-      { path: 'replica/wallet', name: 'ReplicaWallet', component: () => import('../pages/saas-replica/finance/WalletPage.vue'), meta: { terminal: 'pc-tenant' } },
-      { path: 'replica/withdraw', name: 'ReplicaWithdraw', component: () => import('../pages/saas-replica/finance/WithdrawReviewPage.vue'), meta: { terminal: 'pc-tenant' } },
-      { path: 'replica/live-recorded', name: 'ReplicaLiveRecorded', component: () => import('../pages/saas-replica/live/LiveRecordedPage.vue'), meta: { terminal: 'pc-tenant' } },
-      { path: 'replica/live-recorded-control/:id', name: 'ReplicaRecordedControl', component: () => import('../pages/saas-replica/live/RecordedControlPage.vue'), meta: { terminal: 'pc-tenant' } },
-      { path: 'replica/live-goods', name: 'ReplicaLiveGoods', component: () => import('../pages/saas-replica/live/LiveGoodsPage.vue'), meta: { terminal: 'pc-tenant' } },
+      // V2·0829：SaaS 线上系统复刻页面整体删除（复刻对照已下线，直播功能以真实后台为准）
+      // V2·0829 结合件：课程业务相关 SaaS 页面 1:1 复刻 + 课程域修改（红框标注）
+      { path: 'replica/customer', name: 'ReplicaCustomer', component: () => import('../pages/saas-replica/customer/CustomerListPage.vue'), meta: { terminal: 'pc-tenant' } },
+      { path: 'replica/marketing/watch-reward', name: 'ReplicaWatchReward', component: () => import('../pages/saas-replica/marketing/WatchRewardPage.vue'), meta: { terminal: 'pc-tenant' } },
+      { path: 'replica/marketing/red-packet-records', name: 'ReplicaRedPacketRecords', component: () => import('../pages/saas-replica/marketing/RedPacketRecordsPage.vue'), meta: { terminal: 'pc-tenant' } },
+      { path: 'replica/marketing/points-task', name: 'ReplicaPointsTask', component: () => import('../pages/saas-replica/marketing/PointsTaskPage.vue'), meta: { terminal: 'pc-tenant' } },
+      { path: 'replica/marketing/points-records', name: 'ReplicaPointsRecords', component: () => import('../pages/saas-replica/marketing/PointsRecordsPage.vue'), meta: { terminal: 'pc-tenant' } },
+      { path: 'replica/customer/detail', name: 'ReplicaCustomerDetail', component: () => import('../pages/saas-replica/customer/CustomerDetailPage.vue'), meta: { terminal: 'pc-tenant' } },
+      { path: 'replica/live/sessions', name: 'ReplicaLiveSessions', component: () => import('../pages/saas-replica/live/LiveSessionsReplicaPage.vue'), meta: { terminal: 'pc-tenant' } },
       { path: '', redirect: '/tenant/dashboard' },
     ],
   },
@@ -106,10 +101,15 @@ const routes: RouteRecordRaw[] = [
       { path: 'home', name: 'AppHome', component: () => import('../pages/course/app/HomePage.vue'), meta: { terminal: 'app', fn: ['FN-APP-HOME'], role: 'student' } },
       { path: 'lecture', name: 'AppLectureCenter', component: () => import('../pages/course/app/LectureCenterPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-001'], role: 'student' } },
       { path: 'learning-record', name: 'AppLearningRecord', component: () => import('../pages/course/app/LearningRecordPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-007'], role: 'student' } },
-      { path: 'wallet', name: 'AppStudentWallet', component: () => import('../pages/course/app/StudentWalletPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-013'], role: 'student' } },
+      // V2·0829 用户裁决：红包/积分保留——积分中心路由恢复；钱包随交易下线
       { path: 'points', name: 'AppPointsCenter', component: () => import('../pages/course/app/PointsCenterPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-015'], role: 'student' } },
       { path: 'profile', name: 'AppProfile', component: () => import('../pages/course/app/ProfilePage.vue'), meta: { terminal: 'app', fn: ['FN-APP-PROFILE'], role: 'student' } },
-      { path: 'orders', name: 'AppMyOrders', component: () => import('../pages/course/app/MyOrdersPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-ORDERS'], role: 'student' } },
+      // V2·0829 双身份：店长/店员经营页（权限一致，普通用户不可见入口）
+      { path: 'workbench', name: 'AppWorkbench', component: () => import('../pages/course/app/WorkbenchPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-WORKBENCH'], role: 'student' } },
+      { path: 'course-promote', name: 'AppCoursePromote', component: () => import('../pages/course/app/CoursePromotePage.vue'), meta: { terminal: 'app', fn: ['FN-APP-COURSE-PROMOTE'], role: 'student' } },
+      { path: 'dashboard', name: 'AppDashboard', component: () => import('../pages/course/app/AppDashboardPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-DASHBOARD'], role: 'student' } },
+      { path: 'camp/:campId/live/:sessionId', name: 'AppCampLive', component: () => import('../pages/course/app/CampLivePage.vue'), meta: { terminal: 'app', fn: ['FN-APP-CAMP-LIVE'], role: 'student' } },
+      // { path: 'orders', name: 'AppMyOrders', component: () => import('../pages/course/app/MyOrdersPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-ORDERS'], role: 'student' } },
       // { path: 'certificates', name: 'AppCertificates', component: () => import('../pages/course/app/CertificatesPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-CERT'], role: 'student' } },
       { path: 'mall', name: 'AppMall', component: () => import('../pages/course/app/MallPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-MALL'], role: 'student' } },
       { path: 'entertainment', name: 'AppEntertainment', component: () => import('../pages/course/app/EntertainmentPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-ENT'], role: 'student' } },
@@ -120,11 +120,12 @@ const routes: RouteRecordRaw[] = [
       { path: 'course/:id/review', name: 'AppCourseReview', component: () => import('../pages/course/app/CourseReviewPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-009'], shared: true } },
       { path: 'lesson/:id', name: 'AppLessonLearn', component: () => import('../pages/course/app/LessonLearnPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-003'], shared: true } },
       { path: 'camp/:id', name: 'AppCampDetail', component: () => import('../pages/course/app/CampDetailPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-004'], shared: true } },
-      { path: 'camp/:id/pay', name: 'AppCampPay', component: () => import('../pages/course/app/CampPayPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-004'], shared: true } },
       { path: 'camp/:id/learn', name: 'AppCampLearn', component: () => import('../pages/course/app/CampLearnPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-005'], shared: true } },
-      { path: 'camp-qa/:id', name: 'AppCampQA', component: () => import('../pages/course/app/CampQAPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-006'], shared: true } },
-      { path: 'contract/:orderId', name: 'AppContractSign', component: () => import('../pages/course/app/ContractSignPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-010'], shared: true } },
-      { path: 'refund/:orderId', name: 'AppRefundApply', component: () => import('../pages/course/app/RefundApplyPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-011'], shared: true } },
+      // V2·D2-1 本期不做交易：支付/合同/退款下线；答疑推下期
+      // { path: 'camp/:id/pay', name: 'AppCampPay', component: () => import('../pages/course/app/CampPayPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-004'], shared: true } },
+      // { path: 'camp-qa/:id', name: 'AppCampQA', component: () => import('../pages/course/app/CampQAPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-006'], shared: true } },
+      // { path: 'contract/:orderId', name: 'AppContractSign', component: () => import('../pages/course/app/ContractSignPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-010'], shared: true } },
+      // { path: 'refund/:orderId', name: 'AppRefundApply', component: () => import('../pages/course/app/RefundApplyPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-011'], shared: true } },
       { path: 'live/:id', name: 'AppLiveRoom', component: () => import('../pages/course/app/LiveRoomPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-LIVE'], shared: true } },
       { path: 'store/:id', name: 'AppStoreHome', component: () => import('../pages/course/app/StoreHomePage.vue'), meta: { terminal: 'app', fn: ['FN-APP-STORE'], shared: true } },
       // { path: 'lecturer/:id', name: 'AppLecturerHome', component: () => import('../pages/course/app/LecturerHomePage.vue'), meta: { terminal: 'app', fn: ['FN-APP-002'], shared: true } },
@@ -146,16 +147,18 @@ const routes: RouteRecordRaw[] = [
       { path: 'course-types', name: 'CourseTypeManage', component: () => import('../pages/course/tenant/CourseTypeManagePage.vue'), meta: { terminal: 'pc-tenant', fn: ['FN-PC-002A'] } },
       { path: 'questions', name: 'QuestionBankManage', component: () => import('../pages/course/tenant/QuestionBankManagePage.vue'), meta: { terminal: 'pc-tenant', fn: ['FN-PC-004A'] } },
       { path: 'camps', name: 'CampManage', component: () => import('../pages/course/tenant/CampManagePage.vue'), meta: { terminal: 'pc-tenant', fn: ['FN-PC-005'] } },
-      { path: 'enrollments', name: 'EnrollmentReview', component: () => import('../pages/course/tenant/EnrollmentReviewPage.vue'), meta: { terminal: 'pc-tenant', fn: ['FN-PC-011'] } },
-      { path: 'camp-students', name: 'CampStudentManage', component: () => import('../pages/course/tenant/CampStudentManagePage.vue'), meta: { terminal: 'pc-tenant', fn: ['FN-PC-007'] } },
-      { path: 'orders', redirect: '/tenant/orders?businessType=knowledge' },
-      { path: 'aftersale', name: 'CampAftersale', component: () => import('../pages/course/tenant/CampAftersalePage.vue'), meta: { terminal: 'pc-tenant' } },
-      { path: 'withdraw', name: 'WithdrawReview', component: () => import('../pages/course/tenant/WithdrawReviewPage.vue'), meta: { terminal: 'pc-tenant' } },
+      // V2·0829 用户裁决：报名审核环节去除；学员管理整体去除（复用 SaaS 客户列表）
+      { path: 'enrollments', redirect: '/tenant/course/camps' },
+      { path: 'camp-students', redirect: '/tenant/course/camps' },
+      // ── V2·D2-1 本期不做交易：订单/售后/提现/合同/证书相关路由下线（证书按 0828 会议推下期）──
+      // { path: 'orders', redirect: '/tenant/orders?businessType=knowledge' },
+      // { path: 'aftersale', name: 'CampAftersale', component: () => import('../pages/course/tenant/CampAftersalePage.vue'), meta: { terminal: 'pc-tenant' } },
+      // { path: 'withdraw', name: 'WithdrawReview', component: () => import('../pages/course/tenant/WithdrawReviewPage.vue'), meta: { terminal: 'pc-tenant' } },
       { path: 'reviews', name: 'CourseReviewManage', component: () => import('../pages/course/tenant/CourseReviewManagePage.vue'), meta: { terminal: 'pc-tenant', fn: ['FN-PC-014'] } },
-      { path: 'contracts', name: 'ContractManage', component: () => import('../pages/course/tenant/ContractManagePage.vue'), meta: { terminal: 'pc-tenant' } },
-      { path: 'certificates', name: 'CertificateManage', component: () => import('../pages/course/tenant/CertificateManagePage.vue'), meta: { terminal: 'pc-tenant', fn: ['FN-PC-015'] } },
+      // { path: 'contracts', name: 'ContractManage', component: () => import('../pages/course/tenant/ContractManagePage.vue'), meta: { terminal: 'pc-tenant' } },
+      // { path: 'certificates', name: 'CertificateManage', component: () => import('../pages/course/tenant/CertificateManagePage.vue'), meta: { terminal: 'pc-tenant', fn: ['FN-PC-015'] } },
       { path: 'dashboard', name: 'CampDashboard', component: () => import('../pages/course/tenant/CampDashboardPage.vue'), meta: { terminal: 'pc-tenant', fn: ['FN-PC-016'] } },
-      { path: 'student-withdraw', name: 'StudentWithdrawReview', component: () => import('../pages/course/tenant/WithdrawReviewPage.vue'), meta: { terminal: 'pc-tenant' } },
+      // { path: 'student-withdraw', name: 'StudentWithdrawReview', component: () => import('../pages/course/tenant/WithdrawReviewPage.vue'), meta: { terminal: 'pc-tenant' } },
       { path: 'camp-schedule', name: 'CampSchedule', component: () => import('../pages/course/tenant/CampSchedulePage.vue'), meta: { terminal: 'pc-tenant', fn: ['FN-PC-006'] } },
       { path: 'live-list', name: 'LiveList', component: () => import('../pages/course/tenant/LiveListPage.vue'), meta: { terminal: 'pc-tenant' } },
       { path: 'live-anchors', name: 'LiveAnchors', component: () => import('../pages/course/tenant/LiveAnchorManagePage.vue'), meta: { terminal: 'pc-tenant' } },
@@ -166,17 +169,18 @@ const routes: RouteRecordRaw[] = [
       { path: 'live-recordings', redirect: '/tenant/live/recordings' },
       { path: 'student-insight', name: 'StudentInsight', component: () => import('../pages/course/tenant/StudentInsightPage.vue'), meta: { terminal: 'pc-tenant', fn: ['FN-PC-021'] } },
       { path: 'learning-data', name: 'LearningData', component: () => import('../pages/course/tenant/LearningDataPage.vue'), meta: { terminal: 'pc-tenant', fn: ['FN-PC-022'] } },
-      { path: 'camp-quizzes', name: 'CampFinalQuizManage', component: () => import('../pages/course/tenant/CampFinalQuizManagePage.vue'), meta: { terminal: 'pc-tenant' } },
-      { path: 'camp-qas', name: 'CampQaManage', component: () => import('../pages/course/tenant/CampQaManagePage.vue'), meta: { terminal: 'pc-tenant' } },
-      { path: 'certificate-tutorial-edit', name: 'CertificateTutorialEdit', component: () => import('../pages/course/tenant/CertificateTutorialEditPage.vue'), meta: { terminal: 'pc-tenant' } },
+      // ── V2·0828 会议：测验/答疑/证书教程推下期，路由下线 ──
+      // { path: 'camp-quizzes', name: 'CampFinalQuizManage', component: () => import('../pages/course/tenant/CampFinalQuizManagePage.vue'), meta: { terminal: 'pc-tenant' } },
+      // { path: 'camp-qas', name: 'CampQaManage', component: () => import('../pages/course/tenant/CampQaManagePage.vue'), meta: { terminal: 'pc-tenant' } },
+      // { path: 'certificate-tutorial-edit', name: 'CertificateTutorialEdit', component: () => import('../pages/course/tenant/CertificateTutorialEditPage.vue'), meta: { terminal: 'pc-tenant' } },
       { path: 'videos', name: 'VideoList', component: () => import('../pages/course/tenant/VideoListPage.vue'), meta: { terminal: 'pc-tenant' } },
       { path: 'video-edit', name: 'VideoEdit', component: () => import('../pages/course/tenant/VideoEditPage.vue'), meta: { terminal: 'pc-tenant' } },
       { path: 'video-batch-add', name: 'VideoBatchAdd', component: () => import('../pages/course/tenant/VideoBatchAddPage.vue'), meta: { terminal: 'pc-tenant' } },
       { path: 'audios', name: 'AudioList', component: () => import('../pages/course/tenant/AudioListPage.vue'), meta: { terminal: 'pc-tenant' } },
       { path: 'audio-edit', name: 'AudioEdit', component: () => import('../pages/course/tenant/AudioEditPage.vue'), meta: { terminal: 'pc-tenant' } },
       { path: 'audio-batch-add', name: 'AudioBatchAdd', component: () => import('../pages/course/tenant/AudioBatchAddPage.vue'), meta: { terminal: 'pc-tenant' } },
+      // ── V2·D2-1 本期不做交易：课程分成记录下线 ──
       // { path: 'share-records', name: 'CourseShareRecords', component: () => import('../pages/course/tenant/CampCommissionPage.vue'), meta: { terminal: 'pc-tenant' } },
-      { path: 'share-records', name: 'CourseShareRecords', component: () => import('../pages/course/tenant/CampCommissionPage.vue'), meta: { terminal: 'pc-tenant' } },
       // { path: 'share-data', name: 'CourseShareData', component: () => import('../pages/course/tenant/CourseShareDataPage.vue'), meta: { terminal: 'pc-tenant' } },
     ],
   },
@@ -250,7 +254,8 @@ router.beforeEach((to) => {
   // 讲师页面：仅讲师
   // 助教页面：仅助教
   // 学员页面（非共享）：仅学员
-  if (to.path.startsWith('/app/student') && role !== 'student') return ROLE_HOME[role] || '/app/student/home';
+  // V2·0829 双身份：普通用户/店长/店员 均可访问学员端页面（入口与内容随身份变化）
+  if (to.path.startsWith('/app/student') && !['student', 'store_manager', 'store_clerk'].includes(role)) return ROLE_HOME[role] || '/app/student/home';
   return true;
 });
 

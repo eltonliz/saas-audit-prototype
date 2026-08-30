@@ -18,12 +18,7 @@
       <t-input v-model="search" placeholder="请输入音频标题" clearable style="width: 220px">
         <template #prefix><t-icon name="search" /></template>
       </t-input>
-      <t-select v-model="statusFilter" placeholder="上架状态" clearable style="width: 140px">
-        <t-option label="全部状态" value="" />
-        <t-option label="已上架" value="on" />
-        <t-option label="已下架" value="off" />
-        <t-option label="草稿" value="draft" />
-      </t-select>
+      <!-- V2·0829 用户裁决：上架状态筛选删除（无上下架概念） -->
     </div>
 
     <t-card :bordered="false" class="table-card">
@@ -40,18 +35,9 @@
           </div>
         </template>
         <template #duration="{ row }">{{ row.duration }}</template>
-        <template #sale_mode="{ row }">
-          <t-tag :theme="row.sale_mode === 'free' ? 'success' : 'warning'" variant="light" size="small">
-            {{ row.sale_mode === 'free' ? '免费' : '付费' }}
-          </t-tag>
-        </template>
-        <template #status="{ row }">
-          <t-tag :theme="statusTheme(row.status)" variant="light" size="small">{{ statusLabel(row.status) }}</t-tag>
-        </template>
         <template #created_at="{ row }">{{ row.created_at }}</template>
         <template #op="{ row }">
           <t-button variant="text" size="small" theme="primary" @click="goEdit(row)">编辑</t-button>
-          <t-button variant="text" size="small" :theme="row.status === 'on' ? 'warning' : 'success'" @click="toggleStatus(row)">{{ row.status === 'on' ? '下架' : '上架' }}</t-button>
           <t-button variant="text" size="small" theme="danger" @click="del(row)">删除</t-button>
         </template>
       </t-table>
@@ -77,7 +63,7 @@ import { useCourseStore } from '../../../stores/course-store';
 
 const router = useRouter();
 const store = useCourseStore();
-const search = ref(''); const statusFilter = ref('');
+const search = ref('');
 const selected = ref<any[]>([]);
 const selectedKeys = ref<(string|number)[]>([]);
 function onSelChange(_keys: (string | number)[], ctx: any) { selected.value = ctx?.selectedRowData ?? []; }
@@ -88,7 +74,6 @@ const audios = computed(() => store.contentPool.filter((c: any) => c.content_typ
   name: c.title,
   description: c.description,
   duration: c.duration ? `${String(Math.floor(c.duration / 60)).padStart(2, '0')}:${String(c.duration % 60).padStart(2, '0')}` : '-',
-  sale_mode: c.sale_mode,
   status: c.status === 'published' ? 'on' : c.status === 'offline' ? 'off' : 'draft',
   created_at: new Date(c.created_at * 1000).toLocaleString('zh-CN', { hour12: false }),
   color: '#E1BEE7',
@@ -96,7 +81,7 @@ const audios = computed(() => store.contentPool.filter((c: any) => c.content_typ
 
 const filteredAudios = computed(() => audios.value.filter(v =>
   (!search.value || v.name.includes(search.value)) &&
-  (!statusFilter.value || v.status === statusFilter.value)
+  (!search.value || v.name.includes(search.value))
 ));
 
 const columns = [
@@ -104,22 +89,16 @@ const columns = [
   { colKey: 'id', title: 'ID', width: 70 },
   { colKey: 'name', title: '内容标题', minWidth: 280 },
   { colKey: 'duration', title: '时长', width: 90 },
-  { colKey: 'sale_mode', title: '售卖方式', width: 90 },
-  { colKey: 'status', title: '上架状态', width: 100 },
+  // V2·0829 用户裁决：上架状态列已删除
   { colKey: 'created_at', title: '创建时间', width: 150 },
   { colKey: 'op', title: '操作', width: 140, fixed: 'right' },
 ];
 
-const statusLabel = (s: string) => ({ on: '已上架', off: '已下架', draft: '草稿' }[s] ?? s);
-const statusTheme = (s: string) => ({ on: 'success', off: 'default', draft: 'warning' }[s] ?? 'default');
+// V2·0829 用户裁决：上下架状态与操作已删除
 
 function onBatchCreate() { router.push('/tenant/course/audio-batch-add'); }
 function goCreate() { router.push({ path: '/tenant/course/audio-edit', query: { modal: 'audio-edit' } }); }
 function goEdit(row: any) { router.push({ path: '/tenant/course/audio-edit', query: { id: row.id, modal: 'audio-edit' } }); }
-function toggleStatus(row: any) {
-  store.toggleContentStatus(row.id);
-  MessagePlugin.success('状态已切换');
-}
 function del(row: any) {
   DialogPlugin.confirm({ header: '删除音频', body: `确认删除「${row.name}」？已被课程引用的内容不可删除。`, theme: 'warning', onConfirm: () => {
     const res = store.removeContent(row.id);

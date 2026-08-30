@@ -29,10 +29,10 @@
         </div>
         <div class="card-body">
           <div class="card-title">{{ c.title }}</div>
-          <div class="card-meta">{{ c.lecturer_name }} · {{ c.lesson_count }}课时 · ⭐{{ c.rating }}</div>
+          <div class="card-meta">{{ c.lesson_count }}课时 · ⭐{{ c.rating }}</div>
           <div class="card-bottom">
             <span class="card-learners">学习{{ c.total_learners }}人</span>
-            <span class="card-price">{{ c.is_paid ? '¥' + (c.price/100).toFixed(0) : '免费' }}</span>
+            <span class="card-price">免费</span>
           </div>
         </div>
       </div>
@@ -51,9 +51,9 @@
         <div class="card-body">
           <div class="card-title">{{ c.title }}</div>
           <div class="card-meta">{{ c.mode === 'live' ? '直播模式' : '录播模式' }} · {{ c.start_date }}~{{ c.end_date }} · {{ c.total_days }}天</div>
-          <div class="card-meta">主讲 {{ c.main_lecturer_name }} · 已报{{ c.enrolled_count }}人 · 已加入{{ c.joined_count }}人</div>
+          <div class="card-meta">已报名 {{ c.enrolled_count }} 人</div>
           <div class="card-bottom">
-            <span class="card-price">{{ c.is_paid ? '¥' + (c.price/100).toFixed(0) : '免费' }}</span>
+            <span class="card-price">免费</span>
             <span class="enroll-btn">{{ campStatusLabel(c.status) }}</span>
           </div>
         </div>

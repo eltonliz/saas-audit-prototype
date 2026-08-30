@@ -53,14 +53,6 @@
 
           <div class="field">
             <div class="field-label">视频详情</div>
-            <div class="radios-inline">
-              <t-radio :checked="form.detail_mode === 'full'" @change="form.detail_mode = 'full'">购买前查看完整视频详情 <span class="link-minor">查看示例</span></t-radio>
-              <t-radio :checked="form.detail_mode === 'brief'" @change="form.detail_mode = 'brief'">购买前仅查看课节介绍 <span class="link-minor">查看示例</span></t-radio>
-            </div>
-          </div>
-
-          <div class="field">
-            <div class="field-label">视频详情</div>
             <RichEditor v-model="form.description" placeholder="请输入视频详情" :max-length="50000" />
           </div>
         </t-card>
@@ -92,116 +84,24 @@
           </div>
         </t-card>
 
-        <!-- 商品信息 -->
+        <!-- V2·0829 用户裁决：商品信息区块已删除——课程全免费；有效期补充自定义时间 -->
         <t-card :bordered="false" class="section">
           <div class="section-head">
             <div class="section-title-wrap">
-              <h3 class="section-title">商品信息</h3>
-              <span class="section-sub">设置售卖方式与价格</span>
+              <h3 class="section-title">有效期</h3>
             </div>
           </div>
-
           <div class="field">
-            <div class="field-label">售卖方式</div>
-            <t-radio-group v-model="form.sale_type">
-              <t-radio value="free">免费</t-radio>
-              <t-radio value="paid">付费</t-radio>
-            </t-radio-group>
-
-            <div v-if="form.sale_type === 'paid'" class="paid-panel">
-              <div class="paid-row">
-                <span class="paid-label"><span class="req">*</span>商品价格（元）</span>
-                <t-input v-model="form.price" placeholder="请输入价格，最低为1" style="width: 280px" />
-                <t-tooltip content="商品价格需≥1元"><t-icon name="help-circle" class="tip-icon" /></t-tooltip>
-              </div>
-              <div class="paid-row">
-                <span class="paid-label">划线价格（元）</span>
-                <t-input v-model="form.original_price" placeholder="请输入价格，最低为1" style="width: 280px" />
-                <t-tooltip content="划线价格需≥1元"><t-icon name="help-circle" class="tip-icon" /></t-tooltip>
-              </div>
-              <div class="paid-row paid-row-top">
-                <span class="paid-label">有效期</span>
-                <div class="validity-radios">
-                  <t-radio :checked="form.validity_type === 'long'" @change="form.validity_type = 'long'">长期有效</t-radio>
-                  <t-radio :checked="form.validity_type === 'custom'" @change="form.validity_type = 'custom'">自定义时长</t-radio>
-                  <t-radio :checked="form.validity_type === 'fixed'" @change="form.validity_type = 'fixed'">固定时长（自购买后X天内有效）</t-radio>
-                </div>
-              </div>
-              <div v-if="form.validity_type === 'custom'" class="paid-row">
-                <span class="paid-label"></span>
-                <t-date-picker v-model="form.validity_custom_date" enable-time-picker placeholder="选择日期时间" style="width: 280px" />
-              </div>
-              <div v-if="form.validity_type === 'fixed'" class="paid-row">
-                <span class="paid-label"></span>
-                <div class="fixed-days-row">自购买后 <t-input-number v-model="form.validity_fixed_days" :min="1" :max="3650" style="width: 120px" /> 天内有效</div>
-              </div>
-            </div>
-          </div>
-
-          <div v-if="form.sale_type === 'free'" class="field">
             <div class="field-label">有效期</div>
-            <span class="validity-static">长期有效</span>
+            <t-radio-group v-model="form.validity_type" style="margin-right:12px">
+              <t-radio value="long">长期有效</t-radio>
+              <t-radio value="custom">自定义时间</t-radio>
+            </t-radio-group>
+            <t-date-picker v-if="form.validity_type === 'custom'" v-model="form.validity_custom_date" enable-time-picker placeholder="选择失效时间" style="width:220px" />
           </div>
         </t-card>
 
-        <!-- 教学人员 -->
-        <t-card :bordered="false" class="section">
-          <div class="section-head">
-            <div class="section-title-wrap">
-              <h3 class="section-title">教学人员</h3>
-              <span class="section-sub">配置主讲与助教</span>
-            </div>
-          </div>
-          <div class="field">
-            <div class="field-label"><span class="req">*</span>主讲</div>
-            <t-select v-model="form.lecturer_id" placeholder="请选择主讲" filterable clearable style="width: 280px" @change="(v: any) => { const opt = [{ id: 'lect-001', name: '张三讲师' }, { id: 'lect-002', name: '李四讲师' }, { id: 'lect-003', name: '王五讲师' }].find(o => o.id === v); form.lecturer_name = opt?.name || ''; }">
-              <t-option label="张三讲师" value="lect-001" />
-              <t-option label="李四讲师" value="lect-002" />
-              <t-option label="王五讲师" value="lect-003" />
-            </t-select>
-          </div>
-          <div class="field">
-            <div class="field-label">助教</div>
-            <t-select v-model="form.assistant_id" placeholder="请选择助教（选填）" filterable clearable style="width: 280px">
-              <t-option label="王助教" value="asst-001" />
-              <t-option label="刘助教" value="asst-002" />
-            </t-select>
-          </div>
-        </t-card>
-
-        <!-- 分成设置 -->
-        <t-card :bordered="false" class="section">
-          <div class="section-head">
-            <div class="section-title-wrap">
-              <h3 class="section-title">分成设置</h3>
-              <span class="section-sub">三方比例之和须等于 100%</span>
-            </div>
-          </div>
-          <div class="field">
-            <div class="field-label">是否启用课程分成</div>
-            <t-switch v-model="form.share_enabled" />
-          </div>
-          <template v-if="form.share_enabled">
-            <div class="field">
-              <div class="field-label"><span class="req">*</span>主讲比例</div>
-              <t-input-number v-model="form.lecturer_rate" :min="0" :max="100" style="width: 160px" />
-              <span class="field-hint">%</span>
-            </div>
-            <div class="field">
-              <div class="field-label">助教比例</div>
-              <t-input-number v-model="form.assistant_rate" :min="0" :max="100" :disabled="!form.assistant_id" style="width: 160px" />
-              <span class="field-hint">%</span>
-              <span v-if="!form.assistant_id" class="field-hint">未选择助教时比例为 0</span>
-            </div>
-            <div class="field">
-              <div class="field-label">平台比例</div>
-              <span class="validity-static">{{ platformRate }}%</span>
-              <span class="field-hint">自动计算（100 - 主讲 - 助教）</span>
-            </div>
-            <div v-if="form.lecturer_rate + form.assistant_rate >= 100" class="form-error">提示：主讲+助教比例之和须&lt;100%，请重新设置</div>
-            <div class="field-hint">修改仅影响新支付订单，历史订单仍使用原比例快照。</div>
-          </template>
-        </t-card>
+        <!-- V2·0829 用户裁决：主讲人字段去除；分成设置区块已删除（本期不做交易） -->
 
         <!-- 视频设置 -->
         <t-card :bordered="false" class="section">
@@ -244,45 +144,9 @@
             </div>
           </div>
 
-          <div class="field">
-            <div class="field-label">是否允许试看</div>
-            <div class="switch-row">
-              <t-switch v-model="form.allow_preview" />
-              <span class="field-hint">开启后学员可免费试看前 3 分钟</span>
-            </div>
-          </div>
         </t-card>
 
-        <!-- 上架设置 -->
-        <t-card :bordered="false" class="section">
-          <div class="section-head">
-            <div class="section-title-wrap">
-              <h3 class="section-title">上架设置</h3>
-              <span class="section-sub">控制视频何时对学员可见</span>
-            </div>
-          </div>
-
-          <div class="field">
-            <div class="field-label"><span class="req">*</span>是否上架</div>
-            <t-radio-group v-model="form.on_shelf">
-              <t-radio value="immediate">立即上架</t-radio>
-              <t-radio value="scheduled">定时上架</t-radio>
-              <t-radio value="takedown">下架</t-radio>
-            </t-radio-group>
-          </div>
-
-          <div v-if="form.on_shelf === 'scheduled'" class="field">
-            <div class="field-label">定时上架时间</div>
-            <t-date-picker v-model="form.scheduled_time" enable-time-picker placeholder="选择日期时间" />
-          </div>
-
-          <div v-if="form.on_shelf === 'immediate' || form.on_shelf === 'scheduled'" class="field">
-            <div class="field-label">定时下架时间</div>
-            <t-date-picker v-model="form.takedown_time" enable-time-picker placeholder="选择日期时间" />
-          </div>
-
-          <div class="shelf-tip">视频上架后，可在店铺主页显示；下架时隐藏，下架后学员无法学习该内容。</div>
-        </t-card>
+        <!-- V2·0829 用户裁决：允许试看去除（无实际意义）；上架设置整体去除（无收费/免费区分） -->
       </div>
     </div>
 
@@ -347,13 +211,11 @@ import { ref, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { MessagePlugin } from 'tdesign-vue-next';
 import RichEditor from '../../../components/common/RichEditor.vue';
-import { useCourseCommerceStore } from '../../../stores/course-commerce-store';
 import { onMounted } from 'vue';
 import { useCourseStore } from '../../../stores/course-store';
 import { notifyModalOpen } from '../../../utils/modal-spec-bridge';
 onMounted(() => { notifyModalOpen('video-edit'); });
 
-const commerceStore = useCourseCommerceStore();
 const courseStore = useCourseStore();
 
 const route = useRoute();
@@ -428,11 +290,7 @@ const form = ref({
   video_duration: '',
   video_size: '',
   description: '',
-  detail_mode: 'full' as 'full' | 'brief',
   cover_url: coverPresets[0].url,
-  sale_type: 'free' as 'free' | 'paid',
-  price: '',
-  original_price: '',
   validity_type: 'long' as 'long' | 'custom' | 'fixed',
   validity_custom_date: null as Date | null,
   validity_fixed_days: 365,
@@ -440,16 +298,7 @@ const form = ref({
   forbid_speed: false,
   watermark_horse: false,
   watermark_text: false,
-  allow_preview: false,
-  on_shelf: 'immediate' as 'immediate' | 'scheduled' | 'takedown',
-  scheduled_time: null as Date | null,
-  takedown_time: null as Date | null,
-  lecturer_id: '',
-  lecturer_name: '',
-  assistant_id: '',
-  share_enabled: true,
-  lecturer_rate: 70,
-  assistant_rate: 10,
+  // V2·0829 用户裁决：视频详情模式（购买前两选项）/允许试看/上架设置/主讲人字段已去除
 });
 
 // 编辑模式：从 store 内容池回填
@@ -460,14 +309,8 @@ if (isEdit.value && route.query.id) {
     form.value.description = editing.description || '';
     form.value.video_name = `${editing.title}.mp4`;
     form.value.video_duration = editing.duration ? `${Math.floor(editing.duration / 60)}:${String(editing.duration % 60).padStart(2, '0')}` : '';
-    form.value.sale_type = editing.sale_mode === 'paid' ? 'paid' : 'free';
-    form.value.price = editing.price ? String(editing.price / 100) : '';
-    form.value.lecturer_id = editing.lecturer_id || '';
-    form.value.lecturer_name = editing.lecturer_name || '';
   }
 }
-
-const platformRate = computed(() => Math.max(0, 100 - form.value.lecturer_rate - form.value.assistant_rate));
 
 const groupLabel = computed(() => '未分类');
 
@@ -476,12 +319,9 @@ function onCoverUpload() { MessagePlugin.info('原型演示：上传自定义封
 function doSave() {
   if (!form.value.video_name) { MessagePlugin.warning('请先上传视频'); return; }
   if (!form.value.name) { MessagePlugin.warning('请填写视频标题'); return; }
-  if (!form.value.lecturer_id) { MessagePlugin.warning('请选择主讲'); return; }
-  if (form.value.sale_type === 'paid' && (!form.value.price || Number(form.value.price) < 0.01)) { MessagePlugin.warning('售价最低为 0.01 元'); return; }
-  if (form.value.share_enabled && form.value.lecturer_rate + form.value.assistant_rate >= 100) { MessagePlugin.warning('主讲+助教比例之和须<100%，请重新设置'); return; }
   submitting.value = true;
   setTimeout(() => {
-    // 写入 store 内容池（与课程库"选择视频"同源）
+    // 写入 store 内容池（与课程库"选择视频"同源）·V2·0829 全免费无售卖字段
     const durationStr = String(form.value.video_duration || '0:00');
     const parts = durationStr.split(':');
     const durationSec = parts.length === 2 ? (parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10)) : parseInt(durationStr, 10) || 0;
@@ -490,12 +330,7 @@ function doSave() {
       title: form.value.name,
       description: form.value.description || '',
       duration: durationSec,
-      sale_mode: (form.value.sale_type === 'paid' ? 'paid' : 'free') as 'paid' | 'free',
-      price: form.value.sale_type === 'paid' ? Math.round(Number(form.value.price) * 100) : 0,
-      is_standalone_sale: form.value.sale_type === 'paid',
       status: 'published' as const,
-      lecturer_id: form.value.lecturer_id,
-      lecturer_name: form.value.lecturer_name || '',
     };
     if (isEdit.value && route.query.id) {
       courseStore.updateContent(String(route.query.id), payload);

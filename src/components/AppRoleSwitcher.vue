@@ -20,13 +20,15 @@ import { useRoute, useRouter } from 'vue-router';
 const route = useRoute();
 const router = useRouter();
 
+// V2·0829 双身份：普通用户（学员）/ 店长 / 店员（店长与店员权限一致，仅身份名不同）
 const roles = [
-  { key: 'student', icon: '🎓', label: '学员', home: '/app/student/home' },
+  { key: 'student', icon: '🎓', label: '普通用户', home: '/app/student/home' },
+  { key: 'store_manager', icon: '🏪', label: '店长', home: '/app/student/profile' },
+  { key: 'store_clerk', icon: '🧑‍💼', label: '店员', home: '/app/student/profile' },
 ];
 
 const current = computed(() => {
-  const p = route.path;
-  return 'student';
+  try { return localStorage.getItem('app-role') || 'student'; } catch { return 'student'; }
 });
 
 function switchTo(key: string) {

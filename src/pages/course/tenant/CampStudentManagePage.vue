@@ -48,10 +48,6 @@
             <template #phone="{ row }"><span class="mono">{{ row.student_phone }}</span></template>
             <template #camp="{ row }"><span class="camp-title">{{ row.camp_title }}</span></template>
             <template #channel="{ row }"><t-tag size="small" variant="light" theme="default">{{ channelLabel(row.channel) }}</t-tag></template>
-            <template #inviter="{ row }">
-              <t-tag v-if="getInviter(row)" theme="warning" variant="light" size="small">{{ getInviter(row) }}</t-tag>
-              <t-tag v-else theme="default" variant="light" size="small">未分配</t-tag>
-            </template>
             <template #group="{ row }">
               <t-tag v-if="row.group_id" theme="primary" variant="light" size="small">{{ getGroupName(row.group_id) }}</t-tag>
               <t-tag v-else theme="default" variant="light" size="small">未分组</t-tag>
@@ -87,39 +83,14 @@
                 <t-button v-if="row.status === 'rejected'" variant="text" size="small" theme="primary" @click="allowResubmit(row)">
                   <template #icon><t-icon name="refresh" /></template>允许重新提交
                 </t-button>
-                <t-button v-if="['approved','enrolled'].includes(row.status)" variant="text" size="small" theme="primary" @click="openAssign(row)">
-                  <template #icon><t-icon name="user-circle" /></template>调归属
-                </t-button>
+                <!-- V2·0829 用户裁决：归属关系统一走 SaaS 门店成员（店长/店员），课程业务不带归属，「调归属」入口已删 -->
               </div>
             </template>
           </t-table>
         </t-tab-panel>
 
         <!-- ===== 邀请码 ===== -->
-        <t-tab-panel label="邀请码" value="inviteCodes">
-          <div class="toolbar">
-            <t-button theme="primary" size="small" @click="showCreateInvite = true">
-              <template #icon><t-icon name="add" /></template> 生成邀请码
-            </t-button>
-          </div>
-          <t-table :data="campInvites" row-key="id" :columns="inviteColumns" hover>
-            <template #code="{ row }"><span class="code-chip mono">{{ row.code }}</span></template>
-            <template #code_type="{ row }"><t-tag size="small" variant="light" theme="default">{{ row.code_type === 'qr' ? '二维码' : '口令' }}</t-tag></template>
-            <template #usage="{ row }"><span class="usage-text">{{ row.used_count }}{{ row.max_usage > 0 ? '/' + row.max_usage : '/不限' }}</span></template>
-            <template #istatus="{ row }">
-              <t-tag :theme="inviteActive(row) ? 'success' : 'default'" variant="light" size="small">
-                <template #icon><t-icon :name="inviteActive(row) ? 'check-circle' : 'time'" /></template>
-                {{ inviteActive(row) ? '有效' : '已失效' }}
-              </t-tag>
-            </template>
-            <template #op="{ row }">
-              <t-button variant="text" size="small" :theme="row.is_active ? 'danger' : 'primary'" @click="toggleInvite(row)">
-                <template #icon><t-icon :name="row.is_active ? 'stop-circle' : 'play-circle'" /></template>
-                {{ row.is_active ? '停用' : '启用' }}
-              </t-button>
-            </template>
-          </t-table>
-        </t-tab-panel>
+        <!-- V2·0829 用户裁决：邀请码/口令体系下线，邀请码 tab 已删除 -->
 
         <!-- ===== 分组管理 ===== -->
         <t-tab-panel label="分组管理" value="groups">
@@ -175,97 +146,25 @@
               </template>
               <div v-else class="group-empty">
                 <t-icon name="grid-view" class="empty-icon" />
-                <div class="empty-text">点击左侧分组的「查看学员」<br />查看该组成员并管理归属</div>
+                <div class="empty-text">点击左侧分组的「查看学员」<br />查看该组成员</div>
               </div>
             </div>
           </div>
         </t-tab-panel>
 
-        <!-- ===== 助教管理 ===== -->
-        <t-tab-panel label="助教管理" value="assistants">
-          <div class="toolbar">
-            <t-button theme="primary" size="small" @click="showAddAssistant = true">
-              <template #icon><t-icon name="add" /></template> 添加助教
-            </t-button>
-          </div>
-          <t-table :data="campAllLecturers" row-key="id" :columns="assistantColumns" hover>
-            <template #role="{ row }"><t-tag :theme="row.camp_role === 'main_lecturer' ? 'primary' : 'warning'" variant="light" size="small">{{ row.camp_role === 'main_lecturer' ? '讲师' : '助教' }}</t-tag></template>
-            <template #status="{ row }"><t-tag :theme="row.is_active ? 'success' : 'default'" variant="light" size="small">{{ row.is_active ? '在职' : '已离职' }}</t-tag></template>
-            <template #op="{ row }">
-              <t-button v-if="row.camp_role === 'assistant' && row.is_active" variant="text" size="small" theme="danger" @click="removeAssistant(row)">
-                <template #icon><t-icon name="delete" /></template>移除
-              </t-button>
-            </template>
-          </t-table>
-        </t-tab-panel>
+        <!-- V2·0829 用户裁决：助教拉新体系下线，助教管理 tab 已移除 -->
       </t-tabs>
     </div>
 
-    <!-- 添加助教 Dialog -->
-    <t-dialog v-model:visible="showAddAssistant" header="添加助教" width="420px" :on-confirm="doAddAssistant" :confirm-btn="{ content: '添加', theme: 'primary' }" :cancel-btn="{ content: '取消' }">
-      <t-form label-width="80px">
-        <t-form-item label="助教" required-mark>
-          <t-select v-model="newAssistant.lecturer_id" filterable placeholder="选择讲师" style="width: 100%">
-            <t-option v-for="l in availableLecturers" :key="l.id" :label="l.name" :value="l.id" />
-          </t-select>
-        </t-form-item>
-        <t-form-item label="角色类型">
-          <t-input v-model="newAssistant.role_type" placeholder="如：助教" />
-        </t-form-item>
-      </t-form>
-    </t-dialog>
+    <!-- V2·0829：添加助教 Dialog、调归属 Dialog 已删除（归属统一走 SaaS 门店成员体系） -->
 
-    <!-- 调归属 Dialog -->
-    <t-dialog v-model:visible="showAssign" header="归属调整" width="420px" :on-confirm="doAssign" :confirm-btn="{ content: '确认', theme: 'primary' }" :cancel-btn="{ content: '取消' }">
-      <t-form label-width="80px">
-        <t-form-item label="学员">{{ current?.student_name }}</t-form-item>
-        <t-form-item label="助教">
-          <t-select v-model="assignAssistantId" clearable placeholder="选择助教（可选）" style="width: 100%">
-            <t-option v-for="a in campAssistants" :key="a.lecturer_id" :label="a.lecturer_name" :value="a.lecturer_id" />
-          </t-select>
-        </t-form-item>
-        <t-form-item label="分组">
-          <t-select v-model="assignGroupId" clearable placeholder="选择分组（可选）" style="width: 100%">
-            <t-option v-for="g in campGroups" :key="g.id" :label="g.group_name" :value="g.id" />
-          </t-select>
-        </t-form-item>
-      </t-form>
-    </t-dialog>
+    <!-- V2·0829 用户裁决：生成邀请码 Dialog 已删除（邀请码/口令体系下线） -->
 
-    <!-- 生成邀请码 Dialog -->
-    <t-dialog v-model:visible="showCreateInvite" header="生成邀请码" width="420px" :on-confirm="doCreateInvite" :confirm-btn="{ content: '生成', theme: 'primary' }" :cancel-btn="{ content: '取消' }">
-      <t-form label-width="80px">
-        <t-form-item label="助教" required-mark>
-          <t-select v-model="newInvite.assistant_id" style="width: 100%">
-            <t-option v-for="a in campAssistants" :key="a.lecturer_id" :label="a.lecturer_name" :value="a.lecturer_id" />
-          </t-select>
-        </t-form-item>
-        <t-form-item label="类型">
-          <t-radio-group v-model="newInvite.code_type">
-            <t-radio value="qr">扫码</t-radio>
-            <t-radio value="password">口令</t-radio>
-          </t-radio-group>
-        </t-form-item>
-        <t-form-item label="最大次数">
-          <t-input-number v-model="newInvite.max_usage" :min="0" />
-          <span class="hint">0=不限</span>
-        </t-form-item>
-        <t-form-item label="过期时间" required-mark>
-          <t-date-picker v-model="newInvite.expire_at" enable-time-picker placeholder="选择过期时间" style="width: 100%" />
-        </t-form-item>
-      </t-form>
-    </t-dialog>
-
-    <!-- 新建分组 Dialog -->
+    <!-- 新建分组 Dialog（V2·0829：去负责助教） -->
     <t-dialog v-model:visible="showCreateGroup" header="新建分组" width="420px" :on-confirm="doCreateGroup" :confirm-btn="{ content: '创建', theme: 'primary' }" :cancel-btn="{ content: '取消' }">
       <t-form label-width="80px">
         <t-form-item label="分组名称" required-mark>
           <t-input v-model="newGroup.group_name" placeholder="如：学习A组" maxlength="50" />
-        </t-form-item>
-        <t-form-item label="负责助教" required-mark>
-          <t-select v-model="newGroup.assistant_id" style="width: 100%">
-            <t-option v-for="a in campAssistants" :key="a.lecturer_id" :label="a.lecturer_name" :value="a.lecturer_id" />
-          </t-select>
         </t-form-item>
       </t-form>
     </t-dialog>
@@ -281,50 +180,16 @@ import { ref, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { DialogPlugin, MessagePlugin } from 'tdesign-vue-next';
 import { useCampStore } from '../../../stores/camp-store';
-import { useCampPaymentStore } from '../../../stores/camp-payment-store';
-import { useLecturerStore } from '../../../stores/lecturer-store';
 
 const route = useRoute();
 const store = useCampStore();
-const payStore = useCampPaymentStore();
-const lecturerStore = useLecturerStore();
 // 从页面导航直入时默认落到第一个营期，避免空名单
 const campId = (route.query.campId as string) || store.camps[0]?.id || '';
 
 const camp = computed(() => store.loadCamp(campId));
 const campEnrollments = computed(() => store.loadEnrollmentsByCamp(campId));
-const campInvites = computed(() => store.loadInviteCodesByCamp(campId));
 const campGroups = computed(() => store.campGroups.filter(g => g.camp_id === campId));
-const campAssistants = computed(() => store.loadCampLecturersByCamp(campId).filter(l => l.camp_role === 'assistant' && l.is_active));
-
-// 助教管理
-const campAllLecturers = computed(() => store.loadCampLecturersByCamp(campId));
-const availableLecturers = computed(() => {
-  const existing = new Set(campAllLecturers.value.map(l => l.lecturer_id));
-  return lecturerStore.loadLecturerList().filter(l => !existing.has(l.id));
-});
-const showAddAssistant = ref(false);
-const newAssistant = ref({ lecturer_id: '', role_type: '助教' });
-const assistantColumns = [
-  { colKey: 'lecturer_name', title: '讲师', width: 100 },
-  { colKey: 'role_type', title: '角色类型', width: 100 },
-  { colKey: 'role', title: '营期角色', width: 90 },
-  { colKey: 'student_count', title: '名下学员', width: 90 },
-  { colKey: 'status', title: '状态', width: 80 },
-  { colKey: 'op', title: '操作', width: 80 },
-];
-function doAddAssistant() {
-  if (!newAssistant.value.lecturer_id) { MessagePlugin.warning('请选择讲师'); return; }
-  const lec = lecturerStore.lecturers.find(l => l.id === newAssistant.value.lecturer_id);
-  if (!lec) return;
-  store.addCampLecturer({ camp_id: campId, lecturer_id: lec.id, lecturer_name: lec.name, role_type: '助教', camp_role: 'assistant' });
-  MessagePlugin.success('助教已添加');
-  showAddAssistant.value = false;
-  newAssistant.value = { lecturer_id: '', role_type: '助教' };
-}
-function removeAssistant(row: any) {
-  DialogPlugin.confirm({ header: '移除助教', body: `确认移除助教「${row.lecturer_name}」？`, theme: 'warning', onConfirm: () => { store.removeCampLecturer(row.id); MessagePlugin.success('已移除'); } });
-}
+// V2·0829 用户裁决：助教拉新体系下线——助教管理/归属助教/邀请码归属相关逻辑已移除
 
 const activeTab = ref('students');
 const statusFilter = ref('');
@@ -335,7 +200,7 @@ const ENROLLMENT_STATUS: Record<string, { label: string }> = {
   enrolled: { label: '已加入' }, cancelled: { label: '已取消' }, refunded: { label: '已退款' },
 };
 const CHANNEL: Record<string, string> = {
-  assistant_qr: '助教扫码', camp_password: '营期口令', admin_assign: '后台添加', merchant_import: '导入', password: '口令', direct: '直接报名',
+  direct: '直接报名', admin_assign: '后台添加',
 };
 
 const filteredEnrollments = computed(() => {
@@ -377,28 +242,17 @@ function certStatus(sid: string): string {
   return c ? (c.is_revoked ? '已撤销' : '有效') : '无';
 }
 
-function getInviter(row: any): string {
-  if (row.assistant_name) return row.assistant_name;
-  if (row.invite_code_id) {
-    const code = store.inviteCodes.find(c => c.id === row.invite_code_id);
-    if (code) return code.assistant_name;
-  }
-  return '';
-}
+// V2·0829：邀请人（助教归属）列已移除
 function getGroupName(id: string): string {
   return store.campGroups.find(g => g.id === id)?.group_name ?? id.slice(-4);
 }
 function groupStudentCount(groupId: string): number {
   return campEnrollments.value.filter(e => e.group_id === groupId).length;
 }
-function inviteActive(row: any): boolean {
-  const expired = (row.expire_at ?? 0) < Math.floor(Date.now() / 1000);
-  return !expired && row.is_active;
-}
 
-// 审核通过（完整流水线：审核+生成订单+免费自动加入）
+// 审核通过（V2·0829：审核通过即加入）
 function approve(row: any) {
-  store.approveEnrollment(row.id, 'admin'); // store 内自动生成订单+免费营期自动加入
+  store.approveEnrollment(row.id, 'admin');
   MessagePlugin.success(`已通过 ${row.student_name} 的报名申请`);
 }
 const rejectEnrollVisible = ref(false); const rejectEnrollReason = ref(''); const rejectEnrollTarget = ref<any>(null);
@@ -424,59 +278,19 @@ function allowResubmit(row: any) {
   });
 }
 
-// 调归属
-const showAssign = ref(false);
-const current = ref<any>(null);
-const assignAssistantId = ref('');
-const assignGroupId = ref('');
-function openAssign(row: any) {
-  current.value = row;
-  assignAssistantId.value = row.assistant_id ?? '';
-  assignGroupId.value = row.group_id ?? '';
-  showAssign.value = true;
-}
-function doAssign() {
-  if (!current.value) return;
-  store.updateStudentBelong(current.value.id, assignAssistantId.value || undefined, assignGroupId.value || undefined);
-  MessagePlugin.success('归属已调整');
-  showAssign.value = false;
-}
+// V2·0829 用户裁决：调归属、邀请码/口令体系已删——归属统一由 SaaS 门店成员（店长/店员）承接
 
-// 邀请码
-const showCreateInvite = ref(false);
-const newInvite = ref<any>({ assistant_id: '', code_type: 'qr', max_usage: 0, expire_at: new Date(Date.now() + 7 * 86400000) });
-function toggleInvite(row: any) {
-  store.toggleInviteCode(row.id);
-  MessagePlugin.success(row.is_active ? '已停用' : '已启用');
-}
-function doCreateInvite() {
-  if (!newInvite.value.assistant_id) { MessagePlugin.warning('请选择助教'); return; }
-  if (!newInvite.value.expire_at) { MessagePlugin.warning('请选择过期时间'); return; }
-  const ast = campAssistants.value.find(a => a.lecturer_id === newInvite.value.assistant_id);
-  store.createInviteCode({
-    camp_id: campId, assistant_id: newInvite.value.assistant_id,
-    assistant_name: ast?.lecturer_name ?? '', code_type: newInvite.value.code_type,
-    max_usage: newInvite.value.max_usage,
-    expire_at: Math.floor(newInvite.value.expire_at.getTime() / 1000),
-  });
-  MessagePlugin.success('邀请码已生成');
-  showCreateInvite.value = false;
-  newInvite.value = { assistant_id: '', code_type: 'qr', max_usage: 0, expire_at: new Date(Date.now() + 7 * 86400000) };
-}
-
-// 分组
+// 分组（V2·0829：去负责助教）
 const showCreateGroup = ref(false);
-const newGroup = ref<any>({ group_name: '', assistant_id: '' });
+const newGroup = ref<any>({ group_name: '' });
 function doCreateGroup() {
-  if (!newGroup.value.group_name || !newGroup.value.assistant_id) { MessagePlugin.warning('请填写完整'); return; }
-  const ast = campAssistants.value.find(a => a.lecturer_id === newGroup.value.assistant_id);
+  if (!newGroup.value.group_name) { MessagePlugin.warning('请填写分组名称'); return; }
   store.createCampGroup({
     camp_id: campId, group_name: newGroup.value.group_name,
-    assistant_id: newGroup.value.assistant_id, assistant_name: ast?.lecturer_name ?? '',
-  });
+  } as any);
   MessagePlugin.success('分组已创建');
   showCreateGroup.value = false;
-  newGroup.value = { group_name: '', assistant_id: '' };
+  newGroup.value = { group_name: '' };
 }
 function delGroup(row: any) {
   DialogPlugin.confirm({
@@ -507,7 +321,6 @@ const enrollmentColumns = [
   { colKey: 'phone', title: '手机号', width: 130 },
   { colKey: 'camp', title: '营期', minWidth: 160, ellipsis: true },
   { colKey: 'channel', title: '报名来源', width: 100 },
-  { colKey: 'inviter', title: '邀请人', width: 120 },
   { colKey: 'group', title: '分组', width: 100 },
   { colKey: 'status', title: '状态', width: 110 },
   { colKey: 'progress', title: '学习进度', width: 140 },
@@ -515,18 +328,8 @@ const enrollmentColumns = [
   { colKey: 'enrolled_at', title: '报名时间', width: 160 },
   { colKey: 'op', title: '操作', width: 180, fixed: 'right' },
 ];
-const inviteColumns = [
-  { colKey: 'code', title: '邀请码', width: 180 },
-  { colKey: 'code_type', title: '类型', width: 90 },
-  { colKey: 'assistant_name', title: '生成助教', width: 110 },
-  { colKey: 'usage', title: '使用情况', width: 120 },
-  { colKey: 'enrolled_count', title: '已报名', width: 80 },
-  { colKey: 'istatus', title: '状态', width: 90 },
-  { colKey: 'op', title: '操作', width: 80, fixed: 'right' },
-];
 const groupColumns = [
   { colKey: 'group_name', title: '分组名称', minWidth: 140 },
-  { colKey: 'assistant_name', title: '负责助教', width: 100 },
   { colKey: 'student_count', title: '学员数', width: 90 },
   { colKey: 'op', title: '操作', width: 150 },
 ];

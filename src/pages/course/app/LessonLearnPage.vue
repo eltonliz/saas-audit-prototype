@@ -1,32 +1,68 @@
 <template>
   <div class="lesson-learn">
-    <header class="app-header"><span @click="$router.back()">←</span><span>{{ lesson?.title ?? '课时学习' }}</span></header>
+    <!-- 顶部沉浸栏 -->
+    <header class="app-header">
+      <span class="hd-back" @click="$router.back()">←</span>
+      <span class="hd-title">{{ lesson?.title ?? '课时学习' }}</span>
+    </header>
 
-    <!-- 视频播放器（模拟） -->
+    <!-- 播放器（16:9 大屏） -->
     <div class="player">
-      <div class="player-cover">
-        <span class="play-icon" @click="togglePlay"><t-icon :name="playing ? 'pause' : 'play-circle'" :size="48" /></span>
+      <div class="player-cover" @click="togglePlay">
+        <span class="play-icon"><t-icon :name="playing ? 'pause-circle' : 'play-circle'" :size="54" /></span>
       </div>
-      <div class="progress-bar">
-        <div class="progress-fill" :style="{ width: (progress * 100) + '%' }"></div>
+      <div class="player-ctrl">
+        <t-icon :name="playing ? 'pause' : 'play'" :size="16" class="ctrl-ic" @click="togglePlay" />
+        <div class="progress-bar"><div class="progress-fill" :style="{ width: (progress * 100) + '%' }"></div></div>
+        <span class="ctrl-time">{{ Math.floor(progress * 10) }}:00 / 10:00</span>
       </div>
-      <div class="progress-text"><EmojiIcon :emoji="lesson?.mode === 'live' ? '📺' : '📹'" :size="14" /> {{ lesson?.mode === 'live' ? '直播' : '录播' }} · 完播率 {{ (progress * 100).toFixed(0) }}%</div>
+      <span class="mode-tag"><EmojiIcon :emoji="lesson?.mode === 'live' ? '📺' : '📹'" :size="12" /> {{ lesson?.mode === 'live' ? '直播' : '录播' }}</span>
     </div>
 
-    <!-- 学习进度区 -->
-    <div class="stats-row">
-      <div class="stat-box"><div class="stat-num">{{ (progress * 100).toFixed(0) }}%</div><div class="stat-label">完播率</div></div>
-      <div class="stat-box"><div class="stat-num">{{ answeredCount }}/3</div><div class="stat-label">答题正确</div></div>
-      <div class="stat-box"><div class="stat-num done"><t-icon :name="isCompleted ? 'check-circle' : 'minus-circle'" :size="24" /></div><div class="stat-label">课时完成</div></div>
+    <!-- 课时信息 -->
+    <div class="lesson-info">
+      <div class="li-title">{{ lesson?.title ?? '课时学习' }}</div>
+      <div class="li-sub">
+        <span>所属课程：{{ course?.title ?? '—' }}</span>
+        <span class="li-dot">·</span>
+        <span>完播率 ≥90% 触发答题</span>
+      </div>
     </div>
 
-    <!-- 营期内打卡 -->
-    <div v-if="campId" class="checkin-area">
-      <button class="checkin-btn" :disabled="checkedIn" @click="doCheckin"><EmojiIcon :emoji="checkedIn ? '✅' : '📅'" :size="16" /> {{ checkedIn ? '今日已打卡' : '立即打卡 +5积分' }}</button>
+    <!-- 打卡（营期内） -->
+    <div v-if="campId" class="checkin-strip">
+      <button class="checkin-btn" :disabled="checkedIn" @click="doCheckin">
+        <EmojiIcon :emoji="checkedIn ? '✅' : '📅'" :size="15" /> {{ checkedIn ? '今日已打卡' : '立即打卡 +5积分' }}
+      </button>
     </div>
 
-    <!-- 提示 -->
-    <div v-if="!playing && progress === 0" class="hint">点击 <t-icon name="play-circle" :size="14" /> 开始播放，完播率≥90% 触发答题</div>
+    <!-- 内容 Tab：简介 | 目录 -->
+    <div class="content-tabs">
+      <span class="ctab" :class="{ active: ctab === '简介' }" @click="ctab = '简介'">简介</span>
+      <span class="ctab" :class="{ active: ctab === '目录' }" @click="ctab = '目录'">目录（{{ courseLessons.length }}）</span>
+    </div>
+    <div class="tab-body">
+      <!-- 简介 -->
+      <div v-if="ctab === '简介'" class="intro-box">
+        <div class="intro-text">{{ lessonIntro || '本节围绕「' + (lesson?.title ?? '') + '」展开讲解，包含核心方法演示与要点回顾，学完即可掌握本节要点。' }}</div>
+        <div class="intro-meta">
+          <span><t-icon name="time" :size="13" /> 时长约 10 分钟</span>
+          <span><t-icon name="help-circle" :size="13" /> 随堂答题 {{ quizCount }} 题</span>
+        </div>
+      </div>
+      <!-- 目录 -->
+      <div v-else class="toc-box">
+        <div
+          v-for="(l, i) in courseLessons" :key="l.id"
+          class="toc-item" :class="{ current: l.id === lessonId }"
+          @click="goLesson(l)"
+        >
+          <span class="toc-idx">{{ i + 1 }}</span>
+          <span class="toc-name">{{ l.title }}</span>
+          <t-icon v-if="l.id === lessonId" name="sound" :size="14" class="toc-playing" />
+        </div>
+      </div>
+    </div>
 
     <!-- 答题浮层 -->
     <div v-if="showQuiz" class="quiz-overlay">
@@ -47,6 +83,13 @@
       </div>
     </div>
 
+    <!-- 底部固定操作栏：上一节 | 播放 | 下一节 -->
+    <div class="bottom-bar">
+      <button class="bb-side" :disabled="!prevLesson" @click="goLesson(prevLesson)">上一节</button>
+      <button class="bb-play" @click="togglePlay"><t-icon :name="playing ? 'pause' : 'play'" :size="24" /></button>
+      <button class="bb-side" :disabled="!nextLesson" @click="goLesson(nextLesson)">下一节</button>
+    </div>
+
     <!-- Toast 浮层 -->
     <transition name="toast">
       <div v-if="toast" class="toast">{{ toast }}</div>
@@ -56,7 +99,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onUnmounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import EmojiIcon from './EmojiIcon.vue';
 import { useCourseStore } from '../../../stores/course-store';
 import { useMemberStore } from '../../../stores/member-store';
@@ -64,6 +107,7 @@ import { useWalletStore } from '../../../stores/wallet-store';
 import { useCampStore } from '../../../stores/camp-store';
 
 const route = useRoute();
+const router = useRouter();
 const courseStore = useCourseStore();
 const memberStore = useMemberStore();
 const walletStore = useWalletStore();
@@ -74,6 +118,20 @@ const campId = (route.query.campId as string) || '';
 const lesson = computed(() => courseStore.lessons.find(l => l.id === lessonId));
 const courseId = computed(() => lesson.value?.course_id ?? '');
 const course = computed(() => courseStore.loadCourse(courseId.value));
+
+// ── 目录与节次切换（V2·0829 重设计：看课沉浸 + 目录切换） ──
+const courseLessons = computed(() => courseStore.loadLessonsByCourse(courseId.value));
+const currentIndex = computed(() => courseLessons.value.findIndex(l => l.id === lessonId));
+const prevLesson = computed(() => (currentIndex.value > 0 ? courseLessons.value[currentIndex.value - 1] : null));
+const nextLesson = computed(() => (currentIndex.value > -1 && currentIndex.value < courseLessons.value.length - 1 ? courseLessons.value[currentIndex.value + 1] : null));
+function goLesson(l: any) {
+  if (!l || l.id === lessonId) return;
+  router.push({ path: '/app/student/lesson/' + l.id, query: campId ? { campId } : {} });
+}
+const quizCount = computed(() => courseStore.lessons.filter(l => l.course_id === courseId.value && l.question_bank_id).length);
+const lessonIntro = computed(() => (lesson.value as any)?.description || '');
+// 内容 Tab（简介 | 目录）——此前未声明导致点击切换失效
+const ctab = ref<'简介' | '目录'>('目录');
 
 const progress = ref(0);
 const playing = ref(false);
@@ -88,7 +146,6 @@ const checkedIn = ref(false);
 const toast = ref('');
 let toastTimer: any = null;
 
-const myLearningRecord = computed(() => courseStore.learningRecords.find((r: any) => r.student_id === 'STU-001' && r.course_id === courseId.value && r.camp_id === (campId || null)));
 const triggeredQuestions = ref<Set<string>>(new Set());
 
 function showToast(msg: string) {
@@ -114,7 +171,6 @@ function play() {
 function pause() {
   playing.value = false;
   clearInterval(timer);
-  // 记录学习进度
   if (courseId.value) {
     courseStore.updateLearningRecord({
       student_id: 'STU-001', course_id: courseId.value, lesson_id: lessonId, camp_id: campId || undefined,
@@ -145,7 +201,18 @@ function onPlayComplete() {
       source_type: campId ? 'camp' : 'independent',
     });
   }
-  if (progress.value >= 0.9) { isCompleted.value = true; showToast('课时已完成'); }
+  if (progress.value >= 0.9) {
+    isCompleted.value = true; showToast('课时已完成');
+    // 结合件②：学习数据回传 SaaS 复刻客户列表（完课→学习时长/完课率/积分流水）
+    import('../../../stores/saas-replica/customer-replica-store').then(({ useCustomerStore }) => {
+      useCustomerStore().syncLearningData({ student_phone: '13800000001', course_title: course.value?.title ?? '', lesson_title: lesson?.title ?? '', duration_min: 10, event: '完课奖励', points: 20 });
+    });
+    // 红包记录回流：完课红包发放落 SaaS 复刻红包记录
+    import('../../../stores/saas-replica/marketing-replica-store').then(({ useMarketingReplicaStore }) => {
+      const mk = useMarketingReplicaStore();
+      mk.records.unshift({ id: 'RPR-' + Date.now(), rule_name: '完课红包·' + (course.value?.title ?? ''), user_name: '王五', phone: '13800000001', amount_yuan: (course.value?.reward_amount ?? 100) / 100, scene: '课程完课', obtained_at: Math.floor(Date.now() / 1000), receive_status: '已领取' });
+    });
+  }
 }
 
 function submitAnswer() {
@@ -159,19 +226,18 @@ function submitAnswer() {
   quizResult.value = record;
   if (record.is_correct) {
     answeredCount.value++;
-    // 激励发放：红包 or 积分
-    if (course.value?.reward_type === 'red_packet_rule' && course.value.answer_reward_enabled) {
+    const lessonReward = (lesson.value as any)?.reward;
+    if (lessonReward && lessonReward.type === '积分') {
+      memberStore.addPointRecord({ student_id: 'STU-001', source_type: 'quiz', points: Number(lessonReward.amount) || 10, growth: Number(lessonReward.amount) || 10, source_id: q.id, course_id: courseId.value, camp_id: campId || undefined });
+      showToast('+' + (Number(lessonReward.amount) || 10) + ' 积分');
+    } else if (lessonReward) {
       grantRedPacket('answer_correct');
-    } else if (course.value?.reward_type === 'points' && course.value.answer_reward_enabled) {
-      memberStore.addPointRecord({ student_id: 'STU-001', source_type: 'quiz', points: course.value.reward_amount || 10, growth: course.value.reward_amount || 10, source_id: q.id, course_id: courseId.value, camp_id: campId || undefined });
-      showToast('+' + String(course.value.reward_amount || 10) + ' 积分');
     }
   }
 }
 
 function grantRedPacket(triggerType: string) {
-  const lecturerId = course.value?.lecturer_id ?? '';
-  const rules = walletStore.loadRedPacketRules(lecturerId);
+  const rules = walletStore.loadRedPacketRules();
   const rule = rules.find(r => r.rule_type === triggerType && r.status === 'active');
   if (!rule) { showToast('答题正确'); return; }
   try {
@@ -180,6 +246,12 @@ function grantRedPacket(triggerType: string) {
       camp_id: campId || undefined, course_id: courseId.value, trigger_type: triggerType as any,
     } as any);
     showToast('红包已领取 +¥' + (rule.amount / 100).toFixed(2));
+    import('../../../stores/saas-replica/marketing-replica-store').then(({ useMarketingReplicaStore }) => {
+      useMarketingReplicaStore().records.unshift({ id: 'RPR-' + Date.now(), rule_name: rule.name || '答题红包', user_name: '王五', phone: '13800000001', amount_yuan: rule.amount / 100, scene: '课时答题', obtained_at: Math.floor(Date.now() / 1000), receive_status: '已领取' });
+    });
+    import('../../../stores/saas-replica/customer-replica-store').then(({ useCustomerStore }) => {
+      useCustomerStore().syncLearningData({ student_phone: '13800000001', course_title: course.value?.title ?? '', lesson_title: lesson?.title ?? '', duration_min: 0, event: '答题奖励', points: 10 });
+    });
   } catch (e: any) { showToast('答题正确'); }
 }
 
@@ -206,23 +278,61 @@ onUnmounted(() => { clearInterval(timer); clearTimeout(toastTimer); });
 </script>
 
 <style scoped>
-.lesson-learn { padding: 16px; padding-bottom: 80px; max-width: 375px; margin: 0 auto; }
-.app-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; font-weight: 600; font-size: 16px; }
-.player { background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
-.player-cover { height: 180px; background: #1F2C3E; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
-.play-icon { display: flex; align-items: center; justify-content: center; color: #fff; cursor: pointer; }
-.progress-bar { height: 6px; background: #EAECF0; border-radius: 3px; margin-bottom: 8px; }
-.progress-fill { height: 100%; background: #12B76A; border-radius: 3px; transition: width 0.3s; }
-.progress-text { font-size: 13px; color: #667085; display: flex; align-items: center; gap: 4px; }
-.stats-row { display: flex; gap: 12px; margin-bottom: 16px; }
-.stat-box { flex: 1; background: #fff; border-radius: 10px; padding: 12px; text-align: center; }
-.stat-num { font-size: 20px; font-weight: 700; color: #1F2C3E; }
-.stat-num.done { display: flex; align-items: center; justify-content: center; }
-.stat-label { font-size: 11px; color: #98A2B3; margin-top: 2px; }
-.checkin-area { margin-bottom: 16px; }
-.checkin-btn { width: 100%; padding: 12px; background: #E6F9F1; color: #12B76A; border: 1px solid #12B76A; border-radius: 10px; font-size: 15px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
-.checkin-btn:disabled { opacity: 0.6; }
-.hint { text-align: center; color: #98A2B3; font-size: 13px; padding: 20px; display: flex; align-items: center; justify-content: center; gap: 4px; }
+.lesson-learn { max-width: 375px; margin: 0 auto; background: #F5F6F7; min-height: 100vh; padding-bottom: 84px; }
+
+/* 顶部沉浸栏 */
+.app-header { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: #fff; position: sticky; top: 0; z-index: 30; }
+.hd-back { font-size: 20px; color: #1F2C3E; cursor: pointer; line-height: 1; }
+.hd-title { font-size: 16px; font-weight: 700; color: #1F2C3E; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* 播放器 16:9 全宽深色 */
+.player { position: relative; background: #16202E; }
+.player-cover { height: 211px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.play-icon { color: #fff; display: flex; opacity: 0.92; }
+.player-ctrl { position: absolute; left: 0; right: 0; bottom: 0; display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: linear-gradient(transparent, rgba(0,0,0,0.55)); }
+.ctrl-ic { color: #fff; cursor: pointer; }
+.progress-bar { flex: 1; height: 4px; background: rgba(255,255,255,0.28); border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: #12B76A; border-radius: 2px; transition: width 0.3s; }
+.ctrl-time { font-size: 10px; color: rgba(255,255,255,0.85); font-variant-numeric: tabular-nums; }
+.mode-tag { position: absolute; top: 10px; right: 10px; font-size: 10px; color: #fff; background: rgba(0,0,0,0.4); border-radius: 8px; padding: 2px 8px; display: flex; align-items: center; gap: 3px; }
+
+/* 课时信息 */
+.lesson-info { background: #fff; padding: 14px 16px; margin-bottom: 10px; }
+.li-title { font-size: 16px; font-weight: 700; color: #1F2C3E; }
+.li-sub { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #98A2B3; margin-top: 6px; flex-wrap: wrap; }
+.li-dot { color: #D0D5DD; }
+
+/* 打卡条 */
+.checkin-strip { padding: 0 16px; margin-bottom: 10px; }
+.checkin-btn { width: 100%; padding: 11px; background: #E6F9F1; color: #12B76A; border: 1px solid #12B76A; border-radius: 10px; font-size: 14px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.checkin-btn:disabled { opacity: 0.55; }
+
+/* 内容 Tab */
+.content-tabs { display: flex; background: #fff; padding: 0 16px; border-bottom: 1px solid #F2F4F7; }
+.ctab { font-size: 14px; color: #667085; padding: 10px 4px; margin-right: 22px; cursor: pointer; position: relative; }
+.ctab.active { color: #12B76A; font-weight: 700; }
+.ctab.active::after { content: ''; position: absolute; left: 20%; right: 20%; bottom: 0; height: 3px; border-radius: 2px; background: #12B76A; }
+.tab-body { background: #fff; min-height: 180px; padding: 14px 16px 20px; }
+.intro-text { font-size: 13px; color: #475467; line-height: 1.8; }
+.intro-meta { display: flex; gap: 16px; margin-top: 14px; font-size: 12px; color: #98A2B3; flex-wrap: wrap; }
+.intro-meta span { display: inline-flex; align-items: center; gap: 4px; }
+.toc-box { display: flex; flex-direction: column; }
+.toc-item { display: flex; align-items: center; gap: 10px; padding: 11px 8px; border-radius: 8px; cursor: pointer; }
+.toc-item:hover { background: #F7F9FA; }
+.toc-item.current { background: #E6F9F1; }
+.toc-idx { width: 22px; height: 22px; border-radius: 50%; background: #F2F4F7; color: #667085; font-size: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.toc-item.current .toc-idx { background: #12B76A; color: #fff; }
+.toc-name { flex: 1; font-size: 13px; color: #1F2C3E; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.toc-item.current .toc-name { color: #0E9B58; font-weight: 600; }
+.toc-playing { color: #12B76A; }
+
+/* 底部固定操作栏 */
+.bottom-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 375px; height: 60px; background: #fff; border-top: 1px solid #EAECF0; display: flex; align-items: center; gap: 12px; padding: 0 16px; z-index: 90; }
+.bb-side { flex: 1; height: 38px; background: #F2F4F7; color: #475467; border: none; border-radius: 19px; font-size: 13px; cursor: pointer; }
+.bb-side:disabled { opacity: 0.4; cursor: default; }
+.bb-play { width: 46px; height: 46px; border-radius: 50%; background: #12B76A; color: #fff; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; box-shadow: 0 4px 12px rgba(18,183,106,0.35); }
+
+/* 答题浮层 */
 .quiz-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 200; padding: 16px; }
 .quiz-box { background: #fff; border-radius: 16px; padding: 24px; max-width: 343px; width: 100%; }
 .quiz-title { font-size: 16px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 4px; }

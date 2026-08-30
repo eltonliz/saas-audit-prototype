@@ -25,8 +25,9 @@ export const COURSE_MENU_GROUPS: CourseMenuGroup[] = [
       { index: '/tenant/course/courses', label: '课程库' },
       { index: '/tenant/course/videos', label: '视频课程' },
       { index: '/tenant/course/audios', label: '音频课程' },
-      { index: '/tenant/course/share-records', label: '课程分成记录' },
-      { index: '/tenant/course/share-data', label: '分享数据' },
+      // V2·D2-1 本期不做交易：课程分成记录/分享数据下线
+      // { index: '/tenant/course/share-records', label: '课程分成记录' },
+      // { index: '/tenant/course/share-data', label: '分享数据' },
     ],
   },
 ];

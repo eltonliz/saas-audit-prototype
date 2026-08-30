@@ -9,8 +9,8 @@
       <span class="mode-tag"><t-icon :name="camp.mode === 'live' ? 'play-circle' : 'video-camera'" :size="14" /> {{ camp.mode === 'live' ? '直播' : '录播' }}</span>
     </div>
     <h2 class="camp-title">{{ camp.title }}</h2>
-    <div class="meta"><t-icon name="calendar" :size="14" /> {{ camp.start_date }}~{{ camp.end_date }} · {{ camp.total_days }}天 · 主讲{{ camp.main_lecturer_name }}</div>
-    <div class="stat"><t-icon name="user-group" :size="14" /> 已报{{ camp.enrolled_count }}人 · 已加入{{ camp.joined_count }}人 · {{ camp.is_paid ? '¥' + (camp.price/100).toFixed(0) : '免费' }}</div>
+    <div class="meta"><t-icon name="calendar" :size="14" /> {{ camp.start_date }}~{{ camp.end_date }} · {{ camp.total_days }}天</div>
+    <div class="stat"><t-icon name="user-group" :size="14" /> 已报名 {{ camp.enrolled_count }} 人</div>
 
     <!-- P1: 3Tab -->
     <div class="detail-tabs">
@@ -28,21 +28,17 @@
     <!-- 营期模式说明 -->
     <div class="info-card">
       <div class="info-section-title">营期模式说明</div>
-      <div v-if="camp.mode === 'live'" class="info-desc"><t-icon name="play-circle" :size="14" /> <strong>直播模式</strong>：主讲师按排课时间实时推流讲课，学员按时参与直播互动。</div>
+      <div v-if="camp.mode === 'live'" class="info-desc"><t-icon name="play-circle" :size="14" /> <strong>直播模式</strong>：按排课时间实时推流讲课，学员按时参与直播互动。</div>
       <div v-else class="info-desc"><t-icon name="video-camera" :size="14" /> <strong>录播模式</strong>：上传录制好的课程视频，学员按日历排期自主学习，灵活安排时间。</div>
     </div>
 
-    <!-- 讲师卡 -->
-    <div class="lecturer-card">
-      <div class="lecturer-avatar"><t-icon name="user" :size="22" /></div>
-      <div class="lecturer-info"><div class="lecturer-name">{{ camp.main_lecturer_name }}</div><div class="lecturer-role">主讲讲师</div></div>
-    </div>
+    <!-- V2·0829 用户裁决：讲师/助教下线，讲师卡已删除 -->
 
     <!-- 营期信息 -->
     <div class="info-card">
       <div class="info-row"><span class="info-label"><t-icon name="setting" :size="14" /> 模式</span><span class="info-value">{{ camp.mode === 'live' ? '直播' : '录播' }}</span></div>
       <div class="info-row"><span class="info-label"><t-icon name="user-group" :size="14" /> 容量</span><span class="info-value">{{ camp.capacity || '不限' }}人</span></div>
-      <div class="info-row"><span class="info-label"><t-icon name="check-circle" :size="14" /> 已加入</span><span class="info-value">{{ camp.joined_count }}人</span></div>
+      <div class="info-row"><span class="info-label"><t-icon name="check-circle" :size="14" /> 已报名</span><span class="info-value">{{ camp.enrolled_count }}人</span></div>
       <div class="info-row"><span class="info-label"><t-icon name="calendar" :size="14" /> 排课数</span><span class="info-value">{{ camp.schedule_count }}节</span></div>
     </div>
 
@@ -75,17 +71,12 @@
 
     <!-- 报名Tab -->
     <template v-if="detailTab === '报名'">
-    <!-- 报名状态说明 -->
+    <!-- 报名状态说明（V2·0829 用户裁决：报名审核环节去除；报名→等待开营→开营直接学习） -->
     <div class="enroll-status">
-      <div v-if="ctaState === 'enroll'" class="status-row"><t-icon name="info-circle" :size="16" /> 未报名，点击下方按钮立即报名</div>
-      <div v-else-if="ctaState === 'pending'" class="status-row warning"><t-icon name="time" :size="16" /> 报名审核中，请耐心等待</div>
-      <div v-else-if="ctaState === 'rejected'" class="status-row danger"><t-icon name="close-circle" :size="16" /> 审核未通过：{{ myEnrollment?.review_remark ?? '未提供原因' }}</div>
-      <div v-else-if="ctaState === 'pay'" class="status-row success"><t-icon name="check-circle" :size="16" /> 审核通过，请立即支付</div>
-      <div v-else-if="ctaState === 'sign'" class="status-row success"><t-icon name="check-circle" :size="16" /> 已支付并加入营期，请签署合同后开始学习</div>
-      <div v-else-if="ctaState === 'joined-extra'" class="status-row success"><t-icon name="check-circle" :size="16" /> 已加入营期</div>
+      <div v-if="ctaState === 'enroll'" class="status-row"><t-icon name="info-circle" :size="16" /> 营期报名中，点击下方按钮报名</div>
+      <div v-else-if="ctaState === 'waiting'" class="status-row warning"><t-icon name="time" :size="16" /> 已报名，等待开营</div>
+      <div v-else-if="ctaState === 'joined'" class="status-row success"><t-icon name="check-circle" :size="16" /> 营期已开营，可直接开始学习</div>
       <div v-else-if="ctaState === 'cancelled'" class="status-row danger"><t-icon name="close-circle" :size="16" /> 报名已取消</div>
-      <div v-else-if="ctaState === 'order_cancelled'" class="status-row warning"><t-icon name="info-circle" :size="16" /> 订单已超时取消，请联系助教重新报名</div>
-      <div v-else-if="ctaState === 'refunded'" class="status-row danger"><t-icon name="money-circle" :size="16" /> 已退款</div>
       <div v-else-if="ctaState === 'ended'" class="status-row warning"><t-icon name="info-circle" :size="16" /> 营期已结束，无法报名</div>
       <div v-else-if="ctaState === 'not_open'" class="status-row warning"><t-icon name="info-circle" :size="16" /> 营期暂未开放报名</div>
     </div>
@@ -93,29 +84,14 @@
 
     <!-- CTA 始终显示 -->
     <div class="cta-bar">
-      <div v-if="ctaState === 'enroll' && showInviteInput" class="invite-input-area">
-        <input v-model="inviteCode" class="invite-input" placeholder="输入邀请码（选填）" />
-        <button class="invite-confirm" @click="enrollWithCode">确认报名</button>
-      </div>
-      <button v-else-if="ctaState === 'enroll'" class="cta-btn" @click="showInviteInput = true">立即报名</button>
-      <span v-else-if="ctaState === 'pending'" class="cta-info"><t-icon name="time" :size="16" /> 报名审核中</span>
-      <div v-else-if="ctaState === 'rejected'" class="rejected-area">
-        <div class="reject-reason"><t-icon name="close-circle" :size="14" /> 审核未通过：{{ myEnrollment?.review_remark ?? '未提供原因' }}</div>
-        <button class="cta-btn" @click="resubmit">重新提交</button>
-      </div>
-      <button v-else-if="ctaState === 'pay'" class="cta-btn" @click="goPay">立即支付 ¥{{ (camp.is_paid ? camp.price/100 : 0).toFixed(0) }}</button>
-      <button v-else-if="ctaState === 'sign'" class="cta-btn" @click="goSign">签署合同</button>
-      <div v-else-if="ctaState === 'joined-extra'" class="joined-extra">
+      <button v-if="ctaState === 'enroll'" class="cta-btn" @click="enroll">点击报名</button>
+      <span v-else-if="ctaState === 'waiting'" class="cta-info"><t-icon name="time" :size="16" /> 已报名，等待开营</span>
+      <div v-else-if="ctaState === 'joined'" class="joined-extra">
         <button class="cta-btn" @click="goLearn">进入营期学习</button>
         <button class="cta-btn-secondary" @click="$router.push('/app/student/learning-record')">查看我的学习</button>
-        <button v-if="canRefund" class="cta-btn-danger" @click="goRefund">申请退款</button>
       </div>
       <div v-else-if="ctaState === 'cancelled'" class="cancelled-area">
         <span class="cta-info"><t-icon name="close-circle" :size="16" /> 报名已取消</span>
-        <button v-if="camp.status === 'enrolling'" class="cta-btn" @click="enroll">重新报名</button>
-      </div>
-      <div v-else-if="ctaState === 'refunded'" class="refunded-area">
-        <span class="cta-info"><t-icon name="money-circle" :size="16" /> 已退款</span>
         <button v-if="camp.status === 'enrolling'" class="cta-btn" @click="enroll">重新报名</button>
       </div>
       <span v-else-if="ctaState === 'in_progress'" class="cta-info">营期进行中</span>
@@ -131,25 +107,22 @@ import { ref, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { MessagePlugin } from 'tdesign-vue-next';
 import { useCampStore } from '../../../stores/camp-store';
-import { useCampPaymentStore } from '../../../stores/camp-payment-store';
 import { useWalletStore } from '../../../stores/wallet-store';
 
 const route = useRoute(); const router = useRouter();
 const store = useCampStore();
-const payStore = useCampPaymentStore();
 const walletStore = useWalletStore();
 const campId = route.params.id as string;
 const camp = computed(() => store.loadCamp(campId));
 const schedules = computed(() => store.loadSchedulesByCamp(campId));
 const statusLabel = (s: string) => ({ draft: '草稿', published: '已发布', enrolling: '报名中', in_progress: '进行中', ended: '已结束' }[s] ?? s);
 
-// 红包规则（PC RedPacketRuleManagePage 配置 → APP 营期详情展示）
+// 红包规则（PC 配置 → APP 营期详情展示）
 const redPacketRules = computed(() => walletStore.redPacketRules.filter((r: any) => r.status === 'active'));
 const redPacketLabel = (t: string) => ({ completion: '完播红包', answer_correct: '答题红包', new_member: '新成员红包' }[t] ?? t);
 
-// 当前学员的报名 + 订单状态（按钮三态链判定）
+// 当前学员报名状态（V2·D2-1 全免费模式：报名即加入，无支付/合同/退款链路）
 const myEnrollment = computed(() => store.enrollments.find(e => e.camp_id === campId && e.student_id === 'STU-001'));
-const myOrder = computed(() => payStore.enrollmentOrders.find(o => o.enrollment_id === myEnrollment.value?.id));
 
 const ctaState = computed<string>(() => {
   // 营期状态守卫：仅「报名中」开放报名；进行中/已结束/未开放分别提示
@@ -159,71 +132,29 @@ const ctaState = computed<string>(() => {
     if (camp.value?.status === 'ended') return 'ended';
     return 'not_open';
   }
-  if (myEnrollment.value.status === 'pending') return 'pending';
-  if (myEnrollment.value.status === 'rejected') return 'rejected';
-  if (myEnrollment.value.status === 'approved') {
-    if (!myOrder.value || myOrder.value.status === 'pending_pay') return 'pay';
-    if (myOrder.value.status === 'paid') return 'sign';
-    if (myOrder.value.status === 'cancelled') return 'order_cancelled';
-    if (myOrder.value.status === 'refunded') return 'refunded';
+  // V2·0829 用户裁决：报名审核环节去除——报名即 enrolled；开营前「等待开营」，开营后直接学习
+  if (['approved', 'enrolled'].includes(myEnrollment.value.status)) {
+    if (camp.value?.status === 'in_progress' || camp.value?.status === 'ended') return 'joined';
+    return 'waiting';
   }
-  // 支付成功即已加入（handlePostPaySuccess 同步入营+生成合同），展示完整操作组
-  if (myEnrollment.value.status === 'enrolled') return 'joined-extra';
   if (myEnrollment.value.status === 'cancelled') return 'cancelled';
-  if (myEnrollment.value.status === 'refunded') return 'refunded';
   return 'enroll';
 });
 
-const showInviteInput = ref(false); const inviteCode = ref('');
 const detailTab = ref('介绍');
 function enroll() {
   try {
-    store.createEnrollment({ camp_id: campId, student_id: 'STU-001', student_name: '王五', student_phone: '13800000001', channel: 'direct' } as any);
-    const needReview = camp.value?.require_review === true;
-    MessagePlugin.success(needReview ? '报名成功，等待审核' : (camp.value?.is_paid ? '报名成功，请完成支付' : '报名成功，已加入营期'));
+    // V2·0829 推广归因：店长/店员身份报名时，客户归属自己（普通用户经推广链接进入同理，由链接携带 inviter）
+    const appRole = (() => { try { return localStorage.getItem('app-role') || 'student'; } catch { return 'student'; } })();
+    const inviter = appRole === 'store_manager' ? { name: '阿远要快快快乐', role: '店长' }
+      : appRole === 'store_clerk' ? { name: '小李', role: '店员' } : undefined;
+    store.createEnrollment({ camp_id: campId, student_id: 'STU-001', student_name: '王五', student_phone: '13800000001', channel: 'direct', inviter } as any);
+    MessagePlugin.success('已报名，等待开营');
   } catch (e: any) { MessagePlugin.warning(e.message); }
-}
-function enrollWithCode() {
-  try {
-    let channel = 'self'; let assistantId: string | undefined; let codeId: string | null = null;
-    if (inviteCode.value) {
-      const code = store.useInviteCode(inviteCode.value);
-      if (!code) { MessagePlugin.warning('邀请码无效或已用尽'); return; }
-      channel = code.code_type === 'qr' ? 'assistant_qr' : 'camp_password'; assistantId = code.assistant_id; codeId = code.id;
-    }
-    store.createEnrollment({ camp_id: campId, student_id: 'STU-001', student_name: '王五', student_phone: '13800000001', channel, assistant_id: assistantId, invite_code_id: codeId } as any);
-    const needReview = camp.value?.require_review === true;
-    MessagePlugin.success(needReview ? '报名成功，等待审核' : (camp.value?.is_paid ? '报名成功，请完成支付' : '报名成功，已加入营期'));
-    showInviteInput.value = false;
-  } catch (e: any) { MessagePlugin.warning(e.message); }
-}
-function resubmit() {
-  if (myEnrollment.value) { store.updateEnrollment(myEnrollment.value.id, { status: 'pending', review_remark: undefined }); MessagePlugin.success('已重新提交'); }
-}
-
-function goPay() {
-  // 营期免费直接走支付成功；付费跳支付页
-  if (!camp.value?.is_paid || camp.value.price === 0) {
-    // 免费营期：模拟支付成功
-    const orderId = myOrder.value?.id;
-    if (orderId) { payStore.onPaySuccess(orderId, 'FREE-' + Date.now()); MessagePlugin.success('已加入营期'); }
-    return;
-  }
-  router.push('/app/student/camp/' + campId + '/pay');
-}
-
-function goSign() {
-  const orderId = myOrder.value?.id;
-  if (orderId) router.push('/app/student/contract/' + orderId);
 }
 
 function goLearn() {
   router.push('/app/student/camp/' + campId + '/learn');
-}
-// 退款条件：营期未结束（enrolling/published/in_progress）且有已支付订单
-const canRefund = computed(() => camp.value && ['enrolling', 'published', 'in_progress'].includes(camp.value.status) && myOrder.value?.status === 'paid');
-function goRefund() {
-  if (myOrder.value) router.push('/app/student/refund/' + myOrder.value.id);
 }
 </script>
 

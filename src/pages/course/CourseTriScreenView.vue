@@ -1,11 +1,11 @@
 <template>
-  <!-- 三屏联动视图：学员/讲师/助教三端平铺同页 -->
+  <!-- 学员端单屏预览（V2·D2-2 已去掉讲师/助教角色，原三屏联动收敛为学员单屏） -->
   <div class="tri-screen">
     <div class="grid-header">
       <span class="back" @click="$router.back()">←</span>
       <div class="title-wrap">
-        <div class="title">三屏联动 · 课程与营期域 3 端实时视角</div>
-        <div class="sub">学员端 · 讲师端 · 助教端 并排展示，点击各端底部 Tab 可在端内切换页面</div>
+        <div class="title">学员端 · 课程与营期域</div>
+        <div class="sub">课程与营期学员视角预览，点击底部 Tab 可在端内切换页面</div>
       </div>
       <button class="back-portal" @click="$router.push('/')">返回门户</button>
     </div>
@@ -24,12 +24,11 @@
 </template>
 
 <script setup lang="ts">
-type Role = 'student' | 'lecturer' | 'assistant';
+type Role = 'student';
 
+// V2·D2-2：讲师/助教端已下线，仅保留学员端
 const panels: { role: Role; label: string; path: string; color: string }[] = [
   { role: 'student', label: '学员端', path: '/app/student/home', color: '#12B76A' },
-  { role: 'lecturer', label: '讲师端', path: '/app/lecturer/workbench', color: '#722ED1' },
-  { role: 'assistant', label: '助教端', path: '/app/assistant/workbench', color: '#1890FF' },
 ];
 
 function frameSrc(path: string, role: string) {

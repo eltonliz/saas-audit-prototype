@@ -43,21 +43,12 @@ export const EnrollmentStatusEnum = z.enum([
 ]);
 export type EnrollmentStatus = z.infer<typeof EnrollmentStatusEnum>;
 
-/** 报名来源通道（D7·三通道） */
+/** 报名来源通道（V2·0829 用户裁决：邀请码/口令下线，仅保留直接报名与后台添加） */
 export const EnrollmentChannelEnum = z.enum([
-  'assistant_qr',       // 助教二维码扫码
-  'camp_password',      // 营期口令输入
+  'direct',             // 学员直接报名
   'admin_assign',       // 后台手动添加
-  'direct',             // 学员直接报名（无邀请码）
 ]);
 export type EnrollmentChannel = z.infer<typeof EnrollmentChannelEnum>;
-
-/** 邀请码类型（D7·扫码/口令双通道） */
-export const InviteCodeTypeEnum = z.enum([
-  'qr',          // 二维码
-  'password',    // 口令
-]);
-export type InviteCodeType = z.infer<typeof InviteCodeTypeEnum>;
 
 /** 排课类型（V2.0.0简化为二值·course/checkin_task） */
 export const ScheduleTypeEnum = z.enum([
@@ -187,23 +178,15 @@ export const CampEnrollmentSchema = z.object({
   student_name: z.string(),
   student_phone: z.string(),
 
-  /** 报名通道（D7） */
+  /** 报名通道（V2·0829 简化） */
   channel: EnrollmentChannelEnum,
-  invite_code_id: z.string().nullable().optional(),
-  /** 归属助教（D2·归属关系） */
-  assistant_id: z.string().nullable().optional(),
-  assistant_name: z.string().nullable().optional(),
   group_id: z.string().nullable().optional(),
-  belong_type: StudentBelongEnum.default('auto_assign'),
 
   /** 状态机（6状态） */
   status: EnrollmentStatusEnum.default('pending'),
   reviewer_id: z.string().nullable().optional(),
   review_remark: z.string().optional(),
   reviewed_at: z.number().int().nullable().optional(),
-
-  /** 关联营期订单ID（审核通过才生成·D12） */
-  camp_order_id: z.string().nullable().optional(),
 
   enrolled_at: z.number().int(),
   joined_at: z.number().int().nullable().optional(),
@@ -233,28 +216,7 @@ export const DailyCheckinSchema = z.object({
 });
 export type DailyCheckin = z.infer<typeof DailyCheckinSchema>;
 
-/** ENT-CAMP-004 营期邀请码（D7·扫码/口令双通道·原子+1防双花D17） */
-export const CampInviteCodeSchema = z.object({
-  id: z.string(),  // INVITE-YYYYMM-NNNNN
-  code: z.string().min(1),
-  camp_id: z.string(),
-  assistant_id: z.string(),
-  assistant_name: z.string(),
-  code_type: InviteCodeTypeEnum,
-
-  max_usage: z.number().int().min(0).default(0),  // 0=不限
-  /** 已使用次数（原子+1·D17防双花） */
-  used_count: z.number().int().min(0).default(0),
-  /** 已通过审核报名数（聚合） */
-  enrolled_count: z.number().int().min(0).default(0),
-
-  expire_at: z.number().int(),
-  is_active: z.boolean().default(true),
-
-  created_at: z.number().int(),
-  updated_at: z.number().int(),
-});
-export type CampInviteCode = z.infer<typeof CampInviteCodeSchema>;
+// V2·0829 用户裁决：邀请码/口令体系整体下线，CampInviteCode 实体已删除
 
 /** ENT-CAMP-005 营期排课（V2简化二值·course/checkin_task·D7打卡积分） */
 export const CourseScheduleSchema = z.object({
@@ -499,9 +461,8 @@ export type CreateCampInput = z.infer<typeof CreateCampInputSchema>;
 
 export const CreateEnrollmentInputSchema = CampEnrollmentSchema.pick({
   camp_id: true, student_id: true, student_name: true, student_phone: true,
-  channel: true, invite_code_id: true,
-  assistant_id: true, assistant_name: true,
-  group_id: true, belong_type: true,
+  channel: true,
+  group_id: true,
 });
 export type CreateEnrollmentInput = z.infer<typeof CreateEnrollmentInputSchema>;
 
@@ -514,12 +475,6 @@ export const CreateScheduleInputSchema = CourseScheduleSchema.pick({
   points_reward: true, growth_reward: true, task_description: true,
 });
 export type CreateScheduleInput = z.infer<typeof CreateScheduleInputSchema>;
-
-export const CreateInviteCodeInputSchema = CampInviteCodeSchema.pick({
-  camp_id: true, assistant_id: true, assistant_name: true,
-  code_type: true, max_usage: true, expire_at: true,
-});
-export type CreateInviteCodeInput = z.infer<typeof CreateInviteCodeInputSchema>;
 
 export const CreateCheckinInputSchema = DailyCheckinSchema.pick({
   camp_id: true, student_id: true, schedule_id: true,
@@ -563,15 +518,15 @@ export function validateCampCalendarNoOverlap(
 export const CampContracts = {
   // 枚举
   CampModeEnum, CampStatusEnum, EnrollmentStatusEnum, EnrollmentChannelEnum,
-  InviteCodeTypeEnum, ScheduleTypeEnum, ScheduleModeEnum, CampLecturerRoleEnum,
+  ScheduleTypeEnum, ScheduleModeEnum, CampLecturerRoleEnum,
   StudentBelongEnum, CheckinStatusEnum, FinalQuizStatusEnum, DailyRedPacketModeEnum,
   // Schema
-  CampSchema, CampEnrollmentSchema, DailyCheckinSchema, CampInviteCodeSchema,
+  CampSchema, CampEnrollmentSchema, DailyCheckinSchema,
   CourseScheduleSchema, CampLecturerSchema, CampGroupSchema, CampFinalQuizSchema,
   LearningRecordSchema, QASchema, CampCertificateSchema, SeriesSchema, CertTemplateSchema,
   // Input
   CreateCampInputSchema, CreateEnrollmentInputSchema, CreateScheduleInputSchema,
-  CreateInviteCodeInputSchema, CreateCheckinInputSchema,
+  CreateCheckinInputSchema,
   // 辅助函数
   validateCampCalendarNoOverlap,
 } as const;

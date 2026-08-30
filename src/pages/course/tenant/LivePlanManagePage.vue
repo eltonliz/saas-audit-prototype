@@ -53,7 +53,7 @@
         <t-form-item label="来源类型"><t-radio-group v-model="form.sourceType"><t-radio value="normal">普通直播</t-radio><t-radio value="course">课程直播</t-radio><t-radio value="camp">营期直播</t-radio></t-radio-group></t-form-item>
         <t-form-item v-if="form.sourceType === 'course'" label="关联课程"><t-select v-model="form.sourceId" placeholder="选择课程" filterable style="width:100%"><t-option label="商业思维直播课" value="COURSE-004" /><t-option label="直播带货实战课" value="COURSE-007" /></t-select></t-form-item>
         <t-form-item v-if="form.sourceType === 'camp'" label="关联营期"><t-select v-model="form.sourceId" placeholder="选择营期" filterable style="width:100%"><t-option label="数据分析21天营" value="CAMP-002" /></t-select></t-form-item>
-        <t-form-item label="主播"><t-select v-model="form.anchorId" placeholder="选择主播" filterable style="width:100%"><t-option v-for="l in lecturerStore.lecturers" :key="l.id" :label="l.name + ' (' + l.lecturer_no + ')'" :value="l.id" /></t-select></t-form-item>
+        <t-form-item label="主播"><t-select v-model="form.anchorId" placeholder="选择主播" filterable style="width:100%"><t-option v-for="l in liveStore.anchors" :key="l.id" :label="l.name + ' (' + l.no + ')'" :value="l.id" /></t-select></t-form-item>
         <t-form-item label="目标GMV"><t-input-number v-model="form.gmv" :min="0" /></t-form-item>
         <t-form-item label="目标观看人数"><t-input-number v-model="form.viewers" :min="0" /></t-form-item>
       </t-form>
@@ -65,10 +65,9 @@
 import { ref, computed } from 'vue';
 import { MessagePlugin } from 'tdesign-vue-next';
 import { useLiveStore } from '../../../stores/live-store';
-import { useLecturerStore } from '../../../stores/lecturer-store';
 
+// V2·0829：主播为直播域独立角色（本地主播库）
 const liveStore = useLiveStore();
-const lecturerStore = useLecturerStore();
 const search = ref(''); const typeFilter = ref(''); const anchorTypeFilter = ref(''); const showCreate = ref(false);
 const form = ref<any>({ name: '', sourceType: 'normal', sourceId: '', anchorId: '', gmv: 0, viewers: 0 });
 const columns = [
@@ -87,28 +86,28 @@ const columns = [
 
 const sourceLabel = (s: string) => ({ camp_schedule: '营期直播', course_lesson: '课程直播', standalone: '普通直播' }[s] ?? s);
 
-// 从 liveStore.sessions 按 lecturer_id 聚合为"计划"行
+// 从 liveStore.sessions 按 anchor_id 聚合为"计划"行
 const plans = computed(() => {
   const byLecturer = new Map<string, any[]>();
   liveStore.sessions.forEach(s => {
-    const list = byLecturer.get(s.lecturer_id) ?? [];
+    const list = byLecturer.get(s.anchor_id) ?? [];
     list.push(s);
-    byLecturer.set(s.lecturer_id, list);
+    byLecturer.set(s.anchor_id, list);
   });
-  return Array.from(byLecturer.entries()).map(([lecturerId, sessions]) => {
-    const lecturer = lecturerStore.loadLecturer(lecturerId);
+  return Array.from(byLecturer.entries()).map(([anchorId, sessions]) => {
+    const lecturer = liveStore.anchors.find((a: any) => a.id === anchorId);
     const first = sessions[0];
     const totalRevenue = sessions.reduce((sum, s) => sum + s.total_revenue, 0);
     const totalViewers = sessions.reduce((sum, s) => sum + s.total_viewers, 0);
     const totalOrders = sessions.reduce((sum, s) => sum + s.total_orders, 0);
     const conversionRate = totalViewers > 0 ? (totalOrders / totalViewers * 100).toFixed(0) + '%' : '0%';
     return {
-      no: 'PL-' + lecturerId.slice(-5),
-      lecturer_id: lecturerId,
+      no: 'PL-' + anchorId.slice(-5),
+      anchor_id: anchorId,
       type: sourceLabel(first.source),
       name: lecturer?.name + '直播计划',
-      anchorName: lecturer?.name ?? first.lecturer_name,
-      anchorNo: lecturer?.lecturer_no ?? '—',
+      anchorName: lecturer?.name ?? first.anchor_name,
+      anchorNo: lecturer?.no ?? '—',
       sessionCount: sessions.length,
       source: first.camp_title ? '营期：' + first.camp_title : first.course_id ? '课程' : '',
       gmv: totalRevenue,
@@ -122,17 +121,17 @@ const plans = computed(() => {
 const filteredPlans = computed(() => plans.value.filter(p =>
   (!search.value || p.name.includes(search.value)) &&
   (!typeFilter.value || p.type === typeFilter.value) &&
-  (!anchorTypeFilter.value || (lecturerStore.loadLecturer(p.lecturer_id)?.role_type ?? '—') === anchorTypeFilter.value)
+  (!anchorTypeFilter.value || ((liveStore.anchors.find((a: any) => a.id === p.anchor_id)?.type ?? '—') === anchorTypeFilter.value))
 ));
 
 function doCreate() {
   if (!form.value.name) { MessagePlugin.warning('请填写计划名称'); return; }
-  const lecturer = lecturerStore.lecturers.find((l: any) => l.id === form.value.anchorId);
+  const lecturer = liveStore.anchors.find((l: any) => l.id === form.value.anchorId);
   const sourceMap: Record<string, string> = { normal: 'standalone', course: 'course_lesson', camp: 'camp_schedule' };
   liveStore.createSession({
     title: form.value.name,
-    lecturer_id: form.value.anchorId || 'LECT-202608-00001',
-    lecturer_name: lecturer?.name || '未指定',
+    anchor_id: form.value.anchorId || 'ANCHOR-001',
+    anchor_name: lecturer?.name || '未指定',
     camp_id: form.value.sourceType === 'camp' ? form.value.sourceId : null,
     camp_title: null,
     course_id: form.value.sourceType === 'course' ? form.value.sourceId : null,

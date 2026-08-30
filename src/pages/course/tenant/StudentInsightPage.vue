@@ -5,8 +5,8 @@
     <!-- 学员概况统计卡 -->
     <div class="stat-cards">
       <t-card :bordered="false" class="stat-card"><div class="stat-label">累计学员</div><div class="stat-value">{{ stats.totalStudents }}</div></t-card>
-      <t-card :bordered="false" class="stat-card"><div class="stat-label">已加入营期学员</div><div class="stat-value">{{ stats.enrolledStudents }}</div></t-card>
-      <t-card :bordered="false" class="stat-card"><div class="stat-label">获得证书学员</div><div class="stat-value">{{ stats.certifiedStudents }}</div></t-card>
+      <t-card :bordered="false" class="stat-card"><div class="stat-label">已报名学员</div><div class="stat-value">{{ stats.enrolledStudents }}</div></t-card>
+      <!-- V2·0829 用户裁决：证书模块下线，获得证书学员卡片删除 -->
       <t-card :bordered="false" class="stat-card"><div class="stat-label">平均完播率</div><div class="stat-value">{{ stats.avgCompletion }}%</div></t-card>
     </div>
 
@@ -115,8 +115,7 @@ const filteredStudents = computed(() => students.value.filter(s =>
 
 const stats = computed(() => ({
   totalStudents: students.value.length,
-  enrolledStudents: campStore.enrollments.filter(e => e.status === 'enrolled').length,
-  certifiedStudents: new Set(campStore.certificates.filter(c => !c.is_revoked).map(c => c.student_id)).size,
+  enrolledStudents: campStore.enrollments.filter(e => ['pending', 'approved', 'enrolled'].includes(e.status)).length,
   avgCompletion: students.value.length > 0 ? Math.round(students.value.reduce((s, x) => s + x.passRate, 0) / students.value.length * 100) : 0,
 }));
 

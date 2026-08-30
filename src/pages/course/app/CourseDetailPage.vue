@@ -13,15 +13,10 @@
     <div v-if="course.description" class="course-desc">{{ course.description }}</div>
     <!-- P1: 可见性拦截 -->
     <div v-if="course.visibility === 'camp_only'" class="intercept-banner"><t-icon name="lock-on" :size="14" /> 此课程仅营期内可学，请先加入营期</div>
-    <div class="lecturer-card">
-      <div class="lecturer-avatar"><EmojiIcon emoji="👨‍🏫" :size="22" /></div>
-      <div class="lecturer-info">
-        <div class="lecturer-name">{{ course.lecturer_name }}</div>
-        <div class="lecturer-role">{{ course.lecturer_role_type }}</div>
-      </div>
-    </div>
+    <!-- V2·0829 用户裁决：讲师/助教下线，讲师卡已删除 -->
     <div class="tabs">
-      <span v-for="t in ['课时','测验','评价','答疑']" :key="t" class="tab" :class="{ active: tab === t }" @click="tab = t">{{ t }}</span>
+      <!-- V2·0828 会议：测验/答疑推下期 -->
+      <span v-for="t in ['课时','评价']" :key="t" class="tab" :class="{ active: tab === t }" @click="tab = t">{{ t }}</span>
     </div>
     <template v-if="tab === '课时'">
       <div v-for="l in lessons" :key="l.id" class="lesson-item" @click="goLesson(l)">
@@ -29,7 +24,7 @@
           <span class="lesson-status"><t-icon :name="isLessonCompleted(l.id) ? 'check-circle' : 'play-circle'" :size="18" /></span>
           <div class="lesson-text">
             <div class="lesson-title">{{ l.sort_order }}. {{ l.title }}</div>
-            <div class="lesson-meta"><EmojiIcon :emoji="l.mode === 'live' ? '📺' : '📹'" :size="12" /> {{ l.mode === 'live' ? '直播' : '录播' }} · {{ Math.floor(l.video_duration/60) }}分钟{{ l.is_free_preview ? ' · 免费试看' : '' }}</div>
+            <div class="lesson-meta"><EmojiIcon :emoji="l.mode === 'live' ? '📺' : '📹'" :size="12" /> {{ l.mode === 'live' ? '直播' : '录播' }} · {{ Math.floor(l.video_duration/60) }}分钟</div>
           </div>
         </div>
         <span v-if="l.mode === 'live'" class="lesson-live" @click.stop="goLiveByLesson(l)"><EmojiIcon emoji="📺" :size="12" />进入直播</span>
@@ -37,33 +32,7 @@
         <span v-else class="lesson-done-text">已完成</span>
       </div>
     </template>
-    <template v-else-if="tab === '测验'">
-      <div v-if="questions.length > 0 && !quizActive" class="quiz-start">
-        <div class="quiz-summary">共{{ questions.length }}题 · 平均正确率{{ (avgAccuracy*100).toFixed(0) }}%</div>
-        <button class="quiz-start-btn" @click="startQuiz">开始答题</button>
-      </div>
-      <div v-else-if="quizActive && currentQuizQ" class="quiz-active">
-        <div class="quiz-progress">第{{ quizIdx+1 }}/{{ questions.length }}题</div>
-        <div class="quiz-q">{{ currentQuizQ.content }}</div>
-        <div class="quiz-opts">
-          <label v-for="opt in currentQuizQ.options" :key="opt.key" class="quiz-opt" :class="{ selected: quizSelArr.includes(opt.key), correct: quizResult === 'correct' && currentQuizQ.correct_answer.includes(opt.key), wrong: quizResult === 'wrong' && quizSelArr.includes(opt.key) && !currentQuizQ.correct_answer.includes(opt.key) }">
-            <input :type="currentQuizQ.question_type === 'multiple' ? 'checkbox' : 'radio'" :value="opt.key" v-model="quizSelArr" :disabled="!!quizResult" /> {{ opt.key }}. {{ opt.content }}
-          </label>
-        </div>
-        <div v-if="quizResult" class="quiz-feedback" :class="quizResult">
-          <t-icon :name="quizResult === 'correct' ? 'check-circle' : 'close-circle'" :size="16" /> {{ quizResult === 'correct' ? '回答正确' : '回答错误' }}
-          <div class="quiz-explain">{{ currentQuizQ.explanation }}</div>
-          <button class="quiz-next-btn" @click="nextQuiz">{{ quizIdx+1 >= questions.length ? '查看结果' : '下一题' }}</button>
-        </div>
-        <button v-else class="quiz-submit-btn" :disabled="quizSelArr.length === 0" @click="submitQuiz">提交</button>
-      </div>
-      <div v-else-if="quizDone" class="quiz-result">
-        <div class="result-score">得分：{{ quizScore }}分</div>
-        <div class="result-correct">正确 {{ quizCorrectCount }}/{{ questions.length }}题</div>
-        <button class="quiz-retry-btn" @click="retryQuiz">重新答题</button>
-      </div>
-      <div v-else class="empty">暂无测验题目</div>
-    </template>
+    <!-- V2·0828 会议：测验/答疑推下期，模板已移除 -->
     <template v-else-if="tab === '评价'">
       <div class="review-overview">
         <div class="review-score"><t-icon name="star-filled" :size="32" />{{ course.rating }}</div>
@@ -82,18 +51,10 @@
       </div>
       <div v-if="reviews.length === 0" class="empty">暂无评价</div>
     </template>
-    <template v-else-if="tab === '答疑'">
-      <div class="empty">课程答疑在营期内进行，请加入营期后提问</div>
-    </template>
     <div class="cta-bar">
+      <!-- V2·D2-1 本期不做交易：全免费模式，无购买/权益链路 -->
       <button v-if="course.mode === 'live'" class="cta-btn live" @click="goLive"><EmojiIcon emoji="📺" :size="16" /> 进入直播</button>
-      <button v-else-if="course.is_paid && !hasEntitlement" class="cta-btn" @click="goBuy">¥{{ (course.price/100).toFixed(2) }} 立即购买</button>
-      <button v-else-if="course.is_paid && entitlementStatus === 'GRANT_PENDING'" class="cta-btn pending" disabled>权益发放中</button>
-      <button v-else-if="course.is_paid && hasEntitlement" class="cta-btn" @click="goFirstLesson">去学习</button>
-      <button v-else-if="course.is_paid && entitlementStatus === 'EXPIRED'" class="cta-btn" @click="goBuy">重新购买</button>
-      <button v-else-if="course.is_paid && entitlementStatus === 'REVOKED'" class="cta-btn revoked" disabled>已停售</button>
-      <button v-else-if="!course.is_paid && hasEntitlement" class="cta-btn" @click="goFirstLesson">去学习</button>
-      <button v-else class="cta-btn" @click="goFirstLesson">免费学习</button>
+      <button v-else class="cta-btn" @click="goFirstLesson">开始学习</button>
     </div>
   </div>
 </template>
@@ -104,48 +65,15 @@ import { useRoute, useRouter } from 'vue-router';
 import { MessagePlugin } from 'tdesign-vue-next';
 import EmojiIcon from './EmojiIcon.vue';
 import { useCourseStore } from '../../../stores/course-store';
-import { useCourseCommerceStore } from '../../../stores/course-commerce-store';
 
 const route = useRoute();
 const router = useRouter();
 const store = useCourseStore();
-const commerceStore = useCourseCommerceStore();
 const tab = ref('课时');
 const course = computed(() => store.loadCourse(route.params.id as string));
 
-// 权益状态判断（任务书 4.11 按钮状态映射）
-const entitlement = computed(() => {
-  const courseId = route.params.id as string;
-  const studentId = 'STU-001';
-  return commerceStore.entitlements.find((e: any) => e.course_id === courseId && e.student_id === studentId);
-});
-const entitlementStatus = computed(() => entitlement.value?.status ?? null);
-const hasEntitlement = computed(() => entitlement.value?.status === 'ACTIVE');
 const lessons = computed(() => store.loadLessonsByCourse(route.params.id as string));
 const reviews = computed(() => store.loadReviewsByCourse(route.params.id as string));
-const questions = computed(() => {
-  const bank = store.loadQuestionBank(route.params.id as string);
-  return bank ? store.loadQuestionsByBank(bank.id) : [];
-});
-const avgAccuracy = computed(() => questions.value.length > 0 ? questions.value.reduce((s: number, q: any) => s + (q.accuracy_rate || 0), 0) / questions.value.length : 0);
-// P1: 测验答题交互
-const quizActive = ref(false); const quizDone = ref(false); const quizIdx = ref(0); const quizSelArr = ref<string[]>([]); const quizResult = ref(''); const quizScore = ref(0); const quizCorrectCount = ref(0);
-const currentQuizQ = computed(() => questions.value[quizIdx.value]);
-function startQuiz() { quizActive.value = true; quizDone.value = false; quizIdx.value = 0; quizSelArr.value = []; quizResult.value = ''; quizScore.value = 0; quizCorrectCount.value = 0; }
-function submitQuiz() {
-  if (quizSelArr.value.length === 0 || !currentQuizQ.value) return;
-  // 多选题：选中集合必须与正确答案集合完全一致（集合比较）
-  const correctSet = Array.isArray(currentQuizQ.value.correct_answer) ? [...currentQuizQ.value.correct_answer].sort() : [currentQuizQ.value.correct_answer];
-  const selSet = [...quizSelArr.value].sort();
-  const correct = JSON.stringify(selSet) === JSON.stringify(correctSet);
-  quizResult.value = correct ? 'correct' : 'wrong';
-  if (correct) { quizCorrectCount.value++; quizScore.value += currentQuizQ.value.score || 1; }
-}
-function nextQuiz() {
-  quizIdx.value++; quizSelArr.value = []; quizResult.value = '';
-  if (quizIdx.value >= questions.value.length) { quizActive.value = false; quizDone.value = true; }
-}
-function retryQuiz() { quizDone.value = false; startQuiz(); }
 
 function isLessonCompleted(lessonId: string) {
   return store.learningRecords.some((r: any) => r.student_id === 'STU-001' && r.lesson_id === lessonId && r.completion_rate >= 0.9);
@@ -157,19 +85,7 @@ function getBarWidth(stars: number) {
 function goLesson(l: any) { if (l.mode === 'live') return; router.push('/app/student/lesson/' + l.id); }
 function goLive() { const sessionId = course.value?.source_live_session_id || 'LIVE-202608-00002'; router.push('/app/student/live/' + sessionId); }
 function goLiveByLesson(l: any) { const sessionId = l.live_session_id || l.source_live_session_id; if (sessionId) router.push('/app/student/live/' + sessionId); else MessagePlugin.warning('直播间未创建'); }
-function goBuy() {
-  // 模拟支付成功 → 生成主订单 + 学习权益
-  const courseId = route.params.id as string;
-  const courseData = course.value;
-  if (!courseData) return;
-  const order = commerceStore.createPaidOrder(courseId, 'COURSE_DETAIL', 'STU-001', '王五');
-  commerceStore.grantEntitlement({
-    student_id: 'STU-001', student_name: '王五',
-    course_id: courseId, course_title: courseData.title,
-    order_id: order.id, order_no: order.order_no,
-  });
-  MessagePlugin.success('支付成功，学习权益已发放');
-}
+// V2·D2-1 全免费模式：购买/权益逻辑已移除，直接学习
 function goFirstLesson() { const first = lessons.value.find(l => l.mode !== 'live'); if (first) router.push('/app/student/lesson/' + first.id); }
 </script>
 

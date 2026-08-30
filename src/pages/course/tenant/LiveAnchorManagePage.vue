@@ -25,9 +25,6 @@
           <t-tag :theme="row.certStatus === '已通过' ? 'success' : 'warning'" variant="light" size="small">{{ row.certStatus }}</t-tag>
         </template>
         <template #planCount="{ row }">{{ row.planCount }}个</template>
-        <template #linkedLecturer="{ row }">
-          <t-tag theme="primary" variant="light" size="small">{{ row.linkedLecturer || '—' }}</t-tag>
-        </template>
         <template #op="{ row }">
           <t-button variant="text" size="small" theme="primary">编辑</t-button>
           <t-button variant="text" size="small" theme="primary" @click="showCert(row)">查看资质</t-button>
@@ -42,7 +39,6 @@
         <t-form-item label="主播名称" required-mark><t-input v-model="form.name" placeholder="请输入主播名称" /></t-form-item>
         <t-form-item label="主播类型"><t-radio-group v-model="form.type"><t-radio value="real">真人主播</t-radio><t-radio value="virtual">虚拟主播</t-radio></t-radio-group></t-form-item>
         <t-form-item label="性别"><t-radio-group v-model="form.gender"><t-radio value="male">男</t-radio><t-radio value="female">女</t-radio><t-radio value="secret">保密</t-radio></t-radio-group></t-form-item>
-        <t-form-item label="关联讲师"><t-select v-model="form.lecturerId" placeholder="关联讲师库" filterable clearable style="width:100%"><t-option label="张三 (LECT-001)" value="LECT-001" /><t-option label="李四 (LECT-002)" value="LECT-002" /><t-option label="王讲师 (LECT-007)" value="LECT-007" /></t-select></t-form-item>
         <t-form-item label="简介"><t-input v-model="form.bio" placeholder="如：专业测评博主" /></t-form-item>
       </t-form>
       <template #footer><t-button theme="default" @click="showCreate = false">取消</t-button><t-button theme="primary">确认</t-button></template>
@@ -53,13 +49,12 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { MessagePlugin } from 'tdesign-vue-next';
-import { useLecturerStore } from '../../../stores/lecturer-store';
 import { useLiveStore } from '../../../stores/live-store';
 
-const lecturerStore = useLecturerStore();
+// V2·0829 用户裁决：讲师/助教角色下线——主播为直播域独立角色（本地主播库）
 const liveStore = useLiveStore();
 const search = ref(''); const showCreate = ref(false);
-const form = ref<any>({ name: '', type: 'real', gender: 'secret', lecturerId: '', bio: '' });
+const form = ref<any>({ name: '', type: 'real', gender: 'secret', bio: '' });
 const columns = [
   { colKey: 'type', title: '主播类型', width: 90 },
   { colKey: 'no', title: '主播编号', width: 130 },
@@ -70,18 +65,17 @@ const columns = [
   { colKey: 'violations', title: '违规次数', width: 80 },
   { colKey: 'certStatus', title: '资质状态', width: 90 },
   { colKey: 'planCount', title: '直播计划', width: 80 },
-  { colKey: 'linkedLecturer', title: '关联角色', width: 200 },
   { colKey: 'op', title: '操作', width: 160, fixed: 'right' },
 ];
 
-// 从 lecturerStore.lecturers 映射主播行（主播=讲师，C4 决策）
-const anchors = computed(() => lecturerStore.lecturers.map(l => {
-  const sessions = liveStore.sessions.filter((s: any) => s.lecturer_id === l.id);
+// 从 liveStore.anchors（本地主播库）映射主播行
+const anchors = computed(() => liveStore.anchors.map((l: any) => {
+  const sessions = liveStore.sessions.filter((s: any) => s.anchor_id === l.id);
   const liveDays = new Set(sessions.map((s: any) => s.actual_start_at ? new Date(s.actual_start_at * 1000).toDateString() : null)).size;
   const totalRevenue = sessions.reduce((sum: number, s: any) => sum + (s.total_revenue || 0), 0);
   return {
-    type: '真人主播',
-    no: l.lecturer_no,
+    type: l.type === 'virtual' ? '虚拟主播' : '真人主播',
+    no: l.no,
     name: l.name,
     fans: l.fans_count || 0,
     liveDays,
@@ -89,7 +83,6 @@ const anchors = computed(() => lecturerStore.lecturers.map(l => {
     violations: 0,
     certStatus: l.cert_status === 'approved' ? '已通过' : l.cert_status === 'pending' ? '待审核' : '—',
     planCount: sessions.length,
-    linkedLecturer: l.name + ' (' + l.lecturer_no + ')',
     _lecturer_id: l.id,
   };
 }));
@@ -99,8 +92,8 @@ function showCert(row: any) { MessagePlugin.info(`主播「${row.name}」资质�
 function showAddPlan(row: any) {
   liveStore.createSession({
     title: '新直播计划',
-    lecturer_id: row._lecturer_id,
-    lecturer_name: row.name,
+    anchor_id: row._lecturer_id,
+    anchor_name: row.name,
     camp_id: null, camp_title: null, course_id: null, lesson_id: null, schedule_id: null,
     source: 'standalone',
     planned_start_at: Math.floor(Date.now() / 1000) + 86400,

@@ -18,6 +18,9 @@
             </template>
           </div>
           <div class="actions" v-if="!isLocked">
+            <t-button theme="primary" variant="outline" @click="openOneClickDialog">
+              <template #icon><t-icon name="calendar" /></template> 一键排课
+            </t-button>
             <t-button theme="primary" variant="outline" @click="openBatchDialog">
               <template #icon><t-icon name="file" /></template> 批量排课
             </t-button>
@@ -34,44 +37,51 @@
         </div>
       </template>
 
-      <!-- 列表视图：按天展示 -->
+      <!-- 列表视图：按天分组排课卡片 -->
       <div>
         <div v-if="campSchedules.length === 0" class="empty-state">
-          <t-empty :description="isLocked ? '暂无排课（已锁定）' : '暂无排课，点击「新增排课」开始'" />
+          <div class="empty-icon"><t-icon name="calendar" /></div>
+          <div class="empty-title">{{ isLocked ? '暂无排课（已锁定）' : '还没有排课' }}</div>
+          <div class="empty-desc">{{ isLocked ? '审核通过后不可编辑，如需调整请复制营期重做' : '点击右上角「新增排课」开始安排课程内容' }}</div>
         </div>
 
-        <div v-else class="schedule-timeline">
-          <div v-for="[day, scheds] in sortedDaySchedules" :key="day" class="timeline-item">
-            <div class="timeline-marker">
-              <span class="timeline-dot"></span>
-              <span class="timeline-day">Day {{ day }}</span>
+        <div v-else class="day-groups">
+          <div v-for="[day, scheds] in sortedDaySchedules" :key="day" class="day-group">
+            <div class="day-head">
+              <div class="day-badge">
+                <span class="day-label">Day</span>
+                <span class="day-num">{{ day }}</span>
+              </div>
+              <div class="day-meta">
+                <div class="day-name">第 {{ day }} 天</div>
+                <div class="day-sub">{{ scheds.length }} 个排课 · 最早解锁 {{ dayFirstUnlock(scheds) }}</div>
+              </div>
+              <div class="day-line"></div>
             </div>
-            <div class="timeline-content">
+            <div class="day-cards">
               <div v-for="s in scheds" :key="s.id" class="sched-card">
-                <div class="sched-card-header">
-                  <span class="sched-title">{{ s.title }}</span>
-                  <span class="sched-time">
-                    <t-icon name="time" />
-                    {{ formatTime(s.unlock_time) }}
-                  </span>
-                  <t-popconfirm v-if="!isLocked" content="确认删除此排课？" theme="danger" @confirm="del(s)">
-                    <t-button variant="text" theme="danger" size="small"><t-icon name="delete" /></t-button>
-                  </t-popconfirm>
+                <div class="sc-icon" :class="{ 'sc-icon-live': s.schedule_mode === 'live' }">
+                  <t-icon :name="s.schedule_mode === 'live' ? 'video-camera' : 'play-circle'" />
                 </div>
-                <div class="sched-card-body">
-                  <span v-if="s.description" class="sched-desc">{{ s.description }}</span>
-                  <div class="sched-tags">
-                    <t-tag v-if="s.course_id" theme="default" size="small">
-                      关联课程: {{ getCourseName(s.course_id) }}
-                    </t-tag>
-                    <t-tag :theme="s.is_required ? 'danger' : 'default'" size="small">
-                      {{ s.is_required ? '必学' : '可选' }}
-                    </t-tag>
-                    <t-tag v-if="s.completion_criteria" theme="warning" size="small">
-                      {{ s.completion_criteria }}
-                    </t-tag>
+                <div class="sc-main">
+                  <div class="sc-title-row">
+                    <span class="sc-title">{{ s.title }}</span>
+                    <t-tag :theme="s.is_required ? 'danger' : 'default'" variant="light" size="small">{{ s.is_required ? '必学' : '可选' }}</t-tag>
+                    <t-tag v-if="s.completion_criteria" theme="warning" variant="light" size="small">{{ s.completion_criteria }}</t-tag>
+                  </div>
+                  <div v-if="s.description" class="sc-desc">{{ s.description }}</div>
+                  <div v-if="s.course_id" class="sc-course">
+                    <t-icon name="book-open" />
+                    <span>关联课程：{{ getCourseName(s.course_id) }}</span>
+                  </div>
+                  <div class="sc-times">
+                    <span class="sc-time"><t-icon name="unlock" />解锁 {{ formatTime(s.unlock_time) }}</span>
+                    <span v-if="s.deadline" class="sc-time"><t-icon name="time" />截止 {{ formatTime(s.deadline) }}</span>
                   </div>
                 </div>
+                <t-popconfirm v-if="!isLocked" content="确认删除此排课？" theme="danger" @confirm="del(s)">
+                  <t-button variant="text" theme="danger" size="small" class="sc-del"><t-icon name="delete" /></t-button>
+                </t-popconfirm>
               </div>
             </div>
           </div>
@@ -250,10 +260,9 @@
             <t-option v-for="cat in courseCategories" :key="cat.id" :label="cat.name" :value="cat.id" />
           </t-select>
         </t-form-item>
-        <t-form-item label="主讲讲师" required-mark>
-          <t-select v-model="quickCourseForm.main_lecturer_id" clearable placeholder="选择主讲讲师" filterable style="width: 100%">
-            <t-option v-for="l in lecturers" :key="l.id" :label="l.name" :value="l.id" />
-          </t-select>
+        <!-- V2·0829：讲师/助教角色下线，主讲人改为选填文本 -->
+        <t-form-item label="主讲人">
+          <t-input v-model="quickCourseForm.main_lecturer_id" clearable placeholder="选填，仅作为课程内容展示" style="width: 100%" />
         </t-form-item>
         <t-form-item label="课程简介">
           <t-textarea v-model="quickCourseForm.description" placeholder="简要描述课程内容（可后续补充）" :autosize="{ minRows: 2, maxRows: 4 }" />
@@ -327,6 +336,11 @@ function formatTime(unixSec: number): string {
 }
 function getCourseName(id: string): string {
   return courseStore.courses.find(c => c.id === id)?.title ?? id;
+}
+// 某天最早解锁时间（Day 分区头部展示用）
+function dayFirstUnlock(scheds: CourseSchedule[]): string {
+  const min = Math.min(...scheds.map(s => s.unlock_time));
+  return formatTime(min);
 }
 function getPublishedLessonCount(courseId: string): number {
   return courseStore.lessons.filter(l => l.course_id === courseId && l.status === 'published').length;
@@ -512,9 +526,7 @@ function del(s: CourseSchedule) {
   MessagePlugin.success('已删除');
 }
 
-// ===== 快捷新建课程 =====
-import { useLecturerStore } from '../../../stores/lecturer-store';
-const lecturerStore = useLecturerStore();
+// ===== 快捷新建课程（V2·0829：主讲人为内容属性文本，无讲师档案）=====
 
 const showQuickCourse = ref(false);
 const quickCourseForm = ref({
@@ -523,8 +535,6 @@ const quickCourseForm = ref({
   main_lecturer_id: '',
   description: '',
 });
-
-const lecturers = computed(() => lecturerStore.lecturers.filter(l => l.status === 'active' && l.can_be_main));
 
 const courseCategories = computed(() => {
   const map = new Map<string, string>();
@@ -625,24 +635,73 @@ async function doOneClickFromAdd() {
 .title { font-size: 18px; font-weight: 600; }
 .camp-info { font-size: 14px; color: #909399; margin-left: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 360px; }
 .actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-.empty-state { text-align: center; padding: 40px; }
+.empty-state { text-align: center; padding: 56px 0; }
+.empty-icon {
+  width: 64px; height: 64px; margin: 0 auto 14px; border-radius: 18px;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #ECFDF3, #D1FADF);
+}
+.empty-icon .t-icon { font-size: 30px; color: #12B76A; }
+.empty-title { font-size: 15px; font-weight: 600; color: #1F2C3E; }
+.empty-desc { font-size: 13px; color: #98A2B3; margin-top: 5px; }
 
-/* 自定义时间线（替代 el-timeline） */
-.schedule-timeline { padding: 8px 0; }
-.timeline-item { display: flex; gap: 16px; position: relative; padding-bottom: 24px; }
-.timeline-item:last-child { padding-bottom: 0; }
-.timeline-marker { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 48px; flex-shrink: 0; }
-.timeline-dot { width: 10px; height: 10px; border-radius: 50%; background: #12B76A; margin-top: 6px; }
-.timeline-day { font-size: 12px; font-weight: 600; color: #1F2C3E; white-space: nowrap; }
-.timeline-content { flex: 1; padding-left: 16px; border-left: 2px solid #EAECF0; }
+/* ===== Day 分区 + 排课卡片（V2·0830 重设计） ===== */
+.day-groups { display: flex; flex-direction: column; gap: 8px; }
+.day-head { display: flex; align-items: center; gap: 12px; padding: 10px 4px 12px; }
+.day-badge {
+  width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #12B76A, #0E9B58);
+  color: #fff; box-shadow: 0 4px 10px rgba(18, 183, 106, 0.28);
+}
+.day-label { font-size: 10px; opacity: 0.85; letter-spacing: 0.5px; line-height: 1; }
+.day-num { font-size: 20px; font-weight: 800; line-height: 1.15; font-variant-numeric: tabular-nums; }
+.day-meta { min-width: 0; }
+.day-name { font-size: 15px; font-weight: 700; color: #1F2C3E; line-height: 1.3; }
+.day-sub { font-size: 12px; color: #98A2B3; margin-top: 2px; }
+.day-line { flex: 1; height: 1px; background: linear-gradient(90deg, #EAECF0, transparent); }
 
-.sched-card { background: #fff; border: 1px solid #ebeef5; border-radius: 8px; padding: 12px; margin-bottom: 8px; }
-.sched-card-header { display: flex; align-items: center; gap: 8px; }
-.sched-title { font-weight: 600; flex: 1; }
-.sched-time { font-size: 12px; color: #909399; display: flex; align-items: center; gap: 4px; }
-.sched-card-body { margin-top: 8px; }
-.sched-desc { font-size: 13px; color: #909399; }
-.sched-tags { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+.day-cards { display: flex; flex-direction: column; gap: 10px; padding-left: 4px; }
+.sched-card {
+  position: relative; display: flex; align-items: flex-start; gap: 12px;
+  background: #fff; border: 1px solid #EAECF0; border-radius: 14px;
+  padding: 14px 16px 14px 14px; overflow: hidden;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+.sched-card:hover {
+  border-color: #A6F4C5;
+  box-shadow: 0 6px 16px rgba(16, 24, 40, 0.08);
+}
+.sched-card::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+  background: linear-gradient(180deg, #12B76A, #0E9B58);
+}
+.sc-icon {
+  width: 42px; height: 42px; border-radius: 11px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #ECFDF3, #D1FADF);
+}
+.sc-icon .t-icon { font-size: 22px; color: #12B76A; }
+.sc-icon-live { background: linear-gradient(135deg, #FEF3F2, #FEE4E2); }
+.sc-icon-live .t-icon { color: #F04438; }
+.sc-main { flex: 1; min-width: 0; }
+.sc-title-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.sc-title { font-size: 14px; font-weight: 700; color: #1F2C3E; }
+.sc-desc { font-size: 12px; color: #667085; margin-top: 4px; line-height: 1.6; }
+.sc-course {
+  display: inline-flex; align-items: center; gap: 5px; margin-top: 8px;
+  padding: 3px 10px; border-radius: 999px;
+  background: #F6FEF9; border: 1px solid #A6F4C5;
+  font-size: 12px; color: #027A48;
+}
+.sc-course .t-icon { font-size: 13px; color: #12B76A; }
+.sc-times { display: flex; gap: 16px; margin-top: 9px; flex-wrap: wrap; }
+.sc-time {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 12px; color: #98A2B3; font-variant-numeric: tabular-nums;
+}
+.sc-time .t-icon { font-size: 13px; color: #12B76A; }
+.sc-del { flex-shrink: 0; margin-top: 2px; }
 .text-secondary { color: #909399; }
 .course-tip { font-size: 12px; color: #909399; margin-top: 4px; }
 

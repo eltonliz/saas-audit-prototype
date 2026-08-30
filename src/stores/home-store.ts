@@ -25,10 +25,7 @@ export interface HomeCourseCard {
   id: string;
   title: string;
   cover_emoji: string;
-  lecturer_name: string;
   lesson_count: number;
-  price: number; // 分
-  is_paid: boolean;
   mode: 'live' | 'recorded';
   camp_title?: string;
 }
@@ -36,7 +33,6 @@ export interface HomeCourseCard {
 export interface LiveRecommendCard {
   id: string;
   title: string;
-  lecturer_name: string;
   viewers: number;
   status: 'live' | 'not_started';
 }
@@ -68,22 +64,21 @@ export const useHomeStore = defineStore('home', () => {
     { label: '门店', icon: '🏪', route: '/app/student/store-list' },
     { label: '课程库', icon: '📖', route: '/app/student/lecture' },
     { label: '每日签到', icon: '📅', route: '' },
-    { label: '我的订单', icon: '📋', route: '/app/student/orders' },
     { label: '全部分类', icon: '📂', route: '' },
   ]);
 
   // ── 直播推荐配置（横向滚动卡，2 个，标「直播中」）──
   const liveRecommends = ref<LiveRecommendCard[]>([
-    { id: 'LIVE-202608-00002', title: '高效学习训练营·答疑直播', lecturer_name: '张三', viewers: 88, status: 'live' },
-    { id: 'LIVE-202608-00003', title: '运动康复公开课', lecturer_name: '李四', viewers: 0, status: 'not_started' },
+    { id: 'LIVE-202608-00002', title: '高效学习训练营·答疑直播', viewers: 88, status: 'live' },
+    { id: 'LIVE-202608-00003', title: '运动康复公开课', viewers: 0, status: 'not_started' },
   ]);
 
   // ── 平台首页瀑布流（3-4 个课程卡）──
   const homeCourses = ref<HomeCourseCard[]>([
-    { id: 'COURSE-202608-00001', title: '高效学习方法论', cover_emoji: '📖', lecturer_name: '张三', lesson_count: 5, price: 9900, is_paid: true, mode: 'recorded', camp_title: '7天高效学习营' },
-    { id: 'COURSE-202608-00004', title: '商业思维直播课', cover_emoji: '📺', lecturer_name: '李四', lesson_count: 4, price: 29900, is_paid: true, mode: 'live', camp_title: '直播互动课' },
-    { id: 'COURSE-202608-00002', title: '职场沟通技巧', cover_emoji: '💼', lecturer_name: '李四', lesson_count: 3, price: 0, is_paid: false, mode: 'recorded', camp_title: '职场沟通营' },
-    { id: 'COURSE-202608-00003', title: '运动健康指南', cover_emoji: '🏃', lecturer_name: '张三', lesson_count: 8, price: 19900, is_paid: true, mode: 'recorded', camp_title: '运动健康营' },
+    { id: 'COURSE-202608-00001', title: '高效学习方法论', cover_emoji: '📖', lesson_count: 5, mode: 'recorded', camp_title: '7天高效学习营' },
+    { id: 'COURSE-202608-00004', title: '商业思维直播课', cover_emoji: '📺', lesson_count: 4, mode: 'live', camp_title: '直播互动课' },
+    { id: 'COURSE-202608-00002', title: '职场沟通技巧', cover_emoji: '💼', lesson_count: 3, mode: 'recorded', camp_title: '职场沟通营' },
+    { id: 'COURSE-202608-00003', title: '运动健康指南', cover_emoji: '🏃', lesson_count: 8, mode: 'recorded', camp_title: '运动健康营' },
   ]);
 
   // ── 门店列表（3 个门店卡）──

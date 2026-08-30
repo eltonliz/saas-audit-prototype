@@ -144,7 +144,7 @@ function onResizeDblClick() {
     <div class="panel-header">
       <div class="panel-title">{{ (pageReq && pageReq.title) || (activeModal && activeModal.name) || '需求说明' }}</div>
       <div class="panel-sub" v-if="pageReq && pageReq.sourcePath">SaaS线上：{{ pageReq.sourcePath }}</div>
-      <div class="panel-badge" v-if="pageReq && pageReq.markers.length">复刻+新增 · 共 {{ pageReq.markers.length }} 个改动点</div>
+      <div class="panel-badge" v-if="pageReq && pageReq.markers && pageReq.markers.length">复刻+新增 · 共 {{ pageReq.markers.length }} 个改动点</div>
     </div>
 
     <!-- 弹窗级需求说明（页面导航二级项一一对应·互斥显示） -->
@@ -161,7 +161,6 @@ function onResizeDblClick() {
         <div class="spec-section-title">字段与配置项</div>
         <div v-for="(f, i) in activeModal.fields" :key="'mf' + i" class="spec-field-row">
           <span class="sf-name">{{ f.name }}</span>
-          <span class="sf-tag" :class="{ 'sf-new': f.tag === '业务新增' }">{{ f.tag || '线上原有' }}</span>
           <span class="sf-desc">{{ f.desc }}</span>
         </div>
       </div>
@@ -210,7 +209,6 @@ function onResizeDblClick() {
         <div class="spec-section-title">字段说明</div>
         <div v-for="(f, i) in pageReq.spec.fields" :key="'f' + i" class="spec-field-row">
           <span class="sf-name">{{ f.name }}</span>
-          <span class="sf-tag" :class="{ 'sf-new': f.tag === '业务新增' }">{{ f.tag || '线上原有' }}</span>
           <span class="sf-desc">{{ f.desc }}</span>
         </div>
       </div>
@@ -244,8 +242,8 @@ function onResizeDblClick() {
       </div>
     </div>
 
-    <!-- 改动点列表（弹窗说明展示时互斥隐藏） -->
-    <div class="marker-list" v-if="pageReq && pageReq.markers.length && !activeModal">
+    <!-- 改动点列表（弹窗说明展示时互斥隐藏；页面无改动点时整块隐藏） -->
+    <div class="marker-list" v-if="pageReq && pageReq.markers && pageReq.markers.length && !activeModal">
       <div class="marker-list-title">页面改动点编号</div>
       <div
         v-for="m in pageReq.markers"
@@ -496,7 +494,7 @@ function onResizeDblClick() {
   padding: 0 4px;
   flex-shrink: 0;
 }
-.sf-tag.sf-new { color: #f56c6c; border-color: #f56c6c; }
+
 .sf-desc { color: #667085; }
 .req-marker-item {
   background: #fff;

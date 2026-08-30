@@ -72,8 +72,9 @@
           </div>
         </template>
         <template #time="{ row }">{{ row.start_date }} ~ {{ row.end_date }}</template>
-        <template #price="{ row }">{{ row.is_paid ? '¥' + (row.price / 100).toFixed(0) : '免费' }}</template>
-        <template #enroll="{ row }"><span class="enroll-stat">已加入 {{ row.joined_count }}</span><span class="enroll-stat">已通过 {{ row.approved_count }}</span><span class="enroll-stat">已报名 {{ row.enrolled_count }}</span></template>
+        <!-- V2·D2-1 本期不做交易：营期全免费 -->
+        <!-- V2·0829 用户裁决：价格列已删除（全部免费） -->
+        <template #enroll="{ row }"><span class="enroll-stat">已报名 {{ row.enrolled_count }}</span></template>
         <template #schedule_count="{ row }">{{ row.schedule_count ?? 0 }}</template>
         <template #status="{ row }">
           <t-tag :theme="statusTag(row.status)" variant="light" size="small">{{ statusLabel(row.status) }}</t-tag>
@@ -84,7 +85,6 @@
             <t-button variant="text" size="small" @click="$router.push('/tenant/course/camp-schedule?campId=' + row.id)">排课</t-button>
             <t-button variant="text" size="small" @click="openStudentDrawer(row)">学员</t-button>
             <t-button variant="text" size="small" @click="openDetail(row)">详情</t-button>
-            <t-button variant="text" size="small" @click="openInviteDrawer(row)">邀请码</t-button>
             <t-button v-if="row.status === 'draft'" variant="text" size="small" theme="primary" @click="openEdit(row)">编辑</t-button>
             <t-button v-if="row.status === 'draft'" variant="text" size="small" theme="danger" @click="delCamp(row)">删除</t-button>
             <t-button v-if="row.status === 'draft'" variant="text" size="small" theme="primary" @click="submitReview(row)">提审</t-button>
@@ -137,13 +137,7 @@
           <t-date-range-picker v-model="dateRange" :placeholder="['开始日期', '结束日期']" clearable style="width:100%" />
         </t-form-item>
         <div v-if="dateRange && dateRange.length === 2 && daysBetween(dateRange[0], dateRange[1]) > 90" class="form-error">营期最长90天（行业约束），当前 {{ daysBetween(dateRange[0], dateRange[1]) }} 天</div>
-        <t-form-item label="付费模式" required-mark>
-          <t-radio-group v-model="f.is_paid" @change="onPaidChange">
-            <t-radio :value="false">免费</t-radio>
-            <t-radio :value="true">付费</t-radio>
-          </t-radio-group>
-        </t-form-item>
-        <t-form-item v-if="false" label="价格(元)" required-mark><t-input-number v-model="priceYuan" :min="0" style="width:160px" /></t-form-item>
+        <!-- V2·0829 用户裁决：价格字段去除（全部免费） -->
 
         <t-divider align="left">高级配置</t-divider>
         <t-form-item label="报名人数上限">
@@ -153,11 +147,7 @@
         <t-form-item label="报名截止时间">
           <t-date-picker v-model="enrollDeadline" enable-time-picker placeholder="选择报名截止时间" style="width:100%" />
         </t-form-item>
-        <t-form-item label="归属门店" required-mark>
-          <t-select v-model="f.store_id" placeholder="请选择归属门店" style="width:100%">
-            <t-option v-for="st in storeOptions" :key="st.id" :label="st.name" :value="st.id" />
-          </t-select>
-        </t-form-item>
+        <!-- V2·0829 用户裁决：归属关系统一由 SaaS 后台门店成员（店长/店员）承接，课程业务不带归属 -->
         <t-form-item label="营期简介"><t-textarea v-model="f.description" placeholder="营期简介（选填）" :autosize="{ minRows: 2, maxRows: 4 }" /></t-form-item>
       </t-form>
     </t-dialog>
@@ -169,86 +159,7 @@
       <t-input v-model="rejectCampReason" placeholder="驳回原因（必填）" />
     </t-dialog>
 
-    <!-- 邀请码管理 Drawer -->
-    <t-drawer v-model:visible="inviteDrawerVisible" :header="inviteCampTitle + ' · 邀请码管理'" size="720px" placement="right">
-      <div class="drawer-tip">针对不同主讲/助教生成对应的二维码或口令，学员扫码/输口令后自动产生归属关系（归属到对应助教）</div>
-      <div class="invite-stats">
-        <t-card v-for="ic in inviteStatCards" :key="ic.label" :bordered="true" class="is-card">
-          <div class="is-label">{{ ic.label }}</div>
-          <div class="is-val" :style="{ color: ic.color }">{{ ic.value }}</div>
-        </t-card>
-      </div>
-      <t-table :data="currentCampInviteCodes" row-key="id" :columns="inviteColumns" bordered size="small" style="margin-top:12px">
-        <template #code="{ row }">
-          <div class="code-cell">
-            <t-tag theme="primary" variant="light">{{ row.code }}</t-tag>
-            <template v-if="row.code_type === 'qr'">
-              <div class="qr-row">
-                <img v-if="qrDataUrls[row.code]" :src="qrDataUrls[row.code]" alt="QR" class="qr-img" @click="qrPreviewCode = row" />
-                <div class="qr-actions">
-                  <t-button variant="text" size="small" @click="qrPreviewCode = row">放大</t-button>
-                  <t-button variant="text" size="small" @click="downloadQr(row)">下载</t-button>
-                  <t-button variant="text" size="small" @click="copyCode(row.code)">复制</t-button>
-                </div>
-              </div>
-            </template>
-          </div>
-        </template>
-        <template #type="{ row }">
-          <t-tag :theme="row.code_type === 'qr' ? 'primary' : 'success'" variant="light" size="small">{{ row.code_type === 'qr' ? '二维码' : '口令' }}</t-tag>
-        </template>
-        <template #assistant="{ row }"><t-tag theme="warning" variant="light" size="small">{{ row.assistant_name }}</t-tag></template>
-        <template #usage="{ row }">{{ row.used_count }}{{ row.max_usage > 0 ? '/' + row.max_usage : '/不限' }}</template>
-        <template #istatus="{ row }">
-          <t-tag :theme="isCodeExpired(row) ? 'default' : (row.is_active ? 'success' : 'default')" variant="light" size="small">{{ isCodeExpired(row) ? '已过期' : (row.is_active ? '有效' : '已禁用') }}</t-tag>
-        </template>
-      </t-table>
-      <template #footer>
-        <div class="drawer-footer">
-          <t-button theme="default" @click="inviteDrawerVisible = false">关闭</t-button>
-          <t-button theme="primary" @click="openInviteModal">
-            <template #icon><t-icon name="add" /></template>
-            生成邀请码
-          </t-button>
-        </div>
-      </template>
-    </t-drawer>
-
-    <!-- 生成邀请码 Dialog -->
-    <t-dialog v-model:visible="inviteModalVisible" header="生成邀请码" width="480px" :on-confirm="doCreateInviteCode" :confirm-btn="{ content: '生成', theme: 'primary' }" :cancel-btn="{ content: '取消' }">
-      <t-form :data="inviteForm" label-width="100px" label-align="right">
-        <t-form-item label="归属讲师" required-mark>
-          <t-select v-model="inviteForm.assistant_id" placeholder="选择讲师（主讲/助教输入邀请码后自动归属）" style="width:100%">
-            <t-option v-for="a in currentCampLecturersForInvite" :key="a.lecturer_id" :label="a.lecturer_name + '（' + (a.camp_role === 'main_lecturer' ? '主讲' : '助教') + '·' + a.role_type + '）'" :value="a.lecturer_id" />
-          </t-select>
-        </t-form-item>
-        <t-form-item label="邀请码类型" required-mark>
-          <t-radio-group v-model="inviteForm.code_type">
-            <t-radio value="qr">二维码（扫码进入）</t-radio>
-            <t-radio value="password">口令（输入进入）</t-radio>
-          </t-radio-group>
-        </t-form-item>
-        <t-form-item label="使用次数"><t-input-number v-model="inviteForm.max_usage" :min="0" :max="9999" style="width:160px" /><span class="form-tip-inline">0=不限</span></t-form-item>
-        <t-form-item label="过期时间" required-mark>
-          <t-date-picker v-model="inviteForm.expire_at" enable-time-picker placeholder="选择过期时间" style="width:100%" />
-        </t-form-item>
-      </t-form>
-    </t-dialog>
-
-    <!-- QR 预览 Dialog -->
-    <t-dialog v-model:visible="qrPreviewVisible" header="二维码预览" width="400px">
-      <div v-if="qrPreviewCode" class="qr-preview">
-        <img v-if="qrDataUrls[qrPreviewCode.code]" :src="qrDataUrls[qrPreviewCode.code]" alt="QR" class="qr-preview-img" />
-        <div class="qr-preview-row"><t-text theme="secondary">码值：</t-text><t-tag theme="primary" variant="light">{{ qrPreviewCode.code }}</t-tag></div>
-        <div class="qr-preview-row"><t-text theme="secondary">归属讲师：</t-text><t-tag theme="warning" variant="light" size="small">{{ qrPreviewCode.assistant_name }}</t-tag></div>
-      </div>
-      <template #footer>
-        <div class="drawer-footer">
-          <t-button theme="default" @click="copyCode(qrPreviewCode?.code || '')">复制码值</t-button>
-          <t-button theme="primary" @click="downloadQr(qrPreviewCode)">下载二维码</t-button>
-        </div>
-      </template>
-    </t-dialog>
+    <!-- V2·0829 用户裁决：邀请码/口令体系整体下线，邀请码管理 Drawer/生成弹窗/二维码预览已删除 -->
 
     <!-- 营期详情 Drawer（三 Tab） -->
     <t-drawer v-model:visible="detailDrawerVisible" :header="detailCampTitle + ' · 营期详情'" size="1000px" placement="right">
@@ -272,28 +183,7 @@
           </t-table>
         </t-tab-panel>
 
-        <!-- 邀请码漏斗 Tab -->
-        <t-tab-panel value="invite_funnel" label="邀请码漏斗">
-          <div class="drawer-tip">邀请码拉新转化漏斗：生成数 → 使用数（扫码/输码）→ 审核通过数 → 已加入营期数</div>
-          <div class="detail-stats">
-            <t-card :bordered="true" class="ds-card"><div class="ds-label">生成总数</div><div class="ds-val" style="color:#722ED1">{{ inviteFunnel.totalGenerated }}</div></t-card>
-            <t-card :bordered="true" class="ds-card"><div class="ds-label">使用数</div><div class="ds-val" style="color:#1890FF">{{ inviteFunnel.totalUsed }}</div></t-card>
-            <t-card :bordered="true" class="ds-card"><div class="ds-label">审核通过</div><div class="ds-val" style="color:#12B76A">{{ inviteFunnel.totalEnrolled }}</div></t-card>
-            <t-card :bordered="true" class="ds-card"><div class="ds-label">已加入营期</div><div class="ds-val" style="color:#FA8C16">{{ inviteFunnel.totalJoined }}</div></t-card>
-          </div>
-          <t-card :bordered="true" style="margin:12px 0">
-            <div class="funnel-title">整体转化率</div>
-            <div class="funnel-row">使用率：{{ inviteFunnel.totalGenerated > 0 ? (inviteFunnel.totalUsed / inviteFunnel.totalGenerated * 100).toFixed(0) : 0 }}%（{{ inviteFunnel.totalUsed }}/{{ inviteFunnel.totalGenerated }}）</div>
-            <div class="funnel-row">审核通过率：{{ inviteFunnel.totalUsed > 0 ? (inviteFunnel.totalEnrolled / inviteFunnel.totalUsed * 100).toFixed(0) : 0 }}%（{{ inviteFunnel.totalEnrolled }}/{{ inviteFunnel.totalUsed }}）</div>
-            <div class="funnel-row">最终加入率：{{ inviteFunnel.totalUsed > 0 ? (inviteFunnel.totalJoined / inviteFunnel.totalUsed * 100).toFixed(0) : 0 }}%（{{ inviteFunnel.totalJoined }}/{{ inviteFunnel.totalUsed }}）</div>
-          </t-card>
-          <div class="funnel-title">按助教分组</div>
-          <div v-if="inviteFunnel.assistantFunnel.length === 0" class="detail-empty">该营期暂无助教或邀请码数据</div>
-          <t-table v-else :data="inviteFunnel.assistantFunnel" row-key="key" :columns="funnelColumns" bordered size="small">
-            <template #assistant="{ row }"><t-tag theme="warning" variant="light" size="small">{{ row.assistant_name }}</t-tag></template>
-            <template #conversion="{ row }">{{ row.conversion !== '—' ? row.conversion + '%' : '—' }}</template>
-          </t-table>
-        </t-tab-panel>
+        <!-- V2·0829 用户裁决：邀请码漏斗 Tab 已删除（邀请码/口令体系下线） -->
 
         <!-- 排课概览 Tab -->
         <t-tab-panel value="schedule_overview" label="排课概览">
@@ -318,22 +208,17 @@
 import { ref, computed, watch } from 'vue';
 import { DialogPlugin, MessagePlugin } from 'tdesign-vue-next';
 import { useCampStore } from '../../../stores/camp-store';
-import { useHomeStore } from '../../../stores/home-store';
 import { notifyModalOpen } from '../../../utils/modal-spec-bridge';
-import { useLecturerStore } from '../../../stores/lecturer-store';
 import { useCourseStore } from '../../../stores/course-store';
 import CampStudentDrawerPage from './CampStudentDrawerPage.vue';
 
 const store = useCampStore();
-const homeStore = useHomeStore();
-const storeOptions = homeStore.loadStores();
-const lecturerStore = useLecturerStore();
 const courseStore = useCourseStore();
-const lecturers = computed(() => lecturerStore.loadLecturerList().filter(l => l.review_status === 'approved' && l.can_be_main));
+// V2·0829 用户裁决：讲师/助教角色下线；归属关系统一走 SaaS 门店成员（店长/店员），课程业务不带归属
 const search = ref(''); const modeFilter = ref(''); const statusFilter = ref(''); const showCreate = ref(false); const priceYuan = ref(0);
 const editingCamp = ref<any>(null);
-// 营期最大90天约束（行业约束）
-function daysBetween(start: Date, end: Date): number { return Math.floor((end.getTime() - start.getTime()) / 86400000) + 1; }
+// 营期最大90天约束（行业约束）；兼容字符串/Date（t-date-range-picker 默认输出字符串）
+function daysBetween(start: any, end: any): number { return Math.floor((new Date(end).getTime() - new Date(start).getTime()) / 86400000) + 1; }
 const dateRange = ref<any>([]);
 const enrollDeadline = ref<Date | null>(null);
 
@@ -373,48 +258,44 @@ const columns = [
   { colKey: 'camp_no', title: '营期编号', width: 160, ellipsis: true },
   { colKey: 'title', title: '营期名称', minWidth: 160, ellipsis: true },
   { colKey: 'mode', title: '授课模式', width: 100 },
-  { colKey: 'store_name', title: '归属门店', width: 110 },
   { colKey: 'time', title: '营期时间', width: 180 },
-  { colKey: 'price', title: '价格', width: 80 },
+  // V2·0829 用户裁决：价格列已删除（全部免费）
   { colKey: 'enroll', title: '报名情况', width: 180 },
   { colKey: 'schedule_count', title: '排课数', width: 80 },
   { colKey: 'status', title: '状态', width: 90 },
   { colKey: 'op', title: '操作', width: 360, fixed: 'right' },
 ];
 
-const f = ref<{ title: string; description: string; mode: 'live' | 'recorded'; capacity: number; store_id: string }>({ title: '', description: '', mode: 'live', capacity: 0, store_id: '' });
+const f = ref<{ title: string; description: string; mode: 'live' | 'recorded'; capacity: number }>({ title: '', description: '', mode: 'live', capacity: 0 });
 
 const lecturerRate = ref(60);
 const assistantRate = ref(20);
 const platformRate = ref(20);
 function calcPlatformRate() { platformRate.value = Math.max(0, 100 - lecturerRate.value - assistantRate.value); }
-// 付费模式切换联动：切到免费时关闭分成
-function onPaidChange() {
-}
+// V2·0829 用户裁决：价格字段已去除，onPaidChange 不再需要
 
 function openCreate() {
   notifyModalOpen('camp-create');
   editingCamp.value = null;
-  f.value = { title: '', description: '', mode: 'live', capacity: 0, store_id: (storeOptions[0] || { id: 'STORE-001' }).id };
+  f.value = { title: '', description: '', mode: 'live', capacity: 0 };
   priceYuan.value = 0; lecturerRate.value = 60; assistantRate.value = 20; platformRate.value = 20; dateRange.value = []; enrollDeadline.value = null;
   showCreate.value = true;
 }
 
 function doSave() {
-  if (!f.value.title || !(dateRange.value && dateRange.value.length === 2) || !f.value.store_id) { MessagePlugin.warning('请填写完整信息'); return; }
+  if (!f.value.title || !(dateRange.value && dateRange.value.length === 2)) { MessagePlugin.warning('请填写完整信息'); return; }
   if (daysBetween(dateRange.value[0], dateRange.value[1]) > 90) { MessagePlugin.warning('营期最长90天（行业约束）'); return; }
   const data = {
     title: f.value.title, description: f.value.description ?? '', cover_url: '',
     series_id: 'SERIES-001', series_name: '默认系列',
     mode: f.value.mode, allow_products: false,
-    start_date: dateRange.value[0].toISOString().slice(0, 10),
-    end_date: dateRange.value[1].toISOString().slice(0, 10),
-    total_days: Math.ceil((dateRange.value[1].getTime() - dateRange.value[0].getTime()) / 86400000) + 1,
+    start_date: String(dateRange.value[0]).slice(0, 10),
+    end_date: String(dateRange.value[1]).slice(0, 10),
+    total_days: Math.ceil((new Date(dateRange.value[1]).getTime() - new Date(dateRange.value[0]).getTime()) / 86400000) + 1,
     price: 0, is_paid: false,
-    store_id: f.value.store_id,
-    store_name: (storeOptions.find(st => st.id === f.value.store_id) || { name: '' }).name,
+    store_id: '', store_name: '',
     capacity: f.value.capacity,
-    enroll_deadline: enrollDeadline.value ? Math.floor(enrollDeadline.value.getTime() / 1000) : Math.floor(Date.now() / 1000) + 86400 * 7,
+    enroll_deadline: enrollDeadline.value ? Math.floor(new Date(enrollDeadline.value).getTime() / 1000) : Math.floor(Date.now() / 1000) + 86400 * 7,
     daily_red_packet_mode: 'by_course',
   } as any;
   if (editingCamp.value) {
@@ -453,12 +334,12 @@ function delCamp(row: any) {
 function openEdit(row: any) {
   notifyModalOpen('camp-edit');
   editingCamp.value = row;
-  f.value = { title: row.title, description: row.description ?? '', mode: row.mode, capacity: row.capacity || 0, store_id: row.store_id || (storeOptions[0] || { id: 'STORE-001' }).id };
+  f.value = { title: row.title, description: row.description ?? '', mode: row.mode, capacity: row.capacity || 0 };
   priceYuan.value = row.is_paid ? row.price / 100 : 0;
   lecturerRate.value = row.commission_enabled ? Math.round(row.lecturer_rate * 100) : 60;
   assistantRate.value = row.commission_enabled ? Math.round((row.assistant_rate ?? 0.2) * 100) : 20;
   platformRate.value = row.commission_enabled ? Math.round((row.platform_rate ?? 0.2) * 100) : 20;
-  dateRange.value = [new Date(row.start_date), new Date(row.end_date)];
+  dateRange.value = [row.start_date, row.end_date];
   enrollDeadline.value = row.enroll_deadline ? new Date(row.enroll_deadline * 1000) : null;
   showCreate.value = true;
 }
@@ -470,95 +351,7 @@ function openStudentDrawer(row: any) { activeCampId.value = row.id; studentDrawe
 function backToDraft(row: any) { if (store.transitionCampStatus(row.id, 'draft')) { MessagePlugin.success('已退回草稿'); } else { MessagePlugin.warning('当前状态不可回草稿'); } }
 function relistCamp(row: any) { if (store.transitionCampStatus(row.id, 'published')) { MessagePlugin.success('已重新上架'); } else { MessagePlugin.warning('当前状态不可上架'); } }
 
-// ===== 邀请码管理 Drawer =====
-const inviteDrawerVisible = ref(false);
-const inviteCampId = ref('');
-const inviteCampTitle = ref('');
-const inviteModalVisible = ref(false);
-const inviteForm = ref<{ assistant_id: string; code_type: 'qr' | 'password'; max_usage: number; expire_at: Date | null }>({ assistant_id: '', code_type: 'password', max_usage: 0, expire_at: null });
-const qrPreviewVisible = ref(false);
-const qrPreviewCode = ref<any>(null);
-
-const currentCampInviteCodes = computed(() => inviteCampId.value ? store.inviteCodes.filter(c => c.camp_id === inviteCampId.value) : []);
-const currentCampLecturersForInvite = computed(() => inviteCampId.value ? store.campLecturers.filter(cl => cl.camp_id === inviteCampId.value && cl.is_active && (cl.camp_role === 'main_lecturer' || cl.camp_role === 'assistant')) : []);
-
-const inviteCodeStats = computed(() => {
-  const now = Math.floor(Date.now() / 1000);
-  const list = currentCampInviteCodes.value;
-  return {
-    total: list.length,
-    active: list.filter(c => c.is_active && c.expire_at >= now).length,
-    expired: list.filter(c => c.expire_at < now).length,
-    exhausted: list.filter(c => c.max_usage > 0 && c.used_count >= c.max_usage).length,
-    disabled: list.filter(c => !c.is_active).length,
-  };
-});
-const inviteStatCards = computed(() => [
-  { label: '总数', value: inviteCodeStats.value.total, color: '#1F2C3E' },
-  { label: '有效', value: inviteCodeStats.value.active, color: '#12B76A' },
-  { label: '已过期', value: inviteCodeStats.value.expired, color: '#8C8C8C' },
-  { label: '已用尽', value: inviteCodeStats.value.exhausted, color: '#FA8C16' },
-  { label: '已禁用', value: inviteCodeStats.value.disabled, color: '#F04438' },
-]);
-function isCodeExpired(row: any): boolean { return row.expire_at < Math.floor(Date.now() / 1000); }
-
-const inviteColumns = [
-  { colKey: 'code', title: '邀请码', width: 220 },
-  { colKey: 'type', title: '类型', width: 90 },
-  { colKey: 'assistant', title: '归属讲师', width: 120 },
-  { colKey: 'usage', title: '使用情况', width: 110 },
-  { colKey: 'enrolled_count', title: '已报名', width: 80 },
-  { colKey: 'istatus', title: '状态', width: 90 },
-];
-
-function openInviteDrawer(row: any) {
-  inviteCampId.value = row.id; inviteCampTitle.value = row.title; inviteDrawerVisible.value = true;
-  notifyModalOpen('camp-invite-drawer');
-}
-function openInviteModal() {
-  inviteForm.value = { assistant_id: '', code_type: 'password', max_usage: 0, expire_at: new Date(Date.now() + 86400000 * 30) };
-  inviteModalVisible.value = true;
-  notifyModalOpen('camp-invite-create');
-}
-function genInviteCode(): string {
-  const letters = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
-  const digits = '23456789';
-  const chars = letters + digits;
-  let code = '';
-  for (let i = 0; i < 8; i++) code += chars[Math.floor(Math.random() * chars.length)];
-  if (!/[A-Z]/.test(code)) code = letters[Math.floor(Math.random() * letters.length)] + code.slice(1);
-  if (!/[0-9]/.test(code)) code = code.slice(0, -1) + digits[Math.floor(Math.random() * digits.length)];
-  return code;
-}
-function doCreateInviteCode() {
-  if (!inviteForm.value.assistant_id) { MessagePlugin.warning('请选择归属讲师'); return; }
-  if (!inviteForm.value.expire_at) { MessagePlugin.warning('请选择过期时间'); return; }
-  const lecturer = currentCampLecturersForInvite.value.find(a => a.lecturer_id === inviteForm.value.assistant_id);
-  if (!lecturer) { MessagePlugin.warning('该营期暂无可用讲师'); return; }
-  store.createInviteCode({
-    camp_id: inviteCampId.value, assistant_id: lecturer.lecturer_id, assistant_name: lecturer.lecturer_name,
-    code_type: inviteForm.value.code_type, code: genInviteCode(),
-    max_usage: inviteForm.value.max_usage || 0, expire_at: Math.floor(inviteForm.value.expire_at.getTime() / 1000),
-  } as any);
-  MessagePlugin.success('邀请码已生成');
-  inviteModalVisible.value = false;
-}
-function copyCode(code: string) { navigator.clipboard.writeText(code); MessagePlugin.success('码值已复制'); }
-// 二维码本地生成（不依赖外网 QR 服务）
-const qrDataUrls = ref<Record<string, string>>({});
-import QRCode from 'qrcode';
-async function renderQr(code: string) {
-  if (qrDataUrls.value[code]) return;
-  try { qrDataUrls.value[code] = await QRCode.toDataURL(code, { width: 300, margin: 1 }); } catch { /* ignore */ }
-}
-watch(currentCampInviteCodes, (codes) => { codes.forEach(c => { if (c.code_type === 'qr') renderQr(c.code); }); }, { immediate: true });
-function downloadQr(row: any) {
-  if (!row) return;
-  const link = document.createElement('a');
-  link.href = qrDataUrls.value[row.code] || '';
-  link.download = 'invite-qr-' + row.code + '.png';
-  if (link.href) link.click(); else MessagePlugin.warning('二维码生成中，请稍后再试');
-}
+// V2·0829 用户裁决：邀请码/口令体系整体下线，邀请码管理 Drawer 与二维码生成逻辑已删除
 
 // ===== 营期详情 Drawer（三 Tab） =====
 const detailDrawerVisible = ref(false);
@@ -602,15 +395,7 @@ const lessonStatsColumns = [
   { colKey: 'learners', title: '学习人数', width: 80 },
   { colKey: 'completion_criteria', title: '完成判定', width: 160, ellipsis: true },
 ];
-const funnelColumns = [
-  { colKey: 'assistant', title: '讲师', width: 120 },
-  { colKey: 'role_type', title: '角色', width: 100 },
-  { colKey: 'codes', title: '生成码数', width: 90 },
-  { colKey: 'used', title: '使用数', width: 80 },
-  { colKey: 'enrolled', title: '审核通过', width: 90 },
-  { colKey: 'joined', title: '已加入', width: 80 },
-  { colKey: 'conversion', title: '转化率', width: 80 },
-];
+// V2·0829：按助教分组漏斗已移除（助教拉新体系下线），funnelColumns 一并删除
 const overviewColumns = [
   { colKey: 'day', title: '第N天', width: 70 },
   { colKey: 'title', title: '标题', width: 200, ellipsis: true },
@@ -619,22 +404,7 @@ const overviewColumns = [
   { colKey: 'completion_rate', title: '完成率', width: 80 },
   { colKey: 'completed_count', title: '完成人数', width: 80 },
 ];
-const inviteFunnel = computed(() => {
-  const codes = detailCampId.value ? store.inviteCodes.filter(c => c.camp_id === detailCampId.value) : [];
-  const totalGenerated = codes.length;
-  const totalUsed = codes.reduce((s, c) => s + c.used_count, 0);
-  const totalEnrolled = codes.reduce((s, c) => s + c.enrolled_count, 0);
-  const campEnrollments = detailCampId.value ? store.enrollments.filter(e => e.camp_id === detailCampId.value && e.invite_code_id && e.status === 'enrolled') : [];
-  const totalJoined = campEnrollments.length;
-  const assistantFunnel = currentCampLecturersForInvite.value.map(a => {
-    const aCodes = codes.filter(c => c.assistant_id === a.lecturer_id);
-    const aUsed = aCodes.reduce((s, c) => s + c.used_count, 0);
-    const aEnrolled = aCodes.reduce((s, c) => s + c.enrolled_count, 0);
-    const aJoined = campEnrollments.filter(e => e.assistant_id === a.lecturer_id).length;
-    return { key: a.lecturer_id, assistant_name: a.lecturer_name, role_type: a.role_type, codes: aCodes.length, used: aUsed, enrolled: aEnrolled, joined: aJoined, conversion: aUsed > 0 ? String(Math.round(aJoined / aUsed * 100)) : '—' };
-  });
-  return { totalGenerated, totalUsed, totalEnrolled, totalJoined, assistantFunnel };
-});
+// V2·0829：邀请码漏斗已删除
 function openDetail(row: any) {
   detailCampId.value = row.id; detailCampTitle.value = row.title; detailActiveTab.value = 'lesson_stats';
   detailDrawerVisible.value = true;

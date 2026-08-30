@@ -12,7 +12,7 @@
           <div class="card-title">{{ c.title }}</div>
           <div class="card-meta">{{ c.category }} · {{ c.lessons }}课时 · {{ c.mode === 'live' ? '直播' : '录播' }}</div>
           <div class="card-bottom">
-            <span class="card-price" :class="{ free: c.price === 0 }">{{ c.price === 0 ? '免费' : '¥' + c.price }}</span>
+            <span class="card-price free">免费</span>
             <span class="card-learners">{{ c.learners }}人学习</span>
           </div>
         </div>
