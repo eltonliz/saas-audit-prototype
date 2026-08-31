@@ -82,8 +82,9 @@
         <template #op="{ row }">
           <t-space :size="2">
             <t-button variant="text" size="small" theme="primary" @click="openDetail(row)">课时</t-button>
-            <t-button variant="text" size="small" @click="$router.push('/tenant/course/camp-schedule?campId=' + row.id)">排课</t-button>
-            <t-button variant="text" size="small" @click="openStudentDrawer(row)">学员</t-button>
+            <!-- V2·0831 排课仅草稿/待审核可编辑（审核通过后锁定）；学员仅报名阶段后有 -->
+            <t-button v-if="['draft','pending_review'].includes(row.status)" variant="text" size="small" @click="$router.push('/tenant/course/camp-schedule?campId=' + row.id)">排课</t-button>
+            <t-button v-if="!['draft','pending_review'].includes(row.status)" variant="text" size="small" @click="openStudentDrawer(row)">学员</t-button>
             <t-button variant="text" size="small" @click="openDetail(row)">详情</t-button>
             <t-button v-if="row.status === 'draft'" variant="text" size="small" theme="primary" @click="openEdit(row)">编辑</t-button>
             <t-button v-if="row.status === 'draft'" variant="text" size="small" theme="danger" @click="delCamp(row)">删除</t-button>
