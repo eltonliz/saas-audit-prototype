@@ -79,6 +79,8 @@
       <div v-else-if="ctaState === 'cancelled'" class="status-row danger"><t-icon name="close-circle" :size="16" /> 报名已取消</div>
       <div v-else-if="ctaState === 'ended'" class="status-row warning"><t-icon name="info-circle" :size="16" /> 营期已结束，无法报名</div>
       <div v-else-if="ctaState === 'not_open'" class="status-row warning"><t-icon name="info-circle" :size="16" /> 营期暂未开放报名</div>
+      <div v-else-if="ctaState === 'enroll_closed'" class="status-row warning"><t-icon name="time" :size="16" /> 报名已截止，等待开营</div>
+      <div v-else-if="ctaState === 'enroll_full'" class="status-row warning"><t-icon name="user-group" :size="16" /> 报名名额已满</div>
     </div>
     </template>
 
@@ -97,6 +99,8 @@
       <span v-else-if="ctaState === 'in_progress'" class="cta-info">营期进行中</span>
       <span v-else-if="ctaState === 'ended'" class="cta-info">营期已结束</span>
       <span v-else-if="ctaState === 'not_open'" class="cta-info">暂未开放报名</span>
+      <span v-else-if="ctaState === 'enroll_closed'" class="cta-disabled">报名已截止</span>
+      <span v-else-if="ctaState === 'enroll_full'" class="cta-disabled">名额已满</span>
       <span v-else class="cta-info">{{ statusLabel(camp.status) }}</span>
     </div>
   </div>
@@ -125,9 +129,16 @@ const redPacketLabel = (t: string) => ({ completion: '完播红包', answer_corr
 const myEnrollment = computed(() => store.enrollments.find(e => e.camp_id === campId && e.student_id === 'STU-001'));
 
 const ctaState = computed<string>(() => {
-  // 营期状态守卫：仅「报名中」开放报名；进行中/已结束/未开放分别提示
+  // V2·0831 报名截止/满员守卫（与列表卡片口径一致，由 deadline/capacity 推导）
+  const c = camp.value as any;
+  const enrollBlocked = !!c && c.status === 'enrolling' && (enrollBlockedReason.value !== null);
+  // 营期状态守卫：仅「报名中」且未截止未满员开放报名；进行中/已结束/未开放分别提示
   if (!myEnrollment.value) {
-    if (camp.value?.status === 'enrolling') return 'enroll';
+    if (camp.value?.status === 'enrolling') {
+      if (enrollBlockedReason.value === 'full') return 'enroll_full';
+      if (enrollBlockedReason.value === 'closed') return 'enroll_closed';
+      return 'enroll';
+    }
     if (camp.value?.status === 'in_progress') return 'in_progress';
     if (camp.value?.status === 'ended') return 'ended';
     return 'not_open';
@@ -137,8 +148,21 @@ const ctaState = computed<string>(() => {
     if (camp.value?.status === 'in_progress' || camp.value?.status === 'ended') return 'joined';
     return 'waiting';
   }
-  if (myEnrollment.value.status === 'cancelled') return 'cancelled';
+  if (myEnrollment.value.status === 'cancelled') {
+    if (enrollBlocked) return enrollBlockedReason.value === 'full' ? 'enroll_full' : 'enroll_closed';
+    return 'cancelled';
+  }
+  if (enrollBlocked) return enrollBlockedReason.value === 'full' ? 'enroll_full' : 'enroll_closed';
   return 'enroll';
+});
+
+// 报名拦截原因：满员优先于截止（null=可报名）
+const enrollBlockedReason = computed<'full' | 'closed' | null>(() => {
+  const c = camp.value as any;
+  if (!c || c.status !== 'enrolling') return null;
+  if (c.capacity > 0 && c.enrolled_count >= c.capacity) return 'full';
+  if (c.enroll_deadline && Math.floor(Date.now() / 1000) > c.enroll_deadline) return 'closed';
+  return null;
 });
 
 const detailTab = ref('介绍');
@@ -233,6 +257,7 @@ function goLearn() {
 }
 .cta-btn:active { transform:scale(0.96); }
 .cta-info { display:flex; align-items:center; justify-content:center; gap:6px; padding:12px; color:var(--color-text-secondary); font-size:14px; }
+.cta-disabled { display:flex; align-items:center; justify-content:center; width:100%; height:var(--touch-target); background:#F2F4F7; color:#98A2B3; border-radius:8px; font-size:15px; }
 .invite-input-area { display:flex; gap:8px; }
 .invite-input { flex:1; height:var(--touch-target); padding:0 12px; border:1px solid var(--color-border); border-radius:var(--radius-md); font-size:14px; }
 .invite-confirm { height:var(--touch-target); padding:0 20px; background:var(--color-primary); color:#fff; border:none; border-radius:var(--radius-md); font-size:14px; font-weight:600; }

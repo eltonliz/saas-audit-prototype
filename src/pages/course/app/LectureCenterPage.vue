@@ -38,7 +38,7 @@
       </div>
     </template>
 
-    <!-- 营期列表 -->
+    <!-- 营期列表（V2·0831 口径：待开营/已开营/已结束 + 报名截止·满员由 deadline/capacity 推导） -->
     <template v-else-if="tab === '营期'">
       <div class="section-title">🎯 热门营期</div>
       <div class="status-bar">
@@ -47,30 +47,18 @@
       <div v-for="c in filteredCamps" :key="c.id" class="card camp-card" @click="goCamp(c.id)">
         <div class="card-cover">
           <span class="cover-icon">{{ c.mode === 'live' ? '📺' : '📹' }}</span>
+          <span class="cover-badge" :class="'badge-' + campBadge(c).type">{{ campBadge(c).text }}</span>
         </div>
         <div class="card-body">
           <div class="card-title">{{ c.title }}</div>
           <div class="card-meta">{{ c.mode === 'live' ? '直播模式' : '录播模式' }} · {{ c.start_date }}~{{ c.end_date }} · {{ c.total_days }}天</div>
           <div class="card-meta">已报名 {{ c.enrolled_count }} 人</div>
-          <div class="card-bottom">
-            <span class="card-price">免费</span>
-            <span class="enroll-btn">{{ campStatusLabel(c.status) }}</span>
+          <div class="card-bottom card-bottom-btn">
+            <button class="enroll-btn" :class="'btn-' + campBtn(c).type" @click.stop="campBtnAction(c)">{{ campBtn(c).text }}</button>
           </div>
         </div>
       </div>
-    </template>
-
-    <!-- 专题（Series，D5 保留） -->
-    <template v-else>
-      <div class="section-title">📚 专题系列</div>
-      <div v-for="s in seriesList" :key="s.id" class="card" @click="goCampSeries(s.id)">
-        <div class="card-cover"><span class="cover-icon">📚</span></div>
-        <div class="card-body">
-          <div class="card-title">{{ s.name }}</div>
-          <div class="card-meta">{{ s.description }}</div>
-        </div>
-      </div>
-      <div v-if="seriesList.length === 0" class="empty-state">暂无专题</div>
+      <div v-if="filteredCamps.length === 0" class="empty-state">暂无营期</div>
     </template>
   </div>
 </template>
@@ -90,7 +78,6 @@ const tab = ref('课程');
 const tabs = computed(() => [
   { key: '课程', label: '课程', count: courses.value.length },
   { key: '营期', label: '营期', count: filteredCamps.value.length },
-  { key: '专题', label: '专题', count: seriesList.value.length },
 ]);
 const search = ref('');
 const catFilter = ref('全部');
@@ -98,8 +85,7 @@ const campStatusFilter = ref('全部');
 
 const categories = ['全部', ...COURSE_CATEGORIES];
 const courses = computed(() => courseStore.courses.filter(c => c.status === 'published' && c.visibility === 'public'));
-const camps = computed(() => campStore.camps.filter(c => ['published', 'enrolling', 'in_progress'].includes(c.status)));
-const seriesList = computed(() => campStore.seriesList);
+const camps = computed(() => campStore.camps.filter(c => ['enrolling', 'in_progress', 'ended'].includes(c.status)));
 
 const filteredCourses = computed(() => courses.value.filter(c =>
   (!search.value || c.title.includes(search.value)) &&
@@ -113,8 +99,29 @@ const filteredCamps = computed(() => camps.value.filter(c =>
 function reload() { courseStore.reloadCourseList(); }
 function goCourse(id: string) { router.push('/app/student/course/' + id); }
 function goCamp(id: string) { router.push('/app/student/camp/' + id); }
-function goCampSeries(seriesId: string) { tab.value = '营期'; MessagePlugin.info('已切换到营期列表'); }
-function campStatusLabel(s: string) { return ({ published: '可报名', enrolling: '报名中', in_progress: '进行中' }[s] ?? s); }
+function campStatusLabel(s: string) { return ({ enrolling: '报名中', in_progress: '进行中', ended: '已结束' }[s] ?? s); }
+
+// V2·0831 营期展示态：报名截止/满员由 enroll_deadline 与 capacity 推导（营期状态机不变）
+const isCampClosed = (c: any) => (c.capacity > 0 && c.enrolled_count >= c.capacity) || (!!c.enroll_deadline && Math.floor(Date.now() / 1000) > c.enroll_deadline);
+const isCampFull = (c: any) => c.capacity > 0 && c.enrolled_count >= c.capacity;
+const myCampEnrolled = (id: string) => !!campStore.enrollments.find(e => e.camp_id === id && e.student_id === 'STU-001' && e.status !== 'cancelled');
+function campBadge(c: any): { text: string; type: 'open' | 'waiting' | 'ended' } {
+  if (c.status === 'in_progress') return { text: '已开营', type: 'open' };
+  if (c.status === 'ended') return { text: '已结束', type: 'ended' };
+  return { text: '待开营', type: 'waiting' };
+}
+function campBtn(c: any): { text: string; type: 'primary' | 'muted' } {
+  if (c.status === 'ended') return { text: '已结束', type: 'muted' };
+  if (c.status === 'in_progress') return myCampEnrolled(c.id) ? { text: '去学习', type: 'primary' } : { text: '报名已截止', type: 'muted' };
+  if (myCampEnrolled(c.id)) return { text: '已报名', type: 'primary' };
+  if (isCampClosed(c)) return { text: isCampFull(c) ? '名额已满' : '报名已截止', type: 'muted' };
+  return { text: '报名中', type: 'primary' };
+}
+function campBtnAction(c: any) {
+  const b = campBtn(c);
+  if (b.type === 'muted') { MessagePlugin.info(b.text === '已结束' ? '营期已结束' : '报名已截止，等待开营'); return; }
+  goCamp(c.id);
+}
 </script>
 
 <style scoped>
@@ -142,7 +149,14 @@ function campStatusLabel(s: string) { return ({ published: '可报名', enrollin
 .card-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; }
 .card-learners { font-size: 12px; color: #98A2B3; }
 .card-price { font-size: 16px; font-weight: 600; color: #12B76A; }
-.enroll-btn { font-size: 12px; color: #12B76A; padding: 2px 8px; border: 1px solid #12B76A; border-radius: 4px; }
+.enroll-btn { font-size: 12px; padding: 5px 14px; border-radius: 16px; border: none; cursor: pointer; }
+.btn-primary { background: #2E90FA; color: #fff; }
+.btn-muted { background: #F2F4F7; color: #98A2B3; }
+.card-bottom-btn { justify-content: flex-end; }
+.cover-badge { position: absolute; top: 6px; left: 6px; padding: 2px 8px; border-radius: 10px; font-size: 10px; line-height: 16px; }
+.badge-open { background: #12B76A; color: #fff; }
+.badge-waiting { background: #fff; color: #475467; border: 1px solid #D0D5DD; }
+.badge-ended { background: #98A2B3; color: #fff; }
 .empty-state { text-align: center; color: #98A2B3; padding: 40px; }
 .status-bar { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; }
 </style>
