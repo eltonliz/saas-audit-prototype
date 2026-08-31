@@ -6,6 +6,7 @@
       <div class="status-tag" :class="myReview.review_status">{{ reviewStatusLabel(myReview.review_status) }}</div>
       <div class="my-rating"><t-icon v-for="n in myReview.rating" :key="n" name="star-filled" :size="16" /></div>
       <div class="my-content">{{ myReview.content }}</div>
+      <div v-if="myReview.review_status === 'rejected'" class="reject-reason">驳回原因：{{ myReview.review_remark || '内容待改进' }}</div>
       <div class="my-actions">
         <button class="act-btn" @click="toggleHide">{{ myReview.is_hidden ? '取消隐藏' : '隐藏评价' }}</button>
         <button class="act-btn" @click="startEdit">修改评价</button>
@@ -22,7 +23,9 @@
     <label class="form-label">评价内容（最多500字）</label>
     <textarea v-model="content" class="form-textarea" rows="4" maxlength="500" placeholder="请输入评价内容"></textarea>
     <div class="word-count">{{ content.length }}/500</div>
-    <button class="submit-btn" @click="submit">{{ myReview ? '修改评价' : '提交评价' }}</button>
+    <!-- V2·0831 修改态：重新审核提示 -->
+    <div v-if="myReview && editing" class="re-review-tip">修改后将重新提交审核，审核通过前对外仍展示原评价内容</div>
+    <button class="submit-btn" @click="submit">{{ myReview && editing ? '修改评价' : myReview ? '修改评价' : '提交评价' }}</button>
   </div>
 </template>
 
@@ -36,12 +39,13 @@ const route = useRoute(); const router = useRouter(); const store = useCourseSto
 const courseId = route.params.id as string;
 const rating = ref(5); const content = ref('');
 const myReview = computed(() => store.reviews.find(r => r.course_id === courseId && r.student_id === 'STU-001'));
+const editing = ref(false);
 // V2·0831 评价资格守卫：报名过该课程任一营期（学习记录存在）才可评价
 const canReview = computed(() => store.learningRecords.some((r: any) => r.student_id === 'STU-001' && r.course_id === courseId));
 const reviewStatusLabel = (s: string) => ({ pending: '审核中', approved: '已通过', rejected: '已驳回' }[s] ?? s);
 
 function startEdit() {
-  if (myReview.value) { rating.value = myReview.value.rating; content.value = myReview.value.content; }
+  if (myReview.value) { rating.value = myReview.value.rating; content.value = myReview.value.content; editing.value = true; }
 }
 function toggleHide() {
   if (myReview.value) { store.toggleReviewHidden(myReview.value.id); MessagePlugin.success(myReview.value.is_hidden ? '已取消隐藏' : '已隐藏'); }
@@ -71,6 +75,8 @@ function submit() {
 .status-tag.rejected { color: #F04438; background: rgba(240,68,56,0.1); }
 .my-rating { font-size: 16px; margin-bottom: 4px; color: #F79009; }
 .my-content { font-size: 14px; color: #667085; margin-bottom: 8px; }
+.reject-reason { font-size: 12px; color: #F04438; background: rgba(240,68,56,0.06); border-radius: 6px; padding: 6px 8px; margin-bottom: 8px; }
+.re-review-tip { font-size: 12px; color: #B54708; background: #FFFAEB; border: 1px solid #FEDF89; border-radius: 8px; padding: 8px 12px; margin-bottom: 12px; }
 .my-actions { display: flex; gap: 8px; }
 .act-btn { padding: 6px 14px; background: #F9FAFB; color: #667085; border: 1px solid #EAECF0; border-radius: 8px; font-size: 12px; }
 .rating-area { margin-bottom: 20px; }
