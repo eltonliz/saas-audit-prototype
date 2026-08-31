@@ -771,8 +771,6 @@ CampOrder（4态）/PaymentOrder（6态）/CommissionBill（4态）/Contract（3
 
 ## §18 五类图
 
-> 本节与原型 PC 后台侧栏「业务逻辑」块（文字版，常驻页面导航上方）对应；本节为文档版五类图。
-
 ### 18.1 用例图
 
 ```mermaid

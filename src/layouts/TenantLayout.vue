@@ -8,19 +8,6 @@
         <span class="logo-text">{{ isAuditRoute ? '内容审查' : 'SaaS-Class' }}</span>
       </div>
 
-      <!-- 业务逻辑总览（V2·0831 文字版·常驻侧栏·页面导航上方） -->
-      <details v-if="!isAuditRoute" class="biz-logic" open>
-        <summary>业务逻辑</summary>
-        <div class="biz-body">
-          <p><b>主流程</b>：创建课程→提审→发布→建营期→排课→开始报名→学员报名→开营→学习激励→完课→结营。</p>
-          <p><b>营期状态</b>：草稿→待审核→已发布→报名中→进行中→已结束；驳回可改后重提；下架可上架/回草稿；结营不可逆。报名免审核，截止或满员后不可再报。</p>
-          <p><b>激励</b>：答题正确→课时奖励（红包/积分）；单课时完成（完播率≥90%，自然播放累计、拖动进度条不计数）→积分+20；全部课时完成→完课奖励（红包+积分，每学员每课程仅一次）。全自动发放，落红包记录/积分流水，回流客户360。</p>
-          <p><b>评价</b>：报名过任一营期可评；五星必选+500字；提交进审核，通过公开、驳回仅本人可见原因；修改后重新审核；评分与评价数聚合到课程库。</p>
-          <p><b>数据</b>：报名幂等落客户；学习时长/完课率回传；完课红包规则幂等同步营销域；红包积分流水按客户回流客户360。</p>
-          <p><b>边界</b>：全免费无交易；课程无上下架（隐藏用C端展示开关）；营期下架/上架保留；证书/测验/答疑/合同/分成/讲师已下线。</p>
-        </div>
-      </details>
-
       <el-menu
         ref="menuRef"
         :default-active="menuActive"
@@ -418,15 +405,6 @@ body.with-replica-panel .el-overlay {
   overflow-y: auto;
   padding: 8px 0;
 }
-/* 业务逻辑总览（文字版·常驻侧栏） */
-.biz-logic { margin: 10px 12px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; font-size: 12px; color: #CBD5E1; }
-.biz-logic summary { cursor: pointer; padding: 8px 10px; font-weight: 600; color: #2DD4BF; list-style: none; user-select: none; }
-.biz-logic summary::-webkit-details-marker { display: none; }
-.biz-logic summary::before { content: '▸ '; }
-.biz-logic[open] summary::before { content: '▾ '; }
-.biz-body { padding: 0 10px 10px; line-height: 1.75; }
-.biz-body p { margin: 0 0 8px; }
-.biz-body b { color: #E2E8F0; }
 .layout-menu :deep(.el-menu),
 .layout-menu :deep(.el-sub-menu .el-menu) {
   background: transparent;
