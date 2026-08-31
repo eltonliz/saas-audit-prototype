@@ -118,13 +118,11 @@
               <t-switch v-model="form.forbid_seek" />
               <span class="switch-text">视频未学完，禁止拖动进度条</span>
               <span class="field-hint">开启后，学员未学完视频无法拖动进度条</span>
-              <t-link theme="primary" size="small">查看示例</t-link>
             </div>
             <div class="switch-row">
               <t-switch v-model="form.forbid_speed" />
               <span class="switch-text">视频未学完，禁止倍速播放</span>
               <span class="field-hint">开启后，学员未学完视频无法进行倍速播放</span>
-              <t-link theme="primary" size="small">查看示例</t-link>
             </div>
           </div>
 
@@ -134,13 +132,11 @@
               <t-switch v-model="form.watermark_horse" />
               <span class="switch-text">开启防录屏跑马灯</span>
               <span class="field-hint">开启后，在视频课程的播放页面以跑马灯的形式展示用户名和用户ID，可有效防止录屏</span>
-              <t-link theme="primary" size="small">去设置</t-link>
             </div>
             <div class="switch-row">
               <t-switch v-model="form.watermark_text" />
               <span class="switch-text">开启水印</span>
               <span class="field-hint">开启后，默认视频区右上角显示文字或图片水印，支持单独设置，有利于品牌宣传</span>
-              <t-link theme="primary" size="small">去设置</t-link>
             </div>
           </div>
 

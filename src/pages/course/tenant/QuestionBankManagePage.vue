@@ -2,7 +2,7 @@
   <div>
     <h2>题目库<span class="saas-align-tag">1:1 对齐 SaaS 线上 · 2026-08-27 实测</span></h2>
     <div class="saas-new-note">
-      <div class="note-line"><ReplicaMarker :no="1" /> <b style="color:#f56c6c">引用锁定【新增】</b>：被营期测验抽题规则/录播答题卡脚本引用中的题目不可禁用、不可删除。</div>
+      <div class="note-line"><ReplicaMarker :no="1" /> <b style="color:#f56c6c">引用锁定【新增】</b>：被录播答题卡脚本引用中的题目不可禁用、不可删除。</div>
       <div class="note-line"><ReplicaMarker :no="2" /> <b style="color:#f56c6c">答题联动【新增】</b>：录播时间轴命中→弹题作答正确且红包规则匹配才可领奖（营销观看奖励资金流）。</div>
       <div class="note-line"><ReplicaMarker :no="3" /> <b style="color:#f56c6c">分类依赖</b>：「所属分类」必须先在课堂·课程类型中创建。</div>
     </div>

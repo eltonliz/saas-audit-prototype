@@ -169,7 +169,6 @@
           <div class="detail-stats">
             <t-card :bordered="true" class="ds-card"><div class="ds-label">排课总数</div><div class="ds-val">{{ lessonStatsSummary.totalSchedules }}</div></t-card>
             <t-card :bordered="true" class="ds-card"><div class="ds-label">课程类排课</div><div class="ds-val" style="color:#1890FF">{{ lessonStatsSummary.courseLessons }}</div></t-card>
-            <t-card :bordered="true" class="ds-card"><div class="ds-label">总测验</div><div class="ds-val" style="color:#722ED1">{{ lessonStatsSummary.finalQuizzes }}</div></t-card>
           </div>
           <div v-if="lessonStatsData.length === 0" class="detail-empty">该营期暂无排课数据</div>
           <t-table v-else :data="lessonStatsData" row-key="key" :columns="lessonStatsColumns" bordered size="small" style="margin-top:12px">
@@ -379,7 +378,6 @@ const lessonStatsData = computed(() => currentCampSchedules.value.map(s => {
 const lessonStatsSummary = computed(() => ({
   totalSchedules: currentCampSchedules.value.length,
   courseLessons: currentCampSchedules.value.filter(s => s.schedule_type === 'course').length,
-  finalQuizzes: 0,
 }));
 const lessonStatsColumns = [
   { colKey: 'day', title: '第N天', width: 70 },

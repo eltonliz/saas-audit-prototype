@@ -467,8 +467,6 @@ const completionCriteriaOptions = [
   '观看≥30分钟',
   '观看≥15分钟',
   '全部课时学完',
-  '答对所有练习题',
-  '答题正确率≥80%',
 ];
 const addForm = ref({
   day_number: 1,

@@ -772,6 +772,8 @@ CampOrder（4态）/PaymentOrder（6态）/CommissionBill（4态）/Contract（3
 
 ## §18 五类图
 
+> 本节与原型门户「业务逻辑总览」页（`#/business-logic`）对应：业务流程 / 状态机 / 激励触发 / 数据流转 / 系统上下文，五类图 HTML 交互版见门户页顶部入口，本节为文档版。
+
 ### 18.1 用例图
 
 ```mermaid
@@ -835,8 +837,35 @@ flowchart LR
     Lesson -->|学习数据| Customer
 ```
 
-### 18.3 状态图
-见 §14 状态机定义。
+### 18.3 状态图（营期八态·V2·0831 补齐渲染）
+
+```mermaid
+stateDiagram-v2
+    state "草稿" as draft
+    state "待审核" as pending
+    state "已发布" as published
+    state "已驳回" as rejected
+    state "报名中" as enrolling
+    state "进行中" as in_progress
+    state "已结束" as ended
+    state "已下架" as offline
+
+    [*] --> draft
+    draft --> pending: 提审
+    pending --> published: 审核通过
+    pending --> rejected: 驳回
+    rejected --> draft: 修改重提
+    published --> enrolling: 开始报名
+    published --> offline: 下架
+    offline --> published: 上架
+    offline --> draft: 回草稿
+    enrolling --> in_progress: 开营
+    enrolling --> offline: 下架
+    in_progress --> ended: 结营·不可逆
+    ended --> [*]
+```
+
+> 报名状态（V2·0829）：pending/approved/enrolled 统一展示「已报名」，rejected=已驳回；V2 无取消/退款链路。流转定义详见 §14。
 
 ### 18.4 角色操作矩阵
 

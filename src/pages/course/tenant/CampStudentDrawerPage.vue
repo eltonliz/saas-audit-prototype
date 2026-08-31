@@ -30,19 +30,22 @@ const enrollments = computed(() => store.loadEnrollmentsByCamp(props.campId));
 const search = ref('');
 const filtered = computed(() => enrollments.value.filter(e => !search.value || e.student_name.includes(search.value)));
 
+// V2·0831 统计口径：报名免审核无取消/退款，状态统一「已报名」；完课=完成率≥90%
 const stats = computed(() => {
   const e = enrollments.value;
+  const rates = e.map(x => store.learningRecords.find((lr: any) => lr.student_id === x.student_id && lr.camp_id === props.campId)?.completion_rate ?? 0);
+  const avgRate = rates.length ? rates.reduce((a, b) => a + b, 0) / rates.length : 0;
   return [
-    { label: '报名总数', value: e.length },
-    { label: '已报名', value: e.filter(x => ['pending', 'approved', 'enrolled'].includes(x.status)).length },
-    { label: '已取消', value: e.filter(x => x.status === 'cancelled').length },
-    { label: '已退款', value: e.filter(x => x.status === 'refunded').length },
+    { label: '已报名', value: e.length },
+    { label: '已完课', value: rates.filter(r => r >= 0.9).length },
+    { label: '平均完成率', value: Math.round(avgRate * 100) + '%' },
   ];
 });
 
 const channelLabel = (s: string) => ({ direct: '直接报名', admin_assign: '后台添加' }[s] ?? s);
 // V2·0829 用户裁决：报名状态只有「已报名」，已通过/已加入状态不再区分
-const enrollLabel = (s: string) => ({ pending: '已报名', approved: '已报名', enrolled: '已报名', rejected: '已驳回', cancelled: '已取消', refunded: '已退款' }[s] ?? s);
+// V2·0831：无取消/退款链路，状态兜底只保留已报名/已驳回
+const enrollLabel = (s: string) => ({ pending: '已报名', approved: '已报名', enrolled: '已报名', rejected: '已驳回' }[s] ?? s);
 
 function completionRate(sid: string) { const r = store.learningRecords.find((lr: any) => lr.student_id === sid && lr.camp_id === props.campId); return r ? (r.completion_rate * 100).toFixed(0) + '%' : '-'; }
 
