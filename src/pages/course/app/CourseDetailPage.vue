@@ -54,7 +54,7 @@
             {{ r.review_status === 'pending' ? '审核中' : '未通过·' + (r.review_remark || '内容待改进') }}
           </span>
         </div>
-        <div class="review-content" :class="{ blur: r.review_status !== 'approved' }">{{ r.content }}</div>
+        <div class="review-content">{{ r.content }}</div>
         <div class="review-date">{{ new Date(r.created_at * 1000).toLocaleDateString() }}</div>
       </div>
       <div v-if="reviews.length === 0" class="empty">暂无评价</div>
@@ -174,7 +174,6 @@ function goFirstLesson() { const first = lessons.value.find(l => l.mode !== 'liv
 .review-user { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
 .review-content { font-size: 14px; color: #1F2C3E; }
 .review-date { font-size: 12px; color: #98A2B3; margin-top: 6px; }
-.blur { filter: blur(3px); opacity: 0.6; }
 .empty { text-align: center; color: #98A2B3; padding: 40px; }
 .cta-bar { position: fixed; bottom: 56px; left: 50%; transform: translateX(-50%); width: 375px; padding: 12px 16px; background: #fff; border-top: 1px solid #EAECF0; }
 .cta-btn { width: 100%; height: 44px; background: #12B76A; color: #fff; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; }

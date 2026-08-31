@@ -307,7 +307,7 @@ flowchart LR
 | BR-COURSE-006 | 课程可见性：public（APP 独立展示）/ camp_only（仅营期内可学） |
 | BR-COURSE-007 | 直播课审核通过自动创建直播间三联（计划+场次+直播间，类型=课程直播） |
 | BR-COURSE-008 | 课程与题库 1对1 绑定 |
-| BR-COURSE-009 | 评价审核未通过模糊回显（pending/rejected 内容 blur+opacity） |
+| BR-COURSE-009 | 评价内容**明文展示**（V2·0831 取消模糊回显）：审核中/未通过内容明文可见；可见范围控制=未通过仅本人可见（状态+驳回原因），审核通过后对所有学员公开 |
 | BR-COURSE-010 | **有效期**：validity_type=long（长期）| custom（自定义失效时间）；仅数据记录与展示，无自动下架动作（V2-11） |
 | BR-COURSE-011 | **全免费**：price=0、is_paid=false 固定值；表单无价格/售卖字段（V2-01） |
 | BR-COURSE-012 | **完课奖励**：completion_reward_enabled 开启后，reward_cash_enabled（现金红包：金额+关联营销规则）与 reward_points_enabled（积分：分值）至少一项生效，两者可同时开启（V2-05） |
@@ -558,7 +558,7 @@ flowchart LR
 **已移除**：题目介绍字段。
 
 #### FN-PC-006 课程评价审核
-沿用 v1.4.0 FN-COURSE-PC-014（评价列表/审核通过驳回/回复/模糊回显）。
+沿用 v1.4.0 FN-COURSE-PC-014（评价列表/审核通过驳回/回复）；V2·0831：取消模糊回显，内容明文。
 
 #### FN-PC-007 数据看板
 **功能点**：

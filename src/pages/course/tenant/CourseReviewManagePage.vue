@@ -4,7 +4,7 @@
     <t-table :data="store.reviews" :columns="columns" row-key="id" bordered :selected-row-keys="selReviews.map(r => r.id)" @select-change="onSelChange">
       <template #course="{ row }">{{ courseName(row.course_id) }}</template>
       <template #rating="{ row }">{{ '⭐'.repeat(row.rating) }}</template>
-      <template #content="{ row }"><span :class="{ blur: row.review_status === 'pending' || row.review_status === 'rejected' }">{{ row.content }}</span></template>
+      <template #content="{ row }"><span>{{ row.content }}</span></template>
       <template #status="{ row }"><t-tag :theme="tag(row.review_status)" variant="light" size="small">{{ label(row.review_status) }}</t-tag></template>
       <template #op="{ row }">
         <t-button variant="text" size="small" theme="primary" @click="showReviewDetail(row)">详情</t-button>
@@ -111,6 +111,5 @@ const columns = [
 ];
 </script>
 <style scoped>
-.blur { filter: blur(3px); opacity: 0.6; }
 .reply-quote { font-size: 12px; color: #667085; background: #F9FAFB; border-left: 3px solid #CBD5E1; padding: 6px 10px; border-radius: 4px; margin-bottom: 10px; }
 </style>
