@@ -703,7 +703,7 @@ function doSave() {
   drawerVisible.value = false; editing.value = null; form.value = defaultForm();
 }
 // V2·0829 用户裁决：停售/重新上架按钮已去除（相关操作统一在编辑模块内完成）
-// 课程状态 5 状态：draft(草稿) → pending_review(待审核) → published(已发布) → offline(已下架) / rejected(已驳回)
+// V2·0831 课程状态 4 态：draft(草稿) → pending_review(待审核) → published(已发布) / rejected(已驳回)；无上下架（隐藏用 C端展示开关，删除有引用保护）；offline 仅为历史数据兜底显示
 function statusLabel(s: string): string {
   const m: Record<string, string> = { draft: '草稿', pending_review: '待审核', published: '已发布', offline: '已下架', rejected: '已驳回' };
   return m[s] || s;
