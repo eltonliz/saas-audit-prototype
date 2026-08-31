@@ -312,7 +312,6 @@ flowchart LR
 | BR-COURSE-011 | **全免费**：price=0、is_paid=false 固定值；表单无价格/售卖字段（V2-01） |
 | BR-COURSE-012 | **完课奖励**：completion_reward_enabled 开启后，reward_cash_enabled（现金红包：金额+关联营销规则）与 reward_points_enabled（积分：分值）至少一项生效，两者可同时开启（V2-05） |
 | BR-COURSE-013 | **完课红包同步营销域**：课程保存时按「完课红包·课程名」幂等创建/更新营销域观看奖励规则（reward_type=完课红包，bind_scene=营期） |
-| BR-COURSE-014 | **画面方向自动判定**（V2·0831）：课时视频上传时读取视频宽高，宽<高自动标记 portrait（竖屏）、否则 landscape，**不可手动修改**；课程 orientation 取首个课时视频方向（冗余存储，供列表/详情判定）；APP 渲染：看课页播放器横屏 16:9 / 竖屏 9:16（控制栏渐变加浓），课程详情头图横屏 2:1 / 竖屏 3:4 并带「竖屏课程」角标；同一课程内课时应方向一致，混选内容池视频时以首个视频方向为准并在表单提示 |
 
 ### 11.2 营期域
 
@@ -351,7 +350,7 @@ flowchart LR
 
 | 编号 | 规则 |
 |------|------|
-| BR-LEARN-001 | **完播判定**：完播率默认 90%（COMPLETION_THRESHOLD=0.9 单点定义）；按自然播放累计时长 ÷ 课时时长计算，**拖动进度条只改变播放位置、不累计进度**；完播率 ≥90% 即计课时完成，前端"已完成"标签 ≥90% 显示、进度数值照实展示；含直播课时的课程，直播课时以**观看回放达到完播线**计入完成（V2·0831。示例：20 分钟课时需自然播放累计 ≥18 分钟；拖到片尾再退出不计进度） |
+| BR-LEARN-001 | 完播率默认 90%（COMPLETION_THRESHOLD=0.9 单点定义） |
 | BR-LEARN-002 | 学习记录不分区按课程聚合（source_type 标记 independent/camp） |
 | BR-LEARN-010 | **学习数据回传**：完课时同步客户学习数据（时长+10min/完课率重算/「完课奖励」积分流水 +20）；答题正确落「答题奖励」流水 +10 |
 
@@ -711,7 +710,7 @@ CampOrder（4态）/PaymentOrder（6态）/CommissionBill（4态）/Contract（3
 | **前置条件** | 学员已报名且营期已开营 |
 | **主流程** | 1.播放课时视频 → 2.完播率≥trigger_threshold 弹题 → 3.答对 → 4.命中课时行 reward：积分→+N 积分流水；红包→营销规则发放+红包记录 → 5.完播率≥90% 课时完成 → 6.学习数据回传客户（时长/完课率/完课积分+20）→ 7.全部课时完成触发课程完课奖励 |
 | **后置条件** | 学习记录更新；红包记录/积分流水/客户360 同步 |
-| **异常流** | 答错不触发奖励/未配置课时奖励无发放/红包规则未命中提示/课程未开启完课奖励时全部课时完成仅更新学习记录（无弹窗无发放不报错）/完课奖励发放中断按完成结果补发不重复 |
+| **异常流** | 答错不触发奖励/未配置课时奖励无发放/红包规则未命中提示 |
 
 ### UC-GLUE-001 报名落客户（结合件①）
 
@@ -772,7 +771,7 @@ CampOrder（4态）/PaymentOrder（6态）/CommissionBill（4态）/Contract（3
 
 ## §18 五类图
 
-> 本节与原型门户「业务逻辑总览」页（`#/business-logic`）对应：业务流程 / 状态机 / 激励触发 / 数据流转 / 系统上下文，五类图 HTML 交互版见门户页顶部入口，本节为文档版。
+> 本节与原型 PC 后台侧栏「业务逻辑」块（文字版，常驻页面导航上方）对应；本节为文档版五类图。
 
 ### 18.1 用例图
 
@@ -837,35 +836,8 @@ flowchart LR
     Lesson -->|学习数据| Customer
 ```
 
-### 18.3 状态图（营期八态·V2·0831 补齐渲染）
-
-```mermaid
-stateDiagram-v2
-    state "草稿" as draft
-    state "待审核" as pending
-    state "已发布" as published
-    state "已驳回" as rejected
-    state "报名中" as enrolling
-    state "进行中" as in_progress
-    state "已结束" as ended
-    state "已下架" as offline
-
-    [*] --> draft
-    draft --> pending: 提审
-    pending --> published: 审核通过
-    pending --> rejected: 驳回
-    rejected --> draft: 修改重提
-    published --> enrolling: 开始报名
-    published --> offline: 下架
-    offline --> published: 上架
-    offline --> draft: 回草稿
-    enrolling --> in_progress: 开营
-    enrolling --> offline: 下架
-    in_progress --> ended: 结营·不可逆
-    ended --> [*]
-```
-
-> 报名状态（V2·0829）：pending/approved/enrolled 统一展示「已报名」，rejected=已驳回；V2 无取消/退款链路。流转定义详见 §14。
+### 18.3 状态图
+见 §14 状态机定义。
 
 ### 18.4 角色操作矩阵
 

@@ -36,6 +36,8 @@ const route = useRoute(); const router = useRouter(); const store = useCourseSto
 const courseId = route.params.id as string;
 const rating = ref(5); const content = ref('');
 const myReview = computed(() => store.reviews.find(r => r.course_id === courseId && r.student_id === 'STU-001'));
+// V2·0831 评价资格守卫：报名过该课程任一营期（学习记录存在）才可评价
+const canReview = computed(() => store.learningRecords.some((r: any) => r.student_id === 'STU-001' && r.course_id === courseId));
 const reviewStatusLabel = (s: string) => ({ pending: '审核中', approved: '已通过', rejected: '已驳回' }[s] ?? s);
 
 function startEdit() {
@@ -45,7 +47,9 @@ function toggleHide() {
   if (myReview.value) { store.toggleReviewHidden(myReview.value.id); MessagePlugin.success(myReview.value.is_hidden ? '已取消隐藏' : '已隐藏'); }
 }
 function submit() {
+  if (!canReview.value) { MessagePlugin.warning('报名该课程任一营期后才能评价'); return; }
   if (!content.value) { MessagePlugin.warning('请填写评价内容'); return; }
+  if (!rating.value) { MessagePlugin.warning('请选择评分'); return; }
   if (myReview.value) {
     store.updateReview(myReview.value.id, { rating: rating.value, content: content.value });
     MessagePlugin.success('评价已修改，重新审核中');

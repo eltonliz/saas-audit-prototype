@@ -29,8 +29,6 @@ const TerminalPortal = () => import('../pages/portal/TerminalPortal.vue');
 const routes: RouteRecordRaw[] = [
   // ─── 三端入口门户页 ───
   { path: '/', name: 'TerminalPortal', component: TerminalPortal, meta: { terminal: 'portal', system: 'SAAS', page: 'PG-PORTAL' } },
-  // ─── 业务逻辑总览（五类图·V2·0831） ───
-  { path: '/business-logic', name: 'BusinessLogic', component: () => import('../pages/portal/BusinessLogicPage.vue'), meta: { terminal: 'portal', system: 'SAAS', page: 'PG-BIZ-LOGIC' } },
 
   // ─── PC-运营后台 ───
   {

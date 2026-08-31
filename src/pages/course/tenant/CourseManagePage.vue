@@ -52,6 +52,10 @@
         <template #video="{ row }">
           <t-button variant="text" theme="primary" size="small" @click="showVideoDialog(row)"><template #icon><t-icon name="play-circle" /></template>查看视频</t-button>
         </template>
+        <template #rating="{ row }">
+          <span style="color:#F79009; font-weight:600">★ {{ (row.rating || 0).toFixed(1) }}</span>
+          <span style="color:#98A2B3; font-size:12px; margin-left:4px">{{ row.review_count || 0 }}条</span>
+        </template>
         <template #audio="{ row }">
           <t-button variant="text" theme="primary" size="small" @click="showAudioDialog(row)"><template #icon><t-icon name="sound" /></template>查看音频</t-button>
         </template>
@@ -462,6 +466,7 @@ const columns = computed(() => {
     { colKey: 'course_no', title: '课程编号', width: 180, ellipsis: true },
     { colKey: 'title', title: '课程名称', minWidth: 160, ellipsis: true },
     { colKey: 'category_name', title: '分类名称', width: 100 },
+    { colKey: 'rating', title: '评分/评价数', width: 110 },
     { colKey: 'video', title: '查看视频', width: 100 },
     { colKey: 'audio', title: '查看音频', width: 100 },
     { colKey: 'qb', title: '查看题库', width: 100 },

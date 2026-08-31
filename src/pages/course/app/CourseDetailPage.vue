@@ -46,10 +46,15 @@
           </div>
         </div>
       </div>
-      <button class="write-review-btn" @click="$router.push('/app/student/course/' + route.params.id + '/review')"><EmojiIcon emoji="✍️" :size="16" /> 写评价</button>
+      <button class="write-review-btn" :class="{ 'write-disabled': !canReview }" @click="goWriteReview"><EmojiIcon emoji="✍️" :size="16" /> {{ canReview ? (myReview ? '修改我的评价' : '写评价') : '报名后可评价' }}</button>
       <div v-for="r in reviews" :key="r.id" class="review-item">
-        <div class="review-user">{{ r.student_name }} · <t-icon name="star-filled" :size="12" /> {{ r.rating }}</div>
-        <div class="review-content" :class="{ blur: r.review_status === 'pending' }">{{ r.content }}</div>
+        <div class="review-user">
+          {{ r.student_name }} · <t-icon name="star-filled" :size="12" /> {{ r.rating }}
+          <span v-if="r.student_id === 'STU-001' && r.review_status !== 'approved'" class="mine-status" :class="r.review_status">
+            {{ r.review_status === 'pending' ? '审核中' : '未通过·' + (r.review_remark || '内容待改进') }}
+          </span>
+        </div>
+        <div class="review-content" :class="{ blur: r.review_status !== 'approved' }">{{ r.content }}</div>
         <div class="review-date">{{ new Date(r.created_at * 1000).toLocaleDateString() }}</div>
       </div>
       <div v-if="reviews.length === 0" class="empty">暂无评价</div>
@@ -76,7 +81,15 @@ const tab = ref('课时');
 const course = computed(() => store.loadCourse(route.params.id as string));
 
 const lessons = computed(() => store.loadLessonsByCourse(route.params.id as string));
-const reviews = computed(() => store.loadReviewsByCourse(route.params.id as string));
+// V2·0831 评价可见性：审核通过对所有人可见；本人待审/被驳仅本人可见（含驳回原因）
+const reviews = computed(() => store.reviews.filter((r: any) => r.course_id === route.params.id && !r.is_hidden && (r.review_status === 'approved' || r.student_id === 'STU-001')));
+// 评价资格：报名过该课程任一营期（以学习记录存在为准）
+const canReview = computed(() => store.learningRecords.some((r: any) => r.student_id === 'STU-001' && r.course_id === route.params.id));
+const myReview = computed(() => store.reviews.find((r: any) => r.course_id === route.params.id && r.student_id === 'STU-001'));
+function goWriteReview() {
+  if (!canReview.value) { MessagePlugin.warning('报名该课程任一营期后才能评价'); return; }
+  router.push('/app/student/course/' + route.params.id + '/review');
+}
 
 function isLessonCompleted(lessonId: string) {
   return store.learningRecords.some((r: any) => r.student_id === 'STU-001' && r.lesson_id === lessonId && r.completion_rate >= 0.9);
@@ -153,6 +166,10 @@ function goFirstLesson() { const first = lessons.value.find(l => l.mode !== 'liv
 .bar-track { flex: 1; height: 6px; background: #EAECF0; border-radius: 3px; }
 .bar-fill { height: 100%; background: #F79009; border-radius: 3px; }
 .write-review-btn { width: 100%; padding: 12px; background: #E6F9F1; color: #12B76A; border: 1px solid #12B76A; border-radius: 10px; font-size: 15px; font-weight: 600; margin-bottom: 12px; }
+.write-disabled { background: #F9FAFB; color: #98A2B3; border-color: #EAECF0; }
+.mine-status { font-size: 11px; padding: 1px 8px; border-radius: 8px; margin-left: 6px; }
+.mine-status.pending { color: #F79009; background: rgba(247,144,9,0.1); }
+.mine-status.rejected { color: #F04438; background: rgba(240,68,56,0.1); }
 .review-item { background: #fff; border-radius: 10px; padding: 14px; margin-bottom: 8px; }
 .review-user { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
 .review-content { font-size: 14px; color: #1F2C3E; }
