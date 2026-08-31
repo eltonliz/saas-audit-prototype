@@ -265,6 +265,7 @@ export const REPLICA_REQUIREMENTS: Record<string, ReplicaPageRequirement> = {
         { name: '所属分类', desc: '从课程分类中选择，必填' },
         { name: '课程介绍/课程封面', desc: '介绍多行文本；封面预设九宫格点选或上传' },
         { name: '授课方式', desc: '录播或直播，决定内容管理与排课方式' },
+        { name: '视频方向', desc: '上传时按视频宽高自动判定（宽<高=竖屏），不可手改；课程方向取首个课时视频；APP 据此渲染：看课页横屏 16:9 / 竖屏 9:16，详情头图横屏 2:1 / 竖屏 3:4+「竖屏课程」角标' },
         { name: '内容管理表格', desc: '视频/音频课时：类型、编号、名称、文件、时长、分类、是否答题、奖励、移除' },
         { name: '有效期', desc: '长期有效或自定义失效时间' },
         { name: 'C端展示开关', desc: '开启后 APP 列表/推荐位展示' },
@@ -296,6 +297,7 @@ export const REPLICA_REQUIREMENTS: Record<string, ReplicaPageRequirement> = {
         { scene: '快速重复点击保存', handle: '按钮加载态防重，仅生成一条数据' },
         { scene: '课程未开启完课奖励，学员完成全部课时', handle: '仅更新学习记录为「已完成」，无弹窗无发放，不报错' },
         { scene: '完课奖励发放前断网/退出页面', handle: '进度与完成判定已回写，重新进入按完成结果补发弹窗，不重复发放' },
+        { scene: '内容管理混选横屏与竖屏视频', handle: '课程方向以首个课时视频为准，表单提示「课程内课时方向应保持一致」；不阻断保存' },
       ],
     },
     modals: {

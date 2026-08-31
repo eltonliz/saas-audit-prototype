@@ -89,6 +89,10 @@ export const CourseRewardTypeEnum = z.enum([
 ]);
 export type CourseRewardType = z.infer<typeof CourseRewardTypeEnum>;
 
+/** 课时/课程画面方向（V2·0831：上传时按视频宽高自动判定，宽<高=竖屏，不可手改） */
+export const CourseOrientationEnum = z.enum(['landscape', 'portrait']);
+export type CourseOrientation = z.infer<typeof CourseOrientationEnum>;
+
 // ============================================
 // 实体 Schema（ENT-COURSE-001~008）
 // ============================================
@@ -160,6 +164,9 @@ export const CourseSchema = z.object({
   /** 审核时间 */
   reviewed_at: z.number().int().nullable().optional(),
 
+  /** 课程画面方向（取首个课时视频方向，冗余便于列表/详情判定·V2·0831） */
+  orientation: CourseOrientationEnum.default('landscape'),
+
   /** —— 红包配置（D35·积分与红包可共存）—— */
   /** 完播即领开关 */
   completion_reward_enabled: z.boolean().default(false),
@@ -200,6 +207,8 @@ export const LessonSchema = z.object({
   video_url: z.string().url().or(z.string().length(0)).optional(),
   /** 视频时长（秒·mode=recorded时） */
   video_duration: z.number().int().min(0).default(0),
+  /** 画面方向（上传按视频宽高自动判定，宽<高=竖屏·V2·0831） */
+  orientation: CourseOrientationEnum.default('landscape'),
   /** 直播场次ID（mode=live/qa_live时关联LiveSession） */
   live_session_id: z.string().nullable().optional(),
 
@@ -512,6 +521,7 @@ export const CreateLessonInputSchema = LessonSchema.pick({
   mode: true,
   video_url: true,
   video_duration: true,
+  orientation: true,
   live_session_id: true,
   is_free_preview: true,
 });

@@ -6,8 +6,8 @@
       <span class="hd-title">{{ lesson?.title ?? '课时学习' }}</span>
     </header>
 
-    <!-- 播放器（16:9 大屏） -->
-    <div class="player">
+    <!-- 播放器（横屏 16:9 / 竖屏 9:16，V2·0831 按视频方向自动切换） -->
+    <div class="player" :class="{ 'player-portrait': isPortrait }">
       <div class="player-cover" @click="togglePlay">
         <span class="play-icon"><t-icon :name="playing ? 'pause-circle' : 'play-circle'" :size="54" /></span>
       </div>
@@ -118,6 +118,8 @@ const campId = (route.query.campId as string) || '';
 const lesson = computed(() => courseStore.lessons.find(l => l.id === lessonId));
 const courseId = computed(() => lesson.value?.course_id ?? '');
 const course = computed(() => courseStore.loadCourse(courseId.value));
+// V2·0831 竖屏课程：方向取自课程（首个课时视频自动判定），播放器 9:16 渲染
+const isPortrait = computed(() => (course.value as any)?.orientation === 'portrait');
 
 // ── 目录与节次切换（V2·0829 重设计：看课沉浸 + 目录切换） ──
 const courseLessons = computed(() => courseStore.loadLessonsByCourse(courseId.value));
@@ -288,6 +290,10 @@ onUnmounted(() => { clearInterval(timer); clearTimeout(toastTimer); });
 /* 播放器 16:9 全宽深色 */
 .player { position: relative; background: #16202E; }
 .player-cover { height: 211px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+/* 竖屏课程：9:16 近全屏播放区，控制栏渐变加浓便于深色画面下阅读 */
+.player-portrait .player-cover { height: auto; aspect-ratio: 9 / 16; max-height: 78vh; }
+.player-portrait .player-ctrl { background: linear-gradient(transparent, rgba(0,0,0,0.72)); }
+.player-portrait .play-icon { opacity: 0.85; }
 .play-icon { color: #fff; display: flex; opacity: 0.92; }
 .player-ctrl { position: absolute; left: 0; right: 0; bottom: 0; display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: linear-gradient(transparent, rgba(0,0,0,0.55)); }
 .ctrl-ic { color: #fff; cursor: pointer; }

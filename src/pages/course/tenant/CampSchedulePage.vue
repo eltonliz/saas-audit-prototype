@@ -559,8 +559,7 @@ function openQuickCourseDialog() {
 function doQuickCourse() {
   if (!quickCourseForm.value.title) { MessagePlugin.warning('请填写课程名称'); return; }
   if (!quickCourseForm.value.category_id) { MessagePlugin.warning('请选择课程分类'); return; }
-  if (!quickCourseForm.value.main_lecturer_id) { MessagePlugin.warning('请选择主讲讲师'); return; }
-  const cat = courseCategories.value.find(c => c.id === quickCourseForm.value.category_id);
+    const cat = courseCategories.value.find(c => c.id === quickCourseForm.value.category_id);
   const mode = camp.value?.mode ?? 'recorded';
   const course = courseStore.createCourse({
     title: quickCourseForm.value.title,

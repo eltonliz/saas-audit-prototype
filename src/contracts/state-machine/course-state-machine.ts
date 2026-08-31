@@ -161,3 +161,30 @@ export const CourseStateMachine = {
   validateCourseTransition, validateLessonTransition, validateCampTransition,
   validateEnrollmentTransition, validateRedPacketTransition, validateTransition,
 } as const;
+
+// ── 以下为 0 元虚拟订单链路保留的校验（v2.0：支付/合同/分佣下线，仅订单状态机保留）──
+export type CampOrderState = 'pending_pay' | 'paid' | 'cancelled' | 'refunded';
+export function validateCampOrderTransition(current: CampOrderState, target: CampOrderState): boolean {
+  const map: Record<CampOrderState, CampOrderState[]> = {
+    pending_pay: ['paid', 'cancelled'],
+    paid: ['refunded'],
+    cancelled: [],
+    refunded: [],
+  };
+  return (map[current] || []).includes(target);
+}
+export type PaymentOrderState = 'created' | 'paying' | 'success' | 'cancelled';
+export function validatePaymentOrderTransition(current: PaymentOrderState, target: PaymentOrderState): boolean {
+  const map: Record<PaymentOrderState, PaymentOrderState[]> = {
+    created: ['paying', 'cancelled'],
+    paying: ['success', 'cancelled'],
+    success: [],
+    cancelled: [],
+  };
+  return (map[current] || []).includes(target);
+}
+export type ContractState = 'pending_sign' | 'signed' | 'cancelled';
+export function validateContractTransition(current: ContractState, target: ContractState): boolean {
+  const map: Record<ContractState, ContractState[]> = { pending_sign: ['signed', 'cancelled'], signed: [], cancelled: [] };
+  return (map[current] || []).includes(target);
+}

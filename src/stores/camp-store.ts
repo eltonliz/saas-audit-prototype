@@ -462,10 +462,10 @@ export const useCampStore = defineStore('camp', () => {
     const msgs: Record<string, string> = {
       camp_approved: `[SAAS联动] 营期审核通过 → ${
         data.mode === 'live'
-          ? `SAAS直播模块自动创建计划（类型=营期直播，主播=主讲讲师${data.lecturerId ? ' ' + data.lecturerId : ''}）+ 排课锁定`
+          ? 'SAAS直播模块自动创建计划（类型=营期直播）+ 排课锁定'
           : '排课锁定（录播营期，审核通过后不可编辑）'
       }`,
-      camp_started: `[SAAS联动] 营期开营 → SAAS分佣模块触发佣金结算 + SAAS售后模块开启开营拦截（已开营不能退款）`,
+      camp_started: `[SAAS联动] 营期开营 → 排课生效，学员可进入学习`,
     };
     console.log(msgs[event] || `[SAAS联动] ${event}`, data);
   }

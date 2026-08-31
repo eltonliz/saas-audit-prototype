@@ -26,6 +26,7 @@
         <div class="card-cover">
           <span class="cover-icon">{{ c.mode === 'live' ? '📺' : '📖' }}</span>
           <span v-if="c.mode === 'live'" class="live-tag">直播</span>
+          <span v-else-if="(c as any).orientation === 'portrait'" class="live-tag orient-tag">竖屏</span>
         </div>
         <div class="card-body">
           <div class="card-title">{{ c.title }}</div>
@@ -143,6 +144,7 @@ function campBtnAction(c: any) {
 .card-cover { width: 80px; height: 80px; background: #E6F9F1; flex-shrink: 0; display: flex; align-items: center; justify-content: center; position: relative; }
 .cover-icon { font-size: 28px; }
 .live-tag { position: absolute; top: 4px; right: 4px; background: #F04438; color: #fff; padding: 1px 6px; border-radius: 8px; font-size: 10px; }
+.orient-tag { background: #7A5AF8; }
 .card-body { padding: 12px; flex: 1; }
 .card-title { font-size: 15px; font-weight: 600; color: #1F2C3E; margin-bottom: 4px; }
 .card-meta { font-size: 12px; color: #667085; margin-bottom: 2px; }

@@ -31,8 +31,6 @@
 | v1.2.1 | 2026-08-20 | 二轮审查修复（P0×3 + P1×2）：§18.3 引用修正（§15→§14，11→12）；§19 子节编号 8.x→19.x；§25 子节编号 22.x→25.x；Series 降级分类修正（N1 营销→独立说明不计入 38 实体）；BR-RED-006/007 自引用移除；rejectWithdraw 拆分 rejectCommissionWithdraw/rejectStudentWithdraw。 |
 | v1.3.0 | 2026-08-23 | **合并修订版**：合并16-课程域-PRD到此文档（16-PRD废弃）；基于34份PRD全系统审查+10项跨域冲突决策+原型偏离核查，修订9项：①§10角色定义改为店长=主讲/店员=助教 ②§11 BR-CERT-001完成率100%→90% ③§11 BR-REFUND-001退款原因更新 ④§12 Lesson新增content_type/is_standalone_sale/price ⑤§12 Course新增分成字段 ⑥§12新增ShareVisit/OrderAttribution实体 ⑦§14 LiveSession第4态replay→cancelled ⑧§13讲师库管理简化+红包/钱包/提现标注废弃+讲师主页新增 ⑨新增§10A跨域冲突10项决策表 |
 | v1.4.0 | 2026-08-25 | **原型对齐修订版**：课程业务接入现有 SaaS 电商系统。修订：①§10 角色改为讲师/助教（组织结构新增）②§10A 六项新决策替换十项旧决策 ③§11 业务规则移除打卡/积分，分成改线下，订单/售后/分成复用 SaaS 域 ④§12 讲师域实体改为复用组织域 ⑤§13 功能需求对齐 22 菜单 + 直播录播/商品 ⑥§24 决策索引更新 ⑦§30 新增需求说明面板字段规范。业务逻辑未变部分（课程/课时/题库/营期/排课/报名/证书、状态机、Store、业务流程）沿用 v1.3.0。 |
-| v1.4.3 | 2026-08-28 | **方案A·报名审核开关**：营期实体新增 require_review（默认 false）。关闭（默认）：C 端报名即生成订单支付入营，不进审核队列（转化优先）；开启：走报名→审核→通过后生成订单流程（定向/免费限量营期适用）。配套：营期表单「报名需审核」开关、APP 报名提示分支、PC 报名审核页仅处理需审核营期。新增 BR-ENROLL-005、BR-ORDER-C01~C03（课程/训练营订单不适用优惠券与积分抵扣；下单按会员等级赠送积分与成长值，规则源自 SaaS 会员体系，仅资产累计不可抵扣本单）。 |
-| v1.4.2 | 2026-08-28 | **资质审核暂缓 + 残留清理**：①讲师/助教资质审核流程暂不启用——组织管理建档即生效（review_status 恒为 approved），课程库讲师下拉/营期助教下拉直接可选，审核管理页对讲师/助教仅保留档案查看；字段与状态机保留供后续开启 ②全文清理打卡/积分残留：学习链路改为「报名→支付→学习→测验→证书」，激励闭环仅保留红包（复用营销域），发证依据不含打卡完成率 ③排课逻辑明确：仅草稿/待审核营期可编辑排课，审核通过即锁定（复制营期重做）；新增直播草稿营期排课演示数据 ④提现审核：凭证号改选填，打款凭证图片必填（1-3张），新增批量提现统一凭证 ⑤分成记录新增字段口径（分成基数/应分金额/调整金额/净应分）表头问号悬浮解释 ⑥数据看板：主讲统计与助教统计字段对齐，全部统计明细表加分页器，营期/课程统计移除状态列 ⑦移除"日历排课"等与原型不一致的表述，PRD 与原型需求面板一一对齐。 |
 | v1.4.1 | 2026-08-27 | **PRD-原型一致性修订**：①**废弃 FN-COURSE-PC-001 终端角色管理**——终端角色（店长=主讲/店员=助教）复用 SaaS 组织管理（门店域·组织架构/门店成员）统一承接，课程域不再单设页面，讲师/助教档案在组织管理维护，课程/营期经 lecturerStore 同源引用（D16 快照规则不变）②§13.1 PC 端补齐：红包奖励配置 D35（课程级）/课程删除（仅草稿）/课程学员查看抽屉/直播转课时入口/题目触发类型 post_course/助教出题主讲审核流/营期订单支付流水 Timeline/评价二级回复/看板平均完成率 ③移除打卡相关指标与配置（业务无打卡功能）④**废弃三个复用 SaaS 的课程域页面**：红包规则管理（走 SaaS 营销域）、钱包流水查看（走 SaaS 财务域）、课程权益管理（本质是订单衍生，走 SaaS 订单域；数据层 entitlement 保留供 APP 端与订单联动，PC 端不设页面）。 |
 
 ---
@@ -47,7 +45,7 @@
 
 ### 3.1 业务背景
 
-SaaS-Class 课程与营期域是平台的**知识付费 + 营期训练**核心业务，承载「内容生产（讲师→课程→审核）→ 营期组织（营期→排课→招募）→ 学员学习（报名→支付→学习→测验→证书）→ 商业闭环（分成→结算→退款）→ 激励闭环（红包）」完整链路。
+SaaS-Class 课程与营期域是平台的**知识付费 + 营期训练**核心业务，承载「内容生产（讲师→课程→审核）→ 营期组织（营期→排课→招募）→ 学员学习（报名→支付→学习→打卡→证书）→ 商业闭环（分成→结算→退款）→ 激励闭环（积分→红包）」完整链路。
 
 本 PRD 基于 SugarMate（糖尿病智慧健康平台）课程模块的 1:1 逆向分析重建。SugarMate 已实现完整体系（29 实体 / 10 状态机 / 6 store / 33 页面），本 PRD 在其基础上做适配优化，产出 38 实体 / 12 状态机 / 10 store 的完整需求规格（含直播3实体+门店1实体+首页配置1实体，v1.1.0 补全）。
 
@@ -71,9 +69,9 @@ SaaS-Class 课程与营期域是平台的**知识付费 + 营期训练**核心�
 | 管控对象 | 业务内容 | 技术方案 | V1 |
 |---|---|---|---|
 | 课程内容 | 课程/课时/题库/题目/答题/评价 | sim-data mock + Pinia | ✅ |
-| 营期组织 | 营期/排课/报名/邀请码/分组/总测验 | sim-data mock + Pinia | ✅ |
+| 营期组织 | 营期/排课/报名/打卡/邀请码/分组/总测验 | sim-data mock + Pinia | ✅ |
 | 支付分成 | 订单/支付/流水/合同/分成/提现/退款 | sim-data mock + Pinia | ✅ |
-| 激励体系 | 红包（完播/答题/新成员，复用营销域） | sim-data mock + Pinia | ✅ |
+| 激励体系 | 积分（打卡+完播/答题）+ 红包（完播/答题/新成员） | sim-data mock + Pinia | ✅ |
 | 营销 | 团购/秒杀/直播带货 | — | ❌ D22 不做 |
 | 积分商城 | 积分消费 | 独立模块 | ❌ D22 不做 |
 
@@ -91,7 +89,7 @@ SaaS-Class 课程与营期域是平台的**知识付费 + 营期训练**核心�
 | BO-COURSE-06 | 激励双轨 | 学员激励触达率 | ≥80% |
 | BG-COURSE-01 | 付费转化 | 报名→支付转化率 | ≥80% |
 | BG-COURSE-02 | 助教拉新 | 助教拉新学员占比 | ≥30% |
-| BG-COURSE-03 | 学习完成 | 营期课程完成率 | ≥80% |
+| BG-COURSE-03 | 学习完成 | 营期打卡完成率 | ≥80% |
 | BG-COURSE-04 | 证书覆盖 | 营期完成获证率 | 100% |
 | BG-COURSE-05 | 红包激励 | 红包发放成功率 | ≥99% |
 | BG-COURSE-06 | 1:1 对齐 | 代码结构对齐 SugarMate | 100% |
@@ -173,7 +171,7 @@ SaaS-Class 课程与营期域是平台的**知识付费 + 营期训练**核心�
 | US-STU-001 | 学员 | 作为学员，我需要浏览课程和营期列表，以便选择学习内容 |
 | US-STU-002 | 学员 | 作为学员，我需要报名营期并支付，以便加入营期学习 |
 | US-STU-003 | 学员 | 作为学员，我需要观看课时视频并完播答题，以便完成学习 |
-| US-STU-004 | 学员 | 作为学员，我需要完成课程学习任务，以便记录学习进度 |
+| US-STU-004 | 学员 | 作为学员，我需要打卡获取积分，以便记录学习进度 |
 | US-STU-005 | 学员 | 作为学员，我需要领取红包（完播/答题/新成员），以便获得激励 |
 | US-STU-006 | 学员 | 作为学员，我需要查看钱包余额和红包记录，以便管理收益 |
 | US-STU-007 | 学员 | 作为学员，我需要申请提现红包余额，以便变现收益 |
@@ -285,7 +283,7 @@ flowchart LR
     G -->|是| H[课时完成]
     G -->|否| B
     H --> I{营期内?}
-    I -->|是| J[记录任务完成]
+    I -->|是| J[createCheckin 打卡]
     J --> K[points_reward 积分入账]
     I -->|否| L[结束]
     K --> L
@@ -324,7 +322,7 @@ flowchart LR
 flowchart LR
     A[营期 ended] --> B{课程完成率=100%?}
     B -->|否| Z[不发放]
-    B -->|是| C{课程完成率≥80%?}
+    B -->|是| C{打卡完成率≥80%?}
     C -->|否| Z
     C -->|是| D{总测验通过?}
     D -->|否| Z
@@ -515,10 +513,6 @@ pending（待审核）→ approved（已通过，触发4项回滚）
 | BR-ENROLL-002 | 报名幂等拒绝重复 |
 | BR-ENROLL-003 | 审核不通过不生成营期订单（D12） |
 | BR-ENROLL-004 | APP 报名真实落 store（D12）：createEnrollment 生成报名记录 |
-| BR-ENROLL-005 | 营期级报名审核开关 require_review（默认 false）：关闭=报名即 approved 并自动生成订单（付费 pending_pay / 免费零元自动入营）；开启=进入待审核队列（方案A） |
-| BR-ORDER-C01 | 课程订单/训练营订单不适用优惠券（下单与支付均不可用） |
-| BR-ORDER-C02 | 课程订单/训练营订单支付不可用积分抵扣 |
-| BR-ORDER-C03 | 课程订单/训练营订单下单即按会员等级赠送积分与成长值（倍率遵循 SaaS 会员体系；仅累计资产，不可用于本单抵扣） |
 | BR-ENROLL-005 | 报名状态机 6 状态：pending→approved/rejected→enrolled/cancelled/refunded |
 
 ### 11.4 支付域（SEQ-01~15，D9 金额统一为分）
@@ -580,7 +574,7 @@ pending（待审核）→ approved（已通过，触发4项回滚）
 |------|------|
 | BR-LEARN-001 | 完播率默认 90%（D14）：COMPLETION_THRESHOLD=0.9 单点定义 |
 | BR-LEARN-002 | 学习记录不分区按课程聚合（D18）：source_type 标记来源 |
-| BR-LEARN-003 | 学习任务当日完成唯一幂等 |
+| BR-LEARN-003 | 打卡当日唯一幂等 |
 | BR-LEARN-004 | 打卡积分入账（D7）：CourseSchedule.points_reward |
 | BR-LEARN-005 | 邀请码原子+1 防双花（D17） |
 | BR-CERT-001 | 证书发放条件（D8，v1.3.0修订）：课程完成率≥90% + 打卡≥80% + 测验通过 |
@@ -1063,7 +1057,7 @@ pending（待审核）→ approved（已通过，触发4项回滚）
 | student_id | string | 学员ID |
 | student_name | string | 学员姓名快照 |
 | course_completion_rate | number | 课程完成率（必须100%，D8） |
-| checkin_completion_rate | number | 课程完成率（≥certificate_checkin_threshold，D8） |
+| checkin_completion_rate | number | 打卡完成率（≥certificate_checkin_threshold，D8） |
 | final_quiz_passed | boolean | 总测验通过（D8） |
 | final_quiz_score | number | 总测验得分 |
 | template_url | string | 证书模板URL |
@@ -1251,7 +1245,7 @@ pending（待审核）→ approved（已通过，触发4项回滚）
 | department | string? | 科室/领域 |
 | title | string? | 职称 |
 | bio | string? | 简介 |
-| review_status | LecturerReviewStatus | 资质审核状态（**暂不启用**：讲师/助教建档即 approved，字段保留供后续开启审核） |
+| review_status | LecturerReviewStatus | 资质审核状态 |
 | status | LecturerStatus | 状态（active/suspended/left，D16 快照锁定） |
 | total_courses | number | 累计课程数（聚合） |
 | total_camps | number | 累计营期数（聚合） |
@@ -1680,7 +1674,7 @@ pending（待审核）→ approved（已通过，触发4项回滚）
 1. 证书列表（表格：证书号/营期/学员/发放时间/状态/操作）
 2. 撤销证书（is_revoked=true，填撤销原因，D28）
 3. 补发证书（已撤销可补发，issueCertificate）
-4. 证书详情（发放条件：课程完成率/课程完成率/测验通过/得分）
+4. 证书详情（发放条件：课程完成率/打卡完成率/测验通过/得分）
 
 **调用 Action**：loadCertificates/revokeCertificate/issueCertificate
 
@@ -2352,8 +2346,8 @@ Store 采用 Pinia 多 store 分域，action 名 1:1 对齐 SugarMate（zustand�
 | updateLecturer | (id, patch) => Lecturer | 更新讲师 |
 | loadLecturerList | () => Lecturer[] | 加载讲师列表 |
 | loadLecturer | (id) => Lecturer | 加载单讲师 |
-| approveLecturer | (id, reviewerId) => void | 资质审核通过（**暂不启用**：建档即 approved，方法保留） |
-| rejectLecturer | (id, reviewerId, remark) => void | 资质审核驳回（**暂不启用**：方法保留） |
+| approveLecturer | (id, reviewerId) => void | 资质审核通过 |
+| rejectLecturer | (id, reviewerId, remark) => void | 资质审核驳回 |
 | transitionLecturerStatus | (id, target) => void | 讲师状态流转（active→suspended→left，D16 快照锁定） |
 | createAssistantRelation | (input) => LecturerAssistantRelation | 建立讲师-助教归属 |
 | terminateAssistantRelation | (id, reason) => void | 解除归属 |
@@ -2454,9 +2448,9 @@ Store 采用 Pinia 多 store 分域，action 名 1:1 对齐 SugarMate（zustand�
 | **用例名** | 讲师库管理 |
 | **参与者** | 管理员 |
 | **前置条件** | 管理员已登录 PC 后台 |
-| **主流程** | 1.进入讲师库管理页 → 2.查看讲师列表 → 3.新增讲师（表单填写）/ 从成员管理导入 → 4.讲师状态流转（在职/暂停/离职）→ 5.建立讲师-助教归属 → 6.配置红包规则。<br/>**业务调整（v1.4.0）：讲师/助教资质审核流程暂不启用——建档即生效（review_status 恒为 approved），可直接被课程库与营期引用；字段与状态机保留，后续按业务需要再开启审核。** |
-| **后置条件** | 讲师创建成功即被课程引用（无需资质审核） |
-| **异常流** | 手机号格式校验失败/离职讲师不可被新营期引用为主讲 |
+| **主流程** | 1.进入讲师库管理页 → 2.查看讲师列表 → 3.新增讲师（表单填写）/ 从成员管理导入 → 4.资质审核（通过/驳回）→ 5.讲师状态流转（在职/暂停/离职）→ 6.建立讲师-助教归属 → 7.配置红包规则 |
+| **后置条件** | 讲师创建成功，资质审核通过后可被课程引用 |
+| **异常流** | 手机号格式校验失败/资质审核驳回填备注/离职讲师不可被新营期引用为主讲 |
 
 ### UC-COURSE-PC-002 课程中心 CRUD
 
@@ -2464,7 +2458,7 @@ Store 采用 Pinia 多 store 分域，action 名 1:1 对齐 SugarMate（zustand�
 |----|------|
 | **用例名** | 课程中心 CRUD |
 | **参与者** | 管理员 |
-| **前置条件** | 讲师库已有讲师档案（建档即生效，无需审核） |
+| **前置条件** | 讲师库已有审核通过的讲师 |
 | **主流程** | 1.进入课程中心 → 2.新增课程（填写基本信息+分类+讲师+红包配置）→ 3.提交审核 → 4.审核通过（published）→ 5.课程可被营期引用/APP展示 |
 | **后置条件** | 课程发布成功，camp_ref_count 可递增 |
 | **异常流** | 审核驳回填 review_remark/camp_only 课程 APP 不独立展示/讲师离职后课程 lecturer_name 快照不失效 |
@@ -2603,7 +2597,7 @@ Store 采用 Pinia 多 store 分域，action 名 1:1 对齐 SugarMate（zustand�
 
 ### AC-COURSE-009 证书发放条件
 - **Given** 营期 ended
-- **When** 课程完成率=100% + 课程完成率≥80% + 总测验通过
+- **When** 课程完成率=100% + 打卡完成率≥80% + 总测验通过
 - **Then** issueCertificate 成功（幂等已发拒绝）；任一条件不满足则不发放
 
 ### AC-COURSE-010 金额统一为分
@@ -2838,7 +2832,7 @@ flowchart LR
 
 ```
 营期 ended + 全部课程完结(course_completion_rate=100%，D8)
-  + 课程完成率 ≥ certificate_checkin_threshold(0.8，D8)
+  + 打卡完成率 ≥ certificate_checkin_threshold(0.8，D8)
   + final_quiz_passed=true(D8)
   → issueCertificate(幂等已发拒绝 BR-CERT-002)
   → 学员查看证书
@@ -2867,7 +2861,7 @@ flowchart LR
 | MET-COURSE-002 | 营期完成率 | 比率 | ended_camps/total_camps | BO-02 | transitionCampStatus |
 | MET-COURSE-003 | 报名→支付转化率 | 比率 | paid_orders/approved_enrollments | BG-01 | onPaySuccess |
 | MET-COURSE-004 | 助教拉新占比 | 比率 | assistant_qr_enrollments/total_enrollments | BG-02 | createEnrollment(channel) |
-| MET-COURSE-005 | 课程完成率 | 比率 | completed_checkins/scheduled_checkins | BG-03 | createCheckin |
+| MET-COURSE-005 | 打卡完成率 | 比率 | completed_checkins/scheduled_checkins | BG-03 | createCheckin |
 | MET-COURSE-006 | 获证率 | 比率 | certificates/ended_camps_students | BG-04 | issueCertificate |
 | MET-COURSE-007 | 红包发放成功率 | 比率 | success_records/total_records | BG-05 | grantRedPacket |
 | MET-COURSE-008 | 分成结算及时率 | 比率 | settled_on_time/total_settled | BO-03 | settleCommissionBill |

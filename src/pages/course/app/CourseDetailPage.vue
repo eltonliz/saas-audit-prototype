@@ -1,7 +1,10 @@
 <template>
   <div class="course-detail" v-if="course">
     <header class="app-header"><span @click="$router.back()">←</span><span>课程详情</span></header>
-    <div class="cover"><span class="cover-icon"><EmojiIcon :emoji="course.mode === 'live' ? '📺' : '📖'" :size="48" /></span></div>
+    <div class="cover" :class="{ 'cover-portrait': (course as any).orientation === 'portrait' }">
+      <span class="cover-icon"><EmojiIcon :emoji="course.mode === 'live' ? '📺' : '📖'" :size="48" /></span>
+      <span v-if="(course as any).orientation === 'portrait'" class="cover-orient">竖屏课程</span>
+    </div>
     <h2 class="title">{{ course.title }}</h2>
     <div class="meta">{{ course.category_name }} · {{ course.lesson_count }}课时 · {{ course.mode === 'live' ? '直播' : '录播' }}</div>
     <div class="rating-row">
@@ -92,7 +95,9 @@ function goFirstLesson() { const first = lessons.value.find(l => l.mode !== 'liv
 <style scoped>
 .course-detail { padding: 16px; padding-bottom: 80px; max-width: 375px; margin: 0 auto; }
 .app-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; font-weight: 600; }
-.cover { width: 100%; height: 180px; background: #E6F9F1; border-radius: 12px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; }
+.cover { width: 100%; height: 180px; background: #E6F9F1; border-radius: 12px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; position: relative; }
+.cover-portrait { height: auto; aspect-ratio: 3 / 4; }
+.cover-orient { position: absolute; top: 10px; left: 10px; background: rgba(22,32,46,0.72); color: #fff; font-size: 11px; padding: 2px 8px; border-radius: 10px; }
 .cover-icon { font-size: 48px; }
 .title { font-size: 20px; font-weight: 700; color: #1F2C3E; }
 .meta { font-size: 13px; color: #667085; margin: 4px 0; }

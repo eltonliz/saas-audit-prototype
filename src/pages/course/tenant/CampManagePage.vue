@@ -317,12 +317,10 @@ function doRejectCamp() {
   rejectCampVisible.value = false;
 }
 function openEnroll(row: any) { store.openEnrollment(row.id); MessagePlugin.success('报名已开启'); }
-function startCamp(row: any) { store.startCamp(row.id); MessagePlugin.success('营期已开营 → 已触发SAAS分佣模块佣金结算 + 售后模块开启开营拦截'); }
+function startCamp(row: any) { store.startCamp(row.id); MessagePlugin.success('营期已开营，学员可进入学习'); }
 function endCamp(row: any) {
-  // 流程闭环提示：无启用证书模板时营期结束将不发证
-  const tpl = store.resolveCertTemplateForCamp(row.id);
-  const tip = tpl ? `结营后将按「${tpl.cert_name}」为达标学员自动发放证书。` : '⚠️ 未配置启用中的证书模板，结营后不会发放证书（请先到「证书管理」新建证书）。';
-  DialogPlugin.confirm({ header: '结束营期', body: `确认结束营期？结束后不可恢复。<br/>${tip}`, theme: 'warning', onConfirm: () => { store.endCamp(row.id); MessagePlugin.success('营期已结束'); } });
+  // V2.0：证书模块已下线，结营仅确认不可恢复
+  DialogPlugin.confirm({ header: '结束营期', body: '确认结束营期？结束后不可恢复，营期学习与激励发放将随之截止。', theme: 'warning', onConfirm: () => { store.endCamp(row.id); MessagePlugin.success('营期已结束'); } });
 }
 function offlineCamp(row: any) {
   DialogPlugin.confirm({ header: '下架营期', body: '确认下架营期？', theme: 'warning', onConfirm: () => { store.transitionCampStatus(row.id, 'offline'); MessagePlugin.warning('已下架'); } });
