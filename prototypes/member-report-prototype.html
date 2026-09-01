@@ -1319,8 +1319,6 @@ function applyPeriod(s,e){
   renderLive(currentSort);
   toast('统计周期 '+ (s===e? s : s.slice(5)+' ~ '+e.slice(5)) +' · '+n+' 场 · 指标已按 10 分钟聚合口径模拟重算');
 }
-renderAppHead(); renderAppTabs(); renderAppBody();
-applyPeriod('2026-08-26','2026-09-01');
 const AI={
  home:'<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>',
  live:'<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="1" y="5" width="15" height="14" rx="2"/><path d="M23 7l-7 5 7 5V7z"/></svg>',
@@ -1431,7 +1429,7 @@ function openAppMember(i){
   el('p-sheet').classList.add('open');
 }
 function closeSheet(){ el('p-sheet').classList.remove('open'); }
-renderAppHead(); renderAppTabs(); renderAppBody();
+renderAppHead(); renderAppTabs(); renderAppBody(); applyPeriod('2026-08-26','2026-09-01');
 </script>
 </body>
 </html>
