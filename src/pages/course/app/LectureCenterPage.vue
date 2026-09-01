@@ -46,8 +46,9 @@
         <span v-for="s in ['全部','报名中','进行中','已结束']" :key="s" class="cat-chip" :class="{ active: campStatusFilter === s }" @click="campStatusFilter = s">{{ s }}</span>
       </div>
       <div v-for="c in filteredCamps" :key="c.id" class="card camp-card" @click="goCamp(c.id)">
-        <div class="card-cover">
-          <span class="cover-icon">{{ c.mode === 'live' ? '📺' : '📹' }}</span>
+        <div class="card-cover" :class="{ 'has-img': c.cover_url }">
+          <img v-if="c.cover_url" :src="c.cover_url" class="cover-img" />
+          <span v-else class="cover-icon">{{ c.mode === 'live' ? '📺' : '📹' }}</span>
           <span class="cover-badge" :class="'badge-' + campBadge(c).type">{{ campBadge(c).text }}</span>
         </div>
         <div class="card-body">
@@ -141,7 +142,9 @@ function campBtnAction(c: any) {
 .cat-chip.active { background: #E6F9F1; color: #12B76A; }
 .section-title { font-size: 16px; font-weight: 600; color: #1F2C3E; margin-bottom: 12px; }
 .card { background: #fff; border-radius: 12px; margin-bottom: 12px; overflow: hidden; display: flex; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-.card-cover { width: 80px; height: 80px; background: #E6F9F1; flex-shrink: 0; display: flex; align-items: center; justify-content: center; position: relative; }
+.card-cover { width: 80px; height: 80px; background: #E6F9F1; flex-shrink: 0; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+.card-cover.has-img { background: #16202E; }
+.cover-img { width: 100%; height: 100%; object-fit: cover; }
 .cover-icon { font-size: 28px; }
 .live-tag { position: absolute; top: 4px; right: 4px; background: #F04438; color: #fff; padding: 1px 6px; border-radius: 8px; font-size: 10px; }
 .orient-tag { background: #7A5AF8; }

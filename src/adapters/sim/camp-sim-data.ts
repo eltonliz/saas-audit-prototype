@@ -24,7 +24,7 @@ export const SEED_CAMPS: Camp[] = [
   {
     id: 'CAMP-202608-00001', camp_no: 'CAMP-202608-00001',
     title: '7天高效学习营', description: '7天系统学习高效学习方法论',
-    cover_url: '', series_id: 'SERIES-001', series_name: '高效学习系列',
+    cover_url: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=400&h=225&fit=crop', series_id: 'SERIES-001', series_name: '高效学习系列',
     mode: 'live', allow_products: false,
     start_date: dStr(-5), end_date: dStr(1), total_days: 7,
     price: 0, is_paid: false,
@@ -40,7 +40,7 @@ export const SEED_CAMPS: Camp[] = [
   {
     id: 'CAMP-202608-00002', camp_no: 'CAMP-202608-00002',
     title: '职场沟通训练营', description: '录播模式·职场沟通实战训练',
-    cover_url: '', series_id: 'SERIES-001', series_name: '高效学习系列',
+    cover_url: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=225&fit=crop', series_id: 'SERIES-001', series_name: '高效学习系列',
     mode: 'recorded', allow_products: false,
     start_date: dStr(2), end_date: dStr(8), total_days: 7,
     price: 0, is_paid: false,

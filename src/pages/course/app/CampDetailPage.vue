@@ -4,8 +4,9 @@
       <button class="back-btn" @click="$router.back()"><t-icon name="chevron-left" :size="22" /></button>
       <span class="header-title">营期详情</span>
     </header>
-    <div class="cover">
-      <div class="cover-overlay"></div>
+    <div class="cover" :class="{ 'cover-has-img': camp.cover_url }">
+      <img v-if="camp.cover_url" :src="camp.cover_url" class="cover-img" />
+      <div v-else class="cover-overlay"></div>
       <span class="mode-tag"><t-icon :name="camp.mode === 'live' ? 'play-circle' : 'video-camera'" :size="14" /> {{ camp.mode === 'live' ? '直播' : '录播' }}</span>
     </div>
     <h2 class="camp-title">{{ camp.title }}</h2>
@@ -199,6 +200,9 @@ function goLearn() {
   width:100%; height:160px; border-radius:var(--radius-xl); margin-bottom:16px; position:relative; overflow:hidden;
   background:linear-gradient(135deg, var(--color-primary), var(--color-accent));
 }
+.cover-has-img { height: 200px; }
+.cover-img { width:100%; height:100%; object-fit:cover; display:block; }
+.cover-has-img .mode-tag { background: rgba(22,32,46,0.72); }
 .cover-overlay { position:absolute; inset:0; background:linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.15) 100%); }
 .mode-tag {
   position:absolute; top:8px; right:8px; display:inline-flex; align-items:center; gap:4px;

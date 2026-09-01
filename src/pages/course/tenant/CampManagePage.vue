@@ -109,6 +109,15 @@
     >
       <t-form :data="f" label-width="110px" label-align="right">
         <t-form-item label="营期名称" name="title" required-mark><t-input v-model="f.title" placeholder="请输入营期名称" /></t-form-item>
+        <t-form-item label="营期封面">
+          <div class="cover-grid">
+            <div v-for="cover in campCoverPresets" :key="cover.url" class="cover-item" :class="{ active: f.cover_url === cover.url }" @click="f.cover_url = cover.url">
+              <img :src="cover.url" :alt="cover.label" />
+              <div v-if="f.cover_url === cover.url" class="cover-check"><t-icon name="check" /></div>
+            </div>
+            <div class="cover-upload" @click="MessagePlugin.info('上传封面')"><t-icon name="add" class="cover-upload-icon" /><span>上传封面</span></div>
+          </div>
+        </t-form-item>
         <!-- V2·0901 用户裁决：营期不再设授课模式，直播/录播在排课处逐条配置 -->
         <t-form-item label="时间" required-mark>
           <t-date-range-picker v-model="dateRange" :placeholder="['开始日期', '结束日期']" clearable style="width:100%" />
@@ -238,7 +247,17 @@ const columns = [
   { colKey: 'op', title: '操作', width: 360, fixed: 'right' },
 ];
 
-const f = ref<{ title: string; description: string; mode: 'live' | 'recorded'; capacity: number }>({ title: '', description: '', mode: 'live', capacity: 0 });
+const f = ref<{ title: string; description: string; mode: 'live' | 'recorded'; capacity: number; cover_url: string }>({ title: '', description: '', mode: 'recorded', capacity: 0, cover_url: '' });
+
+// V2·0901 营期封面预设（与课程封面同源）
+const campCoverPresets = [
+  { url: 'https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?w=400&h=225&fit=crop', label: '封面1' },
+  { url: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=400&h=225&fit=crop', label: '封面2' },
+  { url: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=225&fit=crop', label: '封面3' },
+  { url: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&h=225&fit=crop', label: '封面4' },
+  { url: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=400&h=225&fit=crop', label: '封面5' },
+  { url: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=400&h=225&fit=crop', label: '封面6' },
+];
 
 const lecturerRate = ref(60);
 const assistantRate = ref(20);
@@ -249,7 +268,7 @@ function calcPlatformRate() { platformRate.value = Math.max(0, 100 - lecturerRat
 function openCreate() {
   notifyModalOpen('camp-create');
   editingCamp.value = null;
-  f.value = { title: '', description: '', mode: 'recorded', capacity: 0 };
+  f.value = { title: '', description: '', mode: 'recorded', capacity: 0, cover_url: '' };
   priceYuan.value = 0; lecturerRate.value = 60; assistantRate.value = 20; platformRate.value = 20; dateRange.value = []; enrollDeadline.value = null;
   showCreate.value = true;
 }
@@ -258,7 +277,7 @@ function doSave() {
   if (!f.value.title || !(dateRange.value && dateRange.value.length === 2)) { MessagePlugin.warning('请填写完整信息'); return; }
   if (daysBetween(dateRange.value[0], dateRange.value[1]) > 90) { MessagePlugin.warning('营期最长90天（行业约束）'); return; }
   const data = {
-    title: f.value.title, description: f.value.description ?? '', cover_url: '',
+    title: f.value.title, description: f.value.description ?? '', cover_url: f.value.cover_url,
     series_id: 'SERIES-001', series_name: '默认系列',
     mode: f.value.mode, allow_products: false,
     start_date: String(dateRange.value[0]).slice(0, 10),
@@ -304,7 +323,7 @@ function delCamp(row: any) {
 function openEdit(row: any) {
   notifyModalOpen('camp-edit');
   editingCamp.value = row;
-  f.value = { title: row.title, description: row.description ?? '', mode: row.mode, capacity: row.capacity || 0 };
+  f.value = { title: row.title, description: row.description ?? '', mode: row.mode, capacity: row.capacity || 0, cover_url: row.cover_url || '' };
   priceYuan.value = row.is_paid ? row.price / 100 : 0;
   lecturerRate.value = row.commission_enabled ? Math.round(row.lecturer_rate * 100) : 60;
   assistantRate.value = row.commission_enabled ? Math.round((row.assistant_rate ?? 0.2) * 100) : 20;
@@ -540,6 +559,28 @@ function formatTime(unix: number): string {
 .live-auto-tip { display: flex; align-items: flex-start; gap: 8px; padding: 12px 16px; margin-top: 8px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; }
 
 /* ── 列表页模式徽章 ── */
+/* 营期封面（V2·0901 与课程封面同款交互） */
+.cover-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+.cover-item {
+  position: relative;
+  width: 100px;
+  height: 56px;
+  border-radius: 6px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color 200ms ease, transform 200ms ease;
+}
+.cover-item:hover { transform: translateY(-2px); }
+.cover-item img { width: 100%; height: 100%; object-fit: cover; }
+.cover-item.active { border-color: var(--color-primary); }
+.cover-check { position: absolute; top: 2px; right: 2px; width: 16px; height: 16px; border-radius: 50%; background: var(--color-primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+.cover-upload {
+  width: 100px; height: 56px; border: 1px dashed #CBD5E1; border-radius: 6px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  cursor: pointer; color: #667085; font-size: 11px;
+}
+.cover-upload-icon { font-size: 18px; }
 .mode-badge {
   display: inline-flex;
   align-items: center;
