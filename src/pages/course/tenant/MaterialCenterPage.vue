@@ -86,7 +86,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { DialogPlugin, MessagePlugin } from 'tdesign-vue-next';
-import { useCourseStore } from '../../stores/course-store';
+import { useCourseStore } from '../../../stores/course-store';
 
 const store = useCourseStore();
 const search = ref('');
