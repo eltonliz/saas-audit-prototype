@@ -1,0 +1,1879 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>内容审查域 PRD V2.0.0 · SAAS 产品需求文档</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --paper:#f5f5f5; --paper-2:#ececec; --ink:#2d3142; --muted:#4f5d75; --soft:#7a8399;
+  --rule:rgba(45,49,66,.12); --accent:#eb6c36; --accent-tint:rgba(235,108,54,.08);
+  --link:#2e5aa8; --ok:#2e7d4f; --danger:#b3372f;
+  --sans:'Geist','Noto Sans SC',system-ui,sans-serif;
+  --serif:'Instrument Serif','Noto Serif SC',serif;
+  --mono:'Geist Mono',ui-monospace,monospace;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--paper);color:var(--ink);font-size:14px;line-height:1.7}
+::selection{background:rgba(235,108,54,.22)}
+
+/* ===== 布局 ===== */
+.doc{max-width:1400px;margin:0 auto;padding:40px 28px 80px;display:grid;grid-template-columns:244px minmax(0,1fr);gap:48px}
+@media(max-width:1080px){.doc{grid-template-columns:1fr;gap:24px}.toc{position:static!important;border:1px solid var(--rule);border-radius:8px;padding:16px;margin-bottom:8px}}
+
+/* ===== 侧栏目录 ===== */
+.toc{position:sticky;top:24px;align-self:start;max-height:calc(100vh - 48px);overflow-y:auto;padding-right:8px}
+.toc::-webkit-scrollbar{width:4px}.toc::-webkit-scrollbar-thumb{background:var(--rule);border-radius:2px}
+.toc .toc-eyebrow{font-family:var(--mono);font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--soft);margin-bottom:12px;padding-left:12px}
+.toc ol{list-style:none;counter-reset:toc}
+.toc li{counter-increment:toc}
+.toc a{display:flex;gap:8px;align-items:baseline;padding:5px 12px;border-radius:6px;color:var(--muted);text-decoration:none;font-size:.82rem;border-left:2px solid transparent}
+.toc a::before{content:counter(toc,decimal-leading-zero);font-family:var(--mono);font-size:.62rem;color:var(--soft);min-width:18px}
+.toc a:hover{background:rgba(45,49,66,.04);color:var(--ink)}
+.toc a.active{background:var(--accent-tint);color:var(--ink);border-left-color:var(--accent);font-weight:500}
+.toc a.active::before{color:var(--accent)}
+.toc .toc-sub{margin:2px 0 10px}
+.toc .toc-sub a{padding-left:36px;font-size:.78rem;color:var(--soft)}
+.toc .toc-sub a::before{content:"–";min-width:0;margin-right:6px}
+
+/* ===== 文档头 ===== */
+.doc-header{margin-bottom:32px}
+.doc-header .eyebrow{font-family:var(--mono);font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.doc-header .eyebrow::after{content:"";flex:1;height:1px;background:var(--rule)}
+.doc-header h1{font-family:var(--serif);font-size:clamp(1.9rem,3.2vw,2.6rem);font-weight:400;letter-spacing:-.02em;line-height:1.15;margin-bottom:6px}
+.doc-header .subtitle{font-family:var(--serif);font-style:italic;font-size:1.05rem;color:var(--muted);margin-bottom:20px}
+.meta-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:8px;overflow:hidden}
+.meta-grid .meta-cell{background:#fff;padding:10px 14px}
+.meta-cell .k{font-family:var(--mono);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin-bottom:2px}
+.meta-cell .v{font-size:.86rem;font-weight:500}
+
+/* ===== 徽标 ===== */
+.badge{display:inline-flex;align-items:center;font-family:var(--mono);font-size:.62rem;font-weight:600;letter-spacing:.08em;padding:2px 8px;border-radius:3px;border:1px solid transparent;vertical-align:middle}
+.badge--p0{background:var(--danger);color:#fff}
+.badge--ok{background:rgba(46,125,79,.1);color:var(--ok);border-color:rgba(46,125,79,.35)}
+.badge--ver{background:var(--ink);color:#fff}
+.badge--term{background:rgba(79,93,117,.08);color:var(--muted);border-color:rgba(79,93,117,.3)}
+.badge--accent{background:var(--accent-tint);color:var(--accent);border-color:rgba(235,108,54,.4)}
+.badge--link{background:rgba(46,90,168,.08);color:var(--link);border-color:rgba(46,90,168,.3)}
+
+/* ===== 章节 ===== */
+.chapter{background:#fff;border:1px solid var(--rule);border-radius:8px;padding:28px 32px;margin-bottom:28px;scroll-margin-top:24px}
+.ch-head{display:flex;align-items:baseline;gap:14px;margin-bottom:6px;padding-bottom:14px;border-bottom:1px solid var(--rule)}
+.ch-head .ch-no{font-family:var(--mono);font-size:.78rem;color:var(--accent);letter-spacing:.1em}
+.ch-head h2{font-family:var(--serif);font-size:1.55rem;font-weight:400;letter-spacing:-.01em}
+.ch-lede{color:var(--muted);font-size:.9rem;margin-bottom:18px}
+.chapter h3{font-size:1.02rem;font-weight:600;margin:26px 0 10px;display:flex;align-items:center;gap:8px}
+.chapter h3::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--accent);opacity:.85;flex:none}
+.chapter h4{font-size:.94rem;font-weight:600;margin:18px 0 8px}
+.chapter p{margin:8px 0;max-width:78ch}
+.chapter ul,.chapter ol{margin:8px 0 8px 22px}
+.chapter li{margin:4px 0}
+.chapter li::marker{color:var(--soft)}
+.chapter strong{font-weight:600}
+code{font-family:var(--mono);font-size:.82em;background:rgba(45,49,66,.06);padding:1px 5px;border-radius:3px}
+
+/* ===== 表格 ===== */
+.tbl-wrap{overflow-x:auto;margin:12px 0}
+table.tbl{width:100%;border-collapse:collapse;font-size:.84rem;border:1px solid var(--rule);border-radius:6px;overflow:hidden}
+.tbl th{font-family:var(--mono);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-align:left;padding:8px 12px;background:rgba(45,49,66,.035);border-bottom:1px solid var(--rule);white-space:nowrap}
+.tbl td{padding:8px 12px;border-bottom:1px solid rgba(45,49,66,.07);vertical-align:top}
+.tbl tr:last-child td{border-bottom:none}
+.tbl td:first-child{white-space:nowrap;font-family:var(--mono);font-size:.76rem;color:var(--muted)}
+.tbl .rowhi td{background:var(--accent-tint)}
+
+/* ===== 图表 ===== */
+.figure{margin:20px 0;border:1px solid var(--rule);border-radius:8px;background:var(--paper);overflow:hidden}
+.figure .fig-head{display:flex;align-items:baseline;gap:12px;padding:14px 20px 0}
+.figure .fig-no{font-family:var(--mono);font-size:.68rem;color:var(--accent);letter-spacing:.1em;white-space:nowrap}
+.figure .fig-title{font-family:var(--serif);font-size:1.12rem}
+.figure .fig-body{padding:6px 12px 8px}
+.figure .fig-body svg{width:100%;height:auto;display:block;min-width:760px}
+.figure .fig-body{overflow-x:auto}
+.figure figcaption{padding:10px 20px 14px;font-size:.8rem;color:var(--soft);border-top:1px solid rgba(45,49,66,.07)}
+.figure figcaption b{color:var(--muted);font-weight:600}
+
+/* ===== FN 卡片 ===== */
+.fn-card{border:1px solid var(--rule);border-radius:8px;margin:18px 0;background:#fff;overflow:hidden}
+.fn-card .fn-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 20px;background:rgba(45,49,66,.025);border-bottom:1px solid var(--rule)}
+.fn-card .fn-code{font-family:var(--mono);font-size:.7rem;font-weight:600;color:var(--accent);letter-spacing:.06em;background:var(--accent-tint);border:1px solid rgba(235,108,54,.35);padding:2px 8px;border-radius:3px;white-space:nowrap}
+.fn-card .fn-name{font-size:.98rem;font-weight:600}
+.fn-card .fn-auto{margin-left:auto;font-family:var(--mono);font-size:.66rem;color:var(--soft)}
+.fn-card .fn-body{padding:16px 20px}
+.fn-card .fn-body h5{font-size:.78rem;font-weight:600;font-family:var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:16px 0 6px}
+.fn-card .fn-body h5:first-child{margin-top:0}
+.fn-meta{display:grid;grid-template-columns:auto 1fr;gap:4px 16px;font-size:.84rem;margin:10px 0}
+.fn-meta dt{font-family:var(--mono);font-size:.68rem;color:var(--soft);white-space:nowrap;padding-top:3px}
+.fn-meta dd{margin:0}
+
+/* ===== Callout ===== */
+.callout{border-left:3px solid var(--accent);background:var(--accent-tint);border-radius:0 6px 6px 0;padding:12px 16px;margin:14px 0;font-size:.88rem}
+.callout b{color:var(--accent)}
+.callout--ink{border-left-color:var(--muted);background:rgba(79,93,117,.06)}
+.callout--ink b{color:var(--muted)}
+
+/* ===== 页脚 ===== */
+.colophon{margin-top:48px;padding-top:20px;border-top:1px solid var(--rule);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-family:var(--mono);font-size:.66rem;color:var(--soft);letter-spacing:.1em}
+
+/* ===== 触摸惯性滚动（iOS） ===== */
+.tbl-wrap,.figure .fig-body{-webkit-overflow-scrolling:touch}
+
+/* ===== 移动端适配（≤768px） ===== */
+@media(max-width:768px){
+  body{font-size:13.5px}
+  .doc{padding:20px 12px 56px;gap:20px}
+  .doc-header h1{font-size:1.7rem}
+  .doc-header .subtitle{font-size:.95rem}
+  .meta-grid{grid-template-columns:1fr 1fr}
+  .meta-cell{padding:8px 10px}
+  .meta-cell .v{font-size:.8rem}
+  .chapter{padding:18px 14px;border-radius:6px}
+  .ch-head{flex-wrap:wrap;gap:4px 10px;padding-bottom:10px}
+  .ch-head h2{font-size:1.28rem}
+  .chapter h3{font-size:.98rem;margin:20px 0 8px}
+  .chapter p{max-width:none}
+  .tbl{font-size:.8rem}
+  .tbl th,.tbl td{padding:7px 9px}
+  .fn-card .fn-head{padding:12px 14px;gap:8px}
+  .fn-card .fn-name{font-size:.92rem}
+  .fn-card .fn-auto{margin-left:0;flex-basis:100%}
+  .fn-card .fn-body{padding:14px}
+  .figure{border-radius:6px}
+  .figure .fig-head{flex-wrap:wrap;gap:4px 10px;padding:12px 14px 0}
+  .figure .fig-title{font-size:1rem}
+  .figure .fig-body{padding:2px 2px 4px}
+  .figure .fig-body svg{min-width:680px}
+  .figure .fig-body::before{content:"← 图表较宽 · 左右滑动查看 →";display:block;text-align:center;font-family:var(--mono);font-size:.66rem;color:var(--soft);padding:4px 0}
+  .figure figcaption{padding:8px 14px 12px;font-size:.74rem}
+  .callout{padding:10px 12px;font-size:.84rem}
+  .colophon{flex-direction:column;gap:4px}
+}
+@media(max-width:420px){
+  .meta-grid{grid-template-columns:1fr}
+  .figure .fig-body svg{min-width:640px}
+}
+
+@media print{
+  body{background:#fff}
+  .doc{grid-template-columns:1fr;padding:0;max-width:none}
+  .toc{display:none}
+  .chapter{break-inside:avoid-page;border:none;padding:12px 0;margin-bottom:16px}
+  .figure .fig-body svg{min-width:0}
+  .figure .fig-body::before{content:""}
+}
+</style>
+</head>
+<body>
+<div class="doc">
+
+<!-- ================= 侧栏目录 ================= -->
+<aside class="toc" aria-label="文档目录">
+  <p class="toc-eyebrow">CONTENTS · 目录</p>
+  <ol>
+    <li><a href="#ch1">版本历史</a></li>
+    <li><a href="#ch3">背景与问题陈述</a></li>
+    <li><a href="#ch4">目标与成功度量</a></li>
+    <li><a href="#ch5">范围</a></li>
+    <li><a href="#ch6">与既有模块关系</a></li>
+    <li><a href="#ch7">业务目标映射</a></li>
+    <li><a href="#ch8">用户故事</a></li>
+    <li><a href="#ch9">五类图</a></li>
+    <li><a href="#ch10">功能需求与用例</a></li>
+    <li><a href="#ch11">业务规则</a></li>
+    <li><a href="#ch12">数据实体</a></li>
+    <li><a href="#ch13">验收标准</a></li>
+    <li><a href="#ch14">指标登记</a></li>
+    <li><a href="#ch15">CONFIG 配置</a></li>
+    <li><a href="#ch16">外部接口</a></li>
+    <li><a href="#ch17">数据脱敏规范</a></li>
+    <li><a href="#ch18">深度分析摘要</a></li>
+  </ol>
+</aside>
+
+<!-- ================= 正文 ================= -->
+<main>
+
+<!-- 文档头 -->
+<header class="doc-header" id="top">
+  <p class="eyebrow">SAAS · Product Requirements Document · D16</p>
+  <h1>内容审查域 产品需求文档</h1>
+  <p class="subtitle">真实环境版 —— 直播实时审查 · 违规处置 · 回放审核拼接发布</p>
+  <div class="meta-grid">
+    <div class="meta-cell"><div class="k">版本 / Version</div><div class="v"><span class="badge badge--ver">V2.0.0</span></div></div>
+    <div class="meta-cell"><div class="k">状态 / Status</div><div class="v"><span class="badge badge--ok">已定稿</span> 2026-09-01</div></div>
+    <div class="meta-cell"><div class="k">优先级 / Priority</div><div class="v"><span class="badge badge--p0">P0</span></div></div>
+    <div class="meta-cell"><div class="k">需求流 / Story</div><div class="v">STR-SAAS-001</div></div>
+    <div class="meta-cell"><div class="k">业务域 / Domain</div><div class="v">内容审查域（D16）</div></div>
+    <div class="meta-cell"><div class="k">终端 / Clients</div><div class="v"><span class="badge badge--term">PC 运营后台</span> <span class="badge badge--term">PC 租户后台</span> <span class="badge badge--term">H5 观众端 375px</span></div></div>
+    <div class="meta-cell"><div class="k">追溯链 / Trace</div><div class="v">UC → FN → PG → SC → BG → BO</div></div>
+    <div class="meta-cell"><div class="k">关联子文档</div><div class="v">回放拼接机制 v2.0.0 · 级别判定规则 v1.0.0</div></div>
+  </div>
+  <div class="callout callout--ink" style="margin-top:16px">
+    <b>数据基线</b> · 本文档所有示例数据均为脱敏格式（详见 <a href="#ch17">§17 数据脱敏展示规范</a>）：场次编号 <code>PLS****XX</code>、租户 <code>租户A</code>、违规摘要敏感词以 <code>██</code> 占位。
+  </div>
+</header>
+
+<!-- §1 版本历史 -->
+<section class="chapter" id="ch1">
+  <div class="ch-head"><span class="ch-no">§ 01</span><h2>版本历史</h2></div>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>版本</th><th>日期</th><th>变更内容</th></tr></thead>
+    <tbody>
+      <tr><td>V1.0.0</td><td>2026-07-22</td><td>初版：三终端效果模拟基线（纯前端 Mock）</td></tr>
+      <tr class="rowhi"><td><b>V2.0.0</b></td><td><b>2026-09-01</b></td><td><b>真实环境版</b>：①移除全部模拟层，改为腾讯云 API 真实对接（回调网关验签去重 + MQ 分发 + WebSocket 推送 + AMS 擦音 + FFmpeg 拼接）；②纳入回放拼接机制 v2.0.0（手动拼接：逐个审核→勾选一一对应→拼接→人工发布）；③纳入审查开关降级行为（关闭后仅 L1 展示，七类不可降级强制执行）；④纳入回放管理列表（待核对/已发布/已驳回）与已发布查看模式；⑤全量示例数据脱敏，去除演示场次数据；⑥五类图重制并内嵌于 §9。</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- §3 背景 -->
+<section class="chapter" id="ch3">
+  <div class="ch-head"><span class="ch-no">§ 03</span><h2>背景与问题陈述</h2></div>
+  <p>内容审查域是 SAAS 平台的<strong>平台级运营管控能力</strong>，针对主播直播内容（音频/视频推流）进行实时审查和擦音处理，并对回放文件执行违规处理与人工发布管控，确保直播与回放内容符合法律法规要求。</p>
+
+  <h3>核心问题</h3>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>编号</th><th>问题</th><th>严重程度</th></tr></thead>
+    <tbody>
+      <tr><td>AUDIT-ISSUE-001</td><td>直播中主播出现违规内容无实时擦音能力</td><td>🔴 高</td></tr>
+      <tr><td>AUDIT-ISSUE-002</td><td>直播回放文件未经擦音处理即开放观看</td><td>🔴 高</td></tr>
+      <tr><td>AUDIT-ISSUE-003</td><td>回放断流产生多片段时无法可靠拼接为完整文件</td><td>🔴 高</td></tr>
+      <tr><td>AUDIT-ISSUE-004</td><td>平台对违规内容缺乏分级管控与人工处置闭环</td><td>🟡 中</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>需求边界</h3>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>管控对象</th><th>审查内容</th><th>技术方案</th><th>V2</th></tr></thead>
+    <tbody>
+      <tr><td>主播直播内容</td><td>音频/视频流（画面 + ASR 文本）</td><td>腾讯云直播审核 + 擦音（真实对接）</td><td>✅</td></tr>
+      <tr><td>回放文件</td><td>音频擦音 + 片段拼接 + 人工发布</td><td>腾讯云 AMS + FFmpeg concat</td><td>✅</td></tr>
+      <tr><td>观众文本消息</td><td>弹幕/聊天</td><td>腾讯云 IM 云端审核（独立体系，不在本域）</td><td>❌</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>级别体系（平台自定义三级）</h3>
+  <p>腾讯云仅返回 <code>Label / subLabel / score / suggestion</code>，<strong>不提供级别划分</strong>。级别为平台业务层自定义（详见子文档《级别判定规则》）：</p>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>级别</th><th>名称</th><th>告警色</th><th>处置方式</th><th>可否降级</th></tr></thead>
+    <tbody>
+      <tr class="rowhi"><td><b>L1</b></td><td>高危</td><td>红</td><td>审核引擎直接断流 + 封禁</td><td>❌ 不可降级</td></tr>
+      <tr><td>L2</td><td>中危</td><td>黄</td><td>运营可记录 / 断流</td><td>❌ 不可降级</td></tr>
+      <tr><td>L3</td><td>低危</td><td>蓝</td><td>运营可记录 / 忽略</td><td>✅ 部分可降级（score&lt;50 降一档转人工）</td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout">
+    <b>L1 不可降级七类</b> · 涉黄 / 涉政 / 涉暴 / 公共安全 / 社会安全 / 违法乱纪 / 广告法 —— 无论置信度高低一律维持 L1，租户不可关闭、不可降级，由腾讯云配置层强制执行。
+  </div>
+  <p>L4 作为兜底级（未命中或边缘内容，仅记录备查）保留定义，页面仅展示 L1/L3 三档统计。级别判定采用三层结构：<strong>标签归类 → 类别定档 → score 校准</strong>（&lt;50 且可降级才降一档并转人工复核）。</p>
+</section>
+
+<!-- §4 目标 -->
+<section class="chapter" id="ch4">
+  <div class="ch-head"><span class="ch-no">§ 04</span><h2>目标与成功度量</h2></div>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>编号</th><th>目标</th><th>度量指标</th><th>目标值</th></tr></thead>
+    <tbody>
+      <tr><td>BO-AUDIT-01</td><td>违规内容发现率</td><td>审查覆盖率（回调全量入库率）</td><td>100%</td></tr>
+      <tr><td>BO-AUDIT-02</td><td>实时擦音及时性</td><td>违规发生→观众端擦音生效延迟</td><td>&lt;3 秒</td></tr>
+      <tr><td>BO-AUDIT-03</td><td>回放合规完整性</td><td>已发布回放擦音/审核覆盖率</td><td>100%</td></tr>
+      <tr><td>BO-AUDIT-04</td><td>违规处置效率</td><td>告警→处置完成响应时间</td><td>P95 &lt;30 秒</td></tr>
+      <tr><td>BO-AUDIT-05</td><td>回放发布可靠性</td><td>拼接成功率（含重试）</td><td>≥99%</td></tr>
+      <tr><td>BO-AUDIT-06</td><td>回调链路可靠性</td><td>回调验签通过后入库率</td><td>≥99.9%</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- §5 范围 -->
+<section class="chapter" id="ch5">
+  <div class="ch-head"><span class="ch-no">§ 05</span><h2>范围</h2></div>
+  <h3>In-Scope（V2）</h3>
+  <h4>运营后台（PC）</h4>
+  <ul>
+    <li>租户管理列表新增「内容审查」开关列（开启直接生效；关闭弹二次确认弹窗，含七类不可降级底线提示与在播场次警告）</li>
+  </ul>
+  <h4>租户后台（PC）—— 直播中控</h4>
+  <ul>
+    <li>直播列表入口复用（直播中控台 / 更多→历史违规列表 / 更多→查看回放 / 回放管理 Tab）</li>
+    <li>内容审查页签：实时违规告警（红/黄/蓝三档统计 + 待处理角标 + 实时列表）</li>
+    <li>违规详情抽屉（证据录音试听 + 处置按钮按级别收敛）</li>
+    <li>违规处置（记录 / 断流 / 忽略；处置说明≥10 字；30 秒超时自动记录）</li>
+    <li>处理方式切换（静音 / 提示音覆盖，实时同步观众端）</li>
+    <li>主播侧警示条（记录=橙色 8 秒；断流=红色常驻；观众无感知）</li>
+    <li>历史违规列表（已结束场次只读档案）</li>
+  </ul>
+  <h4>租户后台（PC）—— 回放管理</h4>
+  <ul>
+    <li>回放管理列表（待核对 / 已发布 / 已驳回三态 + 待核对徽标 + 删除）</li>
+    <li>回放页：片段/文件逐个审核 → 勾选一一对应 → 手动拼接 → 人工发布（v2.0.0）</li>
+    <li>无违规场次免擦音（源码即对外发布版）</li>
+    <li>已发布查看模式（仅展示完整文件，隐藏操作区）</li>
+    <li>擦音前后对比 / 播放器时间轴违规标记复审</li>
+  </ul>
+  <h4>观众端（H5 375px）</h4>
+  <ul>
+    <li>静音处理效果（🔇 + 画面变暗 + 进度条，2-5 秒）</li>
+    <li>提示音覆盖效果（🎧 + 声波动画，2-5 秒）</li>
+    <li>判定未送达提示（与处理效果互斥）</li>
+    <li>断流结束页（「直播已结束，该直播因内容违规已被终止」）</li>
+  </ul>
+  <h4>平台侧基础设施</h4>
+  <ul>
+    <li>审核回调接入服务（网关验签 + 幂等去重 + 级别判定 + MQ 分发）</li>
+    <li>WebSocket 实时推送（中控告警 / 观众端擦音指令）</li>
+    <li>断流指令通道（审查服务 → 腾讯云 DropLiveStream）</li>
+    <li>回放擦音任务（AMS）与拼接任务（FFmpeg concat）调度</li>
+  </ul>
+  <h3>Non-Goals</h3>
+  <ul>
+    <li>观众弹幕/评论审查（腾讯云 IM 独立处理）</li>
+    <li>自研推流端审查能力（依赖腾讯云）</li>
+    <li>违规统计看板（V3）</li>
+    <li>平台管控策略下发（V3）</li>
+    <li>租户个性化规则扩展（V3）</li>
+    <li>腾讯云审核模板/擦音任务的配置管理界面（由平台运维在腾讯云控制台人工配置，系统仅消费回调与任务结果）</li>
+  </ul>
+</section>
+
+<!-- §6 模块关系 -->
+<section class="chapter" id="ch6">
+  <div class="ch-head"><span class="ch-no">§ 06</span><h2>与既有模块关系</h2></div>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>关系类型</th><th>模块</th><th>依赖内容</th><th>V2 说明</th></tr></thead>
+    <tbody>
+      <tr><td>依赖（上游）</td><td>直播域 D09</td><td>场次状态机 + 直播间配置 + 直播列表 + 推流/断流控制</td><td>入口复用直播列表操作列与回放管理 Tab；断流经直播域生效</td></tr>
+      <tr><td>依赖（上游）</td><td>运营域 D13</td><td>租户管理列表</td><td>入口复用租户管理列表，新增「内容审查」开关列</td></tr>
+      <tr><td>依赖（上游）</td><td>录播域 D10</td><td>回放文件生成 / 断流切片</td><td>断流产生多片段，片段/文件由录播域产出、审查域审核拼接发布</td></tr>
+      <tr><td>被依赖（下游）</td><td>观众端 H5</td><td>擦音效果渲染 + 断流结束页</td><td>WebSocket 指令驱动</td></tr>
+      <tr><td>外部依赖</td><td>腾讯云直播审核</td><td>审核回调（API-AUDIT-001）+ 断流（API-AUDIT-007）</td><td>真实对接，L1 自动断流在腾讯云配置层生效</td></tr>
+      <tr><td>外部依赖</td><td>腾讯云 AMS</td><td>回放擦音任务（API-AUDIT-004/005）</td><td>真实对接，异步任务 + 完成回调</td></tr>
+      <tr><td>复用规则</td><td>BR-AUDIT-013</td><td>入口复用</td><td>所有审查入口必须复用已有页面，禁止新增独立菜单</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- §7 BG 映射 -->
+<section class="chapter" id="ch7">
+  <div class="ch-head"><span class="ch-no">§ 07</span><h2>业务目标映射</h2></div>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>BG 编号</th><th>业务目标</th><th>关联 BO</th><th>关联 FN</th><th>优先级</th></tr></thead>
+    <tbody>
+      <tr><td>BG-AUDIT-01</td><td>内容合规</td><td>BO-01/02/03</td><td>INFRA-001 · PC-002/004/005 · APP-001</td><td>P0</td></tr>
+      <tr><td>BG-AUDIT-02</td><td>运营管控</td><td>BO-04</td><td>PC-001/003/006</td><td>P0</td></tr>
+      <tr><td>BG-AUDIT-03</td><td>回放发布可靠</td><td>BO-05</td><td>PC-004/005/006</td><td>P0</td></tr>
+      <tr><td>BG-AUDIT-04</td><td>链路可靠</td><td>BO-06</td><td>INFRA-001</td><td>P1</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- §8 用户故事 -->
+<section class="chapter" id="ch8">
+  <div class="ch-head"><span class="ch-no">§ 08</span><h2>用户故事</h2></div>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>编号</th><th>角色</th><th>故事</th></tr></thead>
+    <tbody>
+      <tr><td>US-AUDIT-001</td><td>平台运营</td><td>作为平台运营，我希望在运营后台租户管理列表直接切换某租户的内容审查开关，以便控制审查范围；关闭时有底线提示（七类不可降级仍强制执行）</td></tr>
+      <tr><td>US-AUDIT-002</td><td>直播运营</td><td>作为直播运营，我希望从直播列表进入直播中控内容审查页签，实时看到分级违规告警与完整判定依据，以便及时处置</td></tr>
+      <tr><td>US-AUDIT-003</td><td>直播运营</td><td>作为直播运营，我希望按违规级别获得收敛的处置选项（L2 记录/断流、L3 记录/忽略），处置说明留档可追溯</td></tr>
+      <tr><td>US-AUDIT-004</td><td>直播运营</td><td>作为直播运营，我希望切换处理方式（静音/提示音覆盖）并实时同步观众端效果</td></tr>
+      <tr><td>US-AUDIT-005</td><td>观众</td><td>作为观众，我希望在直播中感知到处理效果（静音/嘀声）且不被惊扰；被断流时看到明确的结束说明</td></tr>
+      <tr><td>US-AUDIT-006</td><td>直播运营</td><td>作为直播运营，我希望直播结束后逐个审核回放文件、勾选一一对应的片段、手动拼接并人工发布，确保观众看到的回放一定是处理后的合规版本</td></tr>
+      <tr><td>US-AUDIT-007</td><td>直播运营</td><td>作为直播运营，我希望在回放管理列表看到全部回放的发布进度（待核对/已发布/已驳回），并可删除过期回放</td></tr>
+      <tr><td>US-AUDIT-008</td><td>主播</td><td>作为主播，我希望在被记录/断流时收到明确的警示提示（观众不可见），以便整改直播内容</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- §9 五类图 -->
+<section class="chapter" id="ch9">
+  <div class="ch-head"><span class="ch-no">§ 09</span><h2>五类图</h2></div>
+  <p class="ch-lede">五类图基于 diagram-design 规范重制，以内嵌交互式 SVG 呈现；独立文件同步存放于 <code>docs/01-requirements/diagrams/16-内容审查域/</code>。</p>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>编号</th><th>图类型</th><th>文件</th><th>内容摘要</th></tr></thead>
+    <tbody>
+      <tr><td>9-1</td><td>业务流程图（泳道）</td><td>01-业务流程图.html</td><td>四泳道端到端流程：开关管理 → 实时审核 → L1 直断 / L2L3 运营处置 → 观众擦音感知 → 回放审核拼接发布</td></tr>
+      <tr><td>9-2</td><td>信息流转图（架构）</td><td>02-信息流转图.html</td><td>外部（审核引擎/AMS）→ 平台（回调网关/审查服务/数据存储）→ 三端的数据流与指令流全景</td></tr>
+      <tr><td>9-3</td><td>状态机</td><td>03-违规处置状态机.html</td><td>违规记录生命周期：待处理 → 已记录/已断流/已忽略/已超时/已归档</td></tr>
+      <tr><td>9-4</td><td>状态机</td><td>04-回放生命周期状态机.html</td><td>回放场次生命周期：待核对 → 拼接中 → 已拼接 → 已发布（含失败重试/驳回回环）</td></tr>
+      <tr><td>9-5</td><td>业务时序图</td><td>05-业务时序图.html</td><td>直播实时审查全链路时序：回调 → 级别判定 → alt 分支 → 擦音指令 → 观众感知</td></tr>
+      <tr><td>9-6</td><td>接口时序图</td><td>06-接口时序图.html</td><td>外部接口对接时序：回调验签去重 → MQ 分发 → 断流指令 → AMS 擦音 → 回放页状态</td></tr>
+    </tbody>
+  </table></div>
+
+  <figure class="figure" id="fig-9-1">
+  <div class="fig-head"><span class="fig-no">图 9-1</span><span class="fig-title">直播内容审查端到端业务流程</span></div>
+  <div class="fig-body">
+<svg viewBox="0 0 1180 604" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="audit-flow-title audit-flow-desc">
+      <title id="audit-flow-title">直播内容审查端到端业务流程</title>
+      <desc id="audit-flow-desc">四泳道业务流程图：腾讯云审核、平台审查服务、观众端、租户运营协同完成直播实时审查、违规处置、擦音感知与回放审核拼接发布。</desc>
+      <defs>
+        <marker id="f1-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
+        <marker id="f1-arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#eb6c36"/></marker>
+        <marker id="f1-arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#2e5aa8"/></marker>
+      </defs>
+
+      <rect width="100%" height="100%" fill="#f5f5f5"/>
+
+      <!-- 泳道背景（先画背景与分隔线，再画箭头，最后画节点） -->
+      <rect x="24" y="64" width="1132" height="100" fill="rgba(45,49,66,0.02)"/>
+      <rect x="24" y="164" width="1132" height="100" fill="rgba(45,49,66,0.02)"/>
+      <rect x="24" y="264" width="1132" height="100" fill="rgba(45,49,66,0.02)"/>
+      <rect x="24" y="364" width="1132" height="100" fill="rgba(45,49,66,0.02)"/>
+
+      <line x1="24" y1="164" x2="1156" y2="164" stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
+      <line x1="24" y1="264" x2="1156" y2="264" stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
+      <line x1="24" y1="364" x2="1156" y2="364" stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
+      <line x1="120" y1="64" x2="120" y2="464" stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
+
+      <!-- 泳道标签 -->
+      <text x="34" y="106" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.12em">TENCENT · EXTERNAL</text>
+      <text x="34" y="126" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif">腾讯云审核</text>
+      <text x="34" y="206" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.12em">SAAS · PLATFORM</text>
+      <text x="34" y="226" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif">平台审查服务</text>
+      <text x="34" y="306" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.12em">VIEWER · H5</text>
+      <text x="34" y="326" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif">观众端</text>
+      <text x="34" y="406" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.12em">TENANT · OPERATOR</text>
+      <text x="34" y="426" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif">租户运营</text>
+
+      <!-- ===== 箭头（先于节点绘制） ===== -->
+
+      <!-- ③→① 开关生效 -->
+      <path d="M 288,212 H 440 Q 448,212 448,204 V 144" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#f1-arrow)"/>
+      <rect x="324" y="176" width="60" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="354" y="187" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">开关生效</text>
+
+      <!-- ①→④ 审核回调 -->
+      <path d="M 448,140 V 172 H 596 Q 604,172 604,180 V 180" fill="none" stroke="#2e5aa8" stroke-width="1.2" marker-end="url(#f1-arrow-link)"/>
+      <rect x="472" y="150" width="60" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="502" y="161" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">审核回调</text>
+
+      <!-- ①→② 命中 L1 -->
+      <path d="M 524,112 H 828" fill="none" stroke="#eb6c36" stroke-width="1.2" marker-end="url(#f1-arrow-accent)"/>
+      <rect x="648" y="90" width="56" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="676" y="101" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">命中 L1</text>
+
+      <!-- ④→⑤ 判定结果 -->
+      <path d="M 680,212 H 744" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#f1-arrow)"/>
+      <rect x="676" y="190" width="60" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="706" y="201" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">判定入库</text>
+
+      <!-- ⑤→⑦ 实时告警（下行） -->
+      <path d="M 824,240 V 380" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#f1-arrow)"/>
+      <rect x="836" y="296" width="60" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="866" y="307" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">实时告警</text>
+
+      <!-- ⑦→⑤ 处置指令（上行，平行错开 24px） -->
+      <path d="M 800,384 V 244" fill="none" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#f1-arrow)"/>
+      <rect x="736" y="296" width="60" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="766" y="307" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">处置指令</text>
+
+      <!-- ⑤→⑨ 擦音指令（elbow，避开 lane3 节点） -->
+      <path d="M 772,240 V 272 H 644 Q 636,272 636,280 V 280" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#f1-arrow)"/>
+      <rect x="784" y="252" width="60" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="814" y="263" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">擦音指令</text>
+
+      <!-- ②→⑩ 断流生效 -->
+      <path d="M 912,140 V 280" fill="none" stroke="#eb6c36" stroke-width="1.2" marker-end="url(#f1-arrow-accent)"/>
+      <rect x="924" y="196" width="60" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="954" y="207" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">断流生效</text>
+
+      <!-- ⑥→⑧ 回放就绪 -->
+      <path d="M 1092,240 V 380" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#f1-arrow)"/>
+      <rect x="1104" y="296" width="60" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="1134" y="307" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">回放就绪</text>
+
+      <!-- ⑦→⑧ 直播结束（同泳道） -->
+      <path d="M 900,412 H 1012" fill="none" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#f1-arrow)"/>
+      <rect x="920" y="390" width="60" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="950" y="401" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">直播结束</text>
+
+      <!-- ===== 节点 ===== -->
+
+      <!-- ① 直播推流实时审核 -->
+      <rect x="372" y="84" width="152" height="56" rx="6" fill="#f5f5f5"/>
+      <rect x="372" y="84" width="152" height="56" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="448" y="107" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">① 直播推流实时审核</text>
+      <text x="448" y="126" fill="#4f5d75" font-size="10" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">音视频画面 + ASR 文本</text>
+
+      <!-- ② L1 高危自动断流（coral focal） -->
+      <rect x="836" y="84" width="152" height="56" rx="6" fill="#f5f5f5"/>
+      <rect x="836" y="84" width="152" height="56" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1"/>
+      <text x="912" y="107" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">② L1 高危自动断流</text>
+      <text x="912" y="126" fill="#4f5d75" font-size="10" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">七类不可降级 · 零容忍</text>
+
+      <!-- ③ 审查开关·策略管理 -->
+      <rect x="136" y="184" width="152" height="56" rx="6" fill="#f5f5f5"/>
+      <rect x="136" y="184" width="152" height="56" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="212" y="207" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">③ 审查开关·策略管理</text>
+      <text x="212" y="226" fill="#4f5d75" font-size="10" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">租户级开关 + 级别配置</text>
+
+      <!-- ④ 回调验签·级别判定 -->
+      <rect x="528" y="184" width="152" height="56" rx="6" fill="#f5f5f5"/>
+      <rect x="528" y="184" width="152" height="56" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="604" y="207" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">④ 回调验签·级别判定</text>
+      <text x="604" y="226" fill="#4f5d75" font-size="10" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">Label/score → L1/L2/L3</text>
+
+      <!-- ⑤ 违规入库·推送分发 -->
+      <rect x="748" y="184" width="152" height="56" rx="6" fill="#f5f5f5"/>
+      <rect x="748" y="184" width="152" height="56" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="824" y="207" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">⑤ 违规入库·推送分发</text>
+      <text x="824" y="226" fill="#4f5d75" font-size="10" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">DB 落库 + 实时推送</text>
+
+      <!-- ⑥ 回放擦音·文件生成 -->
+      <rect x="1016" y="184" width="152" height="56" rx="6" fill="#f5f5f5"/>
+      <rect x="1016" y="184" width="152" height="56" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="1092" y="207" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">⑥ 回放擦音·文件生成</text>
+      <text x="1092" y="226" fill="#4f5d75" font-size="10" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">AMS 擦音 + 片段/文件</text>
+
+      <!-- ⑨ 擦音效果感知 -->
+      <rect x="560" y="284" width="152" height="56" rx="6" fill="#f5f5f5"/>
+      <rect x="560" y="284" width="152" height="56" rx="6" fill="rgba(79,93,117,0.10)" stroke="#7a8399" stroke-width="1"/>
+      <text x="636" y="307" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">⑨ 擦音效果感知</text>
+      <text x="636" y="326" fill="#4f5d75" font-size="10" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">静音/嘀声 · 2-5 秒</text>
+
+      <!-- ⑩ 断流结束页 -->
+      <rect x="836" y="284" width="152" height="56" rx="6" fill="#f5f5f5"/>
+      <rect x="836" y="284" width="152" height="56" rx="6" fill="rgba(79,93,117,0.10)" stroke="#7a8399" stroke-width="1"/>
+      <text x="912" y="307" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">⑩ 断流结束页</text>
+      <text x="912" y="326" fill="#4f5d75" font-size="10" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">直播已结束·违规终止</text>
+
+      <!-- ⑦ 中控告警处置 -->
+      <rect x="748" y="384" width="152" height="56" rx="6" fill="#f5f5f5"/>
+      <rect x="748" y="384" width="152" height="56" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="824" y="407" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">⑦ 中控告警处置</text>
+      <text x="824" y="426" fill="#4f5d75" font-size="10" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">L2 断流 · L3 记录/忽略</text>
+
+      <!-- ⑧ 回放审核·拼接·发布（coral focal） -->
+      <rect x="1016" y="384" width="152" height="56" rx="6" fill="#f5f5f5"/>
+      <rect x="1016" y="384" width="152" height="56" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1"/>
+      <text x="1092" y="407" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">⑧ 回放审核·拼接·发布</text>
+      <text x="1092" y="426" fill="#4f5d75" font-size="10" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">审核→勾选→拼接→发布</text>
+
+      <!-- ===== 图例（底部横条） ===== -->
+      <line x1="24" y1="488" x2="1156" y2="488" stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
+      <text x="24" y="508" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.14em">LEGEND</text>
+      <rect x="90" y="498" width="28" height="16" rx="2" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="126" y="510" fill="#4f5d75" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif">系统自动</text>
+      <rect x="196" y="498" width="28" height="16" rx="2" fill="rgba(79,93,117,0.10)" stroke="#7a8399" stroke-width="1"/>
+      <text x="232" y="510" fill="#4f5d75" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif">观众感知</text>
+      <rect x="302" y="498" width="28" height="16" rx="2" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1"/>
+      <text x="338" y="510" fill="#4f5d75" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif">关键管控点</text>
+      <line x1="420" y1="506" x2="452" y2="506" stroke="#2e5aa8" stroke-width="1.2" marker-end="url(#f1-arrow-link)"/>
+      <text x="462" y="510" fill="#4f5d75" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif">外部回调</text>
+      <line x1="532" y1="506" x2="564" y2="506" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#f1-arrow)"/>
+      <text x="574" y="510" fill="#4f5d75" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif">指令回传</text>
+
+      <!-- 底部注释 -->
+      <text x="24" y="548" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif">注：租户关闭审查开关后，④⑤⑥⑨ 不再执行（仅 L1 高危由腾讯云配置层强制执行）；回放拼接发布遵循 v2.0.0 手动模式（先审后拼、先审后发）。</text>
+      <text x="24" y="568" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif">示例数据均已脱敏：场次编号形如 PLS****XX，主播昵称脱敏显示，违规文本仅展示脱敏摘要。</text>
+    </svg>
+  </div>
+  <figcaption><b>泳道图</b> · 腾讯云审核 / 平台审查服务 / 观众端 / 租户运营四泳道协同：开关管理 → 实时审核 → L1 直断或 L2/L3 运营处置 → 观众擦音感知 → 回放审核拼接发布。开关关闭后仅 ①② 与 L1 链路继续执行。</figcaption>
+</figure>
+
+  <figure class="figure" id="fig-9-2">
+  <div class="fig-head"><span class="fig-no">图 9-2</span><span class="fig-title">信息流转架构：外部审核到三端分发</span></div>
+  <div class="fig-body">
+<svg viewBox="0 0 1180 648" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="audit-df-title audit-df-desc">
+      <title id="audit-df-title">信息流转架构：外部审核到三端分发</title>
+      <desc id="audit-df-desc">信息流转图：腾讯云审核引擎与擦音服务经回调网关接入平台审查服务，违规数据落库后通过 WebSocket 与指令通道分发给直播中控、观众端与回放页三端。</desc>
+      <defs>
+        <marker id="f2-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
+        <marker id="f2-arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#eb6c36"/></marker>
+        <marker id="f2-arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#2e5aa8"/></marker>
+        <marker id="f2-arrow-open" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polyline points="0 0, 8 3, 0 6" fill="none" stroke="#4f5d75" stroke-width="1.2"/></marker>
+      </defs>
+
+      <rect width="100%" height="100%" fill="#f5f5f5"/>
+
+      <!-- ===== 区域边界（先画） ===== -->
+      <rect x="40" y="80" width="240" height="480" rx="8" fill="rgba(45,49,66,0.02)" stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
+      <rect x="48" y="84" width="88" height="12" rx="2" fill="#f5f5f5"/>
+      <text x="92" y="93" fill="rgba(45,49,66,0.40)" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.14em">EXTERNAL · 腾讯云</text>
+
+      <rect x="340" y="80" width="280" height="480" rx="8" fill="rgba(45,49,66,0.02)" stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
+      <rect x="348" y="84" width="104" height="12" rx="2" fill="#f5f5f5"/>
+      <text x="400" y="93" fill="rgba(45,49,66,0.40)" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.14em">PLATFORM · SAAS 审查域</text>
+
+      <rect x="680" y="80" width="460" height="480" rx="8" fill="rgba(45,49,66,0.02)" stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
+      <rect x="688" y="84" width="80" height="12" rx="2" fill="#f5f5f5"/>
+      <text x="728" y="93" fill="rgba(45,49,66,0.40)" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.14em">CLIENTS · 三端</text>
+
+      <!-- ===== 箭头（先于节点） ===== -->
+
+      <!-- 1 审核引擎 → 回调网关：审核回调 -->
+      <path d="M 250,162 H 386" fill="none" stroke="#2e5aa8" stroke-width="1.2" marker-end="url(#f2-arrow-link)"/>
+      <rect x="278" y="140" width="84" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="320" y="151" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">审核回调 POST</text>
+
+      <!-- 2 回调网关 → 审查服务：分发违规事件（异步） -->
+      <path d="M 480,194 V 296" fill="none" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#f2-arrow-open)"/>
+      <rect x="492" y="228" width="104" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="544" y="239" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">分发违规事件 · MQ</text>
+
+      <!-- 3 审查服务 → 数据存储：违规入库·证据 -->
+      <path d="M 480,376 V 466" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#f2-arrow)"/>
+      <rect x="492" y="408" width="104" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="544" y="419" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">违规入库 · 证据存储</text>
+
+      <!-- 4 审查服务 → 直播中控：WebSocket 实时告警 -->
+      <path d="M 540,300 V 240 H 802 Q 810,240 810,232 V 180" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#f2-arrow)"/>
+      <rect x="648" y="218" width="112" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="704" y="229" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">WebSocket 实时告警</text>
+
+      <!-- 5 审查服务 → 观众端：擦音指令下发 -->
+      <path d="M 570,330 H 712" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#f2-arrow)"/>
+      <rect x="588" y="308" width="88" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="632" y="319" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">擦音指令下发</text>
+
+      <!-- 6 审查服务 → 回放页：拼接·发布状态推送 -->
+      <path d="M 570,355 H 796 Q 810,355 810,367 V 426" fill="none" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#f2-arrow)"/>
+      <rect x="612" y="376" width="112" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="668" y="387" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">拼接·发布状态推送</text>
+
+      <!-- 7 审查服务 → 审核引擎：断流指令 -->
+      <path d="M 390,316 H 168 Q 160,316 160,308 V 198" fill="none" stroke="#2e5aa8" stroke-width="1.2" marker-end="url(#f2-arrow-link)"/>
+      <rect x="176" y="294" width="128" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="240" y="305" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">断流指令 DropLiveStream</text>
+
+      <!-- 8 审查服务 → AMS：回放擦音任务 -->
+      <path d="M 390,348 H 168 Q 160,348 160,356 V 426" fill="none" stroke="#2e5aa8" stroke-width="1.2" marker-end="url(#f2-arrow-link)"/>
+      <rect x="196" y="356" width="88" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="240" y="367" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">回放擦音任务</text>
+
+      <!-- 9 AMS → 审查服务：擦音完成回调（虚线回传） -->
+      <path d="M 190,430 V 390 H 412 Q 420,390 420,382 V 380" fill="none" stroke="#2e5aa8" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#f2-arrow-link)"/>
+      <rect x="240" y="396" width="104" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="292" y="407" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">擦音完成回调</text>
+
+      <!-- 10 数据存储 → 回放页：回放文件·违规档案读取 -->
+      <path d="M 570,490 H 712" fill="none" stroke="#4f5d75" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#f2-arrow)"/>
+      <rect x="588" y="468" width="112" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="644" y="479" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">回放文件·档案读取</text>
+
+      <!-- 11 直播中控 → 审查服务：处置指令提交 -->
+      <path d="M 720,152 H 664 Q 656,152 656,160 V 302 Q 656,310 664,310 H 574" fill="none" stroke="#4f5d75" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#f2-arrow)"/>
+      <rect x="664" y="216" width="104" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="716" y="227" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">处置指令提交</text>
+
+      <!-- ===== 节点 ===== -->
+
+      <!-- 腾讯云直播审核引擎（外部） -->
+      <rect x="70" y="130" width="180" height="64" rx="6" fill="#f5f5f5"/>
+      <rect x="70" y="130" width="180" height="64" rx="6" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.30)" stroke-width="1"/>
+      <rect x="78" y="136" width="28" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+      <text x="92" y="145" fill="rgba(45,49,66,0.8)" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">EXT</text>
+      <text x="160" y="168" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">直播审核引擎</text>
+      <text x="160" y="184" fill="#4f5d75" font-size="10" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">音视频 + ASR · L1 自动断流</text>
+
+      <!-- 腾讯云 AMS 擦音（外部） -->
+      <rect x="70" y="430" width="180" height="64" rx="6" fill="#f5f5f5"/>
+      <rect x="70" y="430" width="180" height="64" rx="6" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.30)" stroke-width="1"/>
+      <rect x="78" y="436" width="28" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+      <text x="92" y="445" fill="rgba(45,49,66,0.8)" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">EXT</text>
+      <text x="160" y="468" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">AMS 擦音服务</text>
+      <text x="160" y="484" fill="#4f5d75" font-size="10" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">回放文件音频擦除</text>
+
+      <!-- 回调网关 -->
+      <rect x="390" y="130" width="180" height="64" rx="6" fill="#f5f5f5"/>
+      <rect x="390" y="130" width="180" height="64" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <rect x="398" y="136" width="28" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+      <text x="412" y="145" fill="rgba(45,49,66,0.8)" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">API</text>
+      <text x="480" y="168" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">回调网关</text>
+      <text x="480" y="184" fill="#4f5d75" font-size="10" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">验签 · 幂等去重 · 分发</text>
+
+      <!-- 审查服务（coral focal） -->
+      <rect x="390" y="300" width="180" height="76" rx="6" fill="#f5f5f5"/>
+      <rect x="390" y="300" width="180" height="76" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1"/>
+      <rect x="398" y="306" width="28" height="12" rx="2" fill="transparent" stroke="rgba(235,108,54,0.40)" stroke-width="0.8"/>
+      <text x="412" y="315" fill="rgba(235,108,54,0.9)" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">SVC</text>
+      <text x="480" y="340" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">审查服务</text>
+      <text x="480" y="358" fill="#4f5d75" font-size="10" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">级别判定 · 处置 · 推送</text>
+
+      <!-- 数据存储 -->
+      <rect x="390" y="470" width="180" height="64" rx="6" fill="#f5f5f5"/>
+      <rect x="390" y="470" width="180" height="64" rx="6" fill="rgba(45,49,66,0.05)" stroke="#4f5d75" stroke-width="1"/>
+      <rect x="398" y="476" width="28" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+      <text x="412" y="485" fill="rgba(45,49,66,0.8)" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">DB</text>
+      <text x="480" y="508" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">数据存储</text>
+      <text x="480" y="524" fill="#4f5d75" font-size="10" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">DB 违规/处置 + COS 证据/回放</text>
+
+      <!-- 直播中控 PC -->
+      <rect x="720" y="112" width="180" height="64" rx="6" fill="#f5f5f5"/>
+      <rect x="720" y="112" width="180" height="64" rx="6" fill="rgba(79,93,117,0.10)" stroke="#7a8399" stroke-width="1"/>
+      <rect x="728" y="118" width="28" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+      <text x="742" y="127" fill="rgba(45,49,66,0.8)" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">UI</text>
+      <text x="810" y="150" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">直播中控 · PC</text>
+      <text x="810" y="166" fill="#4f5d75" font-size="10" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">租户后台 · 告警与处置</text>
+
+      <!-- 观众端 H5 -->
+      <rect x="720" y="270" width="180" height="64" rx="6" fill="#f5f5f5"/>
+      <rect x="720" y="270" width="180" height="64" rx="6" fill="rgba(79,93,117,0.10)" stroke="#7a8399" stroke-width="1"/>
+      <rect x="728" y="276" width="28" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+      <text x="742" y="285" fill="rgba(45,49,66,0.8)" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">UI</text>
+      <text x="810" y="308" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">观众端 · H5</text>
+      <text x="810" y="324" fill="#4f5d75" font-size="10" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">375px · 擦音效果感知</text>
+
+      <!-- 回放页 PC -->
+      <rect x="720" y="430" width="180" height="64" rx="6" fill="#f5f5f5"/>
+      <rect x="720" y="430" width="180" height="64" rx="6" fill="rgba(79,93,117,0.10)" stroke="#7a8399" stroke-width="1"/>
+      <rect x="728" y="436" width="28" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+      <text x="742" y="445" fill="rgba(45,49,66,0.8)" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">UI</text>
+      <text x="810" y="468" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">回放页 · PC</text>
+      <text x="810" y="484" fill="#4f5d75" font-size="10" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">租户后台 · 拼接与发布</text>
+
+      <!-- ===== 图例 ===== -->
+      <line x1="40" y1="584" x2="1140" y2="584" stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
+      <text x="40" y="604" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.14em">LEGEND</text>
+      <rect x="104" y="594" width="28" height="16" rx="2" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="140" y="606" fill="#4f5d75" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif">平台服务</text>
+      <rect x="204" y="594" width="28" height="16" rx="2" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.30)" stroke-width="1"/>
+      <text x="240" y="606" fill="#4f5d75" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif">外部服务</text>
+      <rect x="308" y="594" width="28" height="16" rx="2" fill="rgba(79,93,117,0.10)" stroke="#7a8399" stroke-width="1"/>
+      <text x="344" y="606" fill="#4f5d75" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif">终端界面</text>
+      <rect x="412" y="594" width="28" height="16" rx="2" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1"/>
+      <text x="448" y="606" fill="#4f5d75" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif">核心中枢</text>
+      <line x1="520" y1="602" x2="552" y2="602" stroke="#2e5aa8" stroke-width="1.2" marker-end="url(#f2-arrow-link)"/>
+      <text x="562" y="606" fill="#4f5d75" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif">外部 API 调用</text>
+      <line x1="652" y1="602" x2="684" y2="602" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#f2-arrow)"/>
+      <text x="694" y="606" fill="#4f5d75" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif">异步 / 状态回传</text>
+
+      <text x="40" y="634" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif">注：回调网关对腾讯云回调统一验签与幂等去重，全量事件进入审查服务（BR-AUDIT-005）；审查开关关闭时仅 L1 高危事件继续流转，L2/L3 事件不再向三端分发。</text>
+    </svg>
+  </div>
+  <figcaption><b>架构图</b> · 腾讯云审核引擎与 AMS 经回调网关（验签 · 幂等去重）接入审查服务，违规数据落库后经 WebSocket 与指令通道分发给直播中控、观众端与回放页。回调全量入库（BR-AUDIT-005）。</figcaption>
+</figure>
+
+  <figure class="figure" id="fig-9-3">
+  <div class="fig-head"><span class="fig-no">图 9-3</span><span class="fig-title">违规处置状态机</span></div>
+  <div class="fig-body">
+<svg viewBox="0 0 1100 560" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="audit-vs-title audit-vs-desc">
+      <title id="audit-vs-title">违规处置状态机</title>
+      <desc id="audit-vs-desc">违规处置状态机：违规事件创建后进入待处理，运营可记录、断流或忽略，30 秒超时由系统自动记录，场次结束或审查关闭时归档。</desc>
+      <defs>
+        <marker id="f3-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
+        <marker id="f3-arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#eb6c36"/></marker>
+      </defs>
+
+      <rect width="100%" height="100%" fill="#f5f5f5"/>
+
+      <!-- ===== 转移箭头（先于状态节点） ===== -->
+
+      <!-- start → 待处理 -->
+      <path d="M 76,296 H 146" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#f3-arrow)"/>
+      <rect x="78" y="272" width="72" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="114" y="283" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">L2/L3 回调创建</text>
+
+      <!-- 待处理 → 已记录（上弧 elbow） -->
+      <path d="M 270,270 V 196 H 787 Q 795,196 795,188 V 126" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#f3-arrow)"/>
+      <rect x="500" y="174" width="60" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="530" y="185" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">运营·记录</text>
+
+      <!-- 待处理 → 已超时 -->
+      <path d="M 200,270 V 224 H 413 Q 421,224 421,216 V 186" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#f3-arrow)"/>
+      <rect x="240" y="234" width="72" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="276" y="245" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">30 秒未处置</text>
+
+      <!-- 已超时 → 已记录 -->
+      <path d="M 530,156 H 620 Q 628,156 628,148 V 100 H 716" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#f3-arrow)"/>
+      <rect x="534" y="132" width="88" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="578" y="143" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">系统自动记录+升级</text>
+
+      <!-- 待处理 → 已断流 -->
+      <path d="M 300,296 H 636" fill="none" stroke="#eb6c36" stroke-width="1.2" marker-end="url(#f3-arrow-accent)"/>
+      <rect x="388" y="302" width="168" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="472" y="313" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">运营·断流 / L1 引擎自动断流</text>
+
+      <!-- 待处理 → 已忽略（下弧 elbow） -->
+      <path d="M 270,322 V 392 H 787 Q 795,392 795,400 V 426" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#f3-arrow)"/>
+      <rect x="500" y="398" width="60" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="530" y="409" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">运营·忽略</text>
+
+      <!-- 待处理 → 已归档 -->
+      <path d="M 200,322 V 412 H 413 Q 421,412 421,420 V 426" fill="none" stroke="#4f5d75" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#f3-arrow)"/>
+      <rect x="216" y="388" width="120" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="276" y="399" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">场次结束 / 审查关闭</text>
+
+      <!-- 终态箭头 → ring -->
+      <path d="M 870,96 H 888" fill="none" stroke="#4f5d75" stroke-width="1" marker-end="url(#f3-arrow)"/>
+      <path d="M 790,296 H 808" fill="none" stroke="#eb6c36" stroke-width="1" marker-end="url(#f3-arrow-accent)"/>
+      <path d="M 870,456 H 888" fill="none" stroke="#4f5d75" stroke-width="1" marker-end="url(#f3-arrow)"/>
+      <path d="M 530,456 H 548" fill="none" stroke="#4f5d75" stroke-width="1" marker-end="url(#f3-arrow)"/>
+
+      <!-- ===== 起点与终态 ===== -->
+      <circle cx="70" cy="296" r="6" fill="#2d3142"/>
+
+      <circle cx="896" cy="96" r="8" fill="none" stroke="#2d3142" stroke-width="1.2"/>
+      <circle cx="896" cy="96" r="5" fill="#2d3142"/>
+      <circle cx="816" cy="296" r="8" fill="none" stroke="#eb6c36" stroke-width="1.2"/>
+      <circle cx="816" cy="296" r="5" fill="#eb6c36"/>
+      <circle cx="896" cy="456" r="8" fill="none" stroke="#2d3142" stroke-width="1.2"/>
+      <circle cx="896" cy="456" r="5" fill="#2d3142"/>
+      <circle cx="556" cy="456" r="8" fill="none" stroke="#2d3142" stroke-width="1.2"/>
+      <circle cx="556" cy="456" r="5" fill="#2d3142"/>
+
+      <!-- ===== 状态节点 ===== -->
+
+      <!-- 待处理 -->
+      <rect x="150" y="270" width="150" height="52" rx="8" fill="#f5f5f5"/>
+      <rect x="150" y="270" width="150" height="52" rx="8" fill="#ffffff" stroke="#2d3142" stroke-width="1.2"/>
+      <text x="225" y="292" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">待处理</text>
+      <text x="225" y="310" fill="#4f5d75" font-size="10" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">pending</text>
+
+      <!-- 已超时 -->
+      <rect x="380" y="130" width="150" height="52" rx="8" fill="#f5f5f5"/>
+      <rect x="380" y="130" width="150" height="52" rx="8" fill="#ffffff" stroke="#2d3142" stroke-width="1.2"/>
+      <text x="455" y="152" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">已超时</text>
+      <text x="455" y="170" fill="#4f5d75" font-size="10" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">timeout · 升级提醒</text>
+
+      <!-- 已记录 -->
+      <rect x="720" y="70" width="150" height="52" rx="8" fill="#f5f5f5"/>
+      <rect x="720" y="70" width="150" height="52" rx="8" fill="#ffffff" stroke="#2d3142" stroke-width="1.2"/>
+      <text x="795" y="92" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">已记录</text>
+      <text x="795" y="110" fill="#4f5d75" font-size="10" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">recorded · 存档备查</text>
+
+      <!-- 已断流（coral focal） -->
+      <rect x="640" y="270" width="150" height="52" rx="8" fill="#f5f5f5"/>
+      <rect x="640" y="270" width="150" height="52" rx="8" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1.2"/>
+      <text x="715" y="292" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">已断流</text>
+      <text x="715" y="310" fill="#4f5d75" font-size="10" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">banned · 不可撤销</text>
+
+      <!-- 已忽略 -->
+      <rect x="720" y="430" width="150" height="52" rx="8" fill="#f5f5f5"/>
+      <rect x="720" y="430" width="150" height="52" rx="8" fill="#ffffff" stroke="#2d3142" stroke-width="1.2"/>
+      <text x="795" y="452" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">已忽略</text>
+      <text x="795" y="470" fill="#4f5d75" font-size="10" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">ignored · 非违规</text>
+
+      <!-- 已归档 -->
+      <rect x="380" y="430" width="150" height="52" rx="8" fill="#f5f5f5"/>
+      <rect x="380" y="430" width="150" height="52" rx="8" fill="#ffffff" stroke="#2d3142" stroke-width="1.2"/>
+      <text x="455" y="452" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">已归档</text>
+      <text x="455" y="470" fill="#4f5d75" font-size="10" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">archived · 只读可查</text>
+
+      <!-- ===== 图例 ===== -->
+      <line x1="40" y1="516" x2="1060" y2="516" stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
+      <text x="40" y="536" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.14em">NOTES</text>
+      <text x="104" y="536" fill="#4f5d75" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif">L1 不可降级事件由审核引擎直接断流后回调，进入系统时即携带断流结果；已断流为终态且不可撤销。</text>
+      <text x="104" y="554" fill="#4f5d75" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif">已超时状态由系统自动转入已记录并向上级发送升级提醒；归档记录保留可查，不可再处置。</text>
+    </svg>
+  </div>
+  <figcaption><b>状态机</b> · 违规事件创建后进入待处理，运营可记录、断流或忽略；30 秒超时由系统自动记录并升级提醒；L1 不可降级事件由引擎直接断流后回调即携带断流结果；已断流为终态且不可撤销。</figcaption>
+</figure>
+
+  <figure class="figure" id="fig-9-4">
+  <div class="fig-head"><span class="fig-no">图 9-4</span><span class="fig-title">回放生命周期状态机（拼接发布 v2.0.0）</span></div>
+  <div class="fig-body">
+<svg viewBox="0 0 1100 540" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="audit-rs-title audit-rs-desc">
+      <title id="audit-rs-title">回放生命周期状态机</title>
+      <desc id="audit-rs-desc">回放生命周期状态机：直播结束后生成片段与文件进入待核对，经文件审核、勾选对应与拼接后可发布；拼接可失败重试，发布后可被驳回再重新提交。</desc>
+      <defs>
+        <marker id="f4-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
+        <marker id="f4-arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#eb6c36"/></marker>
+      </defs>
+
+      <rect width="100%" height="100%" fill="#f5f5f5"/>
+
+      <!-- ===== 转移箭头 ===== -->
+
+      <!-- start → 待核对 -->
+      <path d="M 76,260 H 146" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#f4-arrow)"/>
+      <rect x="70" y="234" width="120" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="130" y="245" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">直播结束 · 片段/文件生成</text>
+
+      <!-- 待核对 → 拼接中 -->
+      <path d="M 300,260 H 396" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#f4-arrow)"/>
+      <rect x="290" y="268" width="116" height="28" rx="2" fill="#f5f5f5"/>
+      <text x="348" y="279" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">全部文件审核通过</text>
+      <text x="348" y="293" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">+ 勾选一一对应</text>
+
+      <!-- 拼接中 → 已拼接 -->
+      <path d="M 550,260 H 646" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#f4-arrow)"/>
+      <rect x="548" y="234" width="100" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="598" y="245" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">FFmpeg 拼接成功</text>
+
+      <!-- 待核对 → 已拼接（单文件免拼接，上弧） -->
+      <path d="M 225,234 V 180 H 717 Q 725,180 725,188 V 230" fill="none" stroke="#4f5d75" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#f4-arrow)"/>
+      <rect x="396" y="156" width="104" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="448" y="167" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">单文件 · 免拼接</text>
+
+      <!-- 拼接中 → 拼接失败 -->
+      <path d="M 475,286 V 416" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#f4-arrow)"/>
+      <rect x="487" y="340" width="100" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="537" y="351" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">片段损坏 / 超时</text>
+
+      <!-- 拼接失败 → 拼接中（左侧回环） -->
+      <path d="M 400,446 H 344 Q 336,446 336,438 V 286 Q 336,278 344,278 H 396" fill="none" stroke="#4f5d75" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#f4-arrow)"/>
+      <rect x="264" y="350" width="60" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="294" y="361" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">运营重试</text>
+
+      <!-- 已拼接 → 已发布 -->
+      <path d="M 800,260 H 876" fill="none" stroke="#eb6c36" stroke-width="1.2" marker-end="url(#f4-arrow-accent)"/>
+      <rect x="800" y="234" width="76" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="838" y="245" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">运营·发布</text>
+
+      <!-- 已发布 → 已驳回 -->
+      <path d="M 955,286 V 416" fill="none" stroke="#4f5d75" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#f4-arrow)"/>
+      <rect x="967" y="340" width="60" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="997" y="351" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">发布驳回</text>
+
+      <!-- 已驳回 → 已拼接（右侧回环） -->
+      <path d="M 880,446 H 828 Q 820,446 820,438 V 288 Q 820,280 812,280 H 804" fill="none" stroke="#4f5d75" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#f4-arrow)"/>
+      <rect x="836" y="350" width="60" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="866" y="361" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">重新提交</text>
+
+      <!-- 已发布 → end -->
+      <path d="M 1030,260 H 1052" fill="none" stroke="#eb6c36" stroke-width="1" marker-end="url(#f4-arrow-accent)"/>
+
+      <!-- ===== 起点与终态 ===== -->
+      <circle cx="70" cy="260" r="6" fill="#2d3142"/>
+      <circle cx="1060" cy="260" r="8" fill="none" stroke="#eb6c36" stroke-width="1.2"/>
+      <circle cx="1060" cy="260" r="5" fill="#eb6c36"/>
+
+      <!-- ===== 状态节点 ===== -->
+
+      <!-- 待核对 -->
+      <rect x="150" y="234" width="150" height="52" rx="8" fill="#f5f5f5"/>
+      <rect x="150" y="234" width="150" height="52" rx="8" fill="#ffffff" stroke="#2d3142" stroke-width="1.2"/>
+      <text x="225" y="256" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">待核对</text>
+      <text x="225" y="274" fill="#4f5d75" font-size="10" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">pending · 待审核</text>
+
+      <!-- 拼接中 -->
+      <rect x="400" y="234" width="150" height="52" rx="8" fill="#f5f5f5"/>
+      <rect x="400" y="234" width="150" height="52" rx="8" fill="#ffffff" stroke="#2d3142" stroke-width="1.2"/>
+      <text x="475" y="256" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">拼接中</text>
+      <text x="475" y="274" fill="#4f5d75" font-size="10" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">merging · 进度展示</text>
+
+      <!-- 已拼接 -->
+      <rect x="650" y="234" width="150" height="52" rx="8" fill="#f5f5f5"/>
+      <rect x="650" y="234" width="150" height="52" rx="8" fill="#ffffff" stroke="#2d3142" stroke-width="1.2"/>
+      <text x="725" y="256" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">已拼接</text>
+      <text x="725" y="274" fill="#4f5d75" font-size="10" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">completed · 可发布</text>
+
+      <!-- 已发布（coral focal） -->
+      <rect x="880" y="234" width="150" height="52" rx="8" fill="#f5f5f5"/>
+      <rect x="880" y="234" width="150" height="52" rx="8" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1.2"/>
+      <text x="955" y="256" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">已发布</text>
+      <text x="955" y="274" fill="#4f5d75" font-size="10" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">published · 对观众可见</text>
+
+      <!-- 拼接失败 -->
+      <rect x="400" y="420" width="150" height="52" rx="8" fill="#f5f5f5"/>
+      <rect x="400" y="420" width="150" height="52" rx="8" fill="#ffffff" stroke="#2d3142" stroke-width="1.2"/>
+      <text x="475" y="442" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">拼接失败</text>
+      <text x="475" y="460" fill="#4f5d75" font-size="10" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">failed · 提示原因</text>
+
+      <!-- 已驳回 -->
+      <rect x="880" y="420" width="150" height="52" rx="8" fill="#f5f5f5"/>
+      <rect x="880" y="420" width="150" height="52" rx="8" fill="#ffffff" stroke="#2d3142" stroke-width="1.2"/>
+      <text x="955" y="442" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">已驳回</text>
+      <text x="955" y="460" fill="#4f5d75" font-size="10" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">rejected · 可重新提交</text>
+
+      <!-- ===== 图例 ===== -->
+      <line x1="40" y1="502" x2="1060" y2="502" stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
+      <text x="40" y="522" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.14em">NOTES</text>
+      <text x="104" y="522" fill="#4f5d75" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif">顺序铁律（BR-AUDIT-030）：先全部审核 → 再勾选一一对应 → 再拼接 → 拼接完成后才可发布；任一环节不满足则按钮锁定。</text>
+      <text x="104" y="540" fill="#4f5d75" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif">无违规场次免擦音，源码文件即对外发布版；已发布场次再次进入回放页时自动进入「已发布查看模式」。</text>
+    </svg>
+  </div>
+  <figcaption><b>状态机</b> · 直播结束后生成片段与文件进入待核对，经文件审核、勾选一一对应与拼接后可发布；单文件免拼接、拼接失败可重试、发布被驳回可重新提交。顺序铁律：先审后拼、先审后发（BR-AUDIT-030）。</figcaption>
+</figure>
+
+  <figure class="figure" id="fig-9-5">
+  <div class="fig-head"><span class="fig-no">图 9-5</span><span class="fig-title">直播实时审查业务时序</span></div>
+  <div class="fig-body">
+<svg viewBox="0 0 1100 660" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="audit-bs-title audit-bs-desc">
+      <title id="audit-bs-title">直播实时审查业务时序</title>
+      <desc id="audit-bs-desc">业务时序图：腾讯云审核回调进入审查服务，经级别判定后按 L2/L3 与 L1 两条分支分别由运营处置和引擎直接断流，最终向观众端下发擦音或断流通知。</desc>
+      <defs>
+        <marker id="f5-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
+        <marker id="f5-arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#eb6c36"/></marker>
+        <marker id="f5-arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#2e5aa8"/></marker>
+        <marker id="f5-arrow-open" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polyline points="0 0, 8 3, 0 6" fill="none" stroke="#4f5d75" stroke-width="1.2"/></marker>
+        <marker id="f5-arrow-open-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polyline points="0 0, 8 3, 0 6" fill="none" stroke="#eb6c36" stroke-width="1.2"/></marker>
+      </defs>
+
+      <rect width="100%" height="100%" fill="#f5f5f5"/>
+
+      <!-- ===== 生命线 ===== -->
+      <line x1="170" y1="112" x2="170" y2="600" stroke="rgba(45,49,66,0.20)" stroke-width="1" stroke-dasharray="3,3"/>
+      <line x1="430" y1="112" x2="430" y2="600" stroke="rgba(45,49,66,0.20)" stroke-width="1" stroke-dasharray="3,3"/>
+      <line x1="690" y1="112" x2="690" y2="600" stroke="rgba(45,49,66,0.20)" stroke-width="1" stroke-dasharray="3,3"/>
+      <line x1="950" y1="112" x2="950" y2="600" stroke="rgba(45,49,66,0.20)" stroke-width="1" stroke-dasharray="3,3"/>
+
+      <!-- ===== alt 片段框（跨 审核/审查服务/中控 三条生命线） ===== -->
+      <rect x="148" y="216" width="564" height="220" rx="4" fill="rgba(45,49,66,0.02)" stroke="rgba(45,49,66,0.22)" stroke-width="1"/>
+      <rect x="148" y="216" width="40" height="16" rx="2" fill="#f5f5f5" stroke="rgba(45,49,66,0.22)" stroke-width="1"/>
+      <text x="168" y="228" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">ALT</text>
+      <text x="200" y="228" fill="#4f5d75" font-size="9" font-family="'Geist','Noto Sans SC',sans-serif">[L2/L3 中低危 · 运营处置]</text>
+      <!-- 分支分隔线 -->
+      <line x1="156" y1="364" x2="704" y2="364" stroke="rgba(45,49,66,0.20)" stroke-width="1" stroke-dasharray="4,3"/>
+      <text x="200" y="382" fill="#4f5d75" font-size="9" font-family="'Geist','Noto Sans SC',sans-serif">[L1 不可降级 · 引擎直断]</text>
+
+      <!-- ===== 激活条 ===== -->
+      <rect x="426" y="150" width="8" height="48" fill="rgba(45,49,66,0.06)" stroke="#4f5d75" stroke-width="0.8"/>
+      <rect x="426" y="244" width="8" height="104" fill="rgba(45,49,66,0.06)" stroke="#4f5d75" stroke-width="0.8"/>
+      <rect x="166" y="310" width="8" height="44" fill="rgba(45,49,66,0.06)" stroke="#4f5d75" stroke-width="0.8"/>
+      <rect x="686" y="280" width="8" height="16" fill="rgba(45,49,66,0.06)" stroke="#4f5d75" stroke-width="0.8"/>
+      <rect x="426" y="466" width="8" height="88" fill="rgba(45,49,66,0.06)" stroke="#4f5d75" stroke-width="0.8"/>
+
+      <!-- ===== 消息 ===== -->
+
+      <!-- 1 审核 → 审查服务：审核回调 -->
+      <path d="M 178,150 H 422" fill="none" stroke="#2e5aa8" stroke-width="1.2" marker-end="url(#f5-arrow-link)"/>
+      <rect x="236" y="128" width="116" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="294" y="139" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">审核回调 · 违规事件</text>
+
+      <!-- 2 审查服务 self：验签·级别判定 -->
+      <path d="M 434,186 H 478 V 202 H 438" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#f5-arrow)"/>
+      <rect x="486" y="182" width="128" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="550" y="193" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif">验签 · 去重 · 级别判定</text>
+
+      <!-- 3 审查服务 → 中控：实时推送告警（coral headline，异步） -->
+      <path d="M 438,248 H 682" fill="none" stroke="#eb6c36" stroke-width="1.2" marker-end="url(#f5-arrow-open-accent)"/>
+      <rect x="496" y="226" width="116" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="554" y="237" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">实时推送告警 · async</text>
+
+      <!-- 4 中控 → 审查服务：处置指令 -->
+      <path d="M 686,282 H 438" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#f5-arrow)"/>
+      <rect x="476" y="260" width="160" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="556" y="271" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">处置指令（记录 / 断流 / 忽略）</text>
+
+      <!-- 5 审查服务 → 审核：断流指令 -->
+      <path d="M 426,316 H 178" fill="none" stroke="#2e5aa8" stroke-width="1.2" marker-end="url(#f5-arrow-link)"/>
+      <rect x="228" y="294" width="140" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="298" y="305" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">断流指令 DropLiveStream</text>
+
+      <!-- 6 审核 → 审查服务：断流结果（返回） -->
+      <path d="M 174,344 H 422" fill="none" stroke="#4f5d75" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#f5-arrow)"/>
+      <rect x="252" y="322" width="60" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="282" y="333" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">断流结果</text>
+
+      <!-- 7 审核 → 审查服务：L1 断流通知 -->
+      <path d="M 178,404 H 422" fill="none" stroke="#2e5aa8" stroke-width="1.2" marker-end="url(#f5-arrow-link)"/>
+      <rect x="240" y="382" width="120" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="300" y="393" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">L1 断流通知 · 已执行</text>
+
+      <!-- 8 审查服务 → 中控：推送断流结果 -->
+      <path d="M 438,428 H 682" fill="none" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#f5-arrow-open)"/>
+      <rect x="492" y="406" width="116" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="550" y="417" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">推送断流结果 · async</text>
+
+      <!-- 9 审查服务 → 观众端：擦音指令下发 -->
+      <path d="M 434,472 H 942" fill="none" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#f5-arrow-open)"/>
+      <rect x="632" y="450" width="116" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="690" y="461" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">擦音指令下发 · async</text>
+
+      <!-- 10 观众端 self：擦音效果 -->
+      <path d="M 954,506 H 998 V 522 H 958" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#f5-arrow)"/>
+      <rect x="1004" y="502" width="92" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="1050" y="513" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif">静音 / 嘀声 2-5 秒</text>
+
+      <!-- 11 审查服务 → 观众端：断流结束通知 -->
+      <path d="M 434,556 H 942" fill="none" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#f5-arrow-open)"/>
+      <rect x="620" y="534" width="128" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="684" y="545" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">断流结束通知（L1 或运营断流）</text>
+
+      <!-- ===== 参与者 ===== -->
+      <rect x="95" y="64" width="150" height="44" rx="6" fill="#f5f5f5"/>
+      <rect x="95" y="64" width="150" height="44" rx="6" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.30)" stroke-width="1"/>
+      <text x="170" y="84" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">腾讯云审核引擎</text>
+      <text x="170" y="100" fill="#4f5d75" font-size="9" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">EXTERNAL</text>
+
+      <rect x="355" y="64" width="150" height="44" rx="6" fill="#f5f5f5"/>
+      <rect x="355" y="64" width="150" height="44" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1"/>
+      <text x="430" y="84" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">审查服务</text>
+      <text x="430" y="100" fill="#4f5d75" font-size="9" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">PLATFORM · CORE</text>
+
+      <rect x="615" y="64" width="150" height="44" rx="6" fill="#f5f5f5"/>
+      <rect x="615" y="64" width="150" height="44" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="690" y="84" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">直播中控 · 运营</text>
+      <text x="690" y="100" fill="#4f5d75" font-size="9" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">TENANT PC</text>
+
+      <rect x="875" y="64" width="150" height="44" rx="6" fill="#f5f5f5"/>
+      <rect x="875" y="64" width="150" height="44" rx="6" fill="rgba(79,93,117,0.10)" stroke="#7a8399" stroke-width="1"/>
+      <text x="950" y="84" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">观众端 H5</text>
+      <text x="950" y="100" fill="#4f5d75" font-size="9" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">VIEWER · 375px</text>
+
+      <!-- ===== 图例 ===== -->
+      <line x1="40" y1="616" x2="1060" y2="616" stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
+      <text x="40" y="636" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.14em">NOTES</text>
+      <text x="104" y="636" fill="#4f5d75" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif">处置说明必填不少于 10 字；30 秒未处置由系统自动记录并升级提醒（BR-AUDIT-011）；断流为不可撤销操作。</text>
+      <text x="104" y="654" fill="#4f5d75" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif">判定结果未送达时观众端展示「直播中控尚未收到此违规的判定结果」提示，该提示与擦音效果互斥（不会同时出现）。</text>
+    </svg>
+  </div>
+  <figcaption><b>时序图</b> · 腾讯云审核回调进入审查服务，经级别判定后按 L2/L3（运营处置）与 L1（引擎直断）两条分支流转，最终向观众端下发擦音或断流通知。处置说明必填≥10 字，30 秒未处置自动记录。</figcaption>
+</figure>
+
+  <figure class="figure" id="fig-9-6">
+  <div class="fig-head"><span class="fig-no">图 9-6</span><span class="fig-title">外部接口时序：腾讯云回调与擦音对接</span></div>
+  <div class="fig-body">
+<svg viewBox="0 0 1100 660" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="audit-api-title audit-api-desc">
+      <title id="audit-api-title">外部接口时序：腾讯云回调与擦音对接</title>
+      <desc id="audit-api-desc">接口时序图：腾讯云审核回调经网关验签与去重后分发至审查服务，审查服务执行级别判定与断流指令，并向 AMS 发起回放擦音任务，最终向回放页同步拼接与发布状态。</desc>
+      <defs>
+        <marker id="f6-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
+        <marker id="f6-arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#eb6c36"/></marker>
+        <marker id="f6-arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#2e5aa8"/></marker>
+        <marker id="f6-arrow-open" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polyline points="0 0, 8 3, 0 6" fill="none" stroke="#4f5d75" stroke-width="1.2"/></marker>
+      </defs>
+
+      <rect width="100%" height="100%" fill="#f5f5f5"/>
+
+      <!-- ===== 生命线 ===== -->
+      <line x1="130" y1="112" x2="130" y2="580" stroke="rgba(45,49,66,0.20)" stroke-width="1" stroke-dasharray="3,3"/>
+      <line x1="350" y1="112" x2="350" y2="580" stroke="rgba(45,49,66,0.20)" stroke-width="1" stroke-dasharray="3,3"/>
+      <line x1="570" y1="112" x2="570" y2="580" stroke="rgba(45,49,66,0.20)" stroke-width="1" stroke-dasharray="3,3"/>
+      <line x1="790" y1="112" x2="790" y2="580" stroke="rgba(45,49,66,0.20)" stroke-width="1" stroke-dasharray="3,3"/>
+      <line x1="1010" y1="112" x2="1010" y2="580" stroke="rgba(45,49,66,0.20)" stroke-width="1" stroke-dasharray="3,3"/>
+
+      <!-- ===== 激活条 ===== -->
+      <rect x="346" y="150" width="8" height="100" fill="rgba(45,49,66,0.06)" stroke="#4f5d75" stroke-width="0.8"/>
+      <rect x="126" y="150" width="8" height="24" fill="rgba(45,49,66,0.06)" stroke="#4f5d75" stroke-width="0.8"/>
+      <rect x="566" y="244" width="8" height="264" fill="rgba(45,49,66,0.06)" stroke="#4f5d75" stroke-width="0.8"/>
+      <rect x="126" y="312" width="8" height="32" fill="rgba(45,49,66,0.06)" stroke="#4f5d75" stroke-width="0.8"/>
+      <rect x="786" y="376" width="8" height="32" fill="rgba(45,49,66,0.06)" stroke="#4f5d75" stroke-width="0.8"/>
+      <rect x="1006" y="472" width="8" height="32" fill="rgba(45,49,66,0.06)" stroke="#4f5d75" stroke-width="0.8"/>
+
+      <!-- ===== 消息 ===== -->
+
+      <!-- 1 审核 → 网关：POST /audit/callback -->
+      <path d="M 138,150 H 342" fill="none" stroke="#2e5aa8" stroke-width="1.2" marker-end="url(#f6-arrow-link)"/>
+      <rect x="160" y="128" width="140" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="230" y="139" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">① POST /audit/callback</text>
+
+      <!-- 2 网关 self：验签 + 幂等去重 -->
+      <path d="M 354,182 H 398 V 198 H 358" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#f6-arrow)"/>
+      <rect x="404" y="178" width="100" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="454" y="189" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif">② 验签 + 幂等去重</text>
+
+      <!-- 3 网关 → 审核：200 ACK（返回） -->
+      <path d="M 346,210 H 138" fill="none" stroke="#4f5d75" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#f6-arrow)"/>
+      <rect x="208" y="188" width="64" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="240" y="199" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">③ 200 ACK</text>
+
+      <!-- 4 网关 → 审查服务：分发违规事件（异步） -->
+      <path d="M 354,244 H 562" fill="none" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#f6-arrow-open)"/>
+      <rect x="384" y="222" width="128" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="448" y="233" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">④ 分发违规事件 · MQ</text>
+
+      <!-- 5 审查服务 self：级别判定 -->
+      <path d="M 574,276 H 618 V 292 H 578" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#f6-arrow)"/>
+      <rect x="624" y="272" width="112" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="680" y="283" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif">⑤ 级别判定 L1/L2/L3</text>
+
+      <!-- 6 审查服务 → 审核：断流指令 -->
+      <path d="M 566,312 H 138" fill="none" stroke="#2e5aa8" stroke-width="1.2" marker-end="url(#f6-arrow-link)"/>
+      <rect x="200" y="290" width="160" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="280" y="301" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">⑥ 断流指令 DropLiveStream</text>
+
+      <!-- 7 审核 → 审查服务：断流执行结果（返回） -->
+      <path d="M 138,340 H 562" fill="none" stroke="#2e5aa8" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#f6-arrow-link)"/>
+      <rect x="260" y="318" width="80" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="300" y="329" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">⑦ 断流执行结果</text>
+
+      <!-- 8 审查服务 → AMS：创建回放擦音任务 -->
+      <path d="M 574,376 H 782" fill="none" stroke="#2e5aa8" stroke-width="1.2" marker-end="url(#f6-arrow-link)"/>
+      <rect x="600" y="354" width="128" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="664" y="365" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">⑧ 创建回放擦音任务</text>
+
+      <!-- 9 AMS → 审查服务：擦音完成回调（coral headline，返回） -->
+      <path d="M 786,404 H 574" fill="none" stroke="#eb6c36" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#f6-arrow-accent)"/>
+      <rect x="596" y="382" width="164" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="678" y="393" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">⑨ 擦音完成回调 · muted_file_url</text>
+
+      <!-- 10 审查服务 → 回放页：拼接·发布状态推送（异步） -->
+      <path d="M 574,440 H 1002" fill="none" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#f6-arrow-open)"/>
+      <rect x="688" y="418" width="128" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="752" y="429" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">⑩ 拼接·发布状态推送</text>
+
+      <!-- 11 回放页 → 审查服务：审核/拼接/发布操作 -->
+      <path d="M 1006,472 H 578" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#f6-arrow)"/>
+      <rect x="692" y="450" width="152" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="768" y="461" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">⑪ 审核 / 拼接 / 发布操作</text>
+
+      <!-- 12 审查服务 → 回放页：操作结果（返回） -->
+      <path d="M 574,500 H 1002" fill="none" stroke="#4f5d75" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#f6-arrow)"/>
+      <rect x="716" y="478" width="60" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="746" y="489" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">⑫ 操作结果</text>
+
+      <!-- ===== 参与者 ===== -->
+      <rect x="55" y="64" width="150" height="44" rx="6" fill="#f5f5f5"/>
+      <rect x="55" y="64" width="150" height="44" rx="6" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.30)" stroke-width="1"/>
+      <text x="130" y="84" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">腾讯云审核</text>
+      <text x="130" y="100" fill="#4f5d75" font-size="9" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">API-AUDIT-001</text>
+
+      <rect x="275" y="64" width="150" height="44" rx="6" fill="#f5f5f5"/>
+      <rect x="275" y="64" width="150" height="44" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="350" y="84" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">回调网关</text>
+      <text x="350" y="100" fill="#4f5d75" font-size="9" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">GATEWAY</text>
+
+      <rect x="495" y="64" width="150" height="44" rx="6" fill="#f5f5f5"/>
+      <rect x="495" y="64" width="150" height="44" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1"/>
+      <text x="570" y="84" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">审查服务</text>
+      <text x="570" y="100" fill="#4f5d75" font-size="9" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">PLATFORM · CORE</text>
+
+      <rect x="715" y="64" width="150" height="44" rx="6" fill="#f5f5f5"/>
+      <rect x="715" y="64" width="150" height="44" rx="6" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.30)" stroke-width="1"/>
+      <text x="790" y="84" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">腾讯云 AMS</text>
+      <text x="790" y="100" fill="#4f5d75" font-size="9" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">API-AUDIT-004/005</text>
+
+      <rect x="935" y="64" width="150" height="44" rx="6" fill="#f5f5f5"/>
+      <rect x="935" y="64" width="150" height="44" rx="6" fill="rgba(79,93,117,0.10)" stroke="#7a8399" stroke-width="1"/>
+      <text x="1010" y="84" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">回放页 · 运营</text>
+      <text x="1010" y="100" fill="#4f5d75" font-size="9" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">TENANT PC</text>
+
+      <!-- ===== 图例 ===== -->
+      <line x1="40" y1="596" x2="1060" y2="596" stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
+      <text x="40" y="616" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.14em">NOTES</text>
+      <text x="104" y="616" fill="#4f5d75" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif">回调全量接收（BR-AUDIT-005）：验签失败或重复事件被网关拦截，不进入业务；断流指令仅 L1 引擎自动断流与运营确认断流两个来源。</text>
+      <text x="104" y="634" fill="#4f5d75" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif">无违规场次跳过 AMS 擦音任务，源码文件即对外发布版；擦音任务失败或超时按 BR-AUDIT-019 降级处理（锁定播放 / 警告标注 / 可重试）。</text>
+      <text x="104" y="652" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif">接口编号对应 PRD §16 外部接口标注：① API-AUDIT-001 回调 ⑥ API-AUDIT-007 断流 ⑧⑨ API-AUDIT-004/005 AMS 擦音。</text>
+    </svg>
+  </div>
+  <figcaption><b>时序图</b> · 回调验签去重后 MQ 分发、断流指令 DropLiveStream、AMS 擦音任务与完成回调、回放页拼接发布状态推送与操作提交。无违规场次跳过 AMS 擦音任务，源码文件即对外发布版。</figcaption>
+</figure>
+
+  <h3>状态过渡操作表（违规处置）</h3>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>当前状态</th><th>触发操作</th><th>目标状态</th><th>操作者</th><th>前置约束</th><th>后置动作</th></tr></thead>
+    <tbody>
+      <tr><td>—</td><td>FN-AUDIT-INFRA-001</td><td>待处理</td><td>系统（回调）</td><td>验签通过 + 幂等去重通过 + L2/L3 判定</td><td>违规入库 + 中控告警 + 待处理角标 +1</td></tr>
+      <tr><td>—</td><td>FN-AUDIT-INFRA-001</td><td>已断流</td><td>系统（回调）</td><td>L1 不可降级判定</td><td>引擎已断流，回调携带断流结果直接落库</td></tr>
+      <tr><td>待处理</td><td>FN-AUDIT-PC-003</td><td>已记录</td><td>直播运营</td><td>处置说明≥10 字</td><td>记录存档 + 主播侧橙色警示 8 秒</td></tr>
+      <tr><td>待处理</td><td>FN-AUDIT-PC-003</td><td>已断流</td><td>直播运营</td><td>处置说明≥10 字 + 红色确认</td><td>断流指令下发 + 场次终止 + 主播侧红色常驻提示</td></tr>
+      <tr><td>待处理</td><td>FN-AUDIT-PC-003</td><td>已忽略</td><td>直播运营</td><td>处置说明≥10 字</td><td>标记非违规，主播观众均无感知</td></tr>
+      <tr><td>待处理</td><td>系统超时</td><td>已超时→已记录</td><td>系统（定时）</td><td>30 秒未处置</td><td>自动记录 + 向上级升级提醒</td></tr>
+      <tr><td>待处理/已超时</td><td>系统归档</td><td>已归档</td><td>系统</td><td>场次结束 / 审查关闭</td><td>只读保留可查，不可再处置</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>状态过渡操作表（回放生命周期）</h3>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>当前状态</th><th>触发操作</th><th>目标状态</th><th>操作者</th><th>前置约束</th><th>后置动作</th></tr></thead>
+    <tbody>
+      <tr><td>—</td><td>录播域事件</td><td>待核对</td><td>系统</td><td>直播结束 + 片段/文件生成</td><td>生成 ReplaySegment×N + ReplayFile×N（待审核）</td></tr>
+      <tr><td>待核对</td><td>FN-AUDIT-PC-004</td><td>拼接中</td><td>直播运营</td><td>全部文件审核通过 + 勾选 index 一一对应</td><td>FFmpeg concat 启动 + 进度展示</td></tr>
+      <tr><td>待核对</td><td>FN-AUDIT-PC-004</td><td>已拼接</td><td>系统</td><td>仅 1 片段 1 文件（单文件免拼接）</td><td>自动视为完整回放</td></tr>
+      <tr><td>拼接中</td><td>系统</td><td>已拼接</td><td>系统</td><td>拼接成功</td><td>生成完整源码 + 完整擦音文件（无违规仅源码）</td></tr>
+      <tr><td>拼接中</td><td>系统</td><td>拼接失败</td><td>系统</td><td>片段损坏 / 重试超限</td><td>标记失败原因，运营可重试</td></tr>
+      <tr><td>已拼接</td><td>FN-AUDIT-PC-005</td><td>已发布</td><td>直播运营</td><td>点击「发布」</td><td>回放对观众可见 + 发布留档</td></tr>
+      <tr><td>已发布</td><td>平台审核</td><td>已驳回</td><td>系统/平台</td><td>发布审核驳回</td><td>驳回态，可重新提交发布</td></tr>
+      <tr><td>已驳回</td><td>FN-AUDIT-PC-005</td><td>已拼接</td><td>直播运营</td><td>重新提交</td><td>回到可发布态</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- §10 FN/UC -->
+<section class="chapter" id="ch10">
+  <div class="ch-head"><span class="ch-no">§ 10</span><h2>功能需求列表与用例（FN / UC）</h2></div>
+  <p class="ch-lede">共 8 个功能需求（FN）映射 12 个用例（UC，含弹窗卡与入口卡）。每个 FN 卡片含属性、基本流程、备选流程与数据范围。</p>
+
+  <!-- FN-INFRA-001 -->
+  <div class="fn-card" id="fn-infra-001">
+    <div class="fn-head"><span class="fn-code">FN-AUDIT-INFRA-001</span><span class="fn-name">审核回调接入服务（基础设施）</span><span class="fn-auto">[系统自动] 事件驱动</span></div>
+    <div class="fn-body">
+      <h5>前置条件</h5>
+      <ol>
+        <li>腾讯云直播审核已开启并配置回调地址（回调模板由平台运维在腾讯云控制台人工配置）</li>
+        <li>审查服务与 MQ 已就绪</li>
+      </ol>
+      <h5>基本流程</h5>
+      <ol>
+        <li>[系统自动] 腾讯云审核引擎对推流执行实时审核（音视频画面 + ASR 音频文本），命中违规即回调 <code>POST /audit/callback</code>（携带签名与 <code>Label/subLabel/score/suggestion/asr_text/duration/seq/stream_id</code> 等字段）</li>
+        <li>[系统自动] 回调网关验签（签名不合法直接拒绝，返回 401，不进入业务）</li>
+        <li>[系统自动] 幂等去重（按回调唯一键去重，重复事件返回 200 但不重复入库）</li>
+        <li>[系统自动] 验签去重通过后立即返回 200 ACK</li>
+        <li>[系统自动] 事件写入 MQ，异步分发至审查服务</li>
+        <li>[系统自动] 审查服务执行级别判定（三层：标签归类 → 类别定档 → score 校准，输出 L1/L2/L3）</li>
+        <li>[系统自动] 违规记录入库（含原始回调 JSON 留档，BR-AUDIT-010）</li>
+        <li>[系统自动] 多路分发：直播中控（WebSocket 实时推送告警，待处理角标 +1）；观众端（下发擦音指令，按租户处理方式：静音/提示音覆盖）；L1 事件（腾讯云配置层已自动断流，回调携带断流结果，中控直接展示已断流状态）</li>
+        <li>[系统自动] 若租户审查开关已关闭：L2/L3 事件不再产生与分发；L1 事件（七类不可降级）仍强制执行并展示</li>
+      </ol>
+      <h5>备选流程</h5>
+      <ul>
+        <li>6a. 回调投递失败（网络异常）→ 腾讯云按其重试策略重投；网关侧幂等去重保证不重复入库</li>
+        <li>8a. WebSocket 推送失败 → 观众端展示「直播中控尚未收到此违规的判定结果」提示（与处理效果互斥）；恢复后自动续接</li>
+        <li>9a. 开关中途关闭 → 按规则 BR-AUDIT-020 处理（违规列表只读 + 待处理自动归档，L1 除外）</li>
+      </ul>
+      <h5>数据范围与后置条件</h5>
+      <dl class="fn-meta">
+        <dt>R / W</dt><dd>R: 回调报文 · W: 违规记录、分发日志</dd>
+        <dt>后置条件</dt><dd>验签通过的回调 100% 入库（BR-AUDIT-005）；三端按规则收到分发</dd>
+        <dt>关联 UC</dt><dd>UC-AUDIT-002 / UC-AUDIT-004</dd>
+      </dl>
+    </div>
+  </div>
+
+  <!-- FN-PC-001 -->
+  <div class="fn-card" id="fn-pc-001">
+    <div class="fn-head"><span class="fn-code">FN-AUDIT-PC-001</span><span class="fn-name">租户内容审查开关管理</span><span class="fn-auto">[手动] + [系统自动] · 运营后台 PC</span></div>
+    <div class="fn-body">
+      <h5>前置条件</h5>
+      <p>平台运营已登录运营后台，进入「租户管理」列表页</p>
+      <h5>基本流程</h5>
+      <ol>
+        <li>[手动] 平台运营在租户管理列表定位目标租户（支持关键词 + 启用状态筛选）</li>
+        <li>[手动] 点击该租户行「内容审查」列的开关</li>
+        <li>[系统自动] <strong>开启</strong>：直接生效，toast 提示「已开启内容审查」，开关变绿（无确认弹窗）</li>
+        <li>[系统自动] <strong>关闭</strong>：弹出「确认关闭内容审查」二次确认弹窗：租户摘要区（租户名称脱敏、直播推流地址、今日违规数）；影响说明（中控台不再显示 L2 和 L3 级别的审查记录、观众端不再做擦音处理、回放文件不再处理违规内容）；不可降级底线提示（涉黄/涉政/涉暴等七类不可降级内容仍由平台强制执行审查）；在播场次警告（红字提醒当前在播场数及关闭后的即时影响）</li>
+        <li>[手动] 运营核对后点击红色主按钮「确认关闭」（点「取消」或遮罩不变更）</li>
+        <li>[系统自动] 开关关闭生效，toast 提示「已关闭内容审查」，自动记录操作日志（操作人/时间/租户/原状态/新状态，BR-AUDIT-016）</li>
+      </ol>
+      <div class="callout">
+        <b>关闭后的系统行为（全链路）</b> · L2/L3 事件不再产生与展示（中控告警统计仅剩 L1 计数）；观众端不做任何擦音处理（主播直播不受干扰）；回放文件不做违规处理（不触发 AMS 擦音）；L1 高危（七类不可降级）仍由腾讯云配置层强制审查、自动断流并在中控展示；已产生的违规记录保留可查；中控顶部显示「已关闭内容审查」提示条。
+      </div>
+      <h5>数据范围与后置条件</h5>
+      <dl class="fn-meta">
+        <dt>R / W</dt><dd>R: 租户列表 · W: 租户审查开关状态、操作日志</dd>
+        <dt>后置条件</dt><dd>租户审查能力按开关状态生效；变更全程可追溯</dd>
+        <dt>关联 UC</dt><dd>UC-AUDIT-001 / UC-AUDIT-001M</dd>
+      </dl>
+    </div>
+  </div>
+
+  <!-- FN-PC-002 -->
+  <div class="fn-card" id="fn-pc-002">
+    <div class="fn-head"><span class="fn-code">FN-AUDIT-PC-002</span><span class="fn-name">直播中控内容审查页签（实时监控 + 历史违规）</span><span class="fn-auto">[手动] 入口 + [系统自动] 推送 · 租户后台 PC</span></div>
+    <div class="fn-body">
+      <h5>前置条件</h5>
+      <p>场次状态为直播中/已结束 + 租户审查开关已开启（关闭态下入口保留，仅展示 L1）</p>
+      <h5>入口（全部复用既有页面，BR-AUDIT-013）</h5>
+      <ul>
+        <li>直播列表 → 「直播中控台」→ 自动定位「内容审查」页签（与互动工具/商品卡片/直播订单并列）</li>
+        <li>直播列表 → 「更多」→「历史违规列表」</li>
+        <li>直播列表 → 「更多」→「查看回放」（三种不可点情形：不允许回放 / 回放待平台审核 / 回放未通过审核）</li>
+      </ul>
+      <h5>基本流程（实时监控）</h5>
+      <ol>
+        <li>[手动] 租户运营进入直播中控「内容审查」页签</li>
+        <li>[系统自动] 页面展示：<strong>场次信息条</strong>（直播标题脱敏、场次状态绿/灰/蓝、主播昵称脱敏、已播时长、观看人数）；<strong>审查关闭提示条</strong>（仅开关关闭时）；<strong>告警统计条</strong>（违规总数 + 红/黄/蓝三档计数，点击联动筛选）；<strong>违规筛选栏</strong>（严重程度 全部/L1~L3 · 处置状态 · 排序 时间/严重度）；<strong>违规列表</strong>（色条/时间/级别徽标/状态/类别/脱敏摘要，最新置顶，点击行开详情抽屉：证据录音试听、ASR 原话、置信度、原始判定数据仅调试模式可见）；<strong>待处理角标</strong>（页签名旁红色数字，随处置实时减少）</li>
+        <li>[系统自动] WebSocket 持续接收审查服务推送的违规事件并实时渲染；运营离开页面停止接收，再次进入自动恢复</li>
+        <li>[系统自动] 主播侧警示条联动：「记录」处置后主播画面顶部橙色提醒 8 秒；「断流」后红色提示常驻（仅主播与中控可见，观众无感知）</li>
+      </ol>
+      <h5>基本流程（历史违规，已结束场次）</h5>
+      <ol>
+        <li>[手动] 运营在直播列表「更多」点击「历史违规列表」</li>
+        <li>[系统自动] 展示该场次全部违规档案：顶部橙色横幅「本场次已结束（结束时间 HH:mm:ss），违规列表仅可查看」；统计条 + 筛选栏 + 只读列表（处置按钮全部置灰）；列表底部常驻「本场次已结束，后续违规不再接收」</li>
+      </ol>
+      <h5>备选流程</h5>
+      <ul>
+        <li>2a. 推送失败 → 页面提示「直播中控尚未收到此违规的判定结果」，恢复后自动续接</li>
+        <li>2b. 无违规记录 → 列表显示「暂无违规记录」</li>
+        <li>2c. 开关关闭后进入 → 仅展示 L1 数据 + 顶部关闭提示条</li>
+      </ul>
+      <h5>数据范围与后置条件</h5>
+      <dl class="fn-meta">
+        <dt>R / W</dt><dd>R: 违规记录、处置记录 · W: 无（展示层只读）</dd>
+        <dt>后置条件</dt><dd>运营实时掌握本场全部违规并可进入处置；判定数据完整接收、完整展示，不遗漏不筛选</dd>
+        <dt>关联 UC</dt><dd>UC-AUDIT-000 / UC-AUDIT-002 / UC-AUDIT-005</dd>
+      </dl>
+    </div>
+  </div>
+
+  <!-- FN-PC-003 -->
+  <div class="fn-card" id="fn-pc-003">
+    <div class="fn-head"><span class="fn-code">FN-AUDIT-PC-003</span><span class="fn-name">违规处置与处理方式切换</span><span class="fn-auto">[手动] 处置 + [系统自动] 同步 · 租户后台 PC</span></div>
+    <div class="fn-body">
+      <h5>前置条件</h5>
+      <p>场次状态为直播中 + 存在「待处理」违规</p>
+      <h5>基本流程</h5>
+      <ol>
+        <li>[手动] 运营点击违规行，右侧滑出详情抽屉（完整判定依据 + 证据录音试听）</li>
+        <li>[手动] 按级别收敛的处置按钮（仅「待处理」可点）：<strong>L1 高危</strong>无处置按钮（腾讯云直接断流，平台不参与）；<strong>L2 中危</strong>「记录」「断流」；<strong>L3 低危</strong>「记录」「忽略」</li>
+        <li>[手动] 点击处置按钮弹出确认弹窗（标题随方式变化；断流为红色警示风格 +「断流后直播将立即终止，此操作不可撤销」警告；处置说明必填≥10 字，实时字数提示，未达标确认按钮置灰）</li>
+        <li>[手动] 确认后系统提交处置：状态更新为已记录/已断流/已忽略，待处理角标减一，处置留档（处置人/时间/方式/说明）</li>
+        <li>[系统自动] 断流处置：审查服务向腾讯云下发 DropLiveStream 断流指令 → 场次终止 → 主播红色常驻提示 + 观众端断流结束页</li>
+        <li>[系统自动] 记录处置：主播画面顶部橙色警示 8 秒后消失，观众无感知；忽略处置：仅标记状态，主播观众均无感知</li>
+        <li>[手动] 运营在场次信息条切换<strong>处理方式</strong>（静音 / 提示音覆盖），系统立即同步后台与观众端，此后触发的处理效果按新方式生效；场次已结束时不可切换</li>
+      </ol>
+      <h5>备选流程</h5>
+      <ul>
+        <li>1a. 30 秒未处置 → 系统自动按「已记录」处理并向上级发送升级提醒（BR-AUDIT-011）</li>
+        <li>5a. 断流指令下发失败 → 页面明确提示失败原因，运营可重试</li>
+      </ul>
+      <h5>数据范围与后置条件</h5>
+      <dl class="fn-meta">
+        <dt>R / W</dt><dd>R: 违规记录 · W: 处置记录、处理方式配置</dd>
+        <dt>后置条件</dt><dd>每笔处置有记录、有说明、可追溯；断流全程红色警示且不可撤销</dd>
+        <dt>关联 UC</dt><dd>UC-AUDIT-002 / UC-AUDIT-002M</dd>
+      </dl>
+    </div>
+  </div>
+
+  <!-- FN-PC-004 -->
+  <div class="fn-card" id="fn-pc-004">
+    <div class="fn-head"><span class="fn-code">FN-AUDIT-PC-004</span><span class="fn-name">回放片段/文件审核与手动拼接（v2.0.0）</span><span class="fn-auto">[手动] 审核拼接 + [系统自动] 校验执行 · 租户后台 PC</span></div>
+    <div class="fn-body">
+      <h5>前置条件</h5>
+      <p>直播结束 + 回放片段与回放文件已生成（断流每超过 N 秒产生新片段，<code>segment_index</code> 递增）+ 审查开启；若该场次已发布则进入「已发布查看模式」（见 FN-AUDIT-PC-005）</p>
+      <div class="callout">
+        <b>核心机制（v2.0.0 手动拼接一句话）</b> · 每个回放片段与每个回放文件都单独审核通过 → 勾选序号一一对应的片段和文件 → 触发拼接 → 人工发布。
+      </div>
+      <h5>基本流程</h5>
+      <ol>
+        <li>[手动] 运营从直播列表「更多」→「查看回放」（或回放管理列表「查看回放」，自动携带 publish_status 进入对应模式）</li>
+        <li>[系统自动] 回放页展示：<strong>回放片段列表</strong>（序号/时间段/时长/断流原因/审核状态；单片段时无 checkbox，多片段时仅「已审核」片段可勾选）；<strong>回放文件列表</strong>（每个文件独立卡片 = 序号（与片段一一对应）+ checkbox + 「审核通过」按钮 + 文件名 + 时长 + 大小 + 审核状态；单击卡片播放该文件，多选用于拼接与多选查看）；<strong>单文件场景</strong>（仅 1 个回放文件时无 checkbox，自动视为完整回放）；<strong>本场次违规统计</strong>（有违规时按 L1/L2/L3 分档计数红/黄/蓝，无违规隐藏整个模块）；<strong>回放播放器</strong>（有违规时底部时间轴彩色圆点标注违规时刻可点击跳转复审，无违规无标记）；<strong>擦音模式单选 / 擦音前后对比 / 违规记录列表</strong>（有违规时显示，无违规时全部隐藏）；<strong>场次信息</strong>（推流ID/开始时间/结束时间/峰值观看）</li>
+        <li>[手动] <strong>① 逐个审核</strong>：运营对每个回放文件点「审核通过」（待审核 → 已审核）；文件审核状态同步联动对应片段的审核状态</li>
+        <li>[手动] <strong>② 勾选对应</strong>：多文件场景下勾选序号一一对应的片段与文件（集合 size 相等且 index 完全相等）；单文件场景自动跳过</li>
+        <li>[手动] <strong>③ 拼接</strong>：点击「拼接」按钮（前置校验：所有文件已审核通过 + 勾选一一对应，任一不满足则按钮锁定并提示原因）→ 系统执行 FFmpeg concat（源码 + 擦音双轨），进度条展示拼接中状态</li>
+        <li>[系统自动] <strong>④ 生成完整文件</strong>：有违规场次 → 完整源码文件（只读·对账用）+ 完整回放文件（已擦音·对外发布版）双份；无违规场次 → 仅完整源码文件 = 对外发布版（不生成擦音版本）</li>
+        <li>[手动] 运营可点「查看擦音前后对比」展开左右分栏试听（左原文/右处理后），点击时间轴违规标记或违规列表行跳转对应时间点复审</li>
+      </ol>
+      <h5>拼接状态（merge_status）</h5>
+      <p><code>pending</code> 未拼接 → <code>merging</code> 拼接中（进度条）→ <code>completed</code> 已拼接 / <code>failed</code> 拼接失败（提示「片段 N 损坏」或超时原因，可重试）</p>
+      <h5>失败处理</h5>
+      <ul>
+        <li>片段缺失/损坏 → failed + 提示片段 N 损坏</li>
+        <li>重试超限 → failed + 提示运营联系技术</li>
+        <li>校验失败（勾选不匹配）→ 按钮直接锁定，不进入处理流程</li>
+      </ul>
+      <h5>数据范围与后置条件</h5>
+      <dl class="fn-meta">
+        <dt>R / W</dt><dd>R: 片段/文件/违规记录 · W: 审核状态、勾选集合、merge_status</dd>
+        <dt>后置条件</dt><dd>完整回放文件生成（双文件保留 BR-AUDIT-025）；拼接产物仅供审核，发布由 FN-AUDIT-PC-005 独立完成</dd>
+        <dt>关联 UC</dt><dd>UC-AUDIT-003</dd>
+      </dl>
+    </div>
+  </div>
+
+  <!-- FN-PC-005 -->
+  <div class="fn-card" id="fn-pc-005">
+    <div class="fn-head"><span class="fn-code">FN-AUDIT-PC-005</span><span class="fn-name">回放发布（页内闭环，与拼接拆分）</span><span class="fn-auto">[手动] 发布 + [系统自动] 状态流转 · 租户后台 PC</span></div>
+    <div class="fn-body">
+      <h5>前置条件</h5>
+      <p>所有回放文件已审核通过 + 拼接已完成（merge_status=completed）</p>
+      <h5>基本流程</h5>
+      <ol>
+        <li>[系统自动] 满足前置条件后，右侧「人工审核」区显示「待发布」状态（橙色）+ 绿色「发布」按钮（原「通过并发布」已拆分为「审核通过」+「发布」两步）</li>
+        <li>[手动] 运营核对完整回放文件无误后点击「发布」</li>
+        <li>[系统自动] 发布提交成功 → 该区变为绿色「已发布」生效卡（展示发布人、发布时间），回放对观众可见</li>
+        <li>[系统自动] 已发布场次再次进入回放页时自动进入<strong>「已发布查看模式」</strong>：顶部蓝色提示条「回放已发布」+ 隐藏片段列表/文件列表/拼接区/人工审核区，仅展示完整回放文件（擦音后 + 源码）+ 场次信息</li>
+      </ol>
+      <h5>备选流程</h5>
+      <ul>
+        <li>1a. 文件未全部审核通过 → 发布按钮锁定，提示「需先将所有回放文件审核通过」</li>
+        <li>1b. 未完成拼接 → 发布按钮锁定，提示「需先完成拼接生成完整回放文件」</li>
+        <li>1c. 已驳回场次 → 完整文件已生成但为驳回态，可重新提交发布</li>
+        <li>3a. 发布后遭平台审核驳回 → 回放管理列表状态变「已驳回」，可重新提交</li>
+      </ul>
+      <h5>数据范围与后置条件</h5>
+      <dl class="fn-meta">
+        <dt>R / W</dt><dd>R: 完整文件 · W: publish_status、发布留档</dd>
+        <dt>后置条件</dt><dd>回放只有经人工发布后才对观众可见（BR-AUDIT-021/030）；发布留档可追溯</dd>
+        <dt>关联 UC</dt><dd>UC-AUDIT-006</dd>
+      </dl>
+    </div>
+  </div>
+
+  <!-- FN-PC-006 -->
+  <div class="fn-card" id="fn-pc-006">
+    <div class="fn-head"><span class="fn-code">FN-AUDIT-PC-006</span><span class="fn-name">回放管理列表（发布状态 + 删除）</span><span class="fn-auto">[手动] 查询/删除 + [系统自动] 状态 · 租户后台 PC</span></div>
+    <div class="fn-body">
+      <h5>前置条件</h5>
+      <p>租户已开通内容审查 + 存在已结束并生成回放的场次</p>
+      <h5>基本流程</h5>
+      <ol>
+        <li>[手动] 运营在租户后台直播列表切换到「回放管理」Tab</li>
+        <li>[系统自动] 展示全部已结束场次的回放记录（按创建时间倒序）：标题行（存在「待核对」回放时右侧显示橙色「待核对 N」徽标，发布或驳回后实时减少）；查询区（场次名称/回放ID 脱敏/主播 + 发布状态组合筛选）；列表列（场次ID 可排序 / 场次名称 / 主播 / 直播状态统一灰「已结束」 / 发布状态 橙=待核对·绿=已发布·红=已驳回 可排序 / 操作：查看回放、删除）</li>
+        <li>[手动] 点击「查看回放」→ 携带 publish_status 进入回放页对应模式：已发布→已发布查看模式；已驳回→驳回态（可重新提交）；待核对→完整审核→拼接→发布流程</li>
+        <li>[手动] 点击「删除」→ 二次确认弹窗（「确认删除回放『{场次名称}』（{回放ID}）？删除后不可恢复」）→ 确认后记录移除，待核对徽标同步更新</li>
+      </ol>
+      <h5>备选流程</h5>
+      <ul>
+        <li>2a. 回放文件生成失败（无回放文件）→ 发布状态保持「待核对」，运营可联系平台排查</li>
+        <li>4a. 删除点「取消」→ 不做任何变更</li>
+      </ul>
+      <h5>数据范围与后置条件</h5>
+      <dl class="fn-meta">
+        <dt>R / W</dt><dd>R: 回放场次列表 · W: 删除标记</dd>
+        <dt>后置条件</dt><dd>运营可在统一入口查看全部回放发布进度并管理过期回放</dd>
+        <dt>关联 UC</dt><dd>UC-AUDIT-007 / UC-AUDIT-007D</dd>
+      </dl>
+    </div>
+  </div>
+
+  <!-- FN-APP-001 -->
+  <div class="fn-card" id="fn-app-001">
+    <div class="fn-head"><span class="fn-code">FN-AUDIT-APP-001</span><span class="fn-name">观众端违规处理效果</span><span class="fn-auto">[事件驱动] WebSocket 指令 · 观众端 H5 375px</span></div>
+    <div class="fn-body">
+      <h5>前置条件</h5>
+      <p>观众已进入直播间 + 主播直播中 + 租户审查开关已开启</p>
+      <h5>基本流程</h5>
+      <ol>
+        <li>[系统自动] 观众端订阅 WebSocket 指令通道，接收审查服务下发的处理指令</li>
+        <li>[系统自动] <strong>静音模式</strong>：直播声音消失，画面整体变暗（蒙层），中央显示静音图标 +「静音中...」+ 横向进度条，2-5 秒后自动恢复</li>
+        <li>[系统自动] <strong>提示音覆盖模式</strong>：违规声音被「嘀」声覆盖，中央显示铃铛图标 + 声波跳动动画，2-5 秒后自动恢复</li>
+        <li>[系统自动] 处理生效期间底部右侧显示状态标识（静音中=红 / 提示音覆盖中=橙）</li>
+        <li>[系统自动] <strong>判定未送达</strong>（推送失败）：画面顶部橙色提示「直播中控尚未收到此违规的判定结果」（与处理效果互斥，不同时出现），恢复后自动消失</li>
+        <li>[事件驱动] <strong>断流结束页</strong>（L1 引擎直断或运营断流）：直播声音立即停止，全屏「直播已结束」+「该直播因内容违规已被终止」，直播不再恢复</li>
+      </ol>
+      <div class="callout callout--ink">
+        <b>UI 叠加层级</b> · 主播信息栏/关闭按钮 &gt; 审查效果层 &gt; 视频画面/弹幕/商品卡片 &gt; 底部操作栏；效果层居中不遮挡主播面部核心区域。
+      </div>
+      <h5>备选流程</h5>
+      <ul>
+        <li>2a. 处理方式由直播中控切换后实时同步（FN-AUDIT-PC-003），此后效果按新方式生效</li>
+        <li>6a. 租户关闭审查开关后，观众端不做任何处理，直播全程无变化</li>
+      </ul>
+      <h5>数据范围与后置条件</h5>
+      <dl class="fn-meta">
+        <dt>R / W</dt><dd>R: 处理指令（WebSocket）· W: 无（观众端只感知不写入）</dd>
+        <dt>后置条件</dt><dd>违规内容不传到观众耳朵；处理过程可感知但不惊扰；断流有明确结束说明</dd>
+        <dt>关联 UC</dt><dd>UC-AUDIT-004</dd>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<!-- §11 BR -->
+<section class="chapter" id="ch11">
+  <div class="ch-head"><span class="ch-no">§ 11</span><h2>业务规则（BR）</h2></div>
+  <p class="ch-lede">共 24 条业务规则；高亮行为 v2.0.0 新增/重点规则。</p>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>编号</th><th>规则</th></tr></thead>
+    <tbody>
+      <tr class="rowhi"><td>BR-AUDIT-001</td><td>七类不可降级规则：涉黄/涉政/涉暴/公共安全/社会安全/违法乱纪/广告法为平台绝对不可降级类，任何置信度下不得降级、租户不可关闭，由腾讯云配置层强制执行</td></tr>
+      <tr><td>BR-AUDIT-003</td><td>处置渐进式规则：L1 高危由审核引擎直接断流、平台不参与；L2 中危可记录/断流；L3 低危可记录/忽略。运营可加严不可放宽</td></tr>
+      <tr><td>BR-AUDIT-004</td><td>处置策略映射：L1 断流+封禁（引擎）/ L2 断流（运营确认）/ L3 记录（默认）</td></tr>
+      <tr><td>BR-AUDIT-005</td><td>回调全量接收规则：验签与幂等去重通过后全量入库、全量展示，不截断不筛选</td></tr>
+      <tr><td>BR-AUDIT-008</td><td>场次状态机联动规则：「直播中」触发实时处理；「已结束」触发回放审核拼接发布链路</td></tr>
+      <tr><td>BR-AUDIT-009</td><td>告警分级规则：L1 高危→红色；L2 中危→黄色；L3 低危→蓝色；score&lt;50 且可降级类别降一档转人工复核</td></tr>
+      <tr><td>BR-AUDIT-010</td><td>处置依据完整规则：每条违规必须附完整依据链（判定数据 + 原始回调 JSON + 证据文件 URL）</td></tr>
+      <tr><td>BR-AUDIT-011</td><td>处置超时规则：违规告警 30 秒未处置 → 系统自动记录 + 向上级升级提醒</td></tr>
+      <tr class="rowhi"><td>BR-AUDIT-012</td><td>关闭审查底线规则：租户关闭内容审查后，中控台不再显示 L2/L3 审查记录、观众端不做擦音处理、回放文件不做违规处理；七类不可降级内容（L1）仍由平台强制执行审查并在中控展示</td></tr>
+      <tr><td>BR-AUDIT-013</td><td>入口复用规则：所有审查入口必须复用已有页面（运营后台租户管理列表、租户后台直播列表/回放管理 Tab），禁止新增独立菜单</td></tr>
+      <tr><td>BR-AUDIT-014</td><td>直播列表操作列统一规则：审查开关关闭后入口保留（用于查看 L1 与历史记录）；已结束且允许回放的直播才显示「查看回放」（含审核中/审核未通过两种锁定态）</td></tr>
+      <tr><td>BR-AUDIT-015</td><td>回放先擦音后开放规则：有违规场次的回放必须完成擦音才可播放；未擦音时播放器锁定不可播放原片</td></tr>
+      <tr><td>BR-AUDIT-016</td><td>操作日志规则：内容审查开关变更、处置、审核、拼接、发布、删除必须记录操作日志（操作人/时间/对象/前后状态）</td></tr>
+      <tr><td>BR-AUDIT-017</td><td>场次结束归档规则：场次转「已结束」→ 违规列表只读、处置按钮隐藏、不再接收新违规，记录保留可查</td></tr>
+      <tr><td>BR-AUDIT-018</td><td>审查关闭清理规则：关闭后 L2/L3 事件不再产生与展示；已产生违规记录保留可查，不再追加 L2/L3 新记录</td></tr>
+      <tr><td>BR-AUDIT-019</td><td>回放擦音异常降级规则：擦音超时→播放器锁定+可重试；擦音失败→展示原片+「尚未完成擦音处理」警告标注+可重试</td></tr>
+      <tr><td>BR-AUDIT-020</td><td>开关运行时变更规则：直播中途关闭审查 → 违规列表立即只读+隐藏处置按钮，已触发未处置的 L2/L3 违规自动归档（L1 除外）</td></tr>
+      <tr><td>BR-AUDIT-021</td><td>回放先审后发规则：回放只有经人工发布后才对观众可见；发布留档（发布人/时间）</td></tr>
+      <tr class="rowhi"><td>BR-AUDIT-024</td><td>多片段手动拼接规则：拼接触发、勾选、审核全部由运营在回放页手动完成，系统不自动拼接</td></tr>
+      <tr class="rowhi"><td>BR-AUDIT-025</td><td>双文件保留规则：有违规场次拼接后保留完整源码（只读·对账）+ 完整擦音（对外发布）双份；无违规场次源码即发布版</td></tr>
+      <tr><td>BR-AUDIT-027</td><td>违规标记复审规则：回放播放器时间轴以彩色圆点标注违规时刻（红/黄/蓝），点击跳转复审；违规列表行点击联动跳转</td></tr>
+      <tr class="rowhi"><td>BR-AUDIT-028</td><td>片段与文件独立审核规则：每个 ReplaySegment 与 ReplayFile 单独审核（review_status/reviewer/reviewed_at），拒绝态标红禁用不参与拼接；文件审核通过同步联动对应片段状态</td></tr>
+      <tr class="rowhi"><td>BR-AUDIT-029</td><td>片段文件一一对应规则：segment_index = file_index 且 segment_id = source_segment_id；勾选集合 size 相等 + index 完全相等才可拼接；单文件场景免勾选免拼接</td></tr>
+      <tr class="rowhi"><td>BR-AUDIT-030</td><td>先审后拼与先审后发规则：所有文件审核通过 → 才可勾选拼接；拼接完成 → 才可发布；顺序不可颠倒，任一环节缺失按钮锁定</td></tr>
+      <tr class="rowhi"><td>BR-AUDIT-031</td><td>无违规场次免擦音规则：本场次无违规记录时隐藏擦音模式/擦音对比/违规统计/违规列表，拼接后仅生成源码发布版，跳过 AMS 擦音任务</td></tr>
+      <tr class="rowhi"><td>BR-AUDIT-032</td><td>已发布查看模式规则：已发布场次进入回放页仅展示完整文件（擦音后+源码）+ 场次信息，隐藏全部操作区，无发布按钮</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- §12 ENT -->
+<section class="chapter" id="ch12">
+  <div class="ch-head"><span class="ch-no">§ 12</span><h2>数据实体（ENT）</h2></div>
+  <p class="ch-lede">共 7 个实体；所有涉及个人信息字段在展示层脱敏（§17）。</p>
+
+  <h3>ENT-AUDIT-001 违规记录（ReviewViolation）</h3>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>字段</th><th>类型</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td>violation_id</td><td>String</td><td>违规ID</td></tr>
+      <tr><td>stream_id</td><td>String</td><td>推流/场次ID（脱敏展示 PLS****XX）</td></tr>
+      <tr><td>audit_type</td><td>Enum</td><td>音频/视频/截图</td></tr>
+      <tr><td>violation_type</td><td>Enum</td><td>涉黄/涉政/涉暴/公共安全/社会安全/违法乱纪/广告法/辱骂/一般违禁词/低俗</td></tr>
+      <tr><td>violation_level</td><td>Enum</td><td>L1/L2/L3（L4 兜底仅记录）</td></tr>
+      <tr><td>violation_content</td><td>String</td><td>违规内容摘要（展示层脱敏，敏感词以██占位）</td></tr>
+      <tr><td>violation_time</td><td>DateTime</td><td>违规发生时间</td></tr>
+      <tr><td>suggestion</td><td>Enum</td><td>pass/review/block</td></tr>
+      <tr><td>confidence</td><td>Integer</td><td>置信度（0-100）</td></tr>
+      <tr><td>evidence_url</td><td>String</td><td>证据文件URL（COS，访问需鉴权）</td></tr>
+      <tr><td>raw_callback</td><td>Text</td><td>原始回调JSON（留档，仅调试模式可见）</td></tr>
+      <tr><td>audio_muted</td><td>Boolean</td><td>是否已处理</td></tr>
+      <tr><td>disposal_status</td><td>Enum</td><td>待处理/已记录/已断流/已忽略/已超时/已归档</td></tr>
+      <tr><td>created_at</td><td>DateTime</td><td>记录时间</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>ENT-AUDIT-002 处置记录（ReviewDisposal）</h3>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>字段</th><th>类型</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td>disposal_id</td><td>String</td><td>处置ID</td></tr>
+      <tr><td>violation_id</td><td>String</td><td>关联违规ID</td></tr>
+      <tr><td>disposal_type</td><td>Enum</td><td>记录/断流/忽略/自动记录/自动归档</td></tr>
+      <tr><td>disposal_reason</td><td>Text</td><td>处置说明（必填≥10字）</td></tr>
+      <tr><td>operator</td><td>String</td><td>处置人（脱敏展示）</td></tr>
+      <tr><td>operated_at</td><td>DateTime</td><td>处置时间</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>ENT-AUDIT-003 租户审查配置（TenantAuditConfig）</h3>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>字段</th><th>类型</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td>tenant_id</td><td>String</td><td>租户ID</td></tr>
+      <tr><td>tenant_name</td><td>String</td><td>租户名称（脱敏展示）</td></tr>
+      <tr><td>stream_domain</td><td>String</td><td>推流域名</td></tr>
+      <tr><td>audit_enabled</td><td>Boolean</td><td>审查开关</td></tr>
+      <tr><td>today_violation_count</td><td>Integer</td><td>今日违规数</td></tr>
+      <tr><td>mute_mode</td><td>Enum</td><td>静音/提示音覆盖</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>ENT-AUDIT-004 回放片段（ReplaySegment，v2.0.0）</h3>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>字段</th><th>类型</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td>segment_id</td><td>String</td><td>片段唯一ID</td></tr>
+      <tr><td>stream_id</td><td>String</td><td>所属场次</td></tr>
+      <tr><td>segment_index</td><td>Int(≥1)</td><td>片段序号（按开始时间排序）</td></tr>
+      <tr><td>start_time / end_time</td><td>DateTime</td><td>片段起止时间</td></tr>
+      <tr><td>duration</td><td>Int</td><td>时长（秒）</td></tr>
+      <tr><td>break_reason</td><td>String</td><td>断流原因</td></tr>
+      <tr><td>source_url</td><td>URL</td><td>源码片段地址（鉴权访问）</td></tr>
+      <tr><td>review_status</td><td>Enum</td><td>待审核/已审核/已拒绝</td></tr>
+      <tr><td>reviewer / reviewed_at</td><td>String/DateTime</td><td>审核人与审核时间</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>ENT-AUDIT-005 回放文件（ReplayFile，v2.0.0）</h3>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>字段</th><th>类型</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td>file_id</td><td>UUID</td><td>文件唯一ID</td></tr>
+      <tr><td>stream_id</td><td>String</td><td>所属场次</td></tr>
+      <tr><td>file_index</td><td>Int(≥1)</td><td>文件序号（=对应片段 segment_index）</td></tr>
+      <tr><td>source_segment_id</td><td>String</td><td>对应片段ID（一对一）</td></tr>
+      <tr><td>file_name</td><td>String</td><td>文件名</td></tr>
+      <tr><td>duration / file_size</td><td>Int</td><td>时长（秒）/大小（字节）</td></tr>
+      <tr><td>play_url_original</td><td>URL</td><td>源码文件地址（未擦音，仅租户+运营可见）</td></tr>
+      <tr><td>play_url_muted</td><td>URL?</td><td>回放文件地址（擦音后）</td></tr>
+      <tr><td>is_muted / allow_play</td><td>Boolean</td><td>是否已擦音 / 是否允许播放</td></tr>
+      <tr><td>merge_status</td><td>Enum</td><td>pending/merging/completed/failed</td></tr>
+      <tr><td>publish_status</td><td>Enum</td><td>待核对/已发布/已驳回</td></tr>
+      <tr><td>review_status</td><td>Enum</td><td>待审核/已审核/已拒绝（每个文件独立）</td></tr>
+      <tr><td>reviewer / reviewed_at</td><td>String/DateTime</td><td>审核人与审核时间</td></tr>
+      <tr><td>published_by / published_at</td><td>String/DateTime</td><td>发布人与发布时间</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>ENT-AUDIT-006 回放擦音任务（ReplayMuteTask）</h3>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>字段</th><th>类型</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td>task_id</td><td>String</td><td>任务ID</td></tr>
+      <tr><td>stream_id</td><td>String</td><td>关联场次</td></tr>
+      <tr><td>replay_file_url</td><td>URL</td><td>回放原文件地址</td></tr>
+      <tr><td>muted_file_url</td><td>URL?</td><td>擦音后文件地址</td></tr>
+      <tr><td>task_status</td><td>Enum</td><td>待处理/处理中/已完成/失败/超时</td></tr>
+      <tr><td>progress</td><td>Integer</td><td>进度 0-100</td></tr>
+      <tr><td>started_at / completed_at</td><td>DateTime</td><td>起止时间</td></tr>
+      <tr><td>error_msg</td><td>Text</td><td>错误信息（失败/超时）</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>ENT-AUDIT-007 审查操作日志（AuditOperationLog）</h3>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>字段</th><th>类型</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td>log_id</td><td>String</td><td>日志ID</td></tr>
+      <tr><td>operator</td><td>String</td><td>操作人（脱敏展示）</td></tr>
+      <tr><td>action</td><td>Enum</td><td>开关变更/处置/审核/拼接/发布/驳回/删除</td></tr>
+      <tr><td>target_type / target_id</td><td>String</td><td>操作对象类型与ID</td></tr>
+      <tr><td>before_state / after_state</td><td>String</td><td>前后状态</td></tr>
+      <tr><td>operated_at</td><td>DateTime</td><td>操作时间</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- §13 验收 -->
+<section class="chapter" id="ch13">
+  <div class="ch-head"><span class="ch-no">§ 13</span><h2>验收标准</h2></div>
+  <h3>场景级验收标准</h3>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>编号</th><th>场景</th><th>Given – When – Then</th></tr></thead>
+    <tbody>
+      <tr><td>SC-AUDIT-001</td><td>审查开关-开启</td><td>Given 平台运营在租户管理列表 When 点击「内容审查」开关为开 Then 直接生效+toast，无确认弹窗</td></tr>
+      <tr><td>SC-AUDIT-002</td><td>审查开关-关闭</td><td>Given 租户开关为开 When 点击关闭 Then 弹二次确认（影响说明+七类底线+在播警告），确认后生效+记录日志</td></tr>
+      <tr><td>SC-AUDIT-003</td><td>实时告警</td><td>Given 直播中+开关开启 When 腾讯云回调违规事件 Then 中控统计+1、新违规置顶、待处理角标+1</td></tr>
+      <tr><td>SC-AUDIT-004</td><td>实时处理-静音</td><td>Given 观众观看直播+静音模式 When 处理指令下发 Then 观众端🔇静音+变暗+进度条 2-5 秒后恢复</td></tr>
+      <tr><td>SC-AUDIT-005</td><td>实时处理-覆盖</td><td>Given 观众观看直播+提示音覆盖模式 When 处理指令下发 Then 观众端🎧嘀声+声波动画 2-5 秒后恢复</td></tr>
+      <tr><td>SC-AUDIT-006</td><td>违规处置-断流</td><td>Given L2 违规待处理 When 运营确认断流（说明≥10字）Then 断流指令下发+场次终止+主播红色提示+观众结束页</td></tr>
+      <tr><td>SC-AUDIT-007</td><td>处置超时</td><td>Given 违规告警 30 秒未处置 When 超时触发 Then 系统自动记录+向上级升级提醒</td></tr>
+      <tr><td>SC-AUDIT-008</td><td>L1 引擎直断</td><td>Given 直播命中 L1（七类不可降级）When 腾讯云配置层断流 Then 回调携带断流结果，中控展示已断流，观众看到结束页</td></tr>
+      <tr><td>SC-AUDIT-009</td><td>判定未送达</td><td>Given WebSocket 推送失败 When 处理指令未送达 Then 观众端顶部橙色提示（与处理效果互斥），恢复后续接</td></tr>
+      <tr><td>SC-AUDIT-010</td><td>历史违规只读</td><td>Given 已结束场次 When 进入历史违规列表 Then 只读档案+橙色横幅+处置按钮置灰</td></tr>
+      <tr><td>SC-AUDIT-011</td><td>回放审核拼接</td><td>Given 多片段多文件 When 全部审核通过+勾选一一对应+点拼接 Then FFmpeg 拼接生成完整文件（有违规双份/无违规单份源码）</td></tr>
+      <tr><td>SC-AUDIT-012</td><td>拼接校验锁定</td><td>Given 任一文件未审核或勾选不匹配 When 查看拼接按钮 Then 按钮锁定+提示具体原因</td></tr>
+      <tr><td>SC-AUDIT-013</td><td>回放发布</td><td>Given 全部审核通过+拼接完成 When 运营点「发布」Then 已发布生效卡+回放对观众可见+发布留档</td></tr>
+      <tr><td>SC-AUDIT-014</td><td>已发布查看模式</td><td>Given 场次已发布 When 再次进入回放页 Then 仅展示完整文件+场次信息，隐藏全部操作区</td></tr>
+      <tr><td>SC-AUDIT-015</td><td>无违规免擦音</td><td>Given 场次无违规 When 拼接完成 Then 仅生成源码发布版，隐藏擦音相关模块</td></tr>
+      <tr><td>SC-AUDIT-016</td><td>回放管理列表</td><td>Given 存在待核对回放 When 进入回放管理 Tab Then 三态发布状态+待核对徽标，删除有二次确认</td></tr>
+      <tr><td>SC-AUDIT-017</td><td>开关关闭降级</td><td>Given 租户关闭审查 When 直播进行 Then 中控仅展示 L1、观众端无处理、回放不做违规处理；已产生记录保留可查</td></tr>
+      <tr><td>SC-AUDIT-018</td><td>回调验签幂等</td><td>Given 腾讯云回调 When 签名不合法或重复 Then 拒绝入库（401 / 去重返回 200），验签通过事件 100% 入库</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>功能级验收矩阵</h3>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>FN</th><th>Given</th><th>When</th><th>Then</th></tr></thead>
+    <tbody>
+      <tr><td>INFRA-001</td><td>腾讯云回调到达</td><td>验签+去重通过</td><td>事件入库+MQ 分发+三端推送</td></tr>
+      <tr><td>PC-001</td><td>平台运营在租户管理列表</td><td>切换「内容审查」开关</td><td>开启直接生效 / 关闭二次确认后生效+日志</td></tr>
+      <tr><td>PC-002</td><td>运营在中控「内容审查」页签</td><td>违规事件推送</td><td>统计/列表/角标实时更新</td></tr>
+      <tr><td>PC-003</td><td>存在待处理违规</td><td>运营处置/切换处理方式</td><td>状态更新+留档+主播/观众侧联动</td></tr>
+      <tr><td>PC-004</td><td>回放页（多片段）</td><td>逐个审核+勾选对应+拼接</td><td>校验通过+进度展示+完整文件生成</td></tr>
+      <tr><td>PC-005</td><td>拼接完成</td><td>运营点「发布」</td><td>已发布生效+查看模式切换</td></tr>
+      <tr><td>PC-006</td><td>回放管理 Tab</td><td>筛选/查看/删除</td><td>三态展示+模式进入+删除确认</td></tr>
+      <tr><td>APP-001</td><td>观众在直播间</td><td>处理指令下发</td><td>静音/嘀声效果 2-5 秒+断流结束页</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- §14 指标 -->
+<section class="chapter" id="ch14">
+  <div class="ch-head"><span class="ch-no">§ 14</span><h2>指标登记</h2></div>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>指标编号</th><th>指标名</th><th>定义</th><th>来源</th><th>关联 BG</th></tr></thead>
+    <tbody>
+      <tr><td>METRIC-AUDIT-001</td><td>违规发现率</td><td>验签通过入库数 / 腾讯云回调总数</td><td>回调网关日志</td><td>BG-01</td></tr>
+      <tr><td>METRIC-AUDIT-002</td><td>处理延迟</td><td>违规发生时间戳 → 观众端效果生效时间差</td><td>审查服务链路埋点</td><td>BG-01</td></tr>
+      <tr><td>METRIC-AUDIT-003</td><td>回放擦音覆盖率</td><td>已擦音已发布回放数 / 有违规已发布回放数</td><td>擦音任务记录</td><td>BG-01</td></tr>
+      <tr><td>METRIC-AUDIT-004</td><td>处置响应时间</td><td>告警产生 → 处置完成</td><td>违规+处置记录</td><td>BG-02</td></tr>
+      <tr><td>METRIC-AUDIT-005</td><td>拼接成功率</td><td>completed / (completed+failed)（含重试）</td><td>回放任务记录</td><td>BG-03</td></tr>
+      <tr><td>METRIC-AUDIT-006</td><td>回调链路可靠性</td><td>验签通过入库率（去重除外）</td><td>网关日志</td><td>BG-04</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- §15 CONFIG -->
+<section class="chapter" id="ch15">
+  <div class="ch-head"><span class="ch-no">§ 15</span><h2>CONFIG 集中配置</h2></div>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>编号</th><th>配置项</th><th>类型</th><th>默认值</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td>CONFIG-AUDIT-001</td><td>处理方式默认值</td><td>枚举</td><td>静音</td><td>静音/提示音覆盖（直播中控可切换，场次级生效）</td></tr>
+      <tr><td>CONFIG-AUDIT-002</td><td>告警分级阈值</td><td>规则</td><td>L1红/L2黄/L3蓝</td><td>级别→告警色映射（级别判定三层结构见子文档）</td></tr>
+      <tr><td>CONFIG-AUDIT-003</td><td>处置超时时间</td><td>全局参数</td><td>30 秒</td><td>超时自动记录+升级提醒</td></tr>
+      <tr><td>CONFIG-AUDIT-004</td><td>处理效果持续时长</td><td>全局参数</td><td>2-5 秒</td><td>观众端静音/嘀声展示时长</td></tr>
+      <tr><td>CONFIG-AUDIT-005</td><td>断流判定阈值</td><td>规则</td><td>断流超过 N 秒切片</td><td>断流产生新片段，segment_index 递增</td></tr>
+      <tr><td>CONFIG-AUDIT-006</td><td>拼接重试上限</td><td>全局参数</td><td>3 次</td><td>超限标记 failed，提示联系技术</td></tr>
+      <tr><td>CONFIG-AUDIT-007</td><td>擦音任务超时</td><td>全局参数</td><td>30 分钟</td><td>超时锁定播放器+可手动重试</td></tr>
+      <tr><td>CONFIG-AUDIT-008</td><td>处置说明最少字数</td><td>全局参数</td><td>10 字</td><td>未达标确认按钮置灰</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- §16 外部接口 -->
+<section class="chapter" id="ch16">
+  <div class="ch-head"><span class="ch-no">§ 16</span><h2>外部接口标注</h2></div>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>接口编号</th><th>接口名</th><th>方向</th><th>协议</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td>API-AUDIT-001</td><td>直播审核回调</td><td>腾讯云 → 回调网关</td><td>HTTPS POST + 签名</td><td>违规事件全量回调，验签+幂等去重后 MQ 分发</td></tr>
+      <tr><td>API-AUDIT-002</td><td>审核模板配置</td><td>—</td><td>—</td><td>由平台运维在腾讯云控制台人工配置，系统不提供界面（Non-Goal）</td></tr>
+      <tr><td>API-AUDIT-004</td><td>AMS 擦音任务创建</td><td>审查服务 → 腾讯云 AMS</td><td>HTTPS</td><td>有违规场次回放文件擦音（无违规场次跳过）</td></tr>
+      <tr><td>API-AUDIT-005</td><td>AMS 擦音完成回调</td><td>腾讯云 AMS → 回调网关</td><td>HTTPS POST</td><td>携带 muted_file_url，失败/超时按 BR-AUDIT-019 降级</td></tr>
+      <tr><td>API-AUDIT-006</td><td>回放文件生成通知</td><td>录播域 → 审查服务</td><td>内部事件</td><td>直播结束/断流切片完成，触发待核对状态</td></tr>
+      <tr><td>API-AUDIT-007</td><td>断流指令</td><td>审查服务 → 腾讯云</td><td>HTTPS</td><td>DropLiveStream；来源仅 L1 引擎自动断流与运营确认断流</td></tr>
+      <tr><td>API-AUDIT-008</td><td>三端推送通道</td><td>审查服务 → 中控/观众端/回放页</td><td>WebSocket</td><td>告警推送、擦音指令、拼接发布状态</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- §17 脱敏 -->
+<section class="chapter" id="ch17">
+  <div class="ch-head"><span class="ch-no">§ 17</span><h2>数据脱敏展示规范</h2></div>
+  <p class="ch-lede">本文档所有示例数据均为脱敏格式；产品层面所有涉及个人/租户信息的展示统一遵循以下脱敏规则（展示层脱敏，存储层保留原始值）。</p>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>数据类型</th><th>脱敏格式</th><th>示例</th></tr></thead>
+    <tbody>
+      <tr><td>场次/推流编号</td><td>前缀 + **** + 末 2 位</td><td>PLS****40</td></tr>
+      <tr><td>直播间编号</td><td>LIVE**** + 末 2 位</td><td>LIVE****01</td></tr>
+      <tr><td>租户名称</td><td>「租户」+ 大写字母代号</td><td>租户A</td></tr>
+      <tr><td>主播昵称</td><td>首字符 + ****</td><td>主****</td></tr>
+      <tr><td>手机号</td><td>前 3 位 + **** + 后 4 位</td><td>138****0000</td></tr>
+      <tr><td>违规内容摘要</td><td>敏感片段以 ██ 占位</td><td>这个产品真的██好用</td></tr>
+      <tr><td>证据文件 URL</td><td>域名保留 + 路径脱敏 + 鉴权访问</td><td>https://cos.****.com/audit/****.jpg</td></tr>
+      <tr><td>处置人/审核人/发布人</td><td>姓 + **</td><td>王**</td></tr>
+    </tbody>
+  </table></div>
+  <h3>补充规则</h3>
+  <ol>
+    <li>原始回调 JSON、ASR 原话等敏感判定数据仅<strong>调试模式</strong>可见，生产运营界面一律展示脱敏摘要。</li>
+    <li>证据文件（违规录音/截图）访问必须经 COS 鉴权（预签名 URL + 有效期），禁止公开直链。</li>
+    <li>回放源码文件（未擦音）仅租户运营与平台侧可见，观众端任何入口不可触达。</li>
+  </ol>
+</section>
+
+<!-- §18 摘要 -->
+<section class="chapter" id="ch18">
+  <div class="ch-head"><span class="ch-no">§ 18</span><h2>需求深度分析摘要</h2></div>
+  <h3>V2 范围统计</h3>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>维度</th><th>数量</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td>FN</td><td>8</td><td>基础设施 1 + 运营后台 1 + 租户后台 5（含回放拼接/发布/管理拆分）+ 观众端 1</td></tr>
+      <tr><td>UC</td><td>12</td><td>含 2 个弹窗卡 + 入口卡 + 历史违规 + 删除卡</td></tr>
+      <tr><td>BR</td><td>24</td><td>含七类不可降级/处置渐进式/回调全量/超时/关闭底线/手动拼接/一一对应/先审后拼先审后发/免擦音/查看模式</td></tr>
+      <tr><td>ENT</td><td>7</td><td>违规/处置/租户配置/片段/文件/擦音任务/操作日志</td></tr>
+      <tr><td>CONFIG</td><td>8</td><td>处理方式/分级/超时/时长/切片阈值/重试/擦音超时/字数</td></tr>
+      <tr><td>METRIC</td><td>6</td><td>发现率/延迟/覆盖率/响应/拼接成功率/链路可靠性</td></tr>
+      <tr><td>五类图</td><td>6 文件</td><td>业务流程（泳道）/信息流转（架构）/状态机×2/时序×2，均内嵌于 §9</td></tr>
+      <tr><td>外部接口</td><td>7</td><td>回调/模板（人工）/AMS×2/回放通知/断流/推送通道</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>三端路由 / 入口复用</h3>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>终端</th><th>入口</th><th>路由</th><th>FN</th></tr></thead>
+    <tbody>
+      <tr><td>运营后台 PC</td><td>租户管理列表 →「内容审查」开关列</td><td>/admin/tenant</td><td>PC-001</td></tr>
+      <tr><td>租户后台 PC</td><td>直播列表 →「直播中控台」→ 内容审查页签</td><td>/tenant/live-control?tab=audit</td><td>PC-002/003</td></tr>
+      <tr><td>租户后台 PC</td><td>直播列表 →「更多」→ 历史违规列表</td><td>/tenant/live/:streamId/violations</td><td>PC-002</td></tr>
+      <tr><td>租户后台 PC</td><td>直播列表 →「更多」→ 查看回放</td><td>/tenant/live/:streamId/replay</td><td>PC-004/005</td></tr>
+      <tr><td>租户后台 PC</td><td>直播列表 →「回放管理」Tab</td><td>/tenant/live?tab=replay</td><td>PC-006</td></tr>
+      <tr><td>观众端 H5</td><td>直播间 → 视频画面区叠加处理效果</td><td>/h5/live/:roomId</td><td>APP-001</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>与 V1.0.0（模拟基线）对比</h3>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>维度</th><th>V1.0.0</th><th>V2.0.0</th><th>差异</th></tr></thead>
+    <tbody>
+      <tr><td>架构</td><td>纯前端 Mock（模拟回调生成器/Store 广播/概率模拟）</td><td>腾讯云真实对接（回调网关/MQ/WebSocket/AMS/FFmpeg）</td><td>移除全部仿真层</td></tr>
+      <tr><td>FN</td><td>6</td><td>8</td><td>回放拆分为拼接/发布/管理三个 FN；基础设施改为回调接入服务</td></tr>
+      <tr><td>BR</td><td>16</td><td>24</td><td>新增手动拼接体系（024/025/027/028/029/030）+ 免擦音 + 查看模式；关闭行为改为「仅 L1 展示」</td></tr>
+      <tr><td>ENT</td><td>5（Mock 版）</td><td>7（真实版）</td><td>新增 ReplaySegment/操作日志；ReplayFile 增加 index/对应关系/审核/发布字段</td></tr>
+      <tr><td>回放拼接</td><td>自动拼接+自动发布</td><td>手动：逐个审核→勾选一一对应→拼接→人工发布</td><td>v2.0.0 用户裁决</td></tr>
+      <tr><td>审查开关关闭</td><td>全链路无痕（隐藏入口）</td><td>仅 L1 展示（七类不可降级强制执行），入口保留</td><td>降级行为细化</td></tr>
+      <tr><td>示例数据</td><td>演示场次数据</td><td>全量脱敏格式 + §17 脱敏规范</td><td>去演示数据</td></tr>
+      <tr><td>五类图</td><td>Mermaid 内嵌</td><td>独立 HTML/SVG 图表（6 文件）+ 本文档内嵌</td><td>重制并融合</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<footer class="colophon">
+  <span>SAAS · D16 内容审查域 · PRD V2.0.0</span>
+  <span>STR-SAAS-001 · P0 · 已定稿 2026-09-01</span>
+  <span>UC → FN → PG → SC → BG → BO</span>
+</footer>
+
+</main>
+</div>
+
+<script>
+(function(){
+  var links = Array.prototype.slice.call(document.querySelectorAll('.toc a'));
+  var map = {};
+  links.forEach(function(a){ map[a.getAttribute('href').slice(1)] = a; });
+  var obs = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        links.forEach(function(a){ a.classList.remove('active'); });
+        var a = map[e.target.id];
+        if(a) a.classList.add('active');
+      }
+    });
+  }, {rootMargin:'-30% 0px -60% 0px'});
+  Object.keys(map).forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) obs.observe(el);
+  });
+})();
+</script>
+</body>
+</html>
