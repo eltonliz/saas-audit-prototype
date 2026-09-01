@@ -65,12 +65,7 @@
         table-layout="fixed"
         style="margin-top:16px"
       >
-        <template #mode="{ row }">
-          <div class="mode-badge" :class="row.mode === 'live' ? 'mode-badge-live' : 'mode-badge-recorded'">
-            <t-icon :name="row.mode === 'live' ? 'video-camera' : 'play-circle'" class="mode-badge-icon" />
-            <span>{{ row.mode === 'live' ? '直播' : '录播' }}</span>
-          </div>
-        </template>
+
         <template #time="{ row }">{{ row.start_date }} ~ {{ row.end_date }}</template>
         <!-- V2·D2-1 本期不做交易：营期全免费 -->
         <!-- V2·0829 用户裁决：价格列已删除（全部免费） -->
@@ -114,31 +109,7 @@
     >
       <t-form :data="f" label-width="110px" label-align="right">
         <t-form-item label="营期名称" name="title" required-mark><t-input v-model="f.title" placeholder="请输入营期名称" /></t-form-item>
-        <t-form-item label="默认模式">
-          <div class="mode-cards mode-cards-two">
-            <div class="mode-card mode-card-live" :class="{ active: f.mode === 'live', disabled: !!editingCamp }" @click="!editingCamp && (f.mode = 'live')">
-              <t-icon name="video-camera" class="mode-icon" />
-              <div class="mode-title">直播模式</div>
-            </div>
-            <div class="mode-card mode-card-recorded" :class="{ active: f.mode === 'recorded', disabled: !!editingCamp }" @click="!editingCamp && (f.mode = 'recorded')">
-              <t-icon name="play-circle" class="mode-icon" />
-              <div class="mode-title">录播模式</div>
-            </div>
-          </div>
-          <!-- V2·0901 授课方式不固定：排课支持直播+录播混合 -->
-          <div class="live-auto-tip" style="margin-top:8px">
-            <t-icon name="info-circle" style="color:#2E90FA" />
-            <div style="font-size:12px;color:#667085">默认模式仅作初始设置；排课时支持直播+录播混合编排，具体以每条排课为准。</div>
-          </div>
-          <!-- 直播模式提示卡：审核通过自动创建直播间三联 -->
-          <div v-if="f.mode === 'live'" class="live-auto-tip">
-            <t-icon name="check-circle" style="color:#12B76A" />
-            <div>
-              <div style="font-weight:600;color:#1F2C3E">审核通过后自动创建直播间三联</div>
-              <div style="font-size:12px;color:#667085;margin-top:2px">直播计划 + 直播场次 + 直播间由系统自动创建（类型=营期直播，主播=主讲讲师）。排课时设置开播/结束时间，开播/结束在直播中控台操作。</div>
-            </div>
-          </div>
-        </t-form-item>
+        <!-- V2·0901 用户裁决：营期不再设授课模式，直播/录播在排课处逐条配置 -->
         <t-form-item label="时间" required-mark>
           <t-date-range-picker v-model="dateRange" :placeholder="['开始日期', '结束日期']" clearable style="width:100%" />
         </t-form-item>
@@ -235,8 +206,6 @@ const stats = computed(() => {
   const a = store.camps;
   return [
     { label: '营期总数', value: a.length, color: '#1F2C3E' },
-    { label: '直播营期', value: a.filter(c => c.mode === 'live').length, color: '#F04438' },
-    { label: '录播营期', value: a.filter(c => c.mode === 'recorded').length, color: '#12B76A' },
     { label: '进行中', value: a.filter(c => c.status === 'in_progress').length, color: '#1890FF' },
   ];
 });
@@ -246,8 +215,6 @@ const metrics = computed(() => {
   const a = store.camps;
   return [
     { label: '营期总数', value: a.length, icon: 'layers', cls: 'metric-primary' },
-    { label: '直播营期', value: a.filter(c => c.mode === 'live').length, icon: 'video-camera', cls: 'metric-danger' },
-    { label: '录播营期', value: a.filter(c => c.mode === 'recorded').length, icon: 'play-circle', cls: 'metric-success' },
     { label: '进行中', value: a.filter(c => c.status === 'in_progress').length, icon: 'time', cls: 'metric-warning' },
   ];
 });
@@ -262,7 +229,7 @@ function resetFilter() { search.value = ''; modeFilter.value = ''; statusFilter.
 const columns = [
   { colKey: 'camp_no', title: '营期编号', width: 160, ellipsis: true },
   { colKey: 'title', title: '营期名称', minWidth: 160, ellipsis: true },
-  { colKey: 'mode', title: '授课模式', width: 100 },
+  // V2·0901：营期不设授课模式（直播/录播在排课处逐条配置），模式列删除
   { colKey: 'time', title: '营期时间', width: 180 },
   // V2·0829 用户裁决：价格列已删除（全部免费）
   { colKey: 'enroll', title: '报名情况', width: 180 },
@@ -282,7 +249,7 @@ function calcPlatformRate() { platformRate.value = Math.max(0, 100 - lecturerRat
 function openCreate() {
   notifyModalOpen('camp-create');
   editingCamp.value = null;
-  f.value = { title: '', description: '', mode: 'live', capacity: 0 };
+  f.value = { title: '', description: '', mode: 'recorded', capacity: 0 };
   priceYuan.value = 0; lecturerRate.value = 60; assistantRate.value = 20; platformRate.value = 20; dateRange.value = []; enrollDeadline.value = null;
   showCreate.value = true;
 }
@@ -313,7 +280,7 @@ function doSave() {
   showCreate.value = false; editingCamp.value = null;
 }
 function submitReview(row: any) { store.submitCampForReview(row.id); MessagePlugin.success('已提交审核'); }
-function approveCamp(row: any) { store.approveCamp(row.id, 'admin-001'); MessagePlugin.success(row.mode === 'live' ? '审核通过，营期已发布 → 已触发SAAS直播模块创建计划（营期直播）+ 排课锁定' : '审核通过，营期已发布 → 排课已锁定（录播营期）'); }
+function approveCamp(row: any) { store.approveCamp(row.id, 'admin-001'); MessagePlugin.success('审核通过，营期已发布 → 排课已锁定'); }
 const rejectCampVisible = ref(false); const rejectCampReason = ref(''); const rejectCampTarget = ref<any>(null);
 function rejectCamp(row: any) { rejectCampTarget.value = row; rejectCampReason.value = ''; rejectCampVisible.value = true; notifyModalOpen('camp-reject'); }
 function doRejectCamp() {

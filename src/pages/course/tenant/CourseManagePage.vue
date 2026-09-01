@@ -111,8 +111,7 @@
             <div class="section-header"><t-icon name="layers" class="section-icon" /><span>内容管理</span></div>
             <div class="content-actions">
                 <t-button theme="primary" size="small" @click="openContentPicker('video')"><template #icon><t-icon name="add" /></template>选择视频</t-button>
-                <t-button theme="primary" size="small" @click="openContentPicker('audio')"><template #icon><t-icon name="add" /></template>选择音频</t-button>
-                <span class="pool-tip">从内容池选择素材组课（V2·0901：支持直播+录播混合，直播课时在排课表配置）</span>
+                <span class="pool-tip">从内容池选择视频组课（V2·0901：课程仅视频素材；直播课时在排课表配置）</span>
               </div>
               <t-table :data="form.videos" row-key="video_no" :columns="videoColumns" bordered size="small" style="margin-top:12px">
                 <template #ctype="{ row }"><t-tag :theme="row.ctype === 'audio' ? 'primary' : 'success'" variant="light" size="small">{{ row.ctype === 'audio' ? '音频' : '视频' }}</t-tag></template>

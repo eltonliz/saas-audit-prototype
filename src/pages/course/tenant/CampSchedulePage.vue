@@ -16,9 +16,6 @@
             </template>
           </div>
           <div class="actions" v-if="!isLocked">
-            <t-button theme="primary" variant="outline" @click="openOneClickDialog">
-              <template #icon><t-icon name="calendar" /></template> 一键排课
-            </t-button>
             <t-button theme="primary" variant="outline" @click="openBatchDialog">
               <template #icon><t-icon name="file" /></template> 批量排课
             </t-button>
@@ -174,26 +171,6 @@
       </t-form>
     </t-dialog>
 
-    <!-- ===== 一键排课 Dialog ===== -->
-    <t-dialog v-model:visible="showOneClick" header="一键排整个课程" width="500px" :on-confirm="doOneClick" :confirm-btn="{ content: '一键排课', theme: 'primary', loading: oneClickLoading }" :cancel-btn="{ content: '取消' }">
-      <t-alert theme="info" style="margin-bottom: 16px">
-        自动加载课程的所有已发布课时，每条课时生成一行排课。系统从已有排课的下一个 Day 开始接续排课。
-      </t-alert>
-      <t-form label-width="100px">
-        <t-form-item label="选择课程" required-mark>
-          <t-select v-model="oneClickCourseId" filterable placeholder="选择课程" style="width: 100%">
-            <t-option
-              v-for="c in filteredCourses"
-              :key="c.id"
-              :label="`${c.title}（${getPublishedLessonCount(c.id)}课时）`"
-              :value="c.id"
-            />
-          </t-select>
-          <div class="course-tip">列出全部课程（V2·0901：授课方式不固定，支持直播+录播混合排课）</div>
-        </t-form-item>
-      </t-form>
-    </t-dialog>
-
     <!-- ===== 批量排课 Dialog ===== -->
     <t-dialog v-model:visible="showBatch" header="批量排课" width="1100px" :on-confirm="doBatch" :confirm-btn="{ content: '批量保存', theme: 'primary', loading: batchSubmitting }" :cancel-btn="{ content: '取消' }">
       <div class="batch-tip">动态添加多行排课·一次保存（上限30条）。同一天多条会自动递增 sort_order。</div>
@@ -339,43 +316,6 @@ function dayFirstUnlock(scheds: CourseSchedule[]): string {
 }
 function getPublishedLessonCount(courseId: string): number {
   return courseStore.lessons.filter(l => l.course_id === courseId && l.status === 'published').length;
-}
-
-// ===== 一键排课 =====
-const showOneClick = ref(false);
-const oneClickCourseId = ref('');
-const oneClickLoading = ref(false);
-function openOneClickDialog() {
-  if (isLocked.value) { MessagePlugin.warning('审核通过后排课已锁定'); return; }
-  oneClickCourseId.value = '';
-  showOneClick.value = true;
-  notifyModalOpen('schedule-oneclick');
-}
-async function doOneClick() {
-  if (!oneClickCourseId.value) { MessagePlugin.warning('请先选择课程'); return; }
-  const course = courseStore.courses.find(c => c.id === oneClickCourseId.value);
-  if (!course) { MessagePlugin.warning('课程不存在'); return; }
-  // 课程 mode 匹配校验
-  if (camp.value?.mode === 'live' && course.mode === 'recorded') { MessagePlugin.warning('直播营期不允许排录播课程'); return; }
-  if (camp.value?.mode === 'recorded' && course.mode === 'live') { MessagePlugin.warning('录播营期不允许排直播课程'); return; }
-  oneClickLoading.value = true;
-  try {
-    const existingDayMax = Math.max(0, ...campSchedules.value.map(s => s.day_number));
-    const result = campStore.createSchedulesForCourse({
-      course_id: oneClickCourseId.value,
-      camp_id: campId.value,
-      start_day_number: existingDayMax + 1,
-      start_sort_order: 1,
-    });
-    if (result.failed.length === 0) MessagePlugin.success(`已为课程「${course.title}」创建 ${result.success.length} 条排课`);
-    else if (result.success.length === 0) MessagePlugin.error(`排课失败：${result.failed[0]?.error}`);
-    else MessagePlugin.warning(`成功 ${result.success.length} 条，失败 ${result.failed.length} 条`);
-    showOneClick.value = false;
-  } catch (e: any) {
-    MessagePlugin.error(e.message || '排课失败');
-  } finally {
-    oneClickLoading.value = false;
-  }
 }
 
 // ===== 批量排课 =====
