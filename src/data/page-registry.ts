@@ -34,18 +34,6 @@ export const PAGE_REGISTRY: ModuleRegItem[] = [
         ],
       },
       {
-        key: 'videos', title: '视频课程', route: '/tenant/course/videos',
-        modals: [
-          { key: 'video-edit', title: '新增视频（编辑页）', chain: ['新增视频'] },
-        ],
-      },
-      {
-        key: 'audios', title: '音频课程', route: '/tenant/course/audios',
-        modals: [
-          { key: 'audio-edit', title: '新增音频（编辑页）', chain: ['新增音频'] },
-        ],
-      },
-      {
         key: 'questions', title: '题目库', route: '/tenant/course/questions',
         modals: [
           { key: 'question-create', title: '新增题目', chain: ['新增'] },

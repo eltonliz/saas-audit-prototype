@@ -52,9 +52,6 @@
         <template #video="{ row }">
           <t-button variant="text" theme="primary" size="small" @click="showVideoDialog(row)"><template #icon><t-icon name="play-circle" /></template>查看视频</t-button>
         </template>
-        <template #audio="{ row }">
-          <t-button variant="text" theme="primary" size="small" @click="showAudioDialog(row)"><template #icon><t-icon name="sound" /></template>查看音频</t-button>
-        </template>
         <template #qb="{ row }"><t-button variant="text" theme="primary" size="small" @click="showQuestionDialog(row)"><template #icon><t-icon name="file" /></template>查看题库</t-button></template>
         <template #created="{ row }">{{ new Date(row.created_at * 1000).toLocaleString() }}</template>
         <template #status="{ row }">
@@ -88,24 +85,9 @@
             <t-form-item label="所属分类" required-mark><t-select v-model="form.category_name" placeholder="请选择所属分类" style="width:100%"><t-option v-for="c in categories" :key="c" :label="c" :value="c" /></t-select></t-form-item>
             <t-form-item label="课程介绍"><t-textarea v-model="form.description" :autosize="{ minRows: 3 }" placeholder="请输入课程介绍" /></t-form-item>
             <div class="saas-new-box saas-new-wrap">
-              <div class="saas-new-badge">红框 = 课程业务新增（SaaS 线上无）<ReplicaMarker :no="1" title="点击查看：授课模式为课程业务新增字段" /></div>
-              <t-form-item label="默认授课方式">
-                <t-radio-group v-model="form.mode">
-                  <t-radio value="recorded"><template #label><t-icon name="video" /> 录播</template></t-radio>
-                  <t-radio value="live"><template #label><t-icon name="play-circle" /> 直播</template></t-radio>
-                </t-radio-group>
-                <div class="form-tip">V2·0901：授课方式不固定，课时支持直播+录播混合，具体以每条课时的设置为准</div>
-              </t-form-item>
+              <!-- V2·0901 用户裁决：课程固定为录播组课；直播在「直播列表」独立创建（直播间三联），直播回放可转课程 -->
+              <div class="saas-new-badge">V2·0901：课程=录播组课；直播请在「直播列表」创建，直播回放可转课程</div>
             </div>
-            <t-form-item v-if="form.mode === 'live'" label="直播联动">
-              <div class="live-tip live-auto-tip">
-                <t-icon name="check-circle" style="color:#12B76A" />
-                <div>
-                  <div style="font-weight:600;color:#1F2C3E">审核通过后自动创建直播间三联</div>
-                  <div style="font-size:12px;color:#667085;margin-top:2px">直播计划 + 直播场次 + 直播间由系统自动创建（类型=课程直播，主播=主讲讲师），无需手动配置。排课时设置开播/结束时间。</div>
-                </div>
-              </div>
-            </t-form-item>
             <t-form-item label="是否公开">
               <t-radio-group v-model="form.visibility">
                 <t-radio value="public">公开</t-radio>
@@ -127,11 +109,10 @@
           <!-- 区块2：内容管理 -->
           <div class="section-card">
             <div class="section-header"><t-icon name="layers" class="section-icon" /><span>内容管理</span></div>
-            <template v-if="true">
-              <div class="content-actions">
+            <div class="content-actions">
                 <t-button theme="primary" size="small" @click="openContentPicker('video')"><template #icon><t-icon name="add" /></template>选择视频</t-button>
                 <t-button theme="primary" size="small" @click="openContentPicker('audio')"><template #icon><t-icon name="add" /></template>选择音频</t-button>
-                <span class="pool-tip">从素材中心选择素材组课（V2·0901：支持直播+录播混合，直播课时在排课表配置）</span>
+                <span class="pool-tip">从内容池选择素材组课（V2·0901：支持直播+录播混合，直播课时在排课表配置）</span>
               </div>
               <t-table :data="form.videos" row-key="video_no" :columns="videoColumns" bordered size="small" style="margin-top:12px">
                 <template #ctype="{ row }"><t-tag :theme="row.ctype === 'audio' ? 'primary' : 'success'" variant="light" size="small">{{ row.ctype === 'audio' ? '音频' : '视频' }}</t-tag></template>
@@ -156,20 +137,12 @@
                 <template #file="{ row }"><t-button variant="text" size="small" theme="primary" @click="MessagePlugin.info(`共 ${row.files_count ?? 1} 个文件：${row.file_name ?? row.name}`)">查看{{ row.files_count ?? 1 }}文件</t-button></template>
                 <template #vop="{ row }"><t-button variant="text" size="small" theme="danger" @click="removeVideo(row)">移除</t-button></template>
               </t-table>
-            </template>
-            <div v-else class="live-tip"><t-icon name="info-circle" /> 直播课程无需上传视频，场次/中控在 SAAS 平台「直播」模块管理</div>
           </div>
 
-          <!-- 区块3：展示设置（V2·D2-1 本期不做交易：售卖配置改为展示开关） -->
+          <!-- 区块3：展示设置（V2·0901 用户裁决：仅保留 C端展示，有效期删除） -->
           <div class="section-card saas-new-box" data-saas-no="3">
             <div class="section-header"><t-icon name="cart" class="section-icon" /><span>展示设置</span><ReplicaMarker :no="3" label="编号③ 展示开关" /></div>
-            <t-form-item label="有效期">
-              <t-radio-group v-model="form.validity_type">
-                <t-radio value="long">长期有效</t-radio>
-                <t-radio value="custom">自定义时间</t-radio>
-              </t-radio-group>
-              <t-date-picker v-if="form.validity_type === 'custom'" v-model="form.validity_custom_date" enable-time-picker placeholder="选择失效时间" style="width:220px;margin-left:12px" />
-            </t-form-item>
+            <!-- V2·0901 用户裁决：有效期删除，仅保留 C端展示 -->
             <t-form-item label="C端展示">
               <t-switch v-model="form.show_in_app" />
               <span class="form-tip" style="margin-left:8px">开启后课程在 APP 端课程列表/推荐位展示，关闭则仅通过链接访问</span>
@@ -284,29 +257,7 @@
       <template #footer><t-button @click="videoDialogVisible = false">取消</t-button><t-button theme="primary">确认</t-button></template>
     </t-dialog>
 
-    <!-- 查看音频弹窗（V2·0829 用户裁决：补充查看音频入口） -->
-    <t-dialog v-model:visible="audioDialogVisible" header="查看音频" width="640px">
-      <div class="video-player" v-if="currentCourse">
-        <div class="player-area" style="display:flex;align-items:center;justify-content:center;min-height:120px">
-          <t-icon name="sound" style="font-size:48px;color:#0D9488" />
-        </div>
-        <div class="player-controls">
-          <t-icon name="play" class="ctrl" />
-          <t-icon name="sound" class="ctrl" />
-          <div class="progress-bar"><div class="progress-fill"></div></div>
-          <span class="time">00:00 / {{ formatDuration(currentCourse.video_duration || 600) }}</span>
-        </div>
-        <div class="video-meta">
-          <p><span>所属分类：</span>{{ currentCourse.category_name }}</p>
-          <p><span>音频名称：</span>{{ currentCourse.title }}</p>
-          <p><span>文件名称：</span>{{ currentCourse.course_no }}.mp3</p>
-          <p><span>文件格式：</span>audio/mp3</p>
-          <p><span>文件大小：</span>30.00MB</p>
-          <p><span>音频时长：</span>{{ formatDuration(currentCourse.video_duration || 600) }}</p>
-        </div>
-      </div>
-      <template #footer><t-button @click="audioDialogVisible = false">取消</t-button><t-button theme="primary">确认</t-button></template>
-    </t-dialog>
+    <!-- V2·0901 查看音频弹窗已删除（音频课程管理入口下线） -->
 
     <!-- 查看题库弹窗 -->
     <t-dialog v-model:visible="questionDialogVisible" header="查看题库" width="640px">
@@ -464,7 +415,6 @@ const columns = computed(() => {
     { colKey: 'title', title: '课程名称', minWidth: 160, ellipsis: true },
     { colKey: 'category_name', title: '分类名称', width: 100 },
     { colKey: 'video', title: '查看视频', width: 100 },
-    { colKey: 'audio', title: '查看音频', width: 100 },
     { colKey: 'qb', title: '查看题库', width: 100 },
     { colKey: 'created', title: '创建时间', width: 180 },
     { colKey: 'status', title: '状态', width: 80 },
@@ -762,8 +712,6 @@ function rejectCourse(row: any) {
   MessagePlugin.warning('课程已驳回');
 }
 function showVideoDialog(row: any) { currentCourse.value = row; videoDialogVisible.value = true; notifyModalOpen('course-view-video'); }
-const audioDialogVisible = ref(false);
-function showAudioDialog(row: any) { currentCourse.value = row; audioDialogVisible.value = true; notifyModalOpen('course-view-audio'); }
 function showQuestionDialog(row: any) { currentCourse.value = row; questionDialogVisible.value = true; notifyModalOpen('course-view-quiz'); }
 </script>
 
