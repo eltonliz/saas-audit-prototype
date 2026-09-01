@@ -173,7 +173,6 @@
       <div class="batch-table-header">
         <span class="required">Day</span>
         <span class="required">标题</span>
-        <span class="required">课程</span>
         <span class="required">课时</span>
         <span class="required">解锁时间</span>
         <span>必学</span>
@@ -182,27 +181,18 @@
       <div v-for="(row, idx) in batchRows" :key="idx" class="batch-row">
         <t-input-number v-model="row.day_number" :min="1" :max="camp?.total_days ?? 30" placeholder="1" theme="normal" style="width: 90px; flex-shrink: 0" />
         <t-input v-model="row.title" placeholder="如Day1开营" style="width: 140px; flex-shrink: 0" />
-        <t-select
-          v-model="row.course_id"
-          filterable
-          clearable
-          placeholder="选择课程"
-          style="width: 150px; flex-shrink: 0"
-          @change="onBatchCourseChange(idx)"
-        >
-          <t-option v-for="c in filteredCourses" :key="c.id" :label="c.title" :value="c.id" />
-        </t-select>
-        <!-- V2·0901 排课以课时为单位：课时必选，已排/本批次已选禁选 -->
+        <!-- V2·0901 排课以课时为单位：直接选内容池课时，课程随课时带出；已排/本批次已选禁选 -->
         <t-select
           v-model="row.lesson_id"
           filterable
           placeholder="选择课时"
-          style="width: 180px; flex-shrink: 0"
+          style="width: 260px; flex-shrink: 0"
+          @change="onBatchLessonChange(idx)"
         >
           <t-option
-            v-for="l in batchLessonsOf(row.course_id)"
+            v-for="l in batchAllLessons"
             :key="l.id"
-            :label="`第${l.sort_order}课时：${l.title}${isLessonUsed(l.id, idx) ? '·已排' : ''}`"
+            :label="`${lessonCourseTitle(l.course_id)} · ${l.title}${isLessonUsed(l.id, idx) ? '·已排' : ''}`"
             :value="l.id"
             :disabled="isLessonUsed(l.id, idx)"
           />
@@ -278,9 +268,6 @@ const isLocked = computed(() => {
 });
 const campStatusLabel = (s: string): string => ({ draft: '草稿·可排课', pending_review: '待审核', published: '已发布', enrolling: '报名中', in_progress: '进行中', ended: '已结束', offline: '已下架', rejected: '已驳回' }[s] ?? s);
 
-// V2·0901 用户裁决：授课方式不固定，直播+录播可混合排课——不再按营期mode过滤课程
-const filteredCourses = computed(() => courseStore.courses);
-
 // 按天分组
 const sortedDaySchedules = computed(() => {
   const map = new Map<number, CourseSchedule[]>();
@@ -316,29 +303,27 @@ function getPublishedLessonCount(courseId: string): number {
 const showBatch = ref(false);
 const batchSubmitting = ref(false);
 const batchRows = ref<Array<{
-  day_number: number; schedule_type: 'course'; title: string; course_id: string;
+  day_number: number; schedule_type: 'course'; title: string;
   unlock_time: Date; deadline: Date | null; is_required: boolean;
   description: string; completion_criteria: string;
 }>>([]);
 function createEmptyBatchRow() {
-  return { day_number: 1, schedule_type: 'course' as const, title: '', course_id: '', lesson_id: null as string | null, unlock_time: new Date(), deadline: null, is_required: true, description: '', completion_criteria: '' };
+  return { day_number: 1, schedule_type: 'course' as const, title: '', lesson_id: null as string | null, unlock_time: new Date(), deadline: null, is_required: true, description: '', completion_criteria: '' };
 }
-// V2·0901 批量排课课时化：课时必选（一课时一营期一次），选课程后自动顺延
-function batchLessonsOf(courseId: string) {
-  return courseId ? courseStore.loadLessonsByCourse(courseId).filter(l => l.status === 'published') : [];
+// V2·0901 批量排课课时化：直接从内容池选课时（一课时一营期一次），课程随课时带出
+const batchAllLessons = computed(() => courseStore.lessons.filter(l => l.status === 'published'));
+function lessonCourseTitle(courseId: string | null) {
+  return courseStore.courses.find(c => c.id === courseId)?.title || '未分组';
 }
 const batchUsedLessonIds = computed(() => new Set(campSchedules.value.map(s => s.lesson_id).filter(Boolean)));
 function isLessonUsed(lessonId: string, rowIdx: number): boolean {
   if (batchUsedLessonIds.value.has(lessonId)) return true;
   return batchRows.value.some((r, i) => i !== rowIdx && r.lesson_id === lessonId);
 }
-function onBatchCourseChange(idx: number) {
+function onBatchLessonChange(idx: number) {
   const row = batchRows.value[idx];
-  row.lesson_id = null;
-  const used = new Set<string>(batchUsedLessonIds.value);
-  batchRows.value.forEach((r, i) => { if (i !== idx && r.lesson_id) used.add(r.lesson_id); });
-  const next = batchLessonsOf(row.course_id).find(l => !used.has(l.id));
-  if (next) row.lesson_id = next.id;
+  const lesson = courseStore.lessons.find(l => l.id === row.lesson_id);
+  if (lesson && !row.title.trim()) row.title = lesson.title;
 }
 function cloneLastBatchRow() {
   const last = batchRows.value[batchRows.value.length - 1];
@@ -356,7 +341,6 @@ function doBatch() {
   if (batchRows.value.length > 30) { MessagePlugin.warning('批量新增一次最多30条'); return; }
   for (let i = 0; i < batchRows.value.length; i++) {
     if (!batchRows.value[i].title) { MessagePlugin.warning(`第 ${i + 1} 行标题为空`); return; }
-    if (!batchRows.value[i].course_id) { MessagePlugin.warning(`第 ${i + 1} 行未选择课程`); return; }
     if (!batchRows.value[i].lesson_id) { MessagePlugin.warning(`第 ${i + 1} 行未选择课时`); return; }
     if (!batchRows.value[i].unlock_time) { MessagePlugin.warning(`第 ${i + 1} 行未选择解锁时间`); return; }
   }
@@ -382,7 +366,7 @@ function doBatch() {
         sort_order: currentCount,
         schedule_type: 'course',
         schedule_mode: lessonMode as any,
-        course_id: row.course_id || null,
+        course_id: lesson?.course_id ?? null,
         lesson_id: row.lesson_id || null,
         live_session_id: null,
         unlock_time: Math.floor(row.unlock_time.getTime() / 1000),
@@ -706,12 +690,10 @@ async function doOneClickFromAdd() {
 }
 .batch-table-header > span:nth-child(1) { width: 110px; }
 .batch-table-header > span:nth-child(2) { width: 110px; }
-.batch-table-header > span:nth-child(3) { width: 160px; }
-.batch-table-header > span:nth-child(4) { width: 160px; }
-.batch-table-header > span:nth-child(5) { width: 170px; }
-.batch-table-header > span:nth-child(6) { width: 170px; }
-.batch-table-header > span:nth-child(7) { width: 50px; text-align: center; }
-.batch-table-header > span:nth-child(8) { width: 40px; text-align: center; }
+.batch-table-header > span:nth-child(3) { width: 260px; }
+.batch-table-header > span:nth-child(4) { width: 170px; }
+.batch-table-header > span:nth-child(5) { width: 40px; }
+.batch-table-header > span:nth-child(6) { width: 40px; text-align: center; }
 
 .batch-table-header .required::before {
   content: '*'; color: #F04438; margin-right: 4px;
