@@ -19,7 +19,7 @@
     <!-- V2·0829 用户裁决：讲师/助教下线，讲师卡已删除 -->
     <div class="tabs">
       <!-- V2·0828 会议：测验/答疑推下期 -->
-      <span v-for="t in ['课时','评价']" :key="t" class="tab" :class="{ active: tab === t }" @click="tab = t">{{ t }}</span>
+      <span v-for="t in ['课时','评价']" :key="t" class="tab" :class="{ active: tab === t }" @click="tab = t">{{ t }}<span v-if="t === '评价' && hasReviewFeedback" class="tab-dot"></span></span>
     </div>
     <template v-if="tab === '课时'">
       <div v-for="l in lessons" :key="l.id" class="lesson-item" @click="goLesson(l)">
@@ -86,6 +86,8 @@ const reviews = computed(() => store.reviews.filter((r: any) => r.course_id === 
 // 评价资格：报名过该课程任一营期（以学习记录存在为准）
 const canReview = computed(() => store.learningRecords.some((r: any) => r.student_id === 'STU-001' && r.course_id === route.params.id));
 const myReview = computed(() => store.reviews.find((r: any) => r.course_id === route.params.id && r.student_id === 'STU-001'));
+// V2·0831 驳回/审核中提醒：本人评价非「已通过」时，评价 Tab 显示红点引导查看结果
+const hasReviewFeedback = computed(() => !!myReview.value && myReview.value.review_status !== 'approved');
 function goWriteReview() {
   if (!canReview.value) { MessagePlugin.warning('报名该课程任一营期后才能评价'); return; }
   router.push('/app/student/course/' + route.params.id + '/review');
@@ -124,6 +126,8 @@ function goFirstLesson() { const first = lessons.value.find(l => l.mode !== 'liv
 .lecturer-avatar { width: 44px; height: 44px; background: #E6F9F1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; }
 .lecturer-name { font-size: 15px; font-weight: 600; color: #1F2C3E; }
 .lecturer-role { font-size: 12px; color: #667085; }
+.tab { position: relative; }
+.tab-dot { position: absolute; top: 2px; right: 6px; width: 7px; height: 7px; border-radius: 50%; background: #F04438; }
 .tabs { display: flex; gap: 20px; margin-bottom: 16px; border-bottom: 1px solid #EAECF0; padding-bottom: 8px; }
 .tab { font-size: 15px; color: #667085; }
 .tab.active { color: #12B76A; font-weight: 600; border-bottom: 2px solid #12B76A; }

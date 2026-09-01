@@ -3,990 +3,891 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>会员数据报表中心 v4.0 · 四维中控台（商品×门店×客户×直播）</title>
+<title>会员数据报表中心 v5.0 · 报表中控台</title>
 <style>
   :root{
-    --primary:#1E40AF; --primary-600:#1D4ED8; --primary-hover:#1E3A8A;
-    --secondary:#3B82F6; --accent:#D97706;
-    --bg:#F8FAFC; --surface:#FFFFFF;
-    --fg:#0F172A; --fg-2:#475569; --fg-3:#94A3B8;
-    --muted:#E9EEF6; --border:#DBEAFE; --border-n:#E2E8F0;
-    --destructive:#DC2626; --success:#059669; --warning:#B45309;
-    --ring:#1E40AF;
-    --r-lg:12px; --r-md:8px; --r-sm:6px;
-    --shadow-1:0 1px 2px rgba(15,23,42,.06);
-    --shadow-2:0 4px 16px rgba(15,23,42,.08);
-    --font:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Helvetica Neue",sans-serif;
-    --mono:ui-monospace,"SF Mono","Fira Code",Menlo,monospace;
-    --sidebar-w:228px;
+    --primary:#1E40AF; --primary-h:#1E3A8A;
+    --bg:#F4F6FA; --surface:#FFF;
+    --fg:#0F172A; --fg-2:#475569; --fg-3:#8A94A6;
+    --border:#E2E8F0; --muted:#EEF2F8;
+    --blue:#2563EB; --green:#059669; --amber:#D97706; --violet:#7C3AED;
+    --cyan:#0891B2; --red:#DC2626; --pink:#DB2777;
+    --r-lg:12px; --r-md:8px;
+    --shadow-1:0 1px 2px rgba(15,23,42,.05); --shadow-2:0 6px 20px rgba(15,23,42,.09);
+    --font:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,monospace;
   }
   *{margin:0;padding:0;box-sizing:border-box;}
-  html{font-size:16px;}
-  body{font-family:var(--font);background:var(--bg);color:var(--fg);line-height:1.55;}
-  button,.clickable{cursor:pointer;}
-  :focus-visible{outline:2px solid var(--ring);outline-offset:2px;border-radius:4px;}
-  svg{flex-shrink:0;}
-  .num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum";}
-
-  /* ===== 布局骨架 ===== */
+  body{font-family:var(--font);background:var(--bg);color:var(--fg);line-height:1.55;font-size:14px;}
+  button{cursor:pointer;font-family:var(--font);}
+  :focus-visible{outline:2px solid var(--primary);outline-offset:2px;border-radius:4px;}
+  .num{font-variant-numeric:tabular-nums;}
   .app{display:flex;min-height:100dvh;}
-  .sidebar{width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--border-n);position:sticky;top:0;height:100dvh;display:flex;flex-direction:column;z-index:40;}
-  .brand{display:flex;align-items:center;gap:10px;padding:18px 20px 14px;}
-  .brand-logo{width:34px;height:34px;border-radius:var(--r-md);background:linear-gradient(135deg,var(--primary),var(--secondary));display:flex;align-items:center;justify-content:center;color:#fff;}
-  .brand-name{font-size:15px;font-weight:700;letter-spacing:.2px;}
-  .brand-sub{font-size:11px;color:var(--fg-3);}
-  .nav{flex:1;overflow-y:auto;padding:6px 12px 20px;}
-  .nav-group{font-size:11px;font-weight:600;color:var(--fg-3);text-transform:uppercase;letter-spacing:.6px;padding:16px 10px 6px;}
-  .nav-item{display:flex;align-items:center;gap:10px;width:100%;padding:9px 10px;border:none;background:none;border-radius:var(--r-sm);font-size:13.5px;color:var(--fg-2);font-family:var(--font);text-align:left;transition:background .18s,color .18s;position:relative;}
-  .nav-item:hover{background:var(--muted);color:var(--fg);}
-  .nav-item.active{background:#EFF4FE;color:var(--primary);font-weight:600;}
-  .nav-item.active::before{content:"";position:absolute;left:-12px;top:8px;bottom:8px;width:3px;border-radius:0 3px 3px 0;background:var(--primary);}
-  .nav-item .badge{margin-left:auto;font-size:10px;padding:1px 7px;border-radius:99px;background:var(--muted);color:var(--fg-2);}
-  .nav-item.active .badge{background:var(--primary);color:#fff;}
-  .sidebar-foot{padding:12px 16px;border-top:1px solid var(--border-n);font-size:11px;color:var(--fg-3);line-height:1.7;}
-
+  .sidebar{width:200px;background:#0F1B3D;color:#C7D2EE;position:sticky;top:0;height:100dvh;display:flex;flex-direction:column;z-index:40;flex-shrink:0;}
+  .brand{display:flex;align-items:center;gap:10px;padding:18px 16px 14px;}
+  .brand-logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#2563EB,#7C3AED);display:flex;align-items:center;justify-content:center;color:#fff;}
+  .brand-name{font-size:14px;font-weight:700;color:#fff;}
+  .brand-sub{font-size:10.5px;color:#7C8BC0;}
+  .nav{padding:8px 10px;}
+  .nav-item{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border:none;background:none;border-radius:8px;font-size:13.5px;color:#C7D2EE;text-align:left;transition:background .18s;}
+  .nav-item:hover{background:rgba(255,255,255,.08);color:#fff;}
+  .nav-item.active{background:linear-gradient(90deg,rgba(37,99,235,.9),rgba(37,99,235,.5));color:#fff;font-weight:600;box-shadow:0 2px 8px rgba(37,99,235,.35);}
+  .side-foot{margin-top:auto;padding:14px 16px;border-top:1px solid rgba(255,255,255,.08);font-size:10.5px;color:#7C8BC0;line-height:1.8;}
+  .side-foot b{color:#A5B4DF;}
   .main{flex:1;min-width:0;display:flex;flex-direction:column;}
-  .topbar{height:58px;background:var(--surface);border-bottom:1px solid var(--border-n);display:flex;align-items:center;gap:14px;padding:0 22px;position:sticky;top:0;z-index:30;}
-  .crumbs{display:flex;align-items:center;gap:8px;font-size:13px;min-width:0;}
-  .crumb{color:var(--fg-3);white-space:nowrap;}
-  .crumb.current{color:var(--fg);font-weight:600;}
-  .crumb.link{color:var(--primary);cursor:pointer;background:none;border:none;font:inherit;padding:2px 4px;border-radius:4px;}
-  .crumb.link:hover{background:var(--muted);}
+  .topbar{height:54px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;padding:0 20px;position:sticky;top:0;z-index:30;}
+  .page-title{font-size:15px;font-weight:700;}
   .topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
-  .pill{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:var(--r-sm);border:1px solid var(--border-n);background:var(--surface);font-size:12.5px;color:var(--fg-2);transition:border-color .18s,background .18s;}
-  .pill:hover{border-color:var(--primary);color:var(--primary);}
-  .pill.accent{border-color:#FDE68A;background:#FFFBEB;color:var(--warning);}
-  .pill.info{border-color:var(--border);background:#EFF6FF;color:var(--primary);}
-  .btn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 14px;border-radius:var(--r-sm);border:none;background:var(--primary);color:#fff;font-size:12.5px;font-weight:500;transition:background .18s;}
-  .btn:hover{background:var(--primary-hover);}
-  .btn.ghost{background:var(--surface);color:var(--fg-2);border:1px solid var(--border-n);}
-  .btn.ghost:hover{border-color:var(--primary);color:var(--primary);background:var(--surface);}
-
-  .content{padding:20px 22px 40px;max-width:1440px;width:100%;margin:0 auto;}
-  .page{display:none;}
-  .page.active{display:block;animation:fadeIn .22s ease-out;}
-  @keyframes fadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+  .pill{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 11px;border-radius:6px;border:1px solid var(--border);background:var(--surface);font-size:12px;color:var(--fg-2);}
+  .pill.amber{border-color:#FDE68A;background:#FFFBEB;color:#B45309;}
+  .btn{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 13px;border-radius:6px;border:none;background:var(--primary);color:#fff;font-size:12px;font-weight:500;transition:background .18s;}
+  .btn:hover{background:var(--primary-h);}
+  .btn.ghost{background:var(--surface);color:var(--fg-2);border:1px solid var(--border);}
+  .btn.ghost:hover{border-color:var(--primary);color:var(--primary);}
+  .content{padding:0 20px 44px;max-width:1480px;width:100%;margin:0 auto;}
+  .tabs{display:flex;gap:2px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:4px;margin:16px 0 18px;position:sticky;top:66px;z-index:20;box-shadow:var(--shadow-1);overflow-x:auto;}
+  .tab{flex:1;padding:8px 10px;font-size:13px;color:var(--fg-2);background:none;border:none;border-radius:7px;white-space:nowrap;transition:all .18s;}
+  .tab:hover{background:var(--muted);color:var(--fg);}
+  .tab.active{background:var(--primary);color:#fff;font-weight:600;box-shadow:0 2px 6px rgba(30,64,175,.35);}
+  .pane{display:none;} .pane.active{display:block;animation:fade .22s ease-out;}
+  @keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
   @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
-
-  /* ===== 通用组件 ===== */
-  .notice{display:flex;gap:10px;align-items:flex-start;background:#FFFBEB;border:1px solid #FDE68A;border-radius:var(--r-md);padding:10px 14px;margin-bottom:16px;font-size:12.5px;color:var(--warning);line-height:1.7;}
-  .notice.blue{background:#EFF6FF;border-color:var(--border);color:var(--primary);}
-  .section-label{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--fg-2);margin:20px 0 10px;}
-  .section-label::after{content:"";flex:1;height:1px;background:var(--border-n);}
-  .section-label .tag-mini{font-size:10px;font-weight:500;color:var(--primary);background:#EFF4FE;padding:1px 8px;border-radius:99px;}
-
-  .grid{display:grid;gap:14px;margin-bottom:18px;}
-  .g5{grid-template-columns:repeat(5,1fr);} .g6{grid-template-columns:repeat(6,1fr);}
-  .g4{grid-template-columns:repeat(4,1fr);} .g7{grid-template-columns:repeat(7,1fr);}
-  @media (max-width:1200px){.g5,.g6,.g7{grid-template-columns:repeat(3,1fr);}.g4{grid-template-columns:repeat(2,1fr);}}
-  @media (max-width:760px){.g5,.g6,.g7,.g4{grid-template-columns:repeat(2,1fr);}}
-
-  .card{background:var(--surface);border:1px solid var(--border-n);border-radius:var(--r-lg);padding:14px 16px;box-shadow:var(--shadow-1);transition:box-shadow .18s;}
-  .card:hover{box-shadow:var(--shadow-2);}
-  .card-label{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--fg-3);margin-bottom:6px;}
-  .card-value{font-size:22px;font-weight:700;color:var(--fg);font-variant-numeric:tabular-nums;letter-spacing:-.2px;}
-  .card-value small{font-size:12px;font-weight:400;color:var(--fg-3);margin-left:2px;}
-  .card-trend{display:flex;align-items:center;gap:4px;font-size:11px;margin-top:4px;font-variant-numeric:tabular-nums;}
-  .up{color:var(--success);} .down{color:var(--destructive);} .flat{color:var(--fg-3);}
-  .card-note{font-size:10.5px;color:var(--fg-3);}
-
-  .panel{background:var(--surface);border:1px solid var(--border-n);border-radius:var(--r-lg);box-shadow:var(--shadow-1);margin-bottom:18px;overflow:hidden;}
-  .panel-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 18px 12px;flex-wrap:wrap;}
-  .panel-title{font-size:14.5px;font-weight:600;}
-  .panel-sub{font-size:12px;color:var(--fg-3);margin-top:2px;}
-  .panel-body{padding:0 18px 16px;}
-  .legend{font-size:11.5px;color:var(--fg-3);padding:10px 18px 14px;border-top:1px dashed var(--border-n);line-height:1.8;background:#FCFDFE;}
-
+  .caliber{display:flex;gap:8px;align-items:flex-start;background:#F0F6FF;border-left:3px solid var(--blue);border-radius:0 8px 8px 0;padding:8px 14px;margin-bottom:16px;font-size:12px;color:#334A75;line-height:1.8;}
+  .caliber b{color:var(--primary);}
+  .sec{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--fg-2);margin:18px 0 10px;}
+  .sec::after{content:"";flex:1;height:1px;background:var(--border);}
+  .chip{font-size:10px;font-weight:600;color:#fff;padding:1px 8px;border-radius:99px;}
+  .c-blue{background:var(--blue);} .c-green{background:var(--green);} .c-violet{background:var(--violet);}
+  .c-amber{background:var(--amber);} .c-cyan{background:var(--cyan);} .c-pink{background:var(--pink);} .c-gray{background:var(--fg-3);}
+  .grid{display:grid;gap:12px;margin-bottom:16px;}
+  .g4{grid-template-columns:repeat(4,1fr);} .g5{grid-template-columns:repeat(5,1fr);}
+  .g6{grid-template-columns:repeat(6,1fr);} .g7{grid-template-columns:repeat(7,1fr);}
+  .g2{grid-template-columns:1.6fr 1fr;} .g2e{grid-template-columns:1fr 1fr;}
+  @media (max-width:1180px){.g4,.g5,.g6,.g7{grid-template-columns:repeat(3,1fr);}.g2,.g2e{grid-template-columns:1fr;}}
+  @media (max-width:760px){.g4,.g5,.g6,.g7{grid-template-columns:repeat(2,1fr);}}
+  .card{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:13px 15px;box-shadow:var(--shadow-1);overflow:hidden;}
+  .card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--tone,var(--blue));}
+  .tone-blue{--tone:var(--blue);} .tone-green{--tone:var(--green);} .tone-violet{--tone:var(--violet);}
+  .tone-amber{--tone:var(--amber);} .tone-cyan{--tone:var(--cyan);} .tone-red{--tone:var(--red);} .tone-pink{--tone:var(--pink);}
+  .card-label{font-size:11.5px;color:var(--fg-3);margin-bottom:5px;display:flex;align-items:center;justify-content:space-between;gap:6px;}
+  .demo{font-size:9px;color:var(--fg-3);background:var(--muted);padding:0 6px;border-radius:99px;white-space:nowrap;}
+  .card-value{font-size:21px;font-weight:700;letter-spacing:-.2px;font-variant-numeric:tabular-nums;}
+  .card-value small{font-size:11px;font-weight:400;color:var(--fg-3);margin-left:2px;}
+  .card-foot{display:flex;align-items:flex-end;justify-content:space-between;gap:8px;margin-top:6px;}
+  .card-trend{font-size:11px;display:flex;align-items:center;gap:3px;}
+  .up{color:var(--green);} .down{color:var(--red);} .flat{color:var(--fg-3);}
+  .spark polyline{fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+  .panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-1);margin-bottom:16px;overflow:hidden;}
+  .panel-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:14px 16px 10px;flex-wrap:wrap;}
+  .panel-title{font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .panel-sub{font-size:11.5px;color:var(--fg-3);margin-top:2px;}
+  .legend{font-size:11px;color:var(--fg-3);padding:9px 16px 12px;border-top:1px dashed var(--border);line-height:1.9;background:#FBFCFE;}
+  .legend b{color:var(--fg-2);}
   table{width:100%;border-collapse:collapse;font-size:12.5px;}
-  th{text-align:left;padding:9px 10px;color:var(--fg-2);font-weight:600;font-size:11.5px;background:#F8FAFC;border-bottom:1px solid var(--border-n);white-space:nowrap;}
-  th:first-child{padding-left:18px;} td:first-child{padding-left:18px;}
-  td{padding:9px 10px;border-bottom:1px solid #F1F5F9;color:var(--fg);font-variant-numeric:tabular-nums;}
+  th{text-align:left;padding:8px 10px;color:var(--fg-2);font-weight:600;font-size:11px;background:#F8FAFC;border-bottom:1px solid var(--border);white-space:nowrap;}
+  th:first-child,td:first-child{padding-left:16px;} td:last-child,th:last-child{padding-right:16px;}
+  td{padding:8px 10px;border-bottom:1px solid #F1F5F9;font-variant-numeric:tabular-nums;}
   tr:last-child td{border-bottom:none;}
-  tbody tr{transition:background .15s;}
-  tbody tr:hover{background:#F5F8FF;}
-  .tag{display:inline-flex;align-items:center;gap:3px;padding:1px 8px;border-radius:99px;font-size:11px;font-weight:500;white-space:nowrap;}
-  .tag-blue{background:#DBEAFE;color:#1E40AF;} .tag-purple{background:#EDE9FE;color:#6D28D9;}
-  .tag-amber{background:#FEF3C7;color:#B45309;} .tag-gray{background:#F1F5F9;color:#475569;}
-  .tag-green{background:#D1FAE5;color:#047857;} .tag-red{background:#FEE2E2;color:#B91C1C;}
-  .link{color:var(--primary);background:none;border:none;font:inherit;font-size:12.5px;padding:0;text-decoration:none;}
+  tbody tr{transition:background .15s;} tbody tr:hover{background:#F5F8FF;}
+  .tag{display:inline-flex;align-items:center;padding:1px 8px;border-radius:99px;font-size:10.5px;font-weight:600;white-space:nowrap;}
+  .t-blue{background:#DBEAFE;color:#1E40AF;} .t-violet{background:#EDE9FE;color:#6D28D9;}
+  .t-amber{background:#FEF3C7;color:#B45309;} .t-gray{background:#F1F5F9;color:#475569;}
+  .t-green{background:#D1FAE5;color:#047857;} .t-red{background:#FEE2E2;color:#B91C1C;}
+  .link{color:var(--primary);background:none;border:none;font:inherit;font-size:12.5px;padding:0;}
   .link:hover{text-decoration:underline;}
-  .drill-btn{display:inline-flex;align-items:center;gap:4px;height:26px;padding:0 10px;border-radius:var(--r-sm);border:1px solid var(--border);background:#EFF6FF;color:var(--primary);font-size:11.5px;transition:background .18s;white-space:nowrap;}
-  .drill-btn:hover{background:var(--border);}
-  .rank{display:inline-flex;width:20px;height:20px;border-radius:50%;align-items:center;justify-content:center;font-size:10.5px;font-weight:600;}
-  .rank-1{background:#FEF3C7;color:#B45309;} .rank-2{background:#F1F5F9;color:#475569;} .rank-3{background:#FFEDD5;color:#C2410C;} .rank-n{background:#F8FAFC;color:var(--fg-3);}
+  .rank{display:inline-flex;width:19px;height:19px;border-radius:50%;align-items:center;justify-content:center;font-size:10px;font-weight:700;}
+  .r1{background:#FEF3C7;color:#B45309;} .r2{background:#F1F5F9;color:#475569;} .r3{background:#FFEDD5;color:#C2410C;} .rn{background:#F8FAFC;color:var(--fg-3);}
   .bar-cell{display:flex;align-items:center;gap:8px;}
-  .bar-track{flex:1;height:6px;background:var(--muted);border-radius:99px;overflow:hidden;min-width:40px;}
-  .bar-fill{height:100%;border-radius:99px;background:var(--secondary);}
-  .sort-th{display:inline-flex;align-items:center;gap:4px;cursor:pointer;}
-  .sort-th:hover{color:var(--primary);}
-
-  /* 页签 */
-  .tabs{display:flex;gap:2px;border-bottom:1px solid var(--border-n);margin-bottom:16px;overflow-x:auto;}
-  .tab{padding:9px 16px;font-size:13px;color:var(--fg-2);background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-1px;font-family:var(--font);transition:color .18s;white-space:nowrap;}
-  .tab:hover{color:var(--primary);}
-  .tab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:600;}
-  .subtabs{display:flex;gap:2px;border-bottom:1px solid var(--border-n);margin:6px 0 14px;}
-  .subtab{padding:7px 14px;font-size:12.5px;color:var(--fg-2);background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-1px;font-family:var(--font);}
-  .subtab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:600;}
-
-  /* 漏斗（单色渐变 + 逐级转化率文本，AA） */
-  .funnel-row{display:grid;grid-template-columns:88px 1fr 200px;align-items:center;gap:12px;padding:7px 0;}
-  .funnel-name{font-size:12.5px;color:var(--fg-2);text-align:right;}
-  .funnel-track{height:26px;background:var(--muted);border-radius:var(--r-sm);overflow:hidden;}
-  .funnel-fill{height:100%;display:flex;align-items:center;padding-left:10px;border-radius:var(--r-sm);color:#fff;font-size:11.5px;font-weight:600;font-variant-numeric:tabular-nums;min-width:56px;transition:width .3s ease-out;}
-  .funnel-meta{font-size:11.5px;color:var(--fg-3);font-variant-numeric:tabular-nums;}
+  .bar-track{flex:1;height:6px;background:var(--muted);border-radius:99px;overflow:hidden;min-width:36px;}
+  .bar-fill{height:100%;border-radius:99px;transition:width .35s ease-out;}
+  .chart-wrap{padding:4px 16px 14px;}
+  svg.chart{width:100%;height:auto;display:block;}
+  .donut-flex{display:flex;align-items:center;gap:22px;padding:6px 4px 4px;flex-wrap:wrap;}
+  .donut-legend{display:grid;gap:8px;font-size:12px;flex:1;min-width:180px;}
+  .donut-legend .dl{display:grid;grid-template-columns:12px 1fr auto auto;gap:8px;align-items:center;font-variant-numeric:tabular-nums;}
+  .donut-legend .dl b{font-weight:600;} .donut-legend .dl span{color:var(--fg-3);}
+  .funnel-row{display:grid;grid-template-columns:84px 1fr 210px;align-items:center;gap:12px;padding:6px 0;}
+  .funnel-name{font-size:12px;color:var(--fg-2);text-align:right;}
+  .funnel-track{height:24px;background:var(--muted);border-radius:6px;overflow:hidden;}
+  .funnel-fill{height:100%;display:flex;align-items:center;padding-left:10px;border-radius:6px;color:#fff;font-size:11px;font-weight:600;min-width:52px;transition:width .4s ease-out;}
+  .funnel-meta{font-size:11px;color:var(--fg-3);font-variant-numeric:tabular-nums;}
   .funnel-meta b{color:var(--fg-2);}
-
-  /* 迷你趋势图（CSS 柱） */
-  .mini-chart{display:flex;align-items:flex-end;gap:3px;height:56px;padding:8px 4px 0;}
-  .mini-bar{flex:1;background:linear-gradient(180deg,var(--secondary),var(--primary));border-radius:2px 2px 0 0;min-height:4px;opacity:.85;}
-  .mini-bar:hover{opacity:1;}
-  .mini-axis{display:flex;justify-content:space-between;font-size:10px;color:var(--fg-3);margin-top:4px;padding:0 4px;}
-
-  /* 分布行 */
-  .dist-row{display:grid;grid-template-columns:64px 1fr 52px;align-items:center;gap:10px;padding:5px 0;font-size:12.5px;}
-  .dist-name{color:var(--fg-2);} .dist-num{text-align:right;font-variant-numeric:tabular-nums;color:var(--fg);font-weight:500;}
-  .dist-track{height:18px;background:var(--muted);border-radius:4px;overflow:hidden;}
-  .dist-fill{height:100%;border-radius:4px;transition:width .3s ease-out;}
-
-  /* 口径 tooltip */
-  [data-calc]{cursor:help;border-bottom:1px dashed #93C5FD;}
-  .tooltip{display:none;position:fixed;z-index:9999;max-width:380px;background:#0F172A;color:#E2E8F0;padding:10px 14px;border-radius:var(--r-md);font-size:12px;line-height:1.7;box-shadow:var(--shadow-2);pointer-events:none;}
-  .tooltip b{color:#93C5FD;}
-  .tooltip .calc{color:#6EE7B7;display:block;margin-top:2px;}
-  .tooltip .src{color:#FCD34D;display:block;margin-top:2px;font-family:var(--mono);font-size:11px;}
-
-  /* 口径总览弹窗 */
+  [data-def]{cursor:help;border-bottom:1px dashed #93C5FD;}
+  .tooltip{display:none;position:fixed;z-index:9999;max-width:400px;background:#0F172A;color:#E2E8F0;padding:11px 14px;border-radius:10px;font-size:12px;line-height:1.75;box-shadow:var(--shadow-2);pointer-events:none;}
+  .tooltip .def{color:#fff;display:block;}
+  .tooltip .calc{color:#6EE7B7;display:block;margin-top:3px;font-family:var(--mono);font-size:11px;}
+  .tooltip .src{color:#FCD34D;display:block;margin-top:3px;font-family:var(--mono);font-size:11px;}
   .modal-mask{display:none;position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:9990;align-items:center;justify-content:center;padding:24px;}
   .modal-mask.open{display:flex;}
-  .modal{background:var(--surface);border-radius:var(--r-lg);max-width:920px;width:100%;max-height:86dvh;display:flex;flex-direction:column;box-shadow:var(--shadow-2);animation:pop .2s ease-out;}
+  .modal{background:var(--surface);border-radius:12px;max-width:960px;width:100%;max-height:86dvh;display:flex;flex-direction:column;box-shadow:var(--shadow-2);animation:pop .2s ease-out;}
   @keyframes pop{from{opacity:0;transform:scale(.97);}to{opacity:1;transform:none;}}
-  .modal-head{display:flex;justify-content:space-between;align-items:center;padding:16px 22px;border-bottom:1px solid var(--border-n);}
+  .modal-head{display:flex;justify-content:space-between;align-items:center;padding:15px 22px;border-bottom:1px solid var(--border);}
   .modal-title{font-size:15px;font-weight:700;}
-  .modal-close{background:none;border:none;font-size:22px;color:var(--fg-3);line-height:1;padding:4px 8px;border-radius:6px;}
+  .modal-close{background:none;border:none;font-size:22px;color:var(--fg-3);padding:2px 9px;border-radius:6px;}
   .modal-close:hover{background:var(--muted);color:var(--fg);}
-  .modal-body{overflow-y:auto;padding:18px 22px;}
-  .spec-h{font-size:13.5px;font-weight:700;color:var(--primary);border-left:3px solid var(--primary);padding-left:10px;margin:16px 0 8px;}
+  .modal-body{overflow-y:auto;padding:16px 22px 22px;}
+  .spec-h{font-size:13px;font-weight:700;border-left:3px solid var(--primary);padding-left:9px;margin:16px 0 8px;}
   .spec-h:first-child{margin-top:0;}
-
-  .page-head{margin-bottom:16px;}
-  .page-head h1{font-size:19px;font-weight:700;letter-spacing:-.2px;}
-  .page-head p{font-size:12.5px;color:var(--fg-3);margin-top:3px;}
-  .entity-card{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--border-n);border-radius:var(--r-lg);padding:14px 18px;margin-bottom:16px;box-shadow:var(--shadow-1);}
-  .avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;}
-  .empty{padding:28px;text-align:center;color:var(--fg-3);font-size:12.5px;border:1px dashed var(--border-n);border-radius:var(--r-md);}
+  .subview{display:none;} .subview.active{display:block;animation:fade .2s ease-out;}
+  .entity{display:flex;align-items:center;gap:13px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:13px 16px;margin-bottom:14px;box-shadow:var(--shadow-1);}
+  .avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#2563EB,#7C3AED);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;}
+  .entity .t{font-size:15px;font-weight:700;} .entity .d{font-size:11.5px;color:var(--fg-3);}
+  .entity .back{margin-left:auto;}
 </style>
 </head>
 <body>
 <div class="app">
-
-  <!-- ============ 侧边导航 ============ -->
   <aside class="sidebar">
     <div class="brand">
-      <div class="brand-logo">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
-      </div>
-      <div>
-        <div class="brand-name">会员数据报表中心</div>
-        <div class="brand-sub">四维中控台 · v4.0 原型</div>
-      </div>
+      <div class="brand-logo"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg></div>
+      <div><div class="brand-name">数据报表中心</div><div class="brand-sub">v5.0 · 中控台</div></div>
     </div>
-    <nav class="nav" aria-label="主导航">
-      <div class="nav-group">总览</div>
-      <button class="nav-item active" data-page="tenant" onclick="go('tenant')">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-        租户中控台
-      </button>
-      <div class="nav-group">维度报表</div>
-      <button class="nav-item" data-page="store" onclick="go('store')">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l1.5-5h15L21 9"/><path d="M3 9v11a1 1 0 001 1h16a1 1 0 001-1V9"/><path d="M3 9c0 1.5 1.3 2.5 3 2.5S9 10.5 9 9c0 1.5 1.3 2.5 3 2.5s3-1 3-2.5c0 1.5 1.3 2.5 3 2.5s3-1 3-2.5"/><path d="M9 21v-6h6v6"/></svg>
-        门店总览
-      </button>
-      <button class="nav-item" data-page="live" onclick="go('live')">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
-        直播分析
-      </button>
-      <button class="nav-item" data-page="product" onclick="go('product')">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-9-5-9 5v8l9 5 9-5V8z"/><path d="M3 8l9 5 9-5"/><path d="M12 13v9"/></svg>
-        商品分析
-      </button>
-      <button class="nav-item" data-page="customer" onclick="go('customer')">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-        客户分析
-      </button>
-      <button class="nav-item" data-page="course" onclick="go('course')">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
-        课程维度
-      </button>
-      <div class="nav-group">人员归属</div>
-      <button class="nav-item" data-page="staff" onclick="go('staff')">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        店员维度
-      </button>
-      <button class="nav-item" data-page="manager" onclick="go('manager')">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/><path d="M16 3.13a4 4 0 010 7.75"/><path d="M18 8l1.5 1L21 6"/></svg>
-        店长维度
+    <nav class="nav" aria-label="一级菜单">
+      <button class="nav-item active">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 3v18h18"/><path d="M7 15l4-6 4 3 5-8"/></svg>
+        会员数据报表中心
       </button>
     </nav>
-    <div class="sidebar-foot">
-      数据更新：T+1（每日 11:00 前更新昨日数据）<br>
-      实时数据 → 单场直播数据分析<br>
-      钻取：门店 → 店长/店员 → 会员
-    </div>
+    <div class="side-foot"><b>数据更新</b><br>直播域：T+1（每日 11:00 前）<br>会员/商品/订单域：5 分钟<br>实时数据 → 单场直播分析</div>
   </aside>
 
-  <!-- ============ 主区域 ============ -->
   <div class="main">
     <header class="topbar">
-      <div class="crumbs" id="crumbs"></div>
+      <span class="page-title" id="pageTitle">租户总览</span>
       <div class="topbar-right">
-        <span class="pill info" title="直播数据 T+1 更新；其余报表 5 分钟刷新">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-          T+1 更新
-        </span>
-        <button class="pill">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          查看 <b class="num">2026-08-27</b>
-        </button>
-        <button class="pill accent">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          比对 <b class="num">2026-08-26</b> · 已缓存
-        </button>
-        <button class="btn ghost">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          导出 Excel
-        </button>
+        <span class="pill amber">统计周期 <b class="num">2026-08-27</b> · 环比 <b class="num">2026-08-26</b></span>
+        <button class="btn ghost" onclick="openSpecs()">指标字典</button>
+        <button class="btn">导出</button>
       </div>
     </header>
 
     <main class="content">
-
-    <!-- ==================== 租户中控台 ==================== -->
-    <section class="page active" id="page-tenant">
-      <div class="page-head">
-        <h1>租户中控台</h1>
-        <p>全项目「商品 × 门店 × 客户 × 直播」四维总览 · 店长/店员视角按归属自动裁剪</p>
-      </div>
-
-      <div class="section-label">四维基础盘<span class="tag-mini">周期内</span></div>
-      <div class="grid g4">
-        <div class="card">
-          <div class="card-label"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8l-9-5-9 5v8l9 5 9-5V8z"/><path d="M3 8l9 5 9-5"/><path d="M12 13v9"/></svg>在售商品</div>
-          <div class="card-value" data-calc="COUNT WHERE spu_status=上架" data-source="商品中心（含直播挂车商品）">1,286<small>个</small></div>
-          <div class="card-trend up">▲ 3.2% 环比 · 对比08-26</div>
-        </div>
-        <div class="card">
-          <div class="card-label"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l1.5-5h15L21 9"/><path d="M3 9v11a1 1 0 001 1h16a1 1 0 001-1V9"/></svg>营业门店</div>
-          <div class="card-value" data-calc="COUNT WHERE status=1" data-source="sa_store_entity">156<small>家</small></div>
-          <div class="card-trend flat">— 持平 · 对比08-26</div>
-        </div>
-        <div class="card">
-          <div class="card-label"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>会员总数</div>
-          <div class="card-value" data-calc="COUNT WHERE type=3 AND status=1" data-source="sa_customer_entity">12,560</div>
-          <div class="card-trend up">▲ 5.2% 环比 · 对比08-26</div>
-        </div>
-        <div class="card">
-          <div class="card-label"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="5" width="15" height="14" rx="2"/><path d="M23 7l-7 5 7 5V7z"/></svg>直播场数</div>
-          <div class="card-value" data-calc="COUNT(DISTINCT session_id) WHERE 周期内" data-source="sa_live_session">24<small>场</small></div>
-          <div class="card-trend up">▲ 新增 2 场 环比</div>
-        </div>
-      </div>
-
-      <div class="section-label">四维交叉矩阵<span class="tag-mini">门店落点</span></div>
-      <div class="panel">
-        <div class="panel-head">
-          <div><div class="panel-title">门店 × 直播 × 客户 × 商品</div>
-          <div class="panel-sub">每行 = 一家门店在四个维度上的表现；点击门店名钻取门店总览，点击直播场数查看直播明细</div></div>
-        </div>
-        <table>
-          <thead><tr>
-            <th>门店</th><th class="num">直播场数</th><th class="num">观看人数</th><th class="num">累计观看(分)</th>
-            <th class="num">成交订单</th><th class="num">直播GMV</th><th class="num">动销商品</th><th class="num">成交客户</th><th class="num">转化率</th><th>操作</th>
-          </tr></thead>
-          <tbody>
-            <tr><td><button class="link" onclick="go('store')">天河旗舰店</button></td><td><button class="link num" onclick="go('live')">12</button></td><td>286</td><td>4,120</td><td>86</td><td>¥25,800</td><td>32</td><td>72</td><td>25.2%</td><td><button class="drill-btn" onclick="go('live')">直播明细</button></td></tr>
-            <tr><td><button class="link" onclick="go('store')">白云店</button></td><td>8</td><td>198</td><td>2,860</td><td>52</td><td>¥15,600</td><td>24</td><td>48</td><td>24.2%</td><td><button class="drill-btn" onclick="go('live')">直播明细</button></td></tr>
-            <tr><td><button class="link" onclick="go('store')">番禺店</button></td><td>4</td><td>120</td><td>1,540</td><td>28</td><td>¥8,400</td><td>18</td><td>26</td><td>21.7%</td><td><button class="drill-btn" onclick="go('live')">直播明细</button></td></tr>
-          </tbody>
-        </table>
-        <div class="legend">租户视角横向对比各门店；店长登录后自动过滤到本店；转化率 = 成交客户 ÷ 观看人数</div>
-      </div>
-
-      <div class="section-label">客户路径漏斗<span class="tag-mini">APP 端用户路径</span></div>
-      <div class="panel">
-        <div class="panel-head">
-          <div><div class="panel-title">触达 → 成交 完整转化路径</div>
-          <div class="panel-sub">按「客户 × 直播场次」归集行为链；点击各环节可下钻明细（原型演示静态数据）</div></div>
-        </div>
-        <div class="panel-body">
-          <div class="funnel-row"><div class="funnel-name">触达</div>
-            <div class="funnel-track"><div class="funnel-fill" style="width:100%;background:#C7D7F8;color:#1E3A8A;">12,560</div></div>
-            <div class="funnel-meta"><b>100%</b> 基数 · 群发/预约提醒/私发</div></div>
-          <div class="funnel-row"><div class="funnel-name">预约/进入</div>
-            <div class="funnel-track"><div class="funnel-fill" style="width:71%;background:#A5BDF4;color:#1E3A8A;">8,920</div></div>
-            <div class="funnel-meta"><b>71.0%</b> 留存 · 流失 3,640</div></div>
-          <div class="funnel-row"><div class="funnel-name">观看≥1min</div>
-            <div class="funnel-track"><div class="funnel-fill" style="width:44%;background:#7FA3F0;color:#fff;">5,540</div></div>
-            <div class="funnel-meta"><b>44.1%</b> 留存 · 流失 3,380</div></div>
-          <div class="funnel-row"><div class="funnel-name">互动</div>
-            <div class="funnel-track"><div class="funnel-fill" style="width:26%;background:#5487E8;color:#fff;">3,260</div></div>
-            <div class="funnel-meta"><b>26.0%</b> 留存 · 评论/点赞/分享</div></div>
-          <div class="funnel-row"><div class="funnel-name">点击商品</div>
-            <div class="funnel-track"><div class="funnel-fill" style="width:14%;background:#3B6BD8;color:#fff;">1,760</div></div>
-            <div class="funnel-meta"><b>14.0%</b> 留存 · 点击购物袋</div></div>
-          <div class="funnel-row"><div class="funnel-name">下单</div>
-            <div class="funnel-track"><div class="funnel-fill" style="width:8%;background:#2B55BE;color:#fff;">1,004</div></div>
-            <div class="funnel-meta"><b>8.0%</b> 留存 · 含未支付</div></div>
-          <div class="funnel-row"><div class="funnel-name">支付成交</div>
-            <div class="funnel-track"><div class="funnel-fill" style="width:6%;background:#1E40AF;color:#fff;">752</div></div>
-            <div class="funnel-meta"><b>6.0%</b> 最终转化 · 最大流失：进入→观看</div></div>
-        </div>
-        <div class="legend">触达来源：直播推广分享（通讯录群发）/ 预约提醒 / 门店导购私发 · 每级标注显式留存率与流失量（不只靠颜色区分）</div>
-      </div>
-
-      <div class="section-label">角色视角导航</div>
-      <div class="panel">
-        <div class="panel-head"><div><div class="panel-title">三角色 × 双端视图裁剪</div>
-        <div class="panel-sub">同一套四维数据，按角色裁剪；PC = 中控台报表，APP = 轻量卡片推送</div></div></div>
-        <table>
-          <thead><tr><th>角色</th><th>端</th><th>看到什么</th><th>核心问题</th><th>入口</th></tr></thead>
-          <tbody>
-            <tr><td><span class="tag tag-purple">租户</span></td><td>PC</td><td>本页四维中控台：门店×直播×客户×商品交叉总览</td><td>哪家门店、哪场直播、哪个商品在贡献或拖后腿？</td><td>本页 + 全部维度页签</td></tr>
-            <tr><td><span class="tag tag-blue">店长</span></td><td>PC + APP</td><td>① 直播间角度：单场数据与漏斗<br>② 客户角度：名下客户累计观看分钟/互动/下单<br>③ 商品角度：本场商品成交 + 客户看商品交叉</td><td>我的直播效果如何？我的客户看了多久、买了什么？</td><td>直播分析 / 客户分析 / 商品分析</td></tr>
-            <tr><td><span class="tag tag-gray">店员</span></td><td>APP 为主</td><td>名下会员的直播参与、课程参与、消费贡献（归属快照）</td><td>我的会员谁活跃、谁沉睡、谁在直播间下单了？</td><td>门店总览 → 成员明细钻取</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- ==================== 直播分析 ==================== -->
-    <section class="page" id="page-live">
-      <div class="page-head">
-        <h1>直播分析</h1>
-        <p>口径对齐线上「直播统计 → 直播分析」 · 整体 / 直播 / 互动 / 带货 四组指标 + 场次明细</p>
-      </div>
-      <div class="notice">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-        <span><b>数据 T+1 更新</b>：每天早上 11:00 前更新昨日直播数据（对齐线上）。如需实时数据，请点击场次名进入单场直播数据分析。查看日期 <b class="num">2026-08-27</b>（单天）· 比对 <b class="num">2026-08-26</b>（localStorage 记忆）。</span>
-      </div>
-
       <div class="tabs" role="tablist">
-        <button class="tab active">最近开始</button><button class="tab">最近创建</button><button class="tab">观看数最高</button>
-        <button class="tab">观看峰值最高</button><button class="tab">成交订单数量最高</button><button class="tab">成交订单金额最高</button><button class="tab">流量消耗最高</button>
+        <button class="tab active" data-tab="tenant">租户总览</button>
+        <button class="tab" data-tab="store">门店报表</button>
+        <button class="tab" data-tab="live">直播报表</button>
+        <button class="tab" data-tab="product">商品报表</button>
+        <button class="tab" data-tab="customer">客户报表</button>
+        <button class="tab" data-tab="course">课程报表</button>
+        <button class="tab" data-tab="staff">店员报表</button>
+        <button class="tab" data-tab="manager">店长报表</button>
       </div>
 
-      <div class="section-label">① 整体数据<span class="tag-mini">线上口径</span></div>
-      <div class="grid g5">
-        <div class="card"><div class="card-label">直播场数</div><div class="card-value" data-calc="COUNT(DISTINCT session_id) WHERE 周期内" data-source="sa_live_session">24<small>场</small></div><div class="card-trend up">▲ 2 场 环比</div></div>
-        <div class="card"><div class="card-label">观看总人数</div><div class="card-value" data-calc="SUM(各场次观看人数)，type=3 客户" data-source="sa_live_watch_record.customer_id">54</div><div class="card-trend up">▲ 6 环比</div></div>
-        <div class="card"><div class="card-label">成交订单总数</div><div class="card-value" data-calc="COUNT WHERE 直播订单已支付" data-source="sto_order WHERE live_id非空 AND 已支付">9</div><div class="card-trend flat">— 持平</div></div>
-        <div class="card"><div class="card-label">成交订单总金额</div><div class="card-value" data-calc="SUM(pay_amount) WHERE 直播订单已支付" data-source="sto_order.pay_amount WHERE live_id非空">¥0.63</div><div class="card-trend flat">— 持平</div></div>
-        <div class="card"><div class="card-label">消耗总流量</div><div class="card-value" data-calc="SUM(直播+回放流量)" data-source="sa_live_session_stat.flow_mb（STR-SAAS-002 口径）">644,141<small>MB</small></div><div class="card-trend up">▲ 4.1% 环比</div></div>
-      </div>
-
-      <div class="section-label">② 直播数据<span class="tag-mini">线上口径 · 场均/人均</span></div>
-      <div class="grid g6">
-        <div class="card"><div class="card-label">场均直播时长</div><div class="card-value" data-calc="SUM(直播时长) / 直播场数" data-source="sa_live_session（开播~下播）">4,496.79<small>分</small></div></div>
-        <div class="card"><div class="card-label">场均回放时长</div><div class="card-value" data-calc="SUM(回放时长) / 场数" data-source="sa_live_session_stat.replay_duration">24,171.29<small>分</small></div></div>
-        <div class="card"><div class="card-label">场均观看人数</div><div class="card-value" data-calc="观看总人数 / 直播场数" data-source="派生">2.25</div></div>
-        <div class="card"><div class="card-label">场均峰值人数</div><div class="card-value" data-calc="SUM(峰值人数) / 场数" data-source="sa_live_session_stat.peak_uv">0.54</div></div>
-        <div class="card"><div class="card-label">人均观看直播时长</div><div class="card-value" data-calc="SUM(watch_duration)/观看总人数 ÷60" data-source="sa_live_watch_record">5.7<small>分</small></div></div>
-        <div class="card"><div class="card-label">人均观看回放时长</div><div class="card-value" data-calc="SUM(回放观看时长)/回放人数 ÷60" data-source="sa_live_watch_record WHERE 回放">52.41<small>分</small></div></div>
-      </div>
-
-      <div class="section-label">③ 互动数据　④ 带货数据<span class="tag-mini">线上口径</span></div>
-      <div class="grid g7">
-        <div class="card"><div class="card-label">场均点赞次数</div><div class="card-value" data-calc="SUM(点赞)/场数" data-source="sa_live_session_stat.like_count">0.08</div></div>
-        <div class="card"><div class="card-label">场均评论人数</div><div class="card-value" data-calc="SUM(评论UV)/场数" data-source="sa_live_session_stat.comment_uv">0.08</div></div>
-        <div class="card"><div class="card-label">带货直播场次</div><div class="card-value" data-calc="COUNT WHERE 挂车且成交>0" data-source="sa_live_cart_item + sto_order">2<small>场</small></div></div>
-        <div class="card"><div class="card-label">场均成交商品人数</div><div class="card-value" data-calc="成交客户数 / 带货场数" data-source="sto_order WHERE live_id非空">0.13</div></div>
-        <div class="card"><div class="card-label">场均成交商品订单</div><div class="card-value" data-calc="成交订单总数 / 带货场数" data-source="派生">0.38</div></div>
-        <div class="card"><div class="card-label">成交订单总数</div><div class="card-value">9</div></div>
-        <div class="card"><div class="card-label">成交订单总额</div><div class="card-value">¥0.63</div></div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-head">
-          <div><div class="panel-title">直播场次列表</div>
-          <div class="panel-sub">前 8 列 = 线上口径；后 5 列 = 原型扩展口径（预约/签到/新客/互动UV/消耗流量）</div></div>
-          <button class="btn ghost">筛选：直播ID / 创建时间 / 开播时间</button>
+      <!-- ============ Tab 1 租户总览 ============ -->
+      <section class="pane active" id="pane-tenant">
+        <div class="grid g4">
+          <div class="card tone-blue"><div class="card-label">观看总人数<span class="demo">T+1 · 线上真实</span></div>
+            <div class="card-value" data-def="统计周期内进入过直播间的去重客户数（UV）。同一客户多次进出、观看多场均只计 1 人。" data-calc="COUNT(DISTINCT customer_id)，type=3" data-source="sa_live_watch_record">54</div>
+            <div class="card-foot"><span class="card-trend up">▲ 12.5% 环比</span><svg class="spark" data-spark="6,8,7,9,8,10,6" data-color="#2563EB" width="64" height="20"></svg></div></div>
+          <div class="card tone-green"><div class="card-label">成交订单总金额<span class="demo">T+1 · 线上真实</span></div>
+            <div class="card-value" data-def="直播期间挂车商品订单中已完成支付部分的金额合计（元），不含未支付订单。" data-calc="SUM(pay_amount) WHERE live_id非空 AND 已支付" data-source="sto_order.pay_amount">¥0.63</div>
+            <div class="card-foot"><span class="card-trend flat">— 持平</span><svg class="spark" data-spark="0.2,0,0.1,0,0.6,0.03,0" data-color="#059669" width="64" height="20"></svg></div></div>
+          <div class="card tone-violet"><div class="card-label">会员总数<span class="demo">5min · 示例</span></div>
+            <div class="card-value" data-def="项目下状态正常的 C 端客户总数（type=3），含 VIP 与普通会员。" data-calc="COUNT(customer_id) WHERE type=3 AND status=1" data-source="sa_customer_entity">12,560</div>
+            <div class="card-foot"><span class="card-trend up">▲ 5.2% 环比</span><svg class="spark" data-spark="9,9.4,10,10.5,11,12,12.5" data-color="#7C3AED" width="64" height="20"></svg></div></div>
+          <div class="card tone-cyan"><div class="card-label">消耗总流量 (MB)<span class="demo">T+1 · 线上真实</span></div>
+            <div class="card-value" data-def="全部直播场次产生的流量合计：直播推流/播放流量 + 回放点播流量。用于流量成本核算与对账。" data-calc="SUM(直播流量 + 回放流量)" data-source="sa_live_session_stat（对接 STR-SAAS-002）">644,141</div>
+            <div class="card-foot"><span class="card-trend up">▲ 4.1% 环比</span><svg class="spark" data-spark="70,76,72,80,78,86,84" data-color="#0891B2" width="64" height="20"></svg></div></div>
         </div>
-        <table>
-          <thead><tr>
-            <th>直播信息</th><th>创建时间</th><th>开始时间</th>
-            <th><span class="sort-th">观看人数 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg></span></th>
-            <th>观看峰值人数</th><th>成交订单数</th><th>成交订单金额(元)</th><th>直播时长(分)</th>
-            <th>预约</th><th>签到</th><th>新客</th><th>互动UV</th><th>消耗流量(MB)</th><th>操作</th>
-          </tr></thead>
-          <tbody>
-            <tr><td><button class="link" onclick="go('live-detail')">测试825</button><br><span style="color:var(--fg-3);font-size:11px;font-family:var(--mono);">ID 2608250100220856704</span></td><td>08-25 15:14</td><td>08-25 15:14</td><td>5</td><td>2</td><td>0</td><td>0</td><td>495.82</td><td>3</td><td>2</td><td>1</td><td>4</td><td>495.82</td><td><button class="drill-btn" onclick="go('live-detail')">单场分析</button></td></tr>
-            <tr><td>测试824<br><span style="color:var(--fg-3);font-size:11px;font-family:var(--mono);">ID 2608240100160085479</span></td><td>08-24 14:21</td><td>08-24 14:21</td><td>4</td><td>1</td><td>0</td><td>0</td><td>1,486.02</td><td>2</td><td>1</td><td>0</td><td>3</td><td>1,486.02</td><td><button class="drill-btn" onclick="go('live-detail')">单场分析</button></td></tr>
-            <tr><td><button class="link" onclick="go('live-detail')">直播78 · 带货</button><br><span style="color:var(--fg-3);font-size:11px;font-family:var(--mono);">ID 2607080069071603642</span></td><td>07-08 09:55</td><td>07-08 09:55</td><td>2</td><td>0</td><td>2</td><td>0.60</td><td>343.38</td><td>1</td><td>1</td><td>0</td><td>2</td><td>343.38</td><td><button class="drill-btn" onclick="go('live-detail')">单场分析</button></td></tr>
-            <tr><td>直播76 · 带货<br><span style="color:var(--fg-3);font-size:11px;font-family:var(--mono);">ID 2607060069064424595</span></td><td>07-06 10:09</td><td>07-06 10:09</td><td>4</td><td>0</td><td>7</td><td>0.03</td><td>306.33</td><td>4</td><td>2</td><td>1</td><td>6</td><td>306.33</td><td><button class="drill-btn" onclick="go('live-detail')">单场分析</button></td></tr>
-            <tr><td>下级红包<br><span style="color:var(--fg-3);font-size:11px;font-family:var(--mono);">ID 2606290069059215474</span></td><td>06-29 10:59</td><td>06-29 10:59</td><td>0</td><td>0</td><td>0</td><td>0</td><td>37,439.60</td><td>0</td><td>0</td><td>0</td><td>0</td><td>37,439.60</td><td><button class="drill-btn" onclick="go('live-detail')">单场分析</button></td></tr>
-          </tbody>
-        </table>
-        <div class="legend">共 24 条记录 · 支持按排序页签重排 · 消耗流量按场次归集，可跳转直播流量域（STR-SAAS-002）对账</div>
-      </div>
-    </section>
 
-    <!-- ==================== 单场直播分析 ==================== -->
-    <section class="page" id="page-live-detail">
-      <div class="entity-card">
-        <div class="avatar">测</div>
-        <div style="flex:1;">
-          <div style="font-size:16px;font-weight:700;">测试825 · 天河旗舰店</div>
-          <div style="font-size:12px;color:var(--fg-3);" class="num">开播 08-25 15:14 · 直播时长 495.82 分钟 · ID 2608250100220856704 · 实时数据 5 分钟前更新</div>
-        </div>
-        <button class="btn ghost" onclick="go('live')">返回列表</button>
-      </div>
-
-      <div class="grid g5">
-        <div class="card"><div class="card-label">观看人数</div><div class="card-value">5</div><div class="card-trend flat">— 持平</div></div>
-        <div class="card"><div class="card-label">观看峰值人数</div><div class="card-value">2</div></div>
-        <div class="card"><div class="card-label">预约 / 签到</div><div class="card-value">3 <small>/</small> 2</div></div>
-        <div class="card"><div class="card-label">成交订单数</div><div class="card-value">0</div><div class="card-trend flat">本场未挂车</div></div>
-        <div class="card"><div class="card-label">新客占比</div><div class="card-value">20%</div></div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-head"><div><div class="panel-title">场次漏斗</div><div class="panel-sub">店长视角 ①：站在直播间的角度看本场转化</div></div></div>
-        <div class="panel-body">
-          <div class="funnel-row"><div class="funnel-name">预约</div><div class="funnel-track"><div class="funnel-fill" style="width:60%;background:#A5BDF4;color:#1E3A8A;">3</div></div><div class="funnel-meta"><b>100%</b> 基数</div></div>
-          <div class="funnel-row"><div class="funnel-name">观看</div><div class="funnel-track"><div class="funnel-fill" style="width:100%;background:#7FA3F0;color:#1E3A8A;">5</div></div><div class="funnel-meta"><b>167%</b> · 含未预约直达</div></div>
-          <div class="funnel-row"><div class="funnel-name">签到</div><div class="funnel-track"><div class="funnel-fill" style="width:40%;background:#5487E8;color:#fff;">2</div></div><div class="funnel-meta"><b>40%</b> 留存</div></div>
-          <div class="funnel-row"><div class="funnel-name">互动</div><div class="funnel-track"><div class="funnel-fill" style="width:80%;background:#3B6BD8;color:#fff;">4</div></div><div class="funnel-meta"><b>80%</b> 留存</div></div>
-          <div class="funnel-row"><div class="funnel-name">下单</div><div class="funnel-track"><div class="funnel-fill" style="width:0%;background:#2B55BE;color:transparent;">0</div></div><div class="funnel-meta"><b>0%</b> · 本场未挂车</div></div>
-        </div>
-        <div class="legend">观看 > 预约：含未预约直接进入的会员 · 下单含未支付 · 成交为已支付</div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-head"><div><div class="panel-title">本场商品成交<span class="tag tag-gray" style="margin-left:8px;">商品 × 直播</span></div>
-        <div class="panel-sub">店长视角 ③：从商品角度看直播 —— 挂车商品的点击 / 成交明细</div></div></div>
-        <table>
-          <thead><tr><th>商品</th><th>挂车时长</th><th>商品点击UV</th><th>成交订单数</th><th>成交金额</th><th>成交客户数</th><th>客单价</th></tr></thead>
-          <tbody>
-            <tr><td>玻尿酸精华液 30ml</td><td>38min</td><td>620</td><td>86</td><td>¥25,800</td><td>72</td><td>¥300</td></tr>
-            <tr><td>修护面霜 50g</td><td>25min</td><td>410</td><td>52</td><td>¥15,600</td><td>48</td><td>¥300</td></tr>
-            <tr><td>洁面乳 120ml</td><td>12min</td><td>180</td><td>12</td><td>¥2,160</td><td>12</td><td>¥180</td></tr>
-          </tbody>
-        </table>
-        <div class="legend">挂车明细 = sa_live_cart_item；成交回溯 sto_order（live_id=本场）· 未挂车直播此面板显示空态</div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-head"><div><div class="panel-title">本场客户观看明细<span class="tag tag-gray" style="margin-left:8px;">客户 × 直播</span></div>
-        <div class="panel-sub">店长视角 ②：站在旗下客户角度看直播间 —— 谁来了、看了多久、有没有互动下单</div></div></div>
-        <table>
-          <thead><tr><th>客户</th><th>归属店员</th><th>累计观看分钟</th><th>进入时间</th><th>观看峰值段</th><th>互动</th><th>点击商品</th><th>下单金额</th><th>新客</th></tr></thead>
-          <tbody>
-            <tr><td>王女士</td><td>张三</td><td>45.5</td><td>19:02</td><td><span class="tag tag-green">峰值在场</span></td><td>12</td><td><span class="tag tag-green">是</span></td><td>¥320</td><td><span class="tag tag-amber">新</span></td></tr>
-            <tr><td>李先生</td><td>李四</td><td>32.0</td><td>19:05</td><td><span class="tag tag-green">峰值在场</span></td><td>3</td><td><span class="tag tag-gray">否</span></td><td>—</td><td><span class="tag tag-amber">新</span></td></tr>
-            <tr><td>陈小姐</td><td>王五</td><td>18.2</td><td>19:40</td><td><span class="tag tag-gray">—</span></td><td>5</td><td><span class="tag tag-green">是</span></td><td>¥120</td><td><span class="tag tag-gray">旧</span></td></tr>
-          </tbody>
-        </table>
-        <div class="legend">累计观看分钟 = 该客户本场多次进出观看时长之和（watch_duration 累计）· 归属店员按查询时点 staff_id 快照</div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-head"><div><div class="panel-title">参与会员明细</div></div></div>
-        <table>
-          <thead><tr><th>会员</th><th>等级</th><th>归属店员</th><th>时长</th><th>签到</th><th>互动</th><th>下单</th><th>金额</th><th>新客</th><th>来源</th></tr></thead>
-          <tbody>
-            <tr><td>王女士</td><td><span class="tag tag-amber">黑卡</span></td><td>张三</td><td>45min</td><td>是</td><td>是</td><td>是</td><td>¥320</td><td><span class="tag tag-amber">新</span></td><td>预约</td></tr>
-            <tr><td>李先生</td><td><span class="tag tag-amber">金卡</span></td><td>李四</td><td>32min</td><td>是</td><td>否</td><td>否</td><td>—</td><td><span class="tag tag-amber">新</span></td><td>直达</td></tr>
-            <tr><td>陈小姐</td><td><span class="tag tag-gray">普通</span></td><td>王五</td><td>18min</td><td>否</td><td>是</td><td>是</td><td>¥120</td><td><span class="tag tag-gray">旧</span></td><td>分享</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- ==================== 商品分析 ==================== -->
-    <section class="page" id="page-product">
-      <div class="page-head"><h1>商品分析</h1><p>商品 × 直播（带货表现） · 商品 × 客户（谁看了、谁买了，支持店员跟进）</p></div>
-      <div class="grid g5">
-        <div class="card"><div class="card-label">在售商品</div><div class="card-value" data-calc="COUNT WHERE spu_status=上架" data-source="商品中心">1,286</div></div>
-        <div class="card"><div class="card-label">动销商品</div><div class="card-value" data-calc="COUNT WHERE 周期内有成交（含直播引导）" data-source="sto_order × spu_id">486</div></div>
-        <div class="card"><div class="card-label">直播带货GMV</div><div class="card-value" data-calc="SUM(pay_amount) WHERE live_id非空 AND 已支付" data-source="sto_order">¥58,600</div></div>
-        <div class="card"><div class="card-label">直播成交订单</div><div class="card-value">186</div></div>
-        <div class="card"><div class="card-label">直播引流成交占比</div><div class="card-value" data-calc="直播GMV / 全渠道GMV" data-source="派生">31.5%</div></div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-head"><div><div class="panel-title">商品 × 直播</div><div class="panel-sub">从商品角度看直播：每个商品被哪些场次带过货、点击与成交表现</div></div></div>
-        <table>
-          <thead><tr><th>商品</th><th>带货场次数</th><th>商品点击UV</th><th>成交订单</th><th>成交金额</th><th>成交客户</th><th>客单价</th><th>新客占比</th><th>点击→成交</th></tr></thead>
-          <tbody>
-            <tr><td>玻尿酸精华液 30ml</td><td>6</td><td>3,240</td><td>86</td><td>¥25,800</td><td>72</td><td>¥300</td><td>38.9%</td><td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:64%;"></div></div><span>2.7%</span></div></td></tr>
-            <tr><td>修护面霜 50g</td><td>4</td><td>2,180</td><td>52</td><td>¥15,600</td><td>48</td><td>¥300</td><td>33.3%</td><td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:56%;"></div></div><span>2.4%</span></div></td></tr>
-            <tr><td>洁面乳 120ml</td><td>3</td><td>960</td><td>12</td><td>¥2,160</td><td>12</td><td>¥180</td><td>25.0%</td><td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:30%;"></div></div><span>1.3%</span></div></td></tr>
-          </tbody>
-        </table>
-        <div class="legend">挂车关系 = sa_live_cart_item；成交 = sto_order.live_id + spu_id；点击UV = 直播中点击购物袋去重</div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-head"><div><div class="panel-title">商品 × 客户交叉</div><div class="panel-sub">客户看商品：直播引导的点击/加购/下单行为链，店员按「待跟进」逐个转化</div></div>
-          <div class="tabs" style="border:none;margin:0;">
-            <button class="tab active" style="padding:5px 12px;">全部</button><button class="tab" style="padding:5px 12px;">待跟进</button><button class="tab" style="padding:5px 12px;">已成交</button>
+        <div class="grid g2">
+          <div class="panel" style="margin-bottom:0;">
+            <div class="panel-head"><div><div class="panel-title">门店直播成交对比<span class="chip c-green" style="margin-left:4px;">GMV</span></div>
+            <div class="panel-sub">各门店会员直播成交金额与观看人数（示例数据）</div></div></div>
+            <div class="chart-wrap" id="storeBars"></div>
+            <div class="legend"><b>口径</b>：门店GMV=该门店会员（store_id 归属）直播已支付订单金额合计；门店观看人数=该门店会员去重观看客户数。</div>
+          </div>
+          <div class="panel" style="margin-bottom:0;">
+            <div class="panel-head"><div><div class="panel-title">会员等级构成<span class="chip c-violet" style="margin-left:4px;">结构</span></div>
+            <div class="panel-sub">全部会员按 VIP 等级分布（示例数据）</div></div></div>
+            <div class="chart-wrap"><div class="donut-flex" id="memberDonut"></div></div>
+            <div class="legend"><b>口径</b>：等级取 sa_customer_vip.level，level&gt;1 为 VIP；占比分母为会员总数。</div>
           </div>
         </div>
-        <table>
-          <thead><tr><th>客户</th><th>归属店员</th><th>商品</th><th>来源直播</th><th>行为</th><th>下单金额</th><th>时间</th><th>跟进状态</th></tr></thead>
-          <tbody>
-            <tr><td>王女士</td><td>张三</td><td>玻尿酸精华液 30ml</td><td>测试825场</td><td>点击 → 下单</td><td>¥300</td><td>08-25 16:02</td><td><span class="tag tag-green">已成交</span></td></tr>
-            <tr><td>李先生</td><td>李四</td><td>修护面霜 50g</td><td>测试825场</td><td>仅点击</td><td>—</td><td>08-25 15:40</td><td><span class="tag tag-blue">待跟进</span></td></tr>
-            <tr><td>陈小姐</td><td>王五</td><td>洁面乳 120ml</td><td>直播78场</td><td>加购未付</td><td>—</td><td>07-08 10:20</td><td><span class="tag tag-red">流失风险</span></td></tr>
-          </tbody>
-        </table>
-        <div class="legend">归属按 staff_id 快照隔离 · 「待跟进」列表可直接导出给对应店员</div>
-      </div>
-    </section>
 
-    <!-- ==================== 客户分析 ==================== -->
-    <section class="page" id="page-customer">
-      <div class="page-head"><h1>客户分析</h1><p>客户 × 直播（累计观看深度） · 客户 × 商品（偏好画像与直播贡献）</p></div>
-      <div class="grid g5">
-        <div class="card"><div class="card-label">观看直播客户数</div><div class="card-value" data-calc="COUNT(DISTINCT customer_id) WHERE 周期内有观看" data-source="sa_live_watch_record">5,540</div></div>
-        <div class="card"><div class="card-label">人均累计观看分钟</div><div class="card-value" data-calc="SUM(watch_duration)/观看客户数 ÷60" data-source="sa_live_watch_record">28.6<small>分</small></div></div>
-        <div class="card"><div class="card-label">互动客户数</div><div class="card-value">3,260</div></div>
-        <div class="card"><div class="card-label">直播成交客户数</div><div class="card-value">752</div></div>
-        <div class="card"><div class="card-label">观看→成交转化率</div><div class="card-value" data-calc="成交客户 / 观看客户" data-source="派生">13.6%</div></div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-head"><div><div class="panel-title">客户 × 直播</div>
-        <div class="panel-sub">客户在直播间累计看了多少分钟 —— 店长站在旗下客户角度回看参与深度（含回放）</div></div></div>
-        <table>
-          <thead><tr><th>客户</th><th>归属店员</th><th>观看场次</th><th>累计观看分钟</th><th>最近观看</th><th>互动次数</th><th>直播下单数</th><th>直播消费</th><th>回放分钟</th></tr></thead>
-          <tbody>
-            <tr><td>王女士</td><td>张三</td><td>8</td><td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:92%;"></div></div>326.5</div></td><td>08-27</td><td>46</td><td>3</td><td>¥920</td><td>120.0</td></tr>
-            <tr><td>李先生</td><td>李四</td><td>5</td><td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:40%;"></div></div>142.0</div></td><td>08-25</td><td>9</td><td>1</td><td>¥300</td><td>65.5</td></tr>
-            <tr><td>陈小姐</td><td>王五</td><td>2</td><td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:10%;"></div></div>36.2</div></td><td>08-24</td><td>2</td><td>0</td><td>—</td><td>18.0</td></tr>
-          </tbody>
-        </table>
-        <div class="legend">累计观看分钟 = 所有场次（直播+回放）watch_duration 累计 · 店长视角仅显示本店/名下客户（归属快照隔离）</div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-head"><div><div class="panel-title">客户 × 商品交叉</div><div class="panel-sub">从客户角度看商品：浏览/加购/成交与直播引导贡献，沉淀商品偏好画像</div></div></div>
-        <table>
-          <thead><tr><th>客户</th><th>归属店员</th><th>浏览商品数</th><th>下单商品数</th><th>直播引导金额</th><th>累计消费</th><th>直播贡献占比</th><th>最近购买</th></tr></thead>
-          <tbody>
-            <tr><td>王女士</td><td>张三</td><td>26</td><td>9</td><td>¥920</td><td>¥3,200</td><td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:29%;background:var(--accent);"></div></div>28.8%</div></td><td>08-27</td></tr>
-            <tr><td>李先生</td><td>李四</td><td>14</td><td>3</td><td>¥300</td><td>¥1,800</td><td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:17%;background:var(--accent);"></div></div>16.7%</div></td><td>08-25</td></tr>
-            <tr><td>陈小姐</td><td>王五</td><td>5</td><td>0</td><td>¥0</td><td>¥0</td><td>—</td><td>—</td></tr>
-          </tbody>
-        </table>
-        <div class="legend">直播引导金额 = 该客户所有 live_id 非空已支付订单合计 · 沉淀客户商品偏好画像，供店员精准推荐</div>
-      </div>
-    </section>
-
-    <!-- ==================== 课程维度 ==================== -->
-    <section class="page" id="page-course">
-      <div class="page-head"><h1>课程维度</h1><p>课程观看 / 完播 / 答题 / 红包 / 新客（数据来自 sa_live_watch_record，front_style=2）</p></div>
-      <div class="grid g5">
-        <div class="card"><div class="card-label">课程总数</div><div class="card-value" data-calc="COUNT(*) WHERE status=1" data-source="sa_course_tpl_entity（front_style=2）">128</div></div>
-        <div class="card"><div class="card-label">观看会员</div><div class="card-value">8,520</div></div>
-        <div class="card"><div class="card-label">完播会员</div><div class="card-value" data-calc="COUNT WHERE watch_duration >= 课程时长 × complete_percentage" data-source="watch_duration + complete_percentage">4,860</div></div>
-        <div class="card"><div class="card-label">答题会员</div><div class="card-value" data-calc="COUNT(DISTINCT user_id) FROM 答题记录" data-source="gm_course_day_stat">3,200</div></div>
-        <div class="card"><div class="card-label">人均时长</div><div class="card-value">18<small>分</small></div></div>
-      </div>
-      <div class="panel">
-        <div class="panel-head"><div><div class="panel-title">课程列表</div><div class="panel-sub">按课程维度聚合会员参与数据 · 点击课程名查看课程详情</div></div></div>
-        <table>
-          <thead><tr><th>课程</th><th>类型</th><th>观看UV</th><th>完播UV</th><th>完播率</th><th>答题UV</th><th>正确率</th><th>红包</th><th>新客</th><th>新客占比</th></tr></thead>
-          <tbody>
-            <tr><td><button class="link" onclick="go('course-detail')">产品知识</button></td><td><span class="tag tag-gray">录播</span></td><td>1,860</td><td>1,420</td><td>76.3%</td><td>1,100</td><td>82%</td><td>¥320</td><td>280</td><td>15.1%</td></tr>
-            <tr><td>销售技巧</td><td><span class="tag tag-blue">直播</span></td><td>1,520</td><td>1,080</td><td>71.1%</td><td>920</td><td>78%</td><td>¥280</td><td>320</td><td>21.1%</td></tr>
-            <tr><td>新品培训</td><td><span class="tag tag-gray">录播</span></td><td>1,280</td><td>880</td><td>68.8%</td><td>720</td><td>80%</td><td>¥200</td><td>180</td><td>14.1%</td></tr>
-            <tr><td>话术训练</td><td><span class="tag tag-blue">直播</span></td><td>980</td><td>620</td><td>63.3%</td><td>520</td><td>75%</td><td>¥180</td><td>160</td><td>16.3%</td></tr>
-          </tbody>
-        </table>
-        <div class="legend">完播率 = 完播UV / 观看UV · 新客 = 首次观看该课程的会员 · 类型通过 sa_live_room.front_style 区分</div>
-      </div>
-    </section>
-
-    <!-- ==================== 课程详情 ==================== -->
-    <section class="page" id="page-course-detail">
-      <div class="entity-card">
-        <div class="avatar">产</div>
-        <div style="flex:1;">
-          <div style="font-size:16px;font-weight:700;">产品知识课程 <span class="tag tag-gray">录播</span></div>
-          <div style="font-size:12px;color:var(--fg-3);" class="num">课程时长 25 分钟 · 完播阈值 80% · 数据 5 分钟前更新</div>
+        <div class="sec">客户路径漏斗<span class="chip c-blue">转化</span></div>
+        <div class="panel">
+          <div class="panel-head"><div><div class="panel-title">直播触达 → 支付成交（示例数据）</div>
+          <div class="panel-sub">按「客户 × 直播场次」归集行为链，逐级标注留存率与流失量</div></div></div>
+          <div class="chart-wrap" id="tenantFunnel"></div>
+          <div class="legend"><b>口径</b>：触达=收到直播推广/预约提醒/导购私发的会员数；观看≥1min=累计有效观看满 1 分钟；互动=点赞/评论/分享任一行为；点击商品=点击直播间购物袋；支付成交=订单完成支付。</div>
         </div>
-        <button class="btn ghost" onclick="go('course')">返回列表</button>
-      </div>
-      <div class="grid g5">
-        <div class="card"><div class="card-label">观看UV</div><div class="card-value">1,860</div></div>
-        <div class="card"><div class="card-label">完播UV</div><div class="card-value">1,420</div></div>
-        <div class="card"><div class="card-label">完播率</div><div class="card-value">76.3%</div></div>
-        <div class="card"><div class="card-label">答题UV</div><div class="card-value">1,100</div></div>
-        <div class="card"><div class="card-label">新客占比</div><div class="card-value">15.1%</div></div>
-      </div>
-      <div class="panel">
-        <div class="panel-head"><div><div class="panel-title">观看进度分布</div></div></div>
-        <div class="panel-body">
-          <div class="dist-row"><div class="dist-name">0-25%</div><div class="dist-track"><div class="dist-fill" style="width:15%;background:#DC2626;"></div></div><div class="dist-num">280</div></div>
-          <div class="dist-row"><div class="dist-name">25-50%</div><div class="dist-track"><div class="dist-fill" style="width:19%;background:#D97706;"></div></div><div class="dist-num">360</div></div>
-          <div class="dist-row"><div class="dist-name">50-75%</div><div class="dist-track"><div class="dist-fill" style="width:23%;background:#3B82F6;"></div></div><div class="dist-num">420</div></div>
-          <div class="dist-row"><div class="dist-name">75-100%</div><div class="dist-track"><div class="dist-fill" style="width:43%;background:#059669;"></div></div><div class="dist-num">800</div></div>
+
+        <div class="sec">四维交叉矩阵<span class="chip c-blue">门店落点</span></div>
+        <div class="panel">
+          <div class="panel-head"><div><div class="panel-title">门店 × 直播 × 客户 × 商品</div>
+          <div class="panel-sub">每行 = 一家门店在四个维度的表现；店长登录后自动过滤为本店</div></div></div>
+          <table>
+            <thead><tr><th>门店</th><th>直播场数</th><th>观看人数</th><th>累计观看(分)</th><th>成交订单</th><th>直播GMV</th><th>动销商品</th><th>成交客户</th><th>观看→成交</th><th></th></tr></thead>
+            <tbody>
+              <tr><td><button class="link" onclick="openStoreDetail('天河旗舰店')">天河旗舰店</button></td><td>12</td><td>286</td><td>4,120</td><td>86</td><td>¥25,800</td><td>32</td><td>72</td><td>25.2%</td><td><button class="link" onclick="switchTab('live')">直播明细 →</button></td></tr>
+              <tr><td><button class="link" onclick="openStoreDetail('白云店')">白云店</button></td><td>8</td><td>198</td><td>2,860</td><td>52</td><td>¥15,600</td><td>24</td><td>48</td><td>24.2%</td><td><button class="link" onclick="switchTab('live')">直播明细 →</button></td></tr>
+              <tr><td><button class="link" onclick="openStoreDetail('番禺店')">番禺店</button></td><td>4</td><td>120</td><td>1,540</td><td>28</td><td>¥8,400</td><td>18</td><td>26</td><td>21.7%</td><td><button class="link" onclick="switchTab('live')">直播明细 →</button></td></tr>
+            </tbody>
+          </table>
+          <div class="legend"><b>字段口径</b>：直播场数=该门店关联场次数（sa_live_session）；累计观看(分)=该门店会员 watch_duration 求和÷60；动销商品=有成交的去重 SPU 数；观看→成交=成交客户÷观看人数。</div>
         </div>
-      </div>
-      <div class="panel">
-        <div class="panel-head"><div><div class="panel-title">参与会员明细</div></div></div>
-        <table>
-          <thead><tr><th>会员</th><th>等级</th><th>归属店员</th><th>观看时长</th><th>进度</th><th>答题</th><th>正确率</th><th>红包</th><th>状态</th></tr></thead>
-          <tbody>
-            <tr><td>王女士</td><td><span class="tag tag-amber">黑卡</span></td><td>张三</td><td>25min</td><td>100%</td><td>5/5</td><td>100%</td><td>¥10</td><td><span class="tag tag-green">已完成</span></td></tr>
-            <tr><td>李先生</td><td><span class="tag tag-amber">金卡</span></td><td>李四</td><td>18min</td><td>78%</td><td>4/5</td><td>80%</td><td>¥5</td><td><span class="tag tag-gray">学习中</span></td></tr>
-            <tr><td>陈小姐</td><td><span class="tag tag-gray">普通</span></td><td>王五</td><td>8min</td><td>35%</td><td>2/5</td><td>40%</td><td>—</td><td><span class="tag tag-gray">学习中</span></td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
+      </section>
 
-    <!-- ==================== 门店总览 ==================== -->
-    <section class="page" id="page-store">
-      <div class="page-head"><h1>门店总览</h1><p>按门店维度聚合名下会员数据 · 点击门店名钻取店长/店员 → 会员明细</p></div>
-      <div class="grid g5">
-        <div class="card"><div class="card-label">门店总数</div><div class="card-value" data-calc="COUNT(DISTINCT store_id) WHERE status=1" data-source="sa_store_entity">156<small>家</small></div></div>
-        <div class="card"><div class="card-label">门店总会员</div><div class="card-value" data-calc="COUNT(customer_id) WHERE type=3 AND status=1" data-source="sa_customer_entity.store_id">12,560</div></div>
-        <div class="card"><div class="card-label">店均会员</div><div class="card-value">80.5</div></div>
-        <div class="card"><div class="card-label">门店贡献GMV</div><div class="card-value">¥1.85M</div></div>
-        <div class="card"><div class="card-label">门店复购率</div><div class="card-value">38%</div></div>
-      </div>
-      <div class="panel">
-        <div class="panel-head"><div><div class="panel-title">门店会员对比</div><div class="panel-sub">点击门店名钻取</div></div></div>
-        <table>
-          <thead><tr><th>门店</th><th>名下会员</th><th>VIP占比</th><th>新增</th><th>沉睡</th><th>贡献GMV</th><th>人均贡献</th><th>复购率</th><th>活跃率</th><th>操作</th></tr></thead>
-          <tbody>
-            <tr><td><button class="link" onclick="go('store-detail')">天河旗舰店</button></td><td>486</td><td>36.5%</td><td>32</td><td>52</td><td>¥78,000</td><td>¥160</td><td>42%</td><td>89%</td><td><button class="drill-btn" onclick="go('store-detail')">钻取</button></td></tr>
-            <tr><td><button class="link" onclick="go('store-detail')">白云店</button></td><td>380</td><td>32.1%</td><td>25</td><td>48</td><td>¥56,000</td><td>¥147</td><td>38%</td><td>85%</td><td><button class="drill-btn" onclick="go('store-detail')">钻取</button></td></tr>
-            <tr><td><button class="link" onclick="go('store-detail')">番禺店</button></td><td>320</td><td>28.8%</td><td>20</td><td>45</td><td>¥45,000</td><td>¥140</td><td>35%</td><td>82%</td><td><button class="drill-btn" onclick="go('store-detail')">钻取</button></td></tr>
-          </tbody>
-        </table>
-        <div class="legend">沉睡会员 = 90 天无消费且无登录 · VIP = 非普通等级会员 · 状态指标（沉睡/活跃/复购）每日 02:30 预计算</div>
-      </div>
-    </section>
-
-    <!-- ==================== 门店详情 ==================== -->
-    <section class="page" id="page-store-detail">
-      <div class="entity-card">
-        <div class="avatar">天</div>
-        <div style="flex:1;">
-          <div style="font-size:16px;font-weight:700;">天河旗舰店</div>
-          <div style="font-size:12px;color:var(--fg-3);">归属快照 2026-08-27 · 数据 5 分钟前更新 · 点击行末「明细」钻取该成员名下会员</div>
+      <!-- ============ Tab 2 门店报表 ============ -->
+      <section class="pane" id="pane-store">
+        <div class="subview active" id="store-list">
+          <div class="grid g5">
+            <div class="card tone-blue"><div class="card-label">门店总数</div><div class="card-value" data-def="项目下状态为营业中的门店数量。" data-calc="COUNT(DISTINCT store_id) WHERE status=1" data-source="sa_store_entity">156<small>家</small></div></div>
+            <div class="card tone-violet"><div class="card-label">门店总会员</div><div class="card-value" data-def="全部门店名下 C 端客户总数，按客户归属门店（store_id）统计。" data-calc="COUNT(customer_id) WHERE type=3 AND status=1" data-source="sa_customer_entity.store_id">12,560</div></div>
+            <div class="card tone-green"><div class="card-label">门店贡献GMV</div><div class="card-value" data-def="全部门店会员已支付订单金额合计。" data-calc="SUM(pay_amount) WHERE 已支付" data-source="sto_order × customer.store_id">¥1.85M</div></div>
+            <div class="card tone-amber"><div class="card-label">门店复购率</div><div class="card-value" data-def="90 天内有 ≥2 次已支付订单的会员占同期有消费会员的比例。" data-calc="COUNT(is_repeat_buyer=1) / 有消费会员数" data-source="dws_member_asset.is_repeat_buyer">38%</div></div>
+            <div class="card tone-cyan"><div class="card-label">活跃率</div><div class="card-value" data-def="活跃会员（is_active=1，每日 02:30 预计算）占会员总数比例。" data-calc="COUNT(is_active=1) / 会员数" data-source="dws_member_asset.is_active">85%</div></div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><div><div class="panel-title">门店会员对比</div><div class="panel-sub">点击门店名进入门店详情（示例数据）</div></div></div>
+            <table>
+              <thead><tr><th>门店</th><th>名下会员</th><th>VIP占比</th><th>新增</th><th>沉睡</th><th>贡献GMV</th><th>人均贡献</th><th>复购率</th><th>活跃率</th><th></th></tr></thead>
+              <tbody>
+                <tr><td><button class="link" onclick="openStoreDetail('天河旗舰店')">天河旗舰店</button></td><td>486</td><td>36.5%</td><td>32</td><td>52</td><td>¥78,000</td><td>¥160</td><td>42%</td><td>89%</td><td><button class="link" onclick="openStoreDetail('天河旗舰店')">详情 →</button></td></tr>
+                <tr><td><button class="link" onclick="openStoreDetail('白云店')">白云店</button></td><td>380</td><td>32.1%</td><td>25</td><td>48</td><td>¥56,000</td><td>¥147</td><td>38%</td><td>85%</td><td><button class="link" onclick="openStoreDetail('白云店')">详情 →</button></td></tr>
+                <tr><td><button class="link" onclick="openStoreDetail('番禺店')">番禺店</button></td><td>320</td><td>28.8%</td><td>20</td><td>45</td><td>¥45,000</td><td>¥140</td><td>35%</td><td>82%</td><td><button class="link" onclick="openStoreDetail('番禺店')">详情 →</button></td></tr>
+              </tbody>
+            </table>
+            <div class="legend"><b>字段口径</b>：名下会员=store_id 归属该店的客户数；新增=first_bind_time 落在统计周期；沉睡=90 天无消费且无登录（is_dormant=1）；人均贡献=门店GMV÷名下会员数；VIP占比=VIP会员数÷名下会员数。</div>
+          </div>
         </div>
-        <button class="btn ghost" onclick="go('store')">返回门店列表</button>
-      </div>
-      <div class="grid g5">
-        <div class="card"><div class="card-label">门店成员数</div><div class="card-value" data-calc="COUNT WHERE shop_id=X AND type IN (1,2)" data-source="sa_store_employee">31</div></div>
-        <div class="card"><div class="card-label">店长</div><div class="card-value" data-calc="COUNT WHERE type=2" data-source="sa_store_employee.type=2">3</div></div>
-        <div class="card"><div class="card-label">店员</div><div class="card-value" data-calc="COUNT WHERE type=1" data-source="sa_store_employee.type=1">28</div></div>
-        <div class="card"><div class="card-label">门店会员总数</div><div class="card-value">1,480</div></div>
-        <div class="card"><div class="card-label">门店贡献GMV</div><div class="card-value">¥222,000</div></div>
-      </div>
-      <div class="panel">
-        <div class="panel-head">
-          <div><div class="panel-title">门店成员列表（店长 + 店员）</div><div class="panel-sub">身份：紫色 = 店长，蓝色 = 店员</div></div>
+
+        <div class="subview" id="store-detail">
+          <div class="entity">
+            <div class="avatar" id="sd-avatar">天</div>
+            <div><div class="t" id="sd-name">天河旗舰店</div><div class="d">归属快照 2026-08-27 · 会员/订单数据 5 分钟前更新</div></div>
+            <button class="btn ghost back" onclick="showSub('store','store-list')">← 返回门店列表</button>
+          </div>
+          <div class="grid g5">
+            <div class="card tone-blue"><div class="card-label">门店成员数</div><div class="card-value" data-def="该门店在职员工数（店长 type=2 + 店员 type=1）。" data-calc="COUNT WHERE shop_id=X AND type IN (1,2)" data-source="sa_store_employee">31</div></div>
+            <div class="card tone-violet"><div class="card-label">店长 / 店员</div><div class="card-value">3<small>/</small>28</div></div>
+            <div class="card tone-green"><div class="card-label">门店会员总数</div><div class="card-value">1,480</div></div>
+            <div class="card tone-amber"><div class="card-label">门店贡献GMV</div><div class="card-value">¥222,000</div></div>
+            <div class="card tone-cyan"><div class="card-label">会员活跃率</div><div class="card-value">89%</div></div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><div><div class="panel-title">门店成员列表（店长 + 店员）</div><div class="panel-sub">点击「明细」查看该成员名下会员的明细 / 课程参与 / 直播参与</div></div></div>
+            <table>
+              <thead><tr><th>排名</th><th>成员</th><th>身份</th><th>名下会员</th><th>新增</th><th>VIP</th><th>沉睡</th><th>贡献GMV</th><th>复购率</th><th></th></tr></thead>
+              <tbody>
+                <tr><td><span class="rank r1">1</span></td><td><b>陈总</b></td><td><span class="tag t-violet">店长</span></td><td>620</td><td>45</td><td>180</td><td>52</td><td>¥98,000</td><td>40%</td><td><button class="link" onclick="openMemberDetail('陈总','店长')">明细 →</button></td></tr>
+                <tr><td><span class="rank r2">2</span></td><td><b>张三</b></td><td><span class="tag t-blue">店员</span></td><td>186</td><td>12</td><td>68</td><td>18</td><td>¥28,000</td><td>42%</td><td><button class="link" onclick="openMemberDetail('张三','店员')">明细 →</button></td></tr>
+                <tr><td><span class="rank r3">3</span></td><td><b>李四</b></td><td><span class="tag t-blue">店员</span></td><td>152</td><td>9</td><td>52</td><td>15</td><td>¥22,500</td><td>38%</td><td><button class="link" onclick="openMemberDetail('李四','店员')">明细 →</button></td></tr>
+                <tr><td><span class="rank rn">4</span></td><td><b>刘总</b></td><td><span class="tag t-violet">店长</span></td><td>480</td><td>32</td><td>120</td><td>48</td><td>¥72,000</td><td>36%</td><td><button class="link" onclick="openMemberDetail('刘总','店长')">明细 →</button></td></tr>
+              </tbody>
+            </table>
+            <div class="legend"><b>字段口径</b>：名下会员=staff_id 归属快照（按查询时点，不追溯历史归属）；身份取 sa_store_employee.type（1=店员，2=店长）。</div>
+          </div>
         </div>
-        <table>
-          <thead><tr><th>排名</th><th>成员</th><th>身份</th><th>名下会员</th><th>新增</th><th>VIP</th><th>沉睡</th><th>贡献GMV</th><th>复购率</th><th>操作</th></tr></thead>
-          <tbody>
-            <tr><td><span class="rank rank-1">1</span></td><td><b>张三</b></td><td><span class="tag tag-blue">店员</span></td><td>186</td><td>12</td><td>68</td><td>18</td><td>¥28,000</td><td>42%</td><td><button class="drill-btn" onclick="go('member-detail')">明细</button></td></tr>
-            <tr><td><span class="rank rank-2">2</span></td><td><b>陈总</b></td><td><span class="tag tag-purple">店长</span></td><td>620</td><td>45</td><td>180</td><td>52</td><td>¥98,000</td><td>40%</td><td><button class="drill-btn" onclick="go('member-detail')">明细</button></td></tr>
-            <tr><td><span class="rank rank-3">3</span></td><td><b>李四</b></td><td><span class="tag tag-blue">店员</span></td><td>152</td><td>9</td><td>52</td><td>15</td><td>¥22,500</td><td>38%</td><td><button class="drill-btn" onclick="go('member-detail')">明细</button></td></tr>
-            <tr><td><span class="rank rank-n">4</span></td><td><b>刘总</b></td><td><span class="tag tag-purple">店长</span></td><td>480</td><td>32</td><td>120</td><td>48</td><td>¥72,000</td><td>36%</td><td><button class="drill-btn" onclick="go('member-detail')">明细</button></td></tr>
-          </tbody>
-        </table>
-        <div class="legend">「明细」按钮钻取该成员名下会员数据（会员明细 / 课程参与 / 直播参与 三个子页签）</div>
-      </div>
-    </section>
 
-    <!-- ==================== 会员详情（店员钻取最底层） ==================== -->
-    <section class="page" id="page-member-detail">
-      <div class="entity-card">
-        <div class="avatar">张</div>
-        <div style="flex:1;">
-          <div style="font-size:16px;font-weight:700;">张三 · 店员 · 天河旗舰店</div>
-          <div style="font-size:12px;color:var(--fg-3);" class="num">归属快照 2026-08-27 · 首次绑定 2026-03-15 · 名下会员 186 人</div>
+        <div class="subview" id="member-detail">
+          <div class="entity">
+            <div class="avatar" id="md-avatar">张</div>
+            <div><div class="t" id="md-name">张三 · 店员</div><div class="d">归属快照 2026-08-27 · 首次绑定 2026-03-15</div></div>
+            <button class="btn ghost back" onclick="openStoreDetail(document.getElementById('sd-name').textContent)">← 返回门店</button>
+          </div>
+          <div class="grid g5">
+            <div class="card tone-violet"><div class="card-label">名下会员</div><div class="card-value" data-def="staff_id 归属该成员且状态正常的客户数。" data-calc="COUNT WHERE staff_id=X AND type=3 AND status=1" data-source="sa_customer_entity">186</div></div>
+            <div class="card tone-blue"><div class="card-label">新增会员</div><div class="card-value">12</div></div>
+            <div class="card tone-amber"><div class="card-label">VIP占比</div><div class="card-value">36.5%</div></div>
+            <div class="card tone-green"><div class="card-label">活跃会员</div><div class="card-value">152</div></div>
+            <div class="card tone-cyan"><div class="card-label">贡献GMV</div><div class="card-value">¥28,000</div></div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><div><div class="panel-title">名下会员明细</div></div>
+              <div style="display:flex;gap:6px;">
+                <button class="tab active" style="flex:none;padding:5px 12px;" onclick="mdSub(this,'list')">会员明细</button>
+                <button class="tab" style="flex:none;padding:5px 12px;" onclick="mdSub(this,'course')">课程参与</button>
+                <button class="tab" style="flex:none;padding:5px 12px;" onclick="mdSub(this,'live')">直播参与</button>
+              </div>
+            </div>
+            <div id="md-list">
+              <table>
+                <thead><tr><th>会员</th><th>手机号</th><th>等级</th><th>积分</th><th>余额</th><th>累计消费</th><th>末次消费</th><th>末次登录</th><th>状态</th></tr></thead>
+                <tbody>
+                  <tr><td>王女士</td><td class="num">138****8888</td><td><span class="tag t-amber">黑卡</span></td><td>580</td><td>¥120</td><td>¥3,200</td><td>08-24</td><td>08-25</td><td><span class="tag t-green">活跃</span></td></tr>
+                  <tr><td>李先生</td><td class="num">139****6666</td><td><span class="tag t-amber">金卡</span></td><td>320</td><td>¥80</td><td>¥1,800</td><td>08-22</td><td>08-23</td><td><span class="tag t-green">活跃</span></td></tr>
+                  <tr><td>陈小姐</td><td class="num">137****5555</td><td><span class="tag t-gray">普通</span></td><td>50</td><td>¥0</td><td>¥0</td><td>05-10</td><td>05-12</td><td><span class="tag t-red">沉睡</span></td></tr>
+                </tbody>
+              </table>
+              <div class="legend"><b>字段口径</b>：累计消费=该会员历史已支付订单金额合计；沉睡=90 天无消费且无登录；积分/余额来自 sa_user_points / sa_user_wallet。</div>
+            </div>
+            <div id="md-course" hidden>
+              <table>
+                <thead><tr><th>会员</th><th>课程</th><th>观看时长</th><th>学习进度</th><th>完播</th><th>答题正确率</th><th>红包</th><th>新客</th></tr></thead>
+                <tbody>
+                  <tr><td>王女士</td><td>产品知识</td><td>25min</td><td>100%</td><td><span class="tag t-green">是</span></td><td>100%</td><td>¥10</td><td><span class="tag t-amber">新客</span></td></tr>
+                  <tr><td>李先生</td><td>销售技巧</td><td>18min</td><td>78%</td><td><span class="tag t-gray">否</span></td><td>80%</td><td>¥5</td><td><span class="tag t-gray">旧客</span></td></tr>
+                  <tr><td>陈小姐</td><td>产品知识</td><td>8min</td><td>35%</td><td><span class="tag t-gray">否</span></td><td>40%</td><td>—</td><td><span class="tag t-gray">旧客</span></td></tr>
+                </tbody>
+              </table>
+              <div class="legend"><b>字段口径</b>：观看时长=watch_duration 累计（front_style=2 课程）；学习进度=观看时长÷课程总时长；完播=进度≥课程配置阈值（complete_percentage）；红包=已发放成功的答题红包金额。</div>
+            </div>
+            <div id="md-live" hidden>
+              <table>
+                <thead><tr><th>会员</th><th>直播场次</th><th>累计观看分钟</th><th>签到</th><th>互动</th><th>下单</th><th>金额</th><th>新客</th></tr></thead>
+                <tbody>
+                  <tr><td>王女士</td><td>直播76</td><td>45.0</td><td><span class="tag t-green">是</span></td><td><span class="tag t-green">是</span></td><td><span class="tag t-green">是</span></td><td>¥320</td><td><span class="tag t-amber">新</span></td></tr>
+                  <tr><td>李先生</td><td>直播76</td><td>32.0</td><td><span class="tag t-green">是</span></td><td><span class="tag t-gray">否</span></td><td><span class="tag t-gray">否</span></td><td>—</td><td><span class="tag t-amber">新</span></td></tr>
+                  <tr><td>陈小姐</td><td>直播78</td><td>18.2</td><td><span class="tag t-gray">否</span></td><td><span class="tag t-green">是</span></td><td><span class="tag t-green">是</span></td><td>¥120</td><td><span class="tag t-gray">旧</span></td></tr>
+                </tbody>
+              </table>
+              <div class="legend"><b>字段口径</b>：累计观看分钟=该会员在该场次 watch_duration 累计÷60；下单=live_id 非空已支付订单；新客=is_new_customer=1（首次参与直播）。</div>
+            </div>
+          </div>
         </div>
-        <button class="btn ghost" onclick="go('store-detail')">返回门店</button>
-      </div>
-      <div class="grid g5">
-        <div class="card"><div class="card-label">名下会员</div><div class="card-value">186</div></div>
-        <div class="card"><div class="card-label">新增会员</div><div class="card-value">12</div><div class="card-note">每日更新</div></div>
-        <div class="card"><div class="card-label">VIP占比</div><div class="card-value">36.5%</div></div>
-        <div class="card"><div class="card-label">活跃会员</div><div class="card-value">152</div><div class="card-note">每日更新</div></div>
-        <div class="card"><div class="card-label">贡献GMV</div><div class="card-value">¥28,000</div></div>
-      </div>
+      </section>
+      <!-- ============ Tab 3 直播报表 ============ -->
+      <section class="pane" id="pane-live">
+        <div class="subview active" id="live-list">
+          <div class="caliber"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:2px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            <span><b>统计口径</b>：直播域数据 T+1 更新（每日 11:00 前更新昨日数据）；<b>观看人数</b>=进入直播间的去重客户数；<b>观看峰值人数</b>=单场同时在线最大值；<b>成交订单</b>=挂车商品已支付订单；<b>直播时长</b>=开播至下播时长。本 Tab 指标为线上真实数据。</span></div>
+          <div class="grid g5">
+            <div class="card tone-blue"><div class="card-label">直播场数</div><div class="card-value" data-def="统计周期内创建的直播场次总数（含未开播）。" data-calc="COUNT(DISTINCT session_id)" data-source="sa_live_session">24<small>场</small></div><div class="card-foot"><span class="card-trend up">▲ 2 场 环比</span></div></div>
+            <div class="card tone-violet"><div class="card-label">观看总人数</div><div class="card-value" data-def="各场次去重观看客户数之和（跨场次不去重，场次内去重）。" data-calc="SUM(场次观看人数)" data-source="sa_live_watch_record">54</div><div class="card-foot"><span class="card-trend up">▲ 6 环比</span></div></div>
+            <div class="card tone-green"><div class="card-label">成交订单总数</div><div class="card-value" data-def="直播挂车商品产生的已支付订单数。" data-calc="COUNT WHERE live_id非空 AND 已支付" data-source="sto_order">9</div><div class="card-foot"><span class="card-trend flat">— 持平</span></div></div>
+            <div class="card tone-amber"><div class="card-label">成交订单总金额</div><div class="card-value" data-def="已支付直播订单的支付金额合计（元）。" data-calc="SUM(pay_amount)" data-source="sto_order.pay_amount">¥0.63</div><div class="card-foot"><span class="card-trend flat">— 持平</span></div></div>
+            <div class="card tone-cyan"><div class="card-label">消耗总流量 (MB)</div><div class="card-value" data-def="全部场次直播流量与回放流量之和，用于流量成本分摊与对账。" data-calc="SUM(直播流量+回放流量)" data-source="sa_live_session_stat">644,141</div><div class="card-foot"><span class="card-trend up">▲ 4.1% 环比</span></div></div>
+          </div>
+          <div class="grid g6">
+            <div class="card tone-blue"><div class="card-label">场均直播时长</div><div class="card-value" data-def="平均每场从开播到下播的持续时长。" data-calc="SUM(直播时长)/场数" data-source="sa_live_session">4,496.79<small>分</small></div></div>
+            <div class="card tone-blue"><div class="card-label">场均回放时长</div><div class="card-value" data-def="平均每场回放可观看时长。" data-calc="SUM(回放时长)/场数" data-source="sa_live_session_stat.replay_duration">24,171.29<small>分</small></div></div>
+            <div class="card tone-violet"><div class="card-label">场均观看人数</div><div class="card-value" data-def="观看总人数 ÷ 直播场数。" data-calc="观看总人数/场数" data-source="派生">2.25</div></div>
+            <div class="card tone-violet"><div class="card-label">场均峰值人数</div><div class="card-value" data-def="各场次峰值在线人数的平均值。" data-calc="SUM(峰值人数)/场数" data-source="sa_live_session_stat.peak_uv">0.54</div></div>
+            <div class="card tone-green"><div class="card-label">人均观看直播时长</div><div class="card-value" data-def="观看总时长 ÷ 观看总人数，衡量单客观看深度。" data-calc="SUM(watch_duration)/观看总人数 ÷60" data-source="sa_live_watch_record">5.7<small>分</small></div></div>
+            <div class="card tone-green"><div class="card-label">人均观看回放时长</div><div class="card-value" data-def="回放观看总时长 ÷ 回放观看人数。" data-calc="SUM(回放时长)/回放人数 ÷60" data-source="sa_live_watch_record（回放）">52.41<small>分</small></div></div>
+          </div>
+          <div class="grid g7">
+            <div class="card tone-pink"><div class="card-label">场均点赞次数</div><div class="card-value" data-def="各场次点赞总次数平均值。" data-calc="SUM(点赞)/场数" data-source="sa_live_session_stat.like_count">0.08</div></div>
+            <div class="card tone-pink"><div class="card-label">场均评论人数</div><div class="card-value" data-def="各场次评论去重用户数平均值。" data-calc="SUM(评论UV)/场数" data-source="sa_live_session_stat.comment_uv">0.08</div></div>
+            <div class="card tone-amber"><div class="card-label">带货直播场次</div><div class="card-value" data-def="挂载商品且产生成交的直播场次。" data-calc="COUNT WHERE 挂车 AND 成交>0" data-source="sa_live_cart_item + sto_order">2<small>场</small></div></div>
+            <div class="card tone-amber"><div class="card-label">场均成交商品人数</div><div class="card-value" data-def="带货场次成交客户数平均值。" data-calc="成交客户/带货场数" data-source="sto_order">0.13</div></div>
+            <div class="card tone-amber"><div class="card-label">场均成交商品订单</div><div class="card-value" data-def="带货场次成交订单数平均值。" data-calc="成交订单/带货场数" data-source="派生">0.38</div></div>
+            <div class="card tone-amber"><div class="card-label">带货订单总数</div><div class="card-value">9</div></div>
+            <div class="card tone-amber"><div class="card-label">带货订单总额</div><div class="card-value">¥0.63</div></div>
+          </div>
+          <div class="sec">近 7 日趋势<span class="chip c-gray">示例数据</span></div>
+          <div class="grid g2e">
+            <div class="panel" style="margin-bottom:0;">
+              <div class="panel-head"><div><div class="panel-title">观看人数趋势</div><div class="panel-sub">单位：人（去重 UV）</div></div></div>
+              <div class="chart-wrap" id="trendWatch"></div>
+            </div>
+            <div class="panel" style="margin-bottom:0;">
+              <div class="panel-head"><div><div class="panel-title">直播时长趋势</div><div class="panel-sub">单位：分钟（日合计）</div></div></div>
+              <div class="chart-wrap" id="trendDur"></div>
+            </div>
+          </div>
+          <div class="sec">直播场次明细<span class="chip c-blue">线上真实数据</span></div>
+          <div class="panel">
+            <div class="panel-head"><div><div class="panel-title">场次列表（共 24 场）</div><div class="panel-sub">点击场次名进入单场分析</div></div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;" id="liveSorts">
+                <button class="tab active" style="flex:none;padding:4px 10px;" onclick="sortLive(this,'start')">最近开始</button>
+                <button class="tab" style="flex:none;padding:4px 10px;" onclick="sortLive(this,'create')">最近创建</button>
+                <button class="tab" style="flex:none;padding:4px 10px;" onclick="sortLive(this,'watch')">观看数最高</button>
+                <button class="tab" style="flex:none;padding:4px 10px;" onclick="sortLive(this,'peak')">观看峰值最高</button>
+                <button class="tab" style="flex:none;padding:4px 10px;" onclick="sortLive(this,'orders')">成交订单数最高</button>
+                <button class="tab" style="flex:none;padding:4px 10px;" onclick="sortLive(this,'amount')">成交金额最高</button>
+              </div>
+            </div>
+            <div style="overflow-x:auto;"><table>
+              <thead><tr><th style="min-width:170px;">直播信息</th><th>创建时间</th><th>开始时间</th><th>观看人数</th><th>观看峰值人数</th><th>成交订单数</th><th>成交订单金额(元)</th><th>直播时长(分)</th><th></th></tr></thead>
+              <tbody id="liveRows"></tbody>
+            </table></div>
+            <div class="legend"><b>字段口径</b>：直播信息=场次名称+直播 ID（全局唯一，可跨系统对账）；成交订单金额=该场次挂车商品已支付订单 pay_amount 合计；场次级消耗流量明细由直播流量域（STR-SAAS-002）提供后开放。</div>
+          </div>
+        </div>
 
-      <div class="subtabs" role="tablist">
-        <button class="subtab active" onclick="switchSub('md',['list','course','live'],this)">会员明细</button>
-        <button class="subtab" onclick="switchSub('md',['list','course','live'],this)">课程参与</button>
-        <button class="subtab" onclick="switchSub('md',['list','course','live'],this)">直播参与</button>
-      </div>
+        <div class="subview" id="live-detail">
+          <div class="entity">
+            <div class="avatar">76</div>
+            <div><div class="t">直播76 · 带货场</div><div class="d num">开播 2026-07-06 10:09:10 · 下播 17:09:50 · 直播时长 306.33 分钟 · ID 2607060069064424595</div></div>
+            <button class="btn ghost back" onclick="showSub('live','live-list')">← 返回场次列表</button>
+          </div>
+          <div class="grid g5">
+            <div class="card tone-blue"><div class="card-label">观看人数</div><div class="card-value">4</div></div>
+            <div class="card tone-blue"><div class="card-label">观看峰值人数</div><div class="card-value">0</div></div>
+            <div class="card tone-green"><div class="card-label">成交订单数</div><div class="card-value">7</div></div>
+            <div class="card tone-green"><div class="card-label">成交订单金额</div><div class="card-value">¥0.03</div></div>
+            <div class="card tone-cyan"><div class="card-label">直播时长</div><div class="card-value">306.33<small>分</small></div></div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><div><div class="panel-title">单场转化漏斗（示例数据）</div><div class="panel-sub">店长视角 ①：站在直播间的角度看本场各环节转化</div></div></div>
+            <div class="chart-wrap" id="liveFunnel"></div>
+            <div class="legend"><b>口径</b>：观看人数＞预约人数属正常（含未预约直接进入）；下单含未支付，成交仅含已支付。</div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><div><div class="panel-title">本场商品成交<span class="chip c-amber" style="margin-left:4px;">商品×直播</span></div><div class="panel-sub">店长视角 ③：本场挂车商品的点击 / 成交明细（示例数据）</div></div></div>
+            <table>
+              <thead><tr><th>商品</th><th>挂车时长</th><th>商品点击UV</th><th>成交订单数</th><th>成交金额</th><th>成交客户数</th><th>客单价</th></tr></thead>
+              <tbody>
+                <tr><td>玻尿酸精华液 30ml</td><td>38min</td><td>620</td><td>86</td><td>¥25,800</td><td>72</td><td>¥300</td></tr>
+                <tr><td>修护面霜 50g</td><td>25min</td><td>410</td><td>52</td><td>¥15,600</td><td>48</td><td>¥300</td></tr>
+                <tr><td>洁面乳 120ml</td><td>12min</td><td>180</td><td>12</td><td>¥2,160</td><td>12</td><td>¥180</td></tr>
+              </tbody>
+            </table>
+            <div class="legend"><b>字段口径</b>：挂车时长=商品在本场购物袋的上架时长；商品点击UV=点击该商品的去重客户数；客单价=成交金额÷成交订单数；未挂车场次本表为空。</div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><div><div class="panel-title">本场客户观看明细<span class="chip c-violet" style="margin-left:4px;">客户×直播</span></div><div class="panel-sub">店长视角 ②：旗下客户在本场的参与深度（示例数据）</div></div></div>
+            <table>
+              <thead><tr><th>客户</th><th>归属店员</th><th>累计观看分钟</th><th>进入时间</th><th>互动次数</th><th>点击商品</th><th>下单金额</th><th>新客</th></tr></thead>
+              <tbody>
+                <tr><td>王女士</td><td>张三</td><td>45.5</td><td>10:12</td><td>12</td><td><span class="tag t-green">是</span></td><td>¥320</td><td><span class="tag t-amber">新</span></td></tr>
+                <tr><td>李先生</td><td>李四</td><td>32.0</td><td>10:15</td><td>3</td><td><span class="tag t-gray">否</span></td><td>—</td><td><span class="tag t-amber">新</span></td></tr>
+                <tr><td>陈小姐</td><td>王五</td><td>18.2</td><td>10:40</td><td>5</td><td><span class="tag t-green">是</span></td><td>¥120</td><td><span class="tag t-gray">旧</span></td></tr>
+              </tbody>
+            </table>
+            <div class="legend"><b>字段口径</b>：累计观看分钟=该客户在本场多次进出观看时长之和÷60；归属店员按查询时点 staff_id 快照；新客=is_new_customer=1。</div>
+          </div>
+        </div>
+      </section>
+      <!-- ============ Tab 4 商品报表 ============ -->
+      <section class="pane" id="pane-product">
+        <div class="grid g5">
+          <div class="card tone-blue"><div class="card-label">在售商品</div><div class="card-value" data-def="商品状态为上架的 SPU 数量。" data-calc="COUNT WHERE spu_status=上架" data-source="商品中心">1,286</div></div>
+          <div class="card tone-green"><div class="card-label">动销商品</div><div class="card-value" data-def="统计周期内产生成交（含直播引导）的去重商品数。" data-calc="COUNT(DISTINCT spu_id) WHERE 已支付" data-source="sto_order">486</div></div>
+          <div class="card tone-amber"><div class="card-label">直播带货GMV</div><div class="card-value" data-def="由直播间引导产生的已支付订单金额合计。" data-calc="SUM(pay_amount) WHERE live_id非空" data-source="sto_order">¥58,600</div></div>
+          <div class="card tone-amber"><div class="card-label">直播成交订单</div><div class="card-value" data-def="由直播间引导产生的已支付订单数。" data-calc="COUNT WHERE live_id非空 AND 已支付" data-source="sto_order">186</div></div>
+          <div class="card tone-violet"><div class="card-label">直播引流成交占比</div><div class="card-value" data-def="直播GMV 占全渠道 GMV 的比例，衡量直播渠道贡献。" data-calc="直播GMV / 全渠道GMV" data-source="派生">31.5%</div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div><div class="panel-title">商品直播成交 Top（示例数据）</div><div class="panel-sub">按直播成交金额排序</div></div></div>
+          <div class="chart-wrap" id="productBars"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div><div class="panel-title">商品 × 直播</div><div class="panel-sub">每个商品的带货场次、点击与成交表现</div></div></div>
+          <table>
+            <thead><tr><th>商品</th><th>带货场次数</th><th>商品点击UV</th><th>成交订单</th><th>成交金额</th><th>成交客户</th><th>客单价</th><th>新客占比</th><th>点击→成交</th></tr></thead>
+            <tbody>
+              <tr><td>玻尿酸精华液 30ml</td><td>6</td><td>3,240</td><td>86</td><td>¥25,800</td><td>72</td><td>¥300</td><td>38.9%</td><td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:64%;background:var(--green);"></div></div>2.7%</div></td></tr>
+              <tr><td>修护面霜 50g</td><td>4</td><td>2,180</td><td>52</td><td>¥15,600</td><td>48</td><td>¥300</td><td>33.3%</td><td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:56%;background:var(--green);"></div></div>2.4%</div></td></tr>
+              <tr><td>洁面乳 120ml</td><td>3</td><td>960</td><td>12</td><td>¥2,160</td><td>12</td><td>¥180</td><td>25.0%</td><td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:30%;background:var(--green);"></div></div>1.3%</div></td></tr>
+            </tbody>
+          </table>
+          <div class="legend"><b>字段口径</b>：带货场次数=该商品被挂车的去重场次（sa_live_cart_item）；商品点击UV=直播中点击购物袋该商品的去重客户数；新客占比=首次下单客户数÷成交客户数；点击→成交=成交订单数÷商品点击UV。</div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div><div class="panel-title">商品 × 客户交叉（客户看商品）</div><div class="panel-sub">直播引导的行为链，供店员按状态跟进转化（示例数据）</div></div></div>
+          <table>
+            <thead><tr><th>客户</th><th>归属店员</th><th>商品</th><th>来源直播</th><th>行为</th><th>下单金额</th><th>时间</th><th>跟进状态</th></tr></thead>
+            <tbody>
+              <tr><td>王女士</td><td>张三</td><td>玻尿酸精华液 30ml</td><td>直播78</td><td>点击→下单</td><td>¥300</td><td>07-08 10:02</td><td><span class="tag t-green">已成交</span></td></tr>
+              <tr><td>李先生</td><td>李四</td><td>修护面霜 50g</td><td>直播76</td><td>仅点击</td><td>—</td><td>07-06 10:40</td><td><span class="tag t-blue">待跟进</span></td></tr>
+              <tr><td>陈小姐</td><td>王五</td><td>洁面乳 120ml</td><td>直播76</td><td>加购未付</td><td>—</td><td>07-06 11:20</td><td><span class="tag t-red">流失风险</span></td></tr>
+            </tbody>
+          </table>
+          <div class="legend"><b>字段口径</b>：行为链=点击购物袋→加购→下单→支付；流失风险=加购/下单后 48h 未支付；归属按 staff_id 快照隔离，「待跟进」清单可导出至对应店员。</div>
+        </div>
+      </section>
 
-      <div class="panel" id="sub-md-list">
-        <table>
-          <thead><tr><th>会员</th><th>手机</th><th>等级</th><th>积分</th><th>余额</th><th>累计消费</th><th>末次消费</th><th>末次登录</th><th>状态</th></tr></thead>
-          <tbody>
-            <tr><td>王女士</td><td class="num">138****8888</td><td><span class="tag tag-amber">黑卡</span></td><td>580</td><td>¥120</td><td>¥3,200</td><td>08-24</td><td>08-25</td><td><span class="tag tag-green">活跃</span></td></tr>
-            <tr><td>李先生</td><td class="num">139****6666</td><td><span class="tag tag-amber">金卡</span></td><td>320</td><td>¥80</td><td>¥1,800</td><td>08-22</td><td>08-23</td><td><span class="tag tag-green">活跃</span></td></tr>
-            <tr><td>陈小姐</td><td class="num">137****5555</td><td><span class="tag tag-gray">普通</span></td><td>50</td><td>¥0</td><td>¥0</td><td>05-10</td><td>05-12</td><td><span class="tag tag-red">沉睡</span></td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="panel" id="sub-md-course" hidden>
-        <table>
-          <thead><tr><th>会员</th><th>课程</th><th>观看时长</th><th>进度</th><th>完播</th><th>答题正确率</th><th>红包</th><th>是否新客</th></tr></thead>
-          <tbody>
-            <tr><td>王女士</td><td>产品知识</td><td>25min</td><td>100%</td><td>是</td><td>100%</td><td>¥10</td><td><span class="tag tag-amber">新客</span></td></tr>
-            <tr><td>李先生</td><td>销售技巧</td><td>18min</td><td>78%</td><td>否</td><td>80%</td><td>¥5</td><td><span class="tag tag-gray">旧客</span></td></tr>
-            <tr><td>陈小姐</td><td>产品知识</td><td>8min</td><td>35%</td><td>否</td><td>40%</td><td>—</td><td><span class="tag tag-gray">旧客</span></td></tr>
-          </tbody>
-        </table>
-        <div class="legend">课程参与数据来自 sa_live_watch_record（front_style=2），关联 customer_id 找到该店员名下会员</div>
-      </div>
-      <div class="panel" id="sub-md-live" hidden>
-        <table>
-          <thead><tr><th>会员</th><th>直播场次</th><th>观看时长</th><th>签到</th><th>互动</th><th>下单</th><th>金额</th><th>新客</th></tr></thead>
-          <tbody>
-            <tr><td>王女士</td><td>8.20场</td><td>45min</td><td>是</td><td>是</td><td>是</td><td>¥320</td><td><span class="tag tag-amber">新</span></td></tr>
-            <tr><td>李先生</td><td>8.20场</td><td>32min</td><td>是</td><td>否</td><td>否</td><td>—</td><td><span class="tag tag-amber">新</span></td></tr>
-            <tr><td>陈小姐</td><td>8.21场</td><td>18min</td><td>否</td><td>是</td><td>是</td><td>¥120</td><td><span class="tag tag-gray">旧</span></td></tr>
-          </tbody>
-        </table>
-        <div class="legend">直播参与数据来自 sa_live_watch_record；下单关联 sto_order.live_id</div>
-      </div>
-    </section>
+      <!-- ============ Tab 5 客户报表 ============ -->
+      <section class="pane" id="pane-customer">
+        <div class="grid g5">
+          <div class="card tone-blue"><div class="card-label">观看直播客户数</div><div class="card-value" data-def="统计周期内有直播观看记录的去重客户数。" data-calc="COUNT(DISTINCT customer_id)" data-source="sa_live_watch_record">5,540</div></div>
+          <div class="card tone-violet"><div class="card-label">人均累计观看分钟</div><div class="card-value" data-def="全部客户观看总时长 ÷ 观看客户数（含回放）。" data-calc="SUM(watch_duration)/人数 ÷60" data-source="sa_live_watch_record">28.6<small>分</small></div></div>
+          <div class="card tone-pink"><div class="card-label">互动客户数</div><div class="card-value" data-def="有点赞/评论/分享任一行为的去重客户数。" data-calc="COUNT(DISTINCT customer_id) WHERE 互动行为" data-source="互动明细">3,260</div></div>
+          <div class="card tone-green"><div class="card-label">直播成交客户数</div><div class="card-value" data-def="有直播已支付订单的去重客户数。" data-calc="COUNT(DISTINCT customer_id) WHERE live_id非空" data-source="sto_order">752</div></div>
+          <div class="card tone-amber"><div class="card-label">观看→成交转化率</div><div class="card-value" data-def="直播成交客户数 ÷ 观看直播客户数。" data-calc="成交客户/观看客户" data-source="派生">13.6%</div></div>
+        </div>
+        <div class="grid g2">
+          <div class="panel" style="margin-bottom:0;">
+            <div class="panel-head"><div><div class="panel-title">客户 × 直播参与深度</div><div class="panel-sub">客户在直播间的累计观看分钟（含回放），按归属店员隔离（示例数据）</div></div></div>
+            <table>
+              <thead><tr><th>客户</th><th>归属店员</th><th>观看场次</th><th>累计观看分钟</th><th>最近观看</th><th>互动次数</th><th>直播下单数</th><th>直播消费</th><th>回放分钟</th></tr></thead>
+              <tbody>
+                <tr><td>王女士</td><td>张三</td><td>8</td><td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:92%;background:var(--violet);"></div></div>326.5</div></td><td>08-27</td><td>46</td><td>3</td><td>¥920</td><td>120.0</td></tr>
+                <tr><td>李先生</td><td>李四</td><td>5</td><td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:40%;background:var(--violet);"></div></div>142.0</div></td><td>08-25</td><td>9</td><td>1</td><td>¥300</td><td>65.5</td></tr>
+                <tr><td>陈小姐</td><td>王五</td><td>2</td><td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:10%;background:var(--violet);"></div></div>36.2</div></td><td>08-24</td><td>2</td><td>0</td><td>—</td><td>18.0</td></tr>
+              </tbody>
+            </table>
+            <div class="legend"><b>字段口径</b>：累计观看分钟=该客户全部场次 watch_duration 求和÷60（直播+回放）；回放分钟仅统计回放观看部分；店长/店员视角仅见名下客户。</div>
+          </div>
+          <div class="panel" style="margin-bottom:0;">
+            <div class="panel-head"><div><div class="panel-title">观看深度分层<span class="chip c-violet" style="margin-left:4px;">结构</span></div><div class="panel-sub">按人均累计观看分钟分层（示例数据）</div></div></div>
+            <div class="chart-wrap"><div class="donut-flex" id="watchDonut"></div></div>
+            <div class="legend"><b>分层规则</b>：深度=累计≥60min；中度=15~60min；浅度=1~15min；流失边缘=仅进入未满 1min。分层数值可配置。</div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div><div class="panel-title">客户 × 商品交叉</div><div class="panel-sub">从客户角度看商品：浏览 / 成交与直播引导贡献（示例数据）</div></div></div>
+          <table>
+            <thead><tr><th>客户</th><th>归属店员</th><th>浏览商品数</th><th>下单商品数</th><th>直播引导金额</th><th>累计消费</th><th>直播贡献占比</th><th>最近购买</th></tr></thead>
+            <tbody>
+              <tr><td>王女士</td><td>张三</td><td>26</td><td>9</td><td>¥920</td><td>¥3,200</td><td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:29%;background:var(--amber);"></div></div>28.8%</div></td><td>08-27</td></tr>
+              <tr><td>李先生</td><td>李四</td><td>14</td><td>3</td><td>¥300</td><td>¥1,800</td><td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:17%;background:var(--amber);"></div></div>16.7%</div></td><td>08-25</td></tr>
+              <tr><td>陈小姐</td><td>王五</td><td>5</td><td>0</td><td>¥0</td><td>¥0</td><td>—</td><td>—</td></tr>
+            </tbody>
+          </table>
+          <div class="legend"><b>字段口径</b>：浏览商品数=点击过购物袋商品的去重 SPU 数；直播引导金额=live_id 非空已支付订单合计；直播贡献占比=直播引导金额÷累计消费；用于沉淀客户商品偏好画像。</div>
+        </div>
+      </section>
+      <!-- ============ Tab 6 课程报表 ============ -->
+      <section class="pane" id="pane-course">
+        <div class="subview active" id="course-list">
+          <div class="grid g5">
+            <div class="card tone-blue"><div class="card-label">课程总数</div><div class="card-value" data-def="状态正常的课程数（直播间 front_style=2 视为课程）。" data-calc="COUNT(*) WHERE status=1" data-source="sa_course_tpl_entity">128</div></div>
+            <div class="card tone-violet"><div class="card-label">观看会员</div><div class="card-value" data-def="有课程观看记录的去重客户数。" data-calc="COUNT(DISTINCT customer_id)" data-source="sa_live_watch_record">8,520</div></div>
+            <div class="card tone-green"><div class="card-label">完播会员</div><div class="card-value" data-def="观看进度达到课程配置完播阈值的会员。" data-calc="COUNT WHERE watch_duration >= 时长×complete_percentage" data-source="watch_duration + complete_percentage">4,860</div></div>
+            <div class="card tone-pink"><div class="card-label">答题会员</div><div class="card-value" data-def="参与课程答题的去重会员数。" data-calc="COUNT(DISTINCT user_id)" data-source="gm_course_day_stat">3,200</div></div>
+            <div class="card tone-cyan"><div class="card-label">人均时长</div><div class="card-value" data-def="观看总时长 ÷ 观看会员数。" data-calc="SUM(watch_duration)/人数 ÷60" data-source="sa_live_watch_record">18<small>分</small></div></div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><div><div class="panel-title">课程列表</div><div class="panel-sub">点击课程名进入课程详情（示例数据）</div></div></div>
+            <table>
+              <thead><tr><th>课程</th><th>类型</th><th>观看UV</th><th>完播UV</th><th>完播率</th><th>答题UV</th><th>正确率</th><th>红包金额</th><th>新客</th><th>新客占比</th><th></th></tr></thead>
+              <tbody>
+                <tr><td><button class="link" onclick="openCourseDetail('产品知识')">产品知识</button></td><td><span class="tag t-gray">录播</span></td><td>1,860</td><td>1,420</td><td>76.3%</td><td>1,100</td><td>82%</td><td>¥320</td><td>280</td><td>15.1%</td><td><button class="link" onclick="openCourseDetail('产品知识')">详情 →</button></td></tr>
+                <tr><td>销售技巧</td><td><span class="tag t-blue">直播</span></td><td>1,520</td><td>1,080</td><td>71.1%</td><td>920</td><td>78%</td><td>¥280</td><td>320</td><td>21.1%</td><td></td></tr>
+                <tr><td>新品培训</td><td><span class="tag t-gray">录播</span></td><td>1,280</td><td>880</td><td>68.8%</td><td>720</td><td>80%</td><td>¥200</td><td>180</td><td>14.1%</td><td></td></tr>
+                <tr><td>话术训练</td><td><span class="tag t-blue">直播</span></td><td>980</td><td>620</td><td>63.3%</td><td>520</td><td>75%</td><td>¥180</td><td>160</td><td>16.3%</td><td></td></tr>
+              </tbody>
+            </table>
+            <div class="legend"><b>字段口径</b>：完播率=完播UV÷观看UV；正确率=correct_count÷answer_count；红包金额=reward_status=1 的发放合计；新客=首次观看该课程的会员；类型由 sa_live_room.front_style 区分（2=课程）。</div>
+          </div>
+        </div>
+        <div class="subview" id="course-detail">
+          <div class="entity">
+            <div class="avatar">产</div>
+            <div><div class="t" id="cd-name">产品知识 <span class="tag t-gray">录播</span></div><div class="d num">课程时长 25 分钟 · 完播阈值 80% · 数据 5 分钟前更新</div></div>
+            <button class="btn ghost back" onclick="showSub('course','course-list')">← 返回课程列表</button>
+          </div>
+          <div class="grid g5">
+            <div class="card tone-blue"><div class="card-label">观看UV</div><div class="card-value">1,860</div></div>
+            <div class="card tone-green"><div class="card-label">完播UV</div><div class="card-value">1,420</div></div>
+            <div class="card tone-amber"><div class="card-label">完播率</div><div class="card-value">76.3%</div></div>
+            <div class="card tone-pink"><div class="card-label">答题UV</div><div class="card-value">1,100</div></div>
+            <div class="card tone-violet"><div class="card-label">新客占比</div><div class="card-value">15.1%</div></div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><div><div class="panel-title">观看进度分布</div></div></div>
+            <div class="chart-wrap"><div class="donut-flex" id="progressDonut"></div></div>
+            <div class="legend"><b>口径</b>：进度=watch_duration÷课程总时长；完播阈值=课程配置的 complete_percentage。</div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><div><div class="panel-title">参与会员明细（示例）</div></div></div>
+            <table>
+              <thead><tr><th>会员</th><th>等级</th><th>归属店员</th><th>观看时长</th><th>进度</th><th>答题</th><th>正确率</th><th>红包</th><th>状态</th></tr></thead>
+              <tbody>
+                <tr><td>王女士</td><td><span class="tag t-amber">黑卡</span></td><td>张三</td><td>25min</td><td>100%</td><td>5/5</td><td>100%</td><td>¥10</td><td><span class="tag t-green">已完成</span></td></tr>
+                <tr><td>李先生</td><td><span class="tag t-amber">金卡</span></td><td>李四</td><td>18min</td><td>78%</td><td>4/5</td><td>80%</td><td>¥5</td><td><span class="tag t-gray">学习中</span></td></tr>
+                <tr><td>陈小姐</td><td><span class="tag t-gray">普通</span></td><td>王五</td><td>8min</td><td>35%</td><td>2/5</td><td>40%</td><td>—</td><td><span class="tag t-gray">学习中</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
 
-    <!-- ==================== 店员维度 ==================== -->
-    <section class="page" id="page-staff">
-      <div class="page-head"><h1>店员维度</h1><p>按归属快照统计店员名下会员数据与贡献排名</p></div>
-      <div class="grid g5">
-        <div class="card"><div class="card-label">名下会员数</div><div class="card-value">1,256</div><div class="card-trend up">▲ 5.2% 环比</div></div>
-        <div class="card"><div class="card-label">新增会员</div><div class="card-value">86</div><div class="card-trend up">▲ 12% 环比</div></div>
-        <div class="card"><div class="card-label">贡献 GMV</div><div class="card-value">¥185k</div><div class="card-trend up">▲ 15% 环比</div></div>
-        <div class="card"><div class="card-label">活跃会员</div><div class="card-value">1,058</div><div class="card-note">每日 02:30 预计算</div></div>
-        <div class="card"><div class="card-label">复购率</div><div class="card-value">38%</div><div class="card-note">90 天消费 ≥2 次</div></div>
-      </div>
-      <div class="panel">
-        <div class="panel-head"><div><div class="panel-title">店员会员排行</div><div class="panel-sub">排序：贡献GMV ↓</div></div></div>
-        <table>
-          <thead><tr><th>排名</th><th>店员</th><th>门店</th><th>身份</th><th>名下会员</th><th>新增</th><th>VIP</th><th>沉睡</th><th>贡献GMV</th><th>复购率</th><th>操作</th></tr></thead>
-          <tbody>
-            <tr><td><span class="rank rank-1">1</span></td><td>张三</td><td>天河旗舰店</td><td><span class="tag tag-blue">店员</span></td><td>186</td><td>12</td><td>68</td><td>18</td><td>¥28,000</td><td>42%</td><td><button class="drill-btn" onclick="go('member-detail')">明细</button></td></tr>
-            <tr><td><span class="rank rank-2">2</span></td><td>李四</td><td>天河旗舰店</td><td><span class="tag tag-blue">店员</span></td><td>152</td><td>9</td><td>52</td><td>15</td><td>¥22,500</td><td>38%</td><td><button class="drill-btn" onclick="go('member-detail')">明细</button></td></tr>
-            <tr><td><span class="rank rank-3">3</span></td><td>王五</td><td>白云店</td><td><span class="tag tag-blue">店员</span></td><td>140</td><td>8</td><td>45</td><td>22</td><td>¥19,200</td><td>35%</td><td><button class="drill-btn" onclick="go('member-detail')">明细</button></td></tr>
-            <tr><td><span class="rank rank-n">4</span></td><td>赵六</td><td>番禺店</td><td><span class="tag tag-purple">店长</span></td><td>128</td><td>6</td><td>40</td><td>16</td><td>¥18,000</td><td>31%</td><td><button class="drill-btn" onclick="go('member-detail')">明细</button></td></tr>
-          </tbody>
-        </table>
-        <div class="legend">归属口径：按查询时间点的 staff_id 快照统计 · 沉睡会员 = 90 天无消费且无登录</div>
-      </div>
-    </section>
+      <!-- ============ Tab 7 店员报表 ============ -->
+      <section class="pane" id="pane-staff">
+        <div class="grid g5">
+          <div class="card tone-blue"><div class="card-label">店员人数</div><div class="card-value" data-def="项目下在职店员总数（type=1）。" data-calc="COUNT WHERE type=1" data-source="sa_store_employee">286</div></div>
+          <div class="card tone-violet"><div class="card-label">名下会员总数</div><div class="card-value" data-def="全部店员名下会员合计（staff_id 归属快照）。" data-calc="SUM(店员名下会员数)" data-source="sa_customer_entity.staff_id">1,256</div></div>
+          <div class="card tone-green"><div class="card-label">贡献 GMV</div><div class="card-value" data-def="全部店员名下会员已支付订单金额合计。" data-calc="SUM(pay_amount)" data-source="sto_order × customer.staff_id">¥185k</div></div>
+          <div class="card tone-cyan"><div class="card-label">活跃会员</div><div class="card-value" data-def="全部店员名下活跃会员合计（每日 02:30 预计算）。" data-calc="COUNT(is_active=1)" data-source="dws_member_asset">1,058</div></div>
+          <div class="card tone-amber"><div class="card-label">复购率</div><div class="card-value" data-def="90 天消费 ≥2 次会员占同期有消费会员比例。" data-calc="COUNT(is_repeat_buyer=1)/有消费会员" data-source="dws_member_asset">38%</div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div><div class="panel-title">店员贡献 Top（示例数据）</div><div class="panel-sub">按名下会员贡献 GMV 排序</div></div></div>
+          <div class="chart-wrap" id="staffBars"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div><div class="panel-title">店员会员排行</div><div class="panel-sub">点击明细查看名下会员（示例数据）</div></div></div>
+          <table>
+            <thead><tr><th>排名</th><th>店员</th><th>门店</th><th>身份</th><th>名下会员</th><th>新增</th><th>VIP</th><th>沉睡</th><th>贡献GMV</th><th>复购率</th><th></th></tr></thead>
+            <tbody>
+              <tr><td><span class="rank r1">1</span></td><td>张三</td><td>天河旗舰店</td><td><span class="tag t-blue">店员</span></td><td>186</td><td>12</td><td>68</td><td>18</td><td>¥28,000</td><td>42%</td><td><button class="link" onclick="openMemberDetail('张三','店员')">明细 →</button></td></tr>
+              <tr><td><span class="rank r2">2</span></td><td>李四</td><td>天河旗舰店</td><td><span class="tag t-blue">店员</span></td><td>152</td><td>9</td><td>52</td><td>15</td><td>¥22,500</td><td>38%</td><td><button class="link" onclick="openMemberDetail('李四','店员')">明细 →</button></td></tr>
+              <tr><td><span class="rank r3">3</span></td><td>王五</td><td>白云店</td><td><span class="tag t-blue">店员</span></td><td>140</td><td>8</td><td>45</td><td>22</td><td>¥19,200</td><td>35%</td><td><button class="link" onclick="openMemberDetail('王五','店员')">明细 →</button></td></tr>
+              <tr><td><span class="rank rn">4</span></td><td>赵六</td><td>番禺店</td><td><span class="tag t-violet">店长</span></td><td>128</td><td>6</td><td>40</td><td>16</td><td>¥18,000</td><td>31%</td><td><button class="link" onclick="openMemberDetail('赵六','店长')">明细 →</button></td></tr>
+            </tbody>
+          </table>
+          <div class="legend"><b>字段口径</b>：归属口径=按查询时点 staff_id 快照，不追溯历史；新增=first_bind_time 在统计周期内；VIP=非普通等级会员。</div>
+        </div>
+      </section>
 
-    <!-- ==================== 店长维度 ==================== -->
-    <section class="page" id="page-manager">
-      <div class="page-head"><h1>店长维度</h1><p>店长数据 = 管辖所有店员名下会员数据之和</p></div>
-      <div class="grid g5">
-        <div class="card"><div class="card-label">店长总数</div><div class="card-value">18<small>人</small></div></div>
-        <div class="card"><div class="card-label">管辖会员总数</div><div class="card-value">1,256</div></div>
-        <div class="card"><div class="card-label">管辖 VIP 会员</div><div class="card-value">320</div></div>
-        <div class="card"><div class="card-label">管辖贡献 GMV</div><div class="card-value">¥185k</div></div>
-        <div class="card"><div class="card-label">管辖人均贡献</div><div class="card-value">¥147</div></div>
-      </div>
-      <div class="panel">
-        <div class="panel-head"><div><div class="panel-title">店长管辖总览</div></div></div>
-        <table>
-          <thead><tr><th>店长</th><th>管辖店员</th><th>管辖门店</th><th>管辖会员</th><th>新增</th><th>VIP会员</th><th>贡献GMV</th><th>人均贡献</th><th>复购率</th><th>活跃率</th></tr></thead>
-          <tbody>
-            <tr><td>陈总</td><td>8 人</td><td>3 家</td><td>620</td><td>45</td><td>180</td><td>¥98,000</td><td>¥158</td><td>40%</td><td>85%</td></tr>
-            <tr><td>刘总</td><td>6 人</td><td>2 家</td><td>480</td><td>32</td><td>120</td><td>¥72,000</td><td>¥150</td><td>36%</td><td>82%</td></tr>
-            <tr><td>周总</td><td>5 人</td><td>2 家</td><td>380</td><td>25</td><td>95</td><td>¥52,000</td><td>¥137</td><td>33%</td><td>78%</td></tr>
-          </tbody>
-        </table>
-        <div class="legend">人均贡献 = 管辖贡献GMV / 管辖会员数 · 活跃率 = 活跃会员 / 总会员</div>
-      </div>
-    </section>
-
+      <!-- ============ Tab 8 店长报表 ============ -->
+      <section class="pane" id="pane-manager">
+        <div class="grid g5">
+          <div class="card tone-violet"><div class="card-label">店长人数</div><div class="card-value" data-def="项目下在职店长总数（type=2）。" data-calc="COUNT WHERE type=2" data-source="sa_store_employee">18<small>人</small></div></div>
+          <div class="card tone-blue"><div class="card-label">管辖会员总数</div><div class="card-value" data-def="店长管辖门店全部店员名下会员之和。">1,256</div></div>
+          <div class="card tone-amber"><div class="card-label">管辖 VIP 会员</div><div class="card-value">320</div></div>
+          <div class="card tone-green"><div class="card-label">管辖贡献 GMV</div><div class="card-value">¥185k</div></div>
+          <div class="card tone-cyan"><div class="card-label">管辖人均贡献</div><div class="card-value" data-def="管辖贡献GMV ÷ 管辖会员总数。">¥147</div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div><div class="panel-title">店长管辖总览</div><div class="panel-sub">店长数据 = 管辖门店内所有店员名下会员数据之和（示例数据）</div></div></div>
+          <table>
+            <thead><tr><th>店长</th><th>管辖店员</th><th>管辖门店</th><th>管辖会员</th><th>新增</th><th>VIP会员</th><th>贡献GMV</th><th>人均贡献</th><th>复购率</th><th>活跃率</th></tr></thead>
+            <tbody>
+              <tr><td>陈总</td><td>8 人</td><td>3 家</td><td>620</td><td>45</td><td>180</td><td>¥98,000</td><td>¥158</td><td>40%</td><td>85%</td></tr>
+              <tr><td>刘总</td><td>6 人</td><td>2 家</td><td>480</td><td>32</td><td>120</td><td>¥72,000</td><td>¥150</td><td>36%</td><td>82%</td></tr>
+              <tr><td>周总</td><td>5 人</td><td>2 家</td><td>380</td><td>25</td><td>95</td><td>¥52,000</td><td>¥137</td><td>33%</td><td>78%</td></tr>
+            </tbody>
+          </table>
+          <div class="legend"><b>字段口径</b>：管辖关系按 sa_store_employee 所属门店聚合；人均贡献=管辖GMV÷管辖会员数；活跃率=活跃会员÷管辖会员数；管辖范围变动按查询时点快照，不追溯。</div>
+        </div>
+      </section>
     </main>
   </div>
 </div>
 
-<!-- 字段口径 tooltip -->
 <div class="tooltip" id="tooltip" role="tooltip"></div>
-
-<!-- 字段口径总览 -->
-<div class="modal-mask" id="spec-modal" role="dialog" aria-modal="true" aria-label="字段口径总览">
+<div class="modal-mask" id="spec-modal" role="dialog" aria-modal="true">
   <div class="modal">
-    <div class="modal-head">
-      <div class="modal-title">全字段口径与数据来源总览</div>
-      <button class="modal-close" onclick="closeSpecs()" aria-label="关闭">×</button>
-    </div>
+    <div class="modal-head"><div class="modal-title">指标字典 · 字段口径与数据来源</div>
+      <button class="modal-close" onclick="closeSpecs()" aria-label="关闭">×</button></div>
     <div class="modal-body" id="spec-body"></div>
   </div>
 </div>
 
-<button class="btn" onclick="openSpecs()" style="position:fixed;right:22px;bottom:22px;box-shadow:var(--shadow-2);z-index:100;height:40px;padding:0 18px;">
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>
-  字段口径总览
-</button>
-
 <script>
-/* ===== 页面注册与导航 ===== */
-const PAGES = {
-  'tenant':       {el:'page-tenant',       crumb:['租户中控台']},
-  'store':        {el:'page-store',        crumb:['门店总览']},
-  'store-detail': {el:'page-store-detail', crumb:['门店总览','store','天河旗舰店']},
-  'member-detail':{el:'page-member-detail',crumb:['门店总览','store','天河旗舰店','store-detail','张三 / 名下会员']},
-  'staff':        {el:'page-staff',        crumb:['店员维度']},
-  'manager':      {el:'page-manager',      crumb:['店长维度']},
-  'live':         {el:'page-live',         crumb:['直播分析']},
-  'live-detail':  {el:'page-live-detail',  crumb:['直播分析','live','测试825 · 单场分析']},
-  'product':      {el:'page-product',      crumb:['商品分析']},
-  'customer':     {el:'page-customer',     crumb:['客户分析']},
-  'course':       {el:'page-course',       crumb:['课程维度']},
-  'course-detail':{el:'page-course-detail',crumb:['课程维度','course','产品知识课程']},
-};
-
-function go(name){
-  const p = PAGES[name]; if(!p) return;
-  document.querySelectorAll('.page').forEach(s=>s.classList.remove('active'));
-  document.getElementById(p.el).classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.dataset.page===name));
-  renderCrumbs(p.crumb);
+/* ================= 页签与子视图 ================= */
+const TAB_NAMES = {tenant:'租户总览',store:'门店报表',live:'直播报表',product:'商品报表',customer:'客户报表',course:'课程报表',staff:'店员报表',manager:'店长报表'};
+function switchTab(key){
+  document.querySelectorAll('.tab[data-tab]').forEach(t=>t.classList.toggle('active', t.dataset.tab===key));
+  document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('active', p.id==='pane-'+key));
+  document.getElementById('pageTitle').textContent = TAB_NAMES[key]||'';
   window.scrollTo(0,0);
 }
-function renderCrumbs(items){
-  const box = document.getElementById('crumbs'); box.innerHTML='';
-  items.forEach((it,i)=>{
-    if(i%2===1){ // 可点击页名
-      const b=document.createElement('button'); b.className='crumb link'; b.textContent=it;
-      b.onclick=()=>go(items[i-1]===undefined?it:it); // 兼容：页名紧跟 key
-      // 修正：items 成对 [key,label]，此处直接用前一个 key
-      b.onclick=()=>go(items[i-1]);
-      box.appendChild(b);
-    } else if(i===0){
-      const s=document.createElement('span'); s.className='crumb current'; s.textContent=it; box.appendChild(s);
-      if(items.length>1){const sep=document.createElement('span');sep.className='crumb';sep.textContent='/';box.appendChild(sep);}
-    }
+document.querySelectorAll('.tab[data-tab]').forEach(t=>t.addEventListener('click',()=>switchTab(t.dataset.tab)));
+function showSub(pane,id){
+  document.querySelectorAll('#pane-'+pane+' > .subview').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+function openStoreDetail(name){
+  document.getElementById('sd-name').textContent=name;
+  document.getElementById('sd-avatar').textContent=name.slice(0,1);
+  showSub('store','store-detail');
+}
+function openMemberDetail(name,role){
+  document.getElementById('md-name').textContent=name+' · '+role;
+  document.getElementById('md-avatar').textContent=name.slice(0,1);
+  showSub('store','member-detail');
+}
+function openCourseDetail(name){
+  document.getElementById('cd-name').innerHTML=name+' <span class="tag t-gray">录播</span>';
+  showSub('course','course-detail');
+}
+function mdSub(btn,key){
+  ['list','course','live'].forEach(k=>document.getElementById('md-'+k).hidden = k!==key);
+  btn.parentElement.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+/* ================= 直播场次（线上真实数据） ================= */
+const LIVE=[
+ ['直播828','2608280100360004961','2026-08-28 16:39:36','2026-08-28 16:39:55',0,0,0,'0.00','1.38'],
+ ['直播下级红包','2608270100160079766','2026-08-27 14:26:19','2026-08-27 14:27:20',2,1,0,'0.00','22.12'],
+ ['直播827','2608270100160048305','2026-08-27 14:19:04','2026-08-27 14:20:10',1,1,0,'0.00','4.77'],
+ ['测试825','2608250100220856704','2026-08-25 15:14:10','2026-08-25 15:15:07',5,2,0,'0.00','495.82'],
+ ['测试824','2608240100160085479','2026-08-24 14:21:10','2026-08-24 14:23:30',4,1,0,'0.00','1,486.02'],
+ ['测试001','2608010100360109194','2026-08-01 15:08:30','2026-08-02 14:58:45',2,1,0,'0.00','14,410.25'],
+ ['727开播','2607270100140004515','2026-07-27 14:07:26','2026-07-27 14:07:57',0,1,0,'0.00','5,759.05'],
+ ['测试719','2607190069251266772','2026-07-19 13:56:22','2026-07-19 13:57:13',1,0,0,'0.00','265.87'],
+ ['直播718','2607180069107602904','2026-07-18 13:47:06','2026-07-18 13:48:16',0,1,0,'0.00','18,718.73'],
+ ['测试','2607170069324002006','2026-07-17 17:48:37','2026-07-17 17:49:11',1,1,0,'0.00','20,159.82'],
+ ['直播78','2607080069071603642','2026-07-08 09:55:05','2026-07-08 09:57:22',2,0,2,'0.60','343.38'],
+ ['直播76','2607060069064424595','2026-07-06 10:09:10','2026-07-06 17:09:50',4,0,7,'0.03','306.33'],
+ ['直播74','2607040069077248614','2026-07-04 14:07:09','2026-07-04 14:07:31',1,0,0,'0.00','2,640.53'],
+ ['直播2 71','2607010069106403695','2026-07-01 11:35:43','2026-07-01 14:12:30',2,0,0,'0.00','91.88'],
+ ['直播630 哈哈哈','2606300069702819367','2026-06-30 20:47:11','2026-06-30 21:42:45',4,0,0,'0.00','616.42'],
+ ['直播2 630','2606300069462811724','2026-06-30 16:40:25','2026-06-30 16:40:50',4,0,0,'0.00','238.28'],
+ ['直播630','2606300069542890712','2026-06-30 09:47:47','2026-06-30 14:56:23',3,0,0,'0.00','103.33'],
+ ['直播2 629','2606290069099212874','2026-06-29 13:59:41','2026-06-29 15:25:56',3,0,0,'0.00','35.67'],
+ ['下级红包','2606290069059215474','2026-06-29 10:59:00','2026-06-29 10:59:24',0,0,0,'0.00','37,439.60'],
+ ['629直播','2606290069039263301','2026-06-29 09:48:36','2026-06-29 19:51:47',5,0,0,'0.00','0.02'],
+ ['test直播626','2606260069108437362','2026-06-26 14:21:52','2026-06-26 14:22:26',1,0,0,'0.00','161.87'],
+ ['未开始','2606250069244857410','2026-06-25 18:11:21','2026-06-26 11:22:02',3,1,0,'0.00','19.98'],
+ ['竖屏直播','2606250069144842837','2026-06-25 16:25:12','2026-06-25 16:36:16',3,1,0,'0.00','4,308.73'],
+ ['年中狂欢','2606250069004876915','2026-06-25 11:30:37','2026-06-25 11:31:09',3,2,0,'0.00','293.22'],
+];
+const SORTERS={
+ start:(a,b)=>b[3].localeCompare(a[3]), create:(a,b)=>b[2].localeCompare(a[2]),
+ watch:(a,b)=>b[4]-a[4], peak:(a,b)=>b[5]-a[5],
+ orders:(a,b)=>b[6]-a[6], amount:(a,b)=>parseFloat(b[7])-parseFloat(a[7]),
+};
+function renderLive(key){
+  document.getElementById('liveRows').innerHTML=[...LIVE].sort(SORTERS[key]).map(s=>
+   '<tr><td><button class="link" onclick="openLiveDetail()">'+s[0]+'</button><br><span style="color:var(--fg-3);font-size:10.5px;font-family:var(--mono);">ID '+s[1]+'</span></td>'
+   +'<td>'+s[2]+'</td><td>'+s[3]+'</td><td>'+s[4]+'</td><td>'+s[5]+'</td><td>'+s[6]+'</td><td>¥'+s[7]+'</td><td>'+s[8]+'</td>'
+   +'<td><button class="link" onclick="openLiveDetail()">单场分析 →</button></td></tr>').join('');
+}
+function sortLive(btn,key){
+  document.querySelectorAll('#liveSorts .tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active'); renderLive(key);
+}
+function openLiveDetail(){ showSub('live','live-detail'); }
+renderLive('start');
+
+/* ================= SVG 图表引擎 ================= */
+const el=id=>document.getElementById(id);
+function areaChart(id,data,labels,color,fmt){
+  const W=520,H=175,pL=48,pR=14,pT=14,pB=26;
+  const max=Math.max(...data)*1.15||1;
+  const px=i=>pL+i*(W-pL-pR)/(data.length-1);
+  const py=v=>pT+(1-v/max)*(H-pT-pB);
+  let grid='';
+  for(let g=0;g<=3;g++){const v=max/3*g,y=py(v);
+    grid+='<line x1="'+pL+'" y1="'+y+'" x2="'+(W-pR)+'" y2="'+y+'" stroke="#EEF2F8"/>'
+      +'<text x="'+(pL-7)+'" y="'+(y+4)+'" text-anchor="end" font-size="9.5" fill="#8A94A6">'+fmt(v)+'</text>';}
+  const line=data.map((v,i)=>(i?'L':'M')+px(i).toFixed(1)+','+py(v).toFixed(1)).join(' ');
+  const area=line+' L'+px(data.length-1).toFixed(1)+','+py(0)+' L'+pL+','+py(0)+' Z';
+  const dots=data.map((v,i)=>'<circle cx="'+px(i)+'" cy="'+py(v)+'" r="3.2" fill="#fff" stroke="'+color+'" stroke-width="2"><title>'+labels[i]+'：'+fmt(v)+'</title></circle>').join('');
+  const step=Math.ceil(labels.length/7);
+  const xl=labels.map((l,i)=>(i%step===0||i===labels.length-1)?'<text x="'+px(i)+'" y="'+(H-8)+'" text-anchor="middle" font-size="9.5" fill="#8A94A6">'+l+'</text>':'').join('');
+  el(id).innerHTML='<svg class="chart" viewBox="0 0 '+W+' '+H+'" role="img"><defs><linearGradient id="g'+id+'" x1="0" y1="0" x2="0" y2="1">'
+   +'<stop offset="0%" stop-color="'+color+'" stop-opacity=".22"/><stop offset="100%" stop-color="'+color+'" stop-opacity=".02"/></linearGradient></defs>'
+   +grid+'<path d="'+area+'" fill="url(#g'+id+')"/><path d="'+line+'" fill="none" stroke="'+color+'" stroke-width="2.2" stroke-linecap="round"/>'+dots+xl+'</svg>';
+}
+function donut(id,segs,centerLabel,centerValue){
+  const total=segs.reduce((a,s)=>a+s.v,0)||1;
+  const C=2*Math.PI*56; let off=C*0.25,arcs='';
+  segs.forEach(s=>{
+    const len=s.v/total;
+    arcs+='<circle cx="80" cy="80" r="56" fill="none" stroke="'+s.c+'" stroke-width="22" stroke-dasharray="'
+      +(len*C-2).toFixed(1)+' '+(C-len*C+2).toFixed(1)+'" stroke-dashoffset="'+off.toFixed(1)+'" transform="rotate(-90 80 80)"><title>'
+      +s.n+'：'+s.raw+'（'+(len*100).toFixed(1)+'%）</title></circle>';
+    off-=len*C;
+  });
+  const legend=segs.map(s=>'<div class="dl"><i style="width:11px;height:11px;border-radius:3px;background:'+s.c+';"></i><span>'+s.n+'</span><b>'+s.raw+'</b><span>'+(s.v/total*100).toFixed(1)+'%</span></div>').join('');
+  el(id).innerHTML='<svg width="160" height="160" viewBox="0 0 160 160" role="img">'+arcs
+   +'<text x="80" y="75" text-anchor="middle" font-size="21" font-weight="700" fill="#0F172A">'+centerValue+'</text>'
+   +'<text x="80" y="94" text-anchor="middle" font-size="10" fill="#8A94A6">'+centerLabel+'</text></svg>'
+   +'<div class="donut-legend">'+legend+'</div>';
+}
+function hbars(id,rows,color,fmt){
+  const max=Math.max(...rows.map(r=>r[1]))||1;
+  el(id).innerHTML=rows.map((r,i)=>
+   '<div style="display:grid;grid-template-columns:120px 1fr 76px;gap:10px;align-items:center;padding:5px 0;font-size:12px;">'
+   +'<span style="color:var(--fg-2);text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="'+r[0]+'">'+(i+1)+'. '+r[0]+'</span>'
+   +'<div class="bar-track" style="height:18px;border-radius:4px;"><div class="bar-fill" style="width:'+(r[1]/max*100).toFixed(1)+'%;background:'+color+';display:flex;align-items:center;justify-content:flex-end;"></div></div>'
+   +'<b style="text-align:right;font-variant-numeric:tabular-nums;">'+fmt(r[1])+'</b></div>').join('');
+}
+function funnel(id,stages){
+  const max=stages[0][1]||1;
+  const shades=['#C3D4F7','#9FBCF3','#7BA3EE','#5A8AE6','#3E6FD6','#2B55BE','#1E40AF'];
+  el(id).innerHTML=stages.map((s,i)=>{
+    const w=(s[1]/max*100).toFixed(1);
+    const dark=i<3;
+    const keep=i===0?'基数':'留存 <b>'+s[2]+'</b>'+(s[3]?' · 流失 '+s[3]:'');
+    return '<div class="funnel-row"><div class="funnel-name">'+s[0]+'</div>'
+      +'<div class="funnel-track"><div class="funnel-fill" style="width:'+w+'%;background:'+shades[Math.min(i,6)]+';color:'+(dark?'#1E3A8A':'#fff')+';">'+s[1].toLocaleString()+'</div></div>'
+      +'<div class="funnel-meta">'+keep+'</div></div>';
+  }).join('');
+}
+function sparks(){
+  document.querySelectorAll('.spark[data-spark]').forEach(s=>{
+    const d=s.dataset.spark.split(',').map(Number);
+    const w=+s.getAttribute('width'),h=+s.getAttribute('height');
+    const max=Math.max(...d)||1,min=Math.min(...d);
+    const pts=d.map((v,i)=>((i*(w-4)/(d.length-1)+2).toFixed(1))+','+((h-3-(v-min)/((max-min)||1)*(h-6)).toFixed(1))).join(' ');
+    s.innerHTML='<polyline points="'+pts+'" stroke="'+s.dataset.color+'"/>';
   });
 }
 
-/* ===== 子页签 ===== */
-function switchSub(prefix, keys, btn){
-  keys.forEach(k=>{ document.getElementById('sub-'+prefix+'-'+k).hidden = !btn.textContent.trim().toLowerCase().includes(labelOf(k)); });
-  btn.parentElement.querySelectorAll('.subtab').forEach(t=>t.classList.remove('active'));
-  btn.classList.add('active');
-}
-function labelOf(k){ return {list:'会员明细',course:'课程参与',live:'直播参与'}[k] || k; }
+/* ================= 图表数据（示例标注见各面板） ================= */
+areaChart('trendWatch',[420,380,455,410,470,445,510],['08-21','08-22','08-23','08-24','08-25','08-26','08-27'],'#2563EB',v=>Math.round(v));
+areaChart('trendDur',[320,180,660,120,910,306,660],['08-21','08-22','08-23','08-24','08-25','08-26','08-27'],'#0891B2',v=>Math.round(v));
+donut('memberDonut',
+ [{n:'黑卡',raw:'620',v:620,c:'#7C3AED'},{n:'金卡',raw:'480',v:480,c:'#D97706'},{n:'银卡',raw:'320',v:320,c:'#94A3B8'},{n:'普通',raw:'140',v:140,c:'#CBD5E1'}],
+ '会员总数','1,560');
+donut('watchDonut',
+ [{n:'深度 ≥60min',raw:'1,662',v:30,c:'#7C3AED'},{n:'中度 15-60min',raw:'2,218',v:40,c:'#2563EB'},{n:'浅度 1-15min',raw:'1,104',v:20,c:'#0891B2'},{n:'流失边缘',raw:'554',v:10,c:'#DC2626'}],
+ '观看客户','5,538');
+donut('progressDonut',
+ [{n:'0-25%',raw:'280',v:15,c:'#DC2626'},{n:'25-50%',raw:'360',v:19,c:'#D97706'},{n:'50-75%',raw:'420',v:23,c:'#2563EB'},{n:'75-100%',raw:'800',v:43,c:'#059669'}],
+ '观看UV','1,860');
+funnel('tenantFunnel',[['触达',12560,'100%',''],['预约/进入',8920,'71.0%','3,640'],['观看≥1min',5540,'44.1%','3,380'],['互动',3260,'26.0%','2,280'],['点击商品',1760,'14.0%','1,500'],['下单',1004,'8.0%','756'],['支付成交',752,'6.0%','252']]);
+funnel('liveFunnel',[['预约',48,'100%',''],['观看',4,'8.3%','44'],['签到',2,'50%','2'],['互动',3,'150%','—'],['下单',7,'233%','—'],['成交',6,'85.7%','1']]);
+hbars('storeBars',[['天河旗舰店',25800],['白云店',15600],['番禺店',8400]],'#059669',v=>'¥'+v.toLocaleString());
+hbars('productBars',[['玻尿酸精华液 30ml',25800],['修护面霜 50g',15600],['洁面乳 120ml',2160]],'#D97706',v=>'¥'+v.toLocaleString());
+hbars('staffBars',[['张三',28000],['李四',22500],['王五',19200],['赵六',18000],['孙七',15600]],'#2563EB',v=>'¥'+v.toLocaleString());
+sparks();
 
-/* ===== 口径 tooltip ===== */
-const tip = document.getElementById('tooltip');
-document.addEventListener('mouseover', e=>{
-  const el = e.target.closest('[data-calc]'); if(!el) return;
-  tip.innerHTML = '<b>'+el.textContent.trim().replace(/\s+/g,' ').slice(0,40)+'</b>'
-    + (el.dataset.calc?'<span class="calc">计算：'+el.dataset.calc+'</span>':'')
-    + (el.dataset.source?'<span class="src">来源：'+el.dataset.source+'</span>':'');
+/* ================= 字段口径 tooltip（含义/计算/来源） ================= */
+const tip=el('tooltip');
+document.addEventListener('mouseover',e=>{
+  const t=e.target.closest('[data-def]'); if(!t) return;
+  tip.innerHTML='<span class="def">'+t.dataset.def+'</span>'
+   +(t.dataset.calc?'<span class="calc">计算：'+t.dataset.calc+'</span>':'')
+   +(t.dataset.source?'<span class="src">来源：'+t.dataset.source+'</span>':'');
   tip.style.display='block';
 });
-document.addEventListener('mousemove', e=>{
+document.addEventListener('mousemove',e=>{
   if(tip.style.display!=='block') return;
-  let x=e.clientX+14, y=e.clientY+14;
-  if(x+400>innerWidth) x=e.clientX-400;
-  if(y+160>innerHeight) y=e.clientY-160;
+  let x=e.clientX+14,y=e.clientY+14;
+  if(x+410>innerWidth) x=e.clientX-410;
+  if(y+170>innerHeight) y=e.clientY-170;
   tip.style.left=x+'px'; tip.style.top=y+'px';
 });
-document.addEventListener('mouseout', e=>{ if(e.target.closest('[data-calc]')) tip.style.display='none'; });
+document.addEventListener('mouseout',e=>{ if(e.target.closest('[data-def]')) tip.style.display='none'; });
 
-/* ===== 字段口径总览 ===== */
-const SPECS = {
-  '租户中控台':[
-    ['四维基础盘','商品数/门店数/会员数/直播场数','商品中心 + sa_store_entity + sa_customer_entity + sa_live_session'],
-    ['四维交叉矩阵','门店为行落点，直播×客户×商品为交叉列','跨实体 JOIN 汇总'],
-    ['路径漏斗','触达→预约/进入→观看≥1min→互动→点击商品→下单→支付（逐级留存率文本标注）','行为链归集（客户×直播场次）'],
-    ['角色视图裁剪','租户=全量；店长=本店；店员=名下会员','按登录角色过滤'],
-  ],
-  '直播维度（线上口径）':[
-    ['直播场数','COUNT(DISTINCT session_id) WHERE 周期内','sa_live_session'],
-    ['观看总人数','SUM(各场次观看人数)，type=3 客户','sa_live_watch_record.customer_id'],
-    ['观看峰值人数','MAX(同时在线人数)','sa_live_session_stat.peak_uv'],
-    ['成交订单数/金额','COUNT/SUM(pay_amount) WHERE live_id非空 AND 已支付','sto_order'],
-    ['消耗总流量','SUM(直播+回放流量)','sa_live_session_stat.flow_mb（STR-SAAS-002 口径）'],
-    ['场均直播时长','SUM(直播时长)/场数','sa_live_session（开播~下播）'],
-    ['场均回放时长','SUM(回放时长)/场数','sa_live_session_stat.replay_duration'],
-    ['人均观看直播时长','SUM(watch_duration)/观看总人数 ÷60','sa_live_watch_record'],
-    ['人均观看回放时长','SUM(回放观看时长)/回放人数 ÷60','sa_live_watch_record WHERE 回放'],
-    ['场均点赞/评论人数','SUM/场数','sa_live_session_stat.like_count / comment_uv'],
-    ['带货直播场次','COUNT WHERE 挂车且成交>0','sa_live_cart_item + sto_order'],
-    ['更新机制','T+1：每日 11:00 前更新昨日数据；实时数据走单场分析','线上「直播分析」交互约定'],
-  ],
-  '商品维度':[
-    ['动销商品','COUNT WHERE 周期内有成交（含直播引导）','sto_order × spu_id'],
-    ['直播带货GMV','SUM(pay_amount) WHERE live_id非空 AND 已支付','sto_order WHERE live_id非空'],
-    ['商品点击UV','直播中点击购物袋去重','sa_live_session_stat.item_click_uv'],
-    ['带货场次数','COUNT(DISTINCT live_id) WHERE 挂车','sa_live_cart_item'],
-    ['新客占比','直播新客下单数 / 成交客户','sa_live_watch_record.is_new_customer × order'],
-    ['直播引流成交占比','直播GMV / 全渠道GMV','派生指标'],
-  ],
-  '客户维度':[
-    ['观看直播客户数','COUNT(DISTINCT customer_id) WHERE 周期内有观看','sa_live_watch_record'],
-    ['累计观看分钟','SUM(watch_duration) ÷60（含回放）','sa_live_watch_record.watch_duration'],
-    ['互动次数','点赞+评论+分享计数','sa_live_session_stat 互动明细'],
-    ['直播消费','SUM(pay_amount) WHERE live_id非空 AND 已支付','sto_order'],
-    ['回放分钟','SUM(回放观看时长) ÷60','sa_live_watch_record WHERE 回放'],
-    ['直播贡献占比','直播引导金额 / 累计消费','派生指标'],
-    ['归属隔离','店长/店员仅见名下客户（staff_id 快照）','sa_customer_entity.staff_id'],
-  ],
-  '店员维度':[
-    ['名下会员数','COUNT(customer_id) WHERE staff_id=X AND type=3 AND status=1','sa_customer_entity.staff_id'],
-    ['新增会员','COUNT WHERE first_bind_time 在统计周期内','sa_customer_entity.first_bind_time'],
-    ['贡献GMV','SUM(o.pay_amount) JOIN customer WHERE staff_id=X AND 已支付','sto_order.pay_amount'],
-    ['沉睡会员','COUNT WHERE is_dormant=1（每日02:30预计算）','dws_member_asset.is_dormant'],
-    ['复购率','COUNT(is_repeat_buyer=1) / 有消费会员数','dws_member_asset.is_repeat_buyer'],
-  ],
-  '店长维度':[
-    ['管辖会员数','SUM(店员名下会员数) WHERE 店员归属该店长管辖门店','sa_store_employee（type=2）+ 管辖关系'],
-    ['管辖贡献GMV','SUM(店员贡献GMV) WHERE 归属该店长','派生：店员贡献GMV 汇总'],
-    ['人均贡献','管辖GMV / 管辖会员数','派生指标'],
-  ],
-  '门店维度':[
-    ['门店会员数','COUNT(customer_id) WHERE store_id=X AND type=3','sa_customer_entity.store_id'],
-    ['VIP占比','VIP会员数 / 门店会员数','sa_customer_entity.vip_level_id'],
-    ['门店贡献GMV','SUM(pay_amount) WHERE 该门店会员的已支付订单','sto_order + sa_customer_entity.store_id'],
-    ['活跃率','活跃会员数 / 门店会员数','dws_member_asset.is_active'],
-  ],
-  '课程维度':[
-    ['观看UV','COUNT(DISTINCT customer_id) WHERE room对应课程 AND type=3','sa_live_watch_record.customer_id'],
-    ['完播UV','COUNT WHERE watch_duration >= 课程时长×完播百分比','watch_duration + complete_percentage'],
-    ['答题UV','COUNT(DISTINCT user_id) FROM 答题记录','gm_course_day_stat.answer_user_count'],
-    ['正确率','correct_count / answer_count','gm_course_day_stat'],
-    ['红包金额','SUM(reward_money) WHERE reward_status=1','gm_course_day_stat.reward_money'],
-    ['新客占比','SUM(is_new_customer=1) / 观看UV','sa_live_watch_record.is_new_customer'],
-  ],
+/* ================= 指标字典 ================= */
+const SPECS={
+ '租户总览':[
+  ['观看总人数','统计周期内进入过直播间的去重客户数（UV），同客户多场次只计 1 次','COUNT(DISTINCT customer_id)，type=3','sa_live_watch_record'],
+  ['成交订单总金额','直播挂车商品订单中已支付部分的金额合计','SUM(pay_amount) WHERE live_id非空 AND 已支付','sto_order.pay_amount'],
+  ['会员总数','项目下状态正常的 C 端客户总数','COUNT WHERE type=3 AND status=1','sa_customer_entity'],
+  ['消耗总流量','直播推流/播放流量 + 回放点播流量合计','SUM(直播+回放)','sa_live_session_stat（STR-SAAS-002）'],
+  ['四维交叉矩阵','门店为行落点，直播×客户×商品为交叉列','跨实体 JOIN 汇总','—'],
+  ['路径漏斗','触达→预约/进入→观看≥1min→互动→点击商品→下单→支付，逐级标注留存率','行为链按客户×场次归集','—'],
+ ],
+ '直播报表（线上口径）':[
+  ['直播场数','统计周期内创建的直播场次总数（含未开播）','COUNT(DISTINCT session_id)','sa_live_session'],
+  ['观看总人数','各场次去重观看客户数之和（跨场次不去重，场次内去重）','SUM(场次观看人数)','sa_live_watch_record'],
+  ['观看峰值人数','单场同时在线人数的最大值','MAX(同时在线)','sa_live_session_stat.peak_uv'],
+  ['场均直播时长','开播至下播持续时长的场次平均','SUM(直播时长)/场数','sa_live_session'],
+  ['场均回放时长','回放可观看时长的场次平均','SUM(回放时长)/场数','sa_live_session_stat.replay_duration'],
+  ['人均观看直播时长','单客观看深度：观看总时长÷观看总人数','SUM(watch_duration)/UV ÷60','sa_live_watch_record'],
+  ['场均点赞/评论人数','互动强度指标','SUM/场数','sa_live_session_stat.like_count / comment_uv'],
+  ['带货直播场次','挂载商品且产生成交的场次','COUNT WHERE 挂车 AND 成交>0','sa_live_cart_item + sto_order'],
+  ['更新机制','T+1：每日 11:00 前更新昨日数据；实时数据走单场分析','—','线上「直播分析」约定'],
+ ],
+ '商品报表':[
+  ['动销商品','周期内产生成交（含直播引导）的去重 SPU 数','COUNT(DISTINCT spu_id)','sto_order'],
+  ['直播带货GMV','直播间引导的已支付订单金额合计','SUM(pay_amount) WHERE live_id非空','sto_order'],
+  ['直播引流成交占比','直播GMV ÷ 全渠道GMV','派生','—'],
+  ['商品点击UV','直播中点击购物袋该商品的去重客户数','item_click 去重','sa_live_session_stat.item_click_uv'],
+  ['新客占比','首次下单客户数 ÷ 成交客户数','派生','sa_live_watch_record.is_new_customer'],
+ ],
+ '客户报表':[
+  ['累计观看分钟','该客户全部场次观看时长求和（直播+回放）÷60','SUM(watch_duration) ÷60','sa_live_watch_record'],
+  ['互动客户数','有点赞/评论/分享任一行为的去重客户','COUNT(DISTINCT customer_id)','互动明细'],
+  ['直播贡献占比','直播引导金额 ÷ 累计消费','派生','—'],
+  ['观看深度分层','深度≥60min / 中度15-60 / 浅度1-15 / 流失边缘<1min','分层数值可配置','—'],
+  ['归属隔离','店长/店员仅见名下客户，按查询时点 staff_id 快照','—','sa_customer_entity.staff_id'],
+ ],
+ '门店 / 店员 / 店长':[
+  ['名下会员','staff_id 归属快照统计（不追溯历史归属）','COUNT WHERE staff_id=X AND type=3','sa_customer_entity'],
+  ['贡献GMV','名下会员已支付订单金额合计','SUM(pay_amount)','sto_order × customer.staff_id'],
+  ['沉睡会员','90 天无消费且无登录（is_dormant=1，每日 02:30 预计算）','COUNT(is_dormant=1)','dws_member_asset'],
+  ['复购率','90 天消费 ≥2 次会员 ÷ 有消费会员','COUNT(is_repeat_buyer=1)/有消费会员','dws_member_asset'],
+  ['店长数据','= 管辖门店全部店员名下会员数据之和','SUM(店员数据)','sa_store_employee 聚合'],
+ ],
+ '课程报表':[
+  ['完播UV','观看进度≥课程配置阈值（complete_percentage）','watch_duration ≥ 时长×阈值','sa_live_watch_record + sa_course_tpl_entity'],
+  ['正确率','correct_count ÷ answer_count','gm_course_day_stat','gm_course_day_stat'],
+  ['红包金额','发放成功（reward_status=1）的答题红包合计','SUM(reward_money)','gm_course_day_stat'],
+  ['新客','首次观看该课程的会员','is_new_customer=1','sa_live_watch_record'],
+ ],
 };
-
 function openSpecs(){
-  const body = document.getElementById('spec-body'); let html='';
-  for(const [dim, fields] of Object.entries(SPECS)){
-    html += '<div class="spec-h">'+dim+'</div><table><thead><tr><th style="width:18%">字段</th><th style="width:44%">计算方式</th><th style="width:38%">数据来源</th></tr></thead><tbody>';
+  let html='';
+  for(const [dim,fields] of Object.entries(SPECS)){
+    html+='<div class="spec-h">'+dim+'</div><table><thead><tr><th style="width:16%">字段</th><th style="width:38%">含义（给租户的准确解释）</th><th style="width:26%">计算方式</th><th style="width:20%">数据来源</th></tr></thead><tbody>';
     for(const f of fields){
-      html += '<tr><td style="color:var(--primary);font-weight:600;white-space:nowrap;">'+f[0]+'</td><td style="color:var(--success);font-family:var(--mono);font-size:11px;">'+f[1]+'</td><td style="color:var(--warning);font-family:var(--mono);font-size:11px;">'+f[2]+'</td></tr>';
+      html+='<tr><td style="color:var(--primary);font-weight:600;white-space:nowrap;">'+f[0]+'</td><td>'+f[1]+'</td><td style="color:#047857;font-family:var(--mono);font-size:10.5px;">'+f[2]+'</td><td style="color:#B45309;font-family:var(--mono);font-size:10.5px;">'+f[3]+'</td></tr>';
     }
-    html += '</tbody></table>';
+    html+='</tbody></table>';
   }
-  body.innerHTML = html + '<div class="notice blue" style="margin-top:16px;">页面上任意带虚线下划线的字段，鼠标悬浮可查看该字段的计算方式和数据来源；本弹窗汇总所有维度口径，供开发对表使用。</div>';
-  document.getElementById('spec-modal').classList.add('open');
+  el('spec-body').innerHTML=html+'<div class="caliber" style="margin-top:14px;">页面上带虚线下划线的字段，鼠标悬浮即可看到「含义 / 计算 / 来源」三层解释；本字典为开发对表与租户宣讲的统一口径。</div>';
+  el('spec-modal').classList.add('open');
 }
-function closeSpecs(){ document.getElementById('spec-modal').classList.remove('open'); }
-document.getElementById('spec-modal').addEventListener('click', e=>{ if(e.target.id==='spec-modal') closeSpecs(); });
-document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeSpecs(); });
-
-/* 初始化面包屑 */
-renderCrumbs(PAGES['tenant'].crumb);
+function closeSpecs(){ el('spec-modal').classList.remove('open'); }
+el('spec-modal').addEventListener('click',e=>{ if(e.target.id==='spec-modal') closeSpecs(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeSpecs(); });
 </script>
 </body>
 </html>
