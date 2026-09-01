@@ -108,7 +108,23 @@
               <t-textarea v-model="addForm.description" :autosize="{ minRows: 2, maxRows: 4 }" />
             </t-form-item>
           </div>
+          <!-- V2·0901 授课方式逐条配置：直播只选直播间，录播关联课程 -->
           <div class="form-col-full">
+            <t-form-item label="授课方式" required-mark>
+              <t-radio-group v-model="addForm.teach_mode">
+                <t-radio value="recorded"><template #label><t-icon name="play-circle" /> 录播（关联课程）</template></t-radio>
+                <t-radio value="live"><template #label><t-icon name="video-camera" /> 直播（选择直播间）</template></t-radio>
+              </t-radio-group>
+            </t-form-item>
+          </div>
+          <div v-if="addForm.teach_mode === 'live'" class="form-col-full">
+            <t-form-item label="选择直播间" required-mark>
+              <t-select v-model="addForm.live_room_id" filterable placeholder="选择直播间">
+                <t-option v-for="r in liveStore.rooms" :key="r.id" :label="r.name + '（' + (r.status === 'live' ? '直播中' : '空闲') + '）'" :value="r.id" />
+              </t-select>
+            </t-form-item>
+          </div>
+          <div class="form-col-full" v-if="addForm.teach_mode === 'recorded'">
             <t-form-item label="关联课程" required-mark>
               <div style="display:flex;gap:8px;width:100%">
                 <t-select
@@ -141,7 +157,6 @@
                   <t-select v-model="addForm.lesson_id" clearable placeholder="可选·选具体课时复用已有课时" style="flex:1">
                     <t-option v-for="l in selectedCourseLessons" :key="l.id" :label="`第${l.sort_order}课时：${l.title}（${l.mode === 'live' ? '直播' : l.mode === 'qa_live' ? '直播答疑' : '录播'}）`" :value="l.id" />
                   </t-select>
-                  <t-button theme="primary" :loading="wholeCourseLoading" @click="doOneClickFromAdd">一键排整个课程</t-button>
                 </div>
                 <div class="lesson-tip">
                   <t-icon name="info-circle" />
@@ -257,6 +272,7 @@ import { ref, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { MessagePlugin } from 'tdesign-vue-next';
 import { useCampStore } from '../../../stores/camp-store';
+import { useLiveStore } from '../../../stores/live-store';
 import { notifyModalOpen } from '../../../utils/modal-spec-bridge';
 import { useCourseStore } from '../../../stores/course-store';
 import type { CourseSchedule } from '../../../contracts/schemas/camp-schemas';
@@ -264,6 +280,7 @@ import type { CourseSchedule } from '../../../contracts/schemas/camp-schemas';
 const route = useRoute();
 const campStore = useCampStore();
 const courseStore = useCourseStore();
+const liveStore = useLiveStore();
 // 从页面导航直入时无 campId 参数：优先落到「未锁定」的直播草稿营期（可编辑演示排课），避免空页面与只读态
 const editable = (c: any) => !['published', 'enrolling', 'in_progress', 'ended'].includes(c.status);
 const campId = ref<string>((route.query.campId as string)
@@ -407,6 +424,8 @@ const addForm = ref({
   day_number: 1,
   title: '',
   description: '',
+  teach_mode: 'recorded' as 'recorded' | 'live',
+  live_room_id: '',
   course_id: '',
   lesson_id: null as string | null,
   unlock_time: new Date(),
@@ -416,39 +435,39 @@ const addForm = ref({
 });
 function openAddDialog() {
   if (isLocked.value) { MessagePlugin.warning('审核通过后排课已锁定，如需修改请复制营期重做'); return; }
-  addForm.value = { day_number: 1, title: '', description: '', course_id: '', lesson_id: null, unlock_time: new Date(), deadline: null, completion_criteria: '', is_required: true };
+  addForm.value = { day_number: 1, title: '', description: '', teach_mode: 'recorded', live_room_id: '', course_id: '', lesson_id: null, unlock_time: new Date(), deadline: null, completion_criteria: '', is_required: true };
   showAdd.value = true;
   notifyModalOpen('schedule-add');
 }
 function doAdd() {
   if (!addForm.value.title) { MessagePlugin.warning('请填写排课标题'); return; }
-  if (!addForm.value.course_id) { MessagePlugin.warning('必须选择关联课程'); return; }
   if (!addForm.value.unlock_time) { MessagePlugin.warning('请选择解锁时间'); return; }
-  // 课程 mode 匹配校验
-  if (addForm.value.course_id) {
-    const course = courseStore.courses.find(c => c.id === addForm.value.course_id);
-    if (course) {
-      if (camp.value?.mode === 'live' && course.mode === 'recorded') { MessagePlugin.warning('直播营期不允许排录播课程'); return; }
-      if (camp.value?.mode === 'recorded' && course.mode === 'live') { MessagePlugin.warning('录播营期不允许排直播课程'); return; }
-    }
+  // V2·0901 直播排课：只选直播间，不关联课程
+  if (addForm.value.teach_mode === 'live' && !addForm.value.live_room_id) { MessagePlugin.warning('请选择直播间'); return; }
+  if (addForm.value.teach_mode === 'recorded' && !addForm.value.course_id) { MessagePlugin.warning('必须选择关联课程'); return; }
+  // 直播排课关联该直播间当前场次（无场次则留空，进入时用排课自身标识兜底）
+  let liveSessionId: string | null = null;
+  if (addForm.value.teach_mode === 'live') {
+    const sess = liveStore.sessions.find((x: any) => x.room_id === addForm.value.live_room_id);
+    liveSessionId = sess?.id ?? null;
   }
   const dayScheds = campSchedules.value.filter(s => s.day_number === addForm.value.day_number);
-  const mode = camp.value?.mode === 'live' ? 'live' : 'recorded';
+  const mode = addForm.value.teach_mode;
   campStore.createSchedule({
     camp_id: campId.value,
     day_number: addForm.value.day_number,
     sort_order: dayScheds.length + 1,
     schedule_type: 'course',
     schedule_mode: mode as any,
-    course_id: addForm.value.course_id || null,
-    lesson_id: addForm.value.lesson_id || null,
-    live_session_id: null,
+    course_id: addForm.value.teach_mode === 'recorded' ? (addForm.value.course_id || null) : null,
+    lesson_id: addForm.value.teach_mode === 'recorded' ? (addForm.value.lesson_id || null) : null,
+    live_session_id: liveSessionId,
     unlock_time: Math.floor((addForm.value.unlock_time as Date).getTime() / 1000),
     deadline: addForm.value.deadline ? Math.floor((addForm.value.deadline as Date).getTime() / 1000) : null,
     title: addForm.value.title,
     description: addForm.value.description,
     is_required: addForm.value.is_required,
-    completion_criteria: addForm.value.completion_criteria || '完播率≥90%',
+    completion_criteria: addForm.value.teach_mode === 'live' ? '' : (addForm.value.completion_criteria || '完播率≥90%'),
   } as any);
   MessagePlugin.success('排课添加成功');
   showAdd.value = false;
