@@ -68,7 +68,6 @@ const SEED_TASKS: PointsTask[] = [
   { id: 'PT-002', task_name: '观看直播', points: 5, daily_limit: 50, status: 'enabled', remark: '每满10分钟计1次' },
   { id: 'PT-003', task_name: '每日签到', points: 2, daily_limit: 1, status: 'enabled', remark: '' },
   // ── 课程域新增任务（红框修改点③）──
-  { id: 'PT-004', task_name: '课程报名', points: 10, daily_limit: 0, status: 'enabled', remark: '报名营期成功后发放' },
   { id: 'PT-005', task_name: '课时完课', points: 20, daily_limit: 6, status: 'enabled', remark: '完成一节课时发放' },
   { id: 'PT-006', task_name: '课时答题', points: 10, daily_limit: 6, status: 'enabled', remark: '答题全部正确发放' },
 ];

@@ -19,11 +19,7 @@
             <div class="info-item"><span class="lbl">成长值</span><span>{{ customer.growth_value }}（累计 {{ customer.growth_total }}）</span></div>
             <div class="info-item">
               <span class="lbl">客户来源</span>
-              <!-- ═══ 红框修改点⑤：客户来源新增「课程报名」 ═══ -->
-              <ReplicaFieldBox v-if="customer.source === '课程报名'" :no="5" label="课程域新增">
-                <t-tag size="small" variant="light" theme="warning">课程报名</t-tag>
-              </ReplicaFieldBox>
-              <t-tag v-else size="small" variant="light" theme="default">{{ customer.source }}</t-tag>
+              <t-tag size="small" variant="light" theme="default">{{ customer.source }}</t-tag>
             </div>
             <div class="info-item"><span class="lbl">注册时间</span><span>{{ fmt(customer.created_at) }}</span></div>
             <div class="info-item"><span class="lbl">所属门店</span><span>{{ customer.store_name || '—' }}</span></div>
@@ -91,7 +87,7 @@ const timeline = computed(() => {
   const rows: { id: string; time: string; text: string; kind: string; kindLabel: string; theme: string }[] = [];
   // 积分/课程行为（积分流水含课程报名/完课/答题）
   store.loadPointsByCustomer(customer.value.id).forEach(p => {
-    const isCourse = ['课程报名', '完课奖励', '答题奖励'].includes(p.event);
+    const isCourse = ['完课奖励', '答题奖励'].includes(p.event);
     rows.push({ id: p.id, time: fmt(p.operate_at), text: `${p.event}：${p.reason}（${p.delta >= 0 ? '+' : ''}${p.delta} 积分）`, kind: isCourse ? 'course' : 'points', kindLabel: isCourse ? '课程' : '积分', theme: isCourse ? 'warning' : 'primary' });
   });
   // 红包领取（按手机号回流的课程红包）

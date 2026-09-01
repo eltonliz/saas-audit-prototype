@@ -745,12 +745,7 @@ export const REPLICA_REQUIREMENTS: Record<string, ReplicaPageRequirement> = {
       { no: 1, title: '完课/答题红包类型', type: 'new', description: '新增字段：红包类型「完课红包/答题红包」、绑定场景「营期」。上游：课程表单完课奖励配置同步创建规则；下游：C端完课/答题自动发放、红包记录流水。' },
     ],
   },
-  '/tenant/replica/marketing/red-packet-records': {
-    title: '课程结合 · 红包记录',
-    markers: [
-      { no: 2, title: '课程红包场景', type: 'new', description: '新增字段：红包场景「课程完课/课时答题」（筛选+标记）。上游：C端完课/答题发放回流；下游：看板红包金额统计、客户360行为轨迹。' },
-    ],
-  },
+  // V2·0901：红包记录/场次管理（复刻）入口下线
   '/tenant/replica/marketing/points-task': {
     title: '课程结合 · 积分任务设置',
     markers: [
@@ -763,12 +758,7 @@ export const REPLICA_REQUIREMENTS: Record<string, ReplicaPageRequirement> = {
       { no: 6, title: '课程积分事件', type: 'new', description: '新增枚举：积分事件「课程报名/完课奖励/答题奖励」（筛选+标记）。上游：课程事件落积分流水；下游：客户360行为轨迹。' },
     ],
   },
-  '/tenant/replica/live/sessions': {
-    title: '课程结合 · 场次管理',
-    markers: [
-      { no: 4, title: '营期排课来源', type: 'new', description: '新增字段：来源「营期排课」标记、关联排课标题。上游：营期排课保存自动创建直播场次；下游：学员跳转观看、直播统计。' },
-    ],
-  },
+  // V2·0901：场次管理（复刻）入口下线
 
 
 

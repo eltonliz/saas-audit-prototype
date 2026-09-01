@@ -43,7 +43,7 @@ import { useMarketingReplicaStore } from '../../../stores/saas-replica/marketing
 import ReplicaFieldBox from '../../../components/replica/ReplicaFieldBox.vue';
 
 const store = useMarketingReplicaStore();
-const COURSE_TASKS = ['课程报名', '课时完课', '课时答题'];
+const COURSE_TASKS = ['课时完课', '课时答题'];
 
 const columns = [
   { colKey: 'task_name', title: '任务名称', width: 220 },

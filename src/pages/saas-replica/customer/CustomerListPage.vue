@@ -14,13 +14,11 @@
         <div class="fg-item"><span class="fg-label">搜索门店</span><t-select size="small" placeholder="全部" clearable /></div>
         <div class="fg-item"><span class="fg-label">搜索所属店员</span><t-select size="small" placeholder="全部" clearable /></div>
         <div class="fg-item">
-          <span class="fg-label"><ReplicaFieldBox :no="1" label="课程域新增：来源含课程报名">客户来源</ReplicaFieldBox></span>
+          <span class="fg-label"><ReplicaFieldBox :no="1" label="课程域">客户来源</ReplicaFieldBox></span>
           <t-select size="small" placeholder="全部" clearable v-model="filterSource">
-            <!-- V2·0829 修改点③：客户来源新增「课程报名」 -->
-            <t-option label="全部" value="" />
+                        <t-option label="全部" value="" />
             <t-option label="APP注册" value="APP注册" />
             <t-option label="门店导入" value="门店导入" />
-            <t-option label="课程报名" value="课程报名" />
           </t-select>
         </div>
         <div class="fg-item"><span class="fg-label">关键词</span><t-input size="small" placeholder="请输入客户编号/名称" v-model="keyword" /></div>
@@ -63,9 +61,9 @@
         <template #store_staff_role="{ row }">
           <t-tag size="small" variant="light" :theme="row.store_staff_role === '店长' ? 'warning' : 'default'">{{ row.store_staff_role || '—' }}</t-tag>
         </template>
-        <!-- ═══ 课程域修改点①：客户来源列表头红框（含课程报名） ═══ -->
+        <!-- 课程域：客户来源 -->
         <template #source-title>
-          <ReplicaFieldBox :no="1" label="课程域新增：来源含课程报名">客户来源</ReplicaFieldBox>
+          <ReplicaFieldBox :no="1" label="课程域">客户来源</ReplicaFieldBox>
         </template>
         <!-- ═══ 课程域修改点②：学习数据 4 列表头红框标记 ═══ -->
         <template #learn_course_count-title>
@@ -113,7 +111,6 @@
       <div class="points-filter">
         <t-select size="small" placeholder="积分变化事件" clearable style="width:150px">
           <!-- ═══ ReplicaMarker 修改点①：课程域积分事件 ═══ -->
-          <t-option label="课程报名" value="课程报名" />
           <t-option label="完课奖励" value="完课奖励" />
           <t-option label="答题奖励" value="答题奖励" />
           <t-option label="管理员发放" value="管理员发放" />

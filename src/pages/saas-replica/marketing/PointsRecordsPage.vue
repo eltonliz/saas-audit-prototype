@@ -14,7 +14,6 @@
         <ReplicaFieldBox :no="6" label="课程域新增">
           <t-select size="small" placeholder="积分事件" clearable style="width:140px" v-model="filterEvent">
             <t-option label="管理员发放" value="管理员发放" />
-            <t-option label="课程报名" value="课程报名" />
             <t-option label="完课奖励" value="完课奖励" />
             <t-option label="答题奖励" value="答题奖励" />
           </t-select>
@@ -57,7 +56,7 @@ const router = useRouter();
 const store = useCustomerStore();
 const keyword = ref('');
 const filterEvent = ref('');
-const COURSE_EVENTS = ['课程报名', '完课奖励', '答题奖励'];
+const COURSE_EVENTS = ['完课奖励', '答题奖励'];
 
 const filteredList = computed(() => store.pointsRecords.map(p => {
   const c = store.customers.find(x => x.id === p.customer_id);
