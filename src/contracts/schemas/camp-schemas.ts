@@ -147,6 +147,9 @@ export const CampSchema = z.object({
   capacity: z.number().int().min(0).default(0),  // 0=不限
   enroll_deadline: z.number().int(),
 
+  /** V2·0901 客户可见范围：true=客户端不展示完整课表（Day1/Day2…），仅展示当前进行中的一节课；排课进度与后台不变 */
+  client_single_view: z.boolean().default(false),
+
   /** 聚合字段 */
   enrolled_count: z.number().int().min(0).default(0),
   approved_count: z.number().int().min(0).default(0),
@@ -456,6 +459,7 @@ export const CreateCampInputSchema = CampSchema.pick({
   store_id: true, store_name: true,
   certificate_checkin_threshold: true,
   capacity: true, enroll_deadline: true,
+  client_single_view: true,
 });
 export type CreateCampInput = z.infer<typeof CreateCampInputSchema>;
 

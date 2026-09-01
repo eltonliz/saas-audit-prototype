@@ -133,6 +133,11 @@
         <t-form-item label="报名截止时间">
           <t-date-picker v-model="enrollDeadline" enable-time-picker placeholder="选择报名截止时间" style="width:100%" />
         </t-form-item>
+        <!-- V2·0901 客户可见范围：开启后客户端不展示完整课表，仅展示当前一节课 -->
+        <t-form-item label="客户可见范围">
+          <t-switch v-model="f.client_single_view" size="small" />
+          <span class="form-tip-inline">开启后客户端不展示完整课表（Day1/Day2…），仅展示当前进行中的一节课；排课进度照常推进，后台不受影响</span>
+        </t-form-item>
         <!-- V2·0829 用户裁决：归属关系统一由 SaaS 后台门店成员（店长/店员）承接，课程业务不带归属 -->
         <t-form-item label="营期简介"><t-textarea v-model="f.description" placeholder="营期简介（选填）" :autosize="{ minRows: 2, maxRows: 4 }" /></t-form-item>
       </t-form>
@@ -247,7 +252,7 @@ const columns = [
   { colKey: 'op', title: '操作', width: 360, fixed: 'right' },
 ];
 
-const f = ref<{ title: string; description: string; mode: 'live' | 'recorded'; capacity: number; cover_url: string }>({ title: '', description: '', mode: 'recorded', capacity: 0, cover_url: '' });
+const f = ref<{ title: string; description: string; mode: 'live' | 'recorded'; capacity: number; cover_url: string; client_single_view: boolean }>({ title: '', description: '', mode: 'recorded', capacity: 0, cover_url: '', client_single_view: false });
 
 // V2·0901 营期封面预设（与课程封面同源）
 const campCoverPresets = [
@@ -268,7 +273,7 @@ function calcPlatformRate() { platformRate.value = Math.max(0, 100 - lecturerRat
 function openCreate() {
   notifyModalOpen('camp-create');
   editingCamp.value = null;
-  f.value = { title: '', description: '', mode: 'recorded', capacity: 0, cover_url: '' };
+  f.value = { title: '', description: '', mode: 'recorded', capacity: 0, cover_url: '', client_single_view: false };
   priceYuan.value = 0; lecturerRate.value = 60; assistantRate.value = 20; platformRate.value = 20; dateRange.value = []; enrollDeadline.value = null;
   showCreate.value = true;
 }
@@ -286,6 +291,7 @@ function doSave() {
     price: 0, is_paid: false,
     store_id: '', store_name: '',
     capacity: f.value.capacity,
+    client_single_view: f.value.client_single_view,
     enroll_deadline: enrollDeadline.value ? Math.floor(new Date(enrollDeadline.value).getTime() / 1000) : Math.floor(Date.now() / 1000) + 86400 * 7,
     daily_red_packet_mode: 'by_course',
   } as any;
@@ -323,7 +329,7 @@ function delCamp(row: any) {
 function openEdit(row: any) {
   notifyModalOpen('camp-edit');
   editingCamp.value = row;
-  f.value = { title: row.title, description: row.description ?? '', mode: row.mode, capacity: row.capacity || 0, cover_url: row.cover_url || '' };
+  f.value = { title: row.title, description: row.description ?? '', mode: row.mode, capacity: row.capacity || 0, cover_url: row.cover_url || '', client_single_view: row.client_single_view ?? false };
   priceYuan.value = row.is_paid ? row.price / 100 : 0;
   lecturerRate.value = row.commission_enabled ? Math.round(row.lecturer_rate * 100) : 60;
   assistantRate.value = row.commission_enabled ? Math.round((row.assistant_rate ?? 0.2) * 100) : 20;

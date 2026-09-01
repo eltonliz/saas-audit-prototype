@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>内容审查域 · 业务时序图</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-paper:   #f5f5f5;
+      --color-ink:     #2d3142;
+      --color-muted:   #4f5d75;
+      --color-accent:  #eb6c36;
+      --font-sans:     'Geist', 'Noto Sans SC', system-ui, sans-serif;
+      --font-serif:    'Instrument Serif', 'Noto Serif SC', serif;
+      --font-mono:     'Geist Mono', ui-monospace, monospace;
+    }
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-paper);
+      color: var(--color-ink);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 2rem;
+    }
+    .frame { max-width: 1240px; width: 100%; }
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      margin-bottom: 0.5rem;
+    }
+    h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      color: var(--color-ink);
+      margin-bottom: 1.5rem;
+    }
+    svg { width: 100%; min-width: 960px; display: block; }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <p class="eyebrow">Sequence · 内容审查域 PRD v2.0.0 · 图 9-5</p>
+    <h1>直播实时审查业务时序</h1>
+
+    <svg viewBox="0 0 1100 660" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="audit-bs-title audit-bs-desc">
+      <title id="audit-bs-title">直播实时审查业务时序</title>
+      <desc id="audit-bs-desc">业务时序图：腾讯云审核回调进入审查服务，经级别判定后按 L2/L3 与 L1 两条分支分别由运营处置和引擎直接断流，最终向观众端下发擦音或断流通知。</desc>
+      <defs>
+        <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
+        <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#eb6c36"/></marker>
+        <marker id="arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#2e5aa8"/></marker>
+        <marker id="arrow-open" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polyline points="0 0, 8 3, 0 6" fill="none" stroke="#4f5d75" stroke-width="1.2"/></marker>
+        <marker id="arrow-open-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polyline points="0 0, 8 3, 0 6" fill="none" stroke="#eb6c36" stroke-width="1.2"/></marker>
+      </defs>
+
+      <rect width="100%" height="100%" fill="#f5f5f5"/>
+
+      <!-- ===== 生命线 ===== -->
+      <line x1="170" y1="112" x2="170" y2="600" stroke="rgba(45,49,66,0.20)" stroke-width="1" stroke-dasharray="3,3"/>
+      <line x1="430" y1="112" x2="430" y2="600" stroke="rgba(45,49,66,0.20)" stroke-width="1" stroke-dasharray="3,3"/>
+      <line x1="690" y1="112" x2="690" y2="600" stroke="rgba(45,49,66,0.20)" stroke-width="1" stroke-dasharray="3,3"/>
+      <line x1="950" y1="112" x2="950" y2="600" stroke="rgba(45,49,66,0.20)" stroke-width="1" stroke-dasharray="3,3"/>
+
+      <!-- ===== alt 片段框（跨 审核/审查服务/中控 三条生命线） ===== -->
+      <rect x="148" y="216" width="564" height="220" rx="4" fill="rgba(45,49,66,0.02)" stroke="rgba(45,49,66,0.22)" stroke-width="1"/>
+      <rect x="148" y="216" width="40" height="16" rx="2" fill="#f5f5f5" stroke="rgba(45,49,66,0.22)" stroke-width="1"/>
+      <text x="168" y="228" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">ALT</text>
+      <text x="200" y="228" fill="#4f5d75" font-size="9" font-family="'Geist','Noto Sans SC',sans-serif">[L2/L3 中低危 · 运营处置]</text>
+      <!-- 分支分隔线 -->
+      <line x1="156" y1="364" x2="704" y2="364" stroke="rgba(45,49,66,0.20)" stroke-width="1" stroke-dasharray="4,3"/>
+      <text x="200" y="382" fill="#4f5d75" font-size="9" font-family="'Geist','Noto Sans SC',sans-serif">[L1 不可降级 · 引擎直断]</text>
+
+      <!-- ===== 激活条 ===== -->
+      <rect x="426" y="150" width="8" height="48" fill="rgba(45,49,66,0.06)" stroke="#4f5d75" stroke-width="0.8"/>
+      <rect x="426" y="244" width="8" height="104" fill="rgba(45,49,66,0.06)" stroke="#4f5d75" stroke-width="0.8"/>
+      <rect x="166" y="310" width="8" height="44" fill="rgba(45,49,66,0.06)" stroke="#4f5d75" stroke-width="0.8"/>
+      <rect x="686" y="280" width="8" height="16" fill="rgba(45,49,66,0.06)" stroke="#4f5d75" stroke-width="0.8"/>
+      <rect x="426" y="466" width="8" height="88" fill="rgba(45,49,66,0.06)" stroke="#4f5d75" stroke-width="0.8"/>
+
+      <!-- ===== 消息 ===== -->
+
+      <!-- 1 审核 → 审查服务：审核回调 -->
+      <path d="M 178,150 H 422" fill="none" stroke="#2e5aa8" stroke-width="1.2" marker-end="url(#arrow-link)"/>
+      <rect x="236" y="128" width="116" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="294" y="139" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">审核回调 · 违规事件</text>
+
+      <!-- 2 审查服务 self：验签·级别判定 -->
+      <path d="M 434,186 H 478 V 202 H 438" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="486" y="182" width="128" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="550" y="193" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif">验签 · 去重 · 级别判定</text>
+
+      <!-- 3 审查服务 → 中控：实时推送告警（coral headline，异步） -->
+      <path d="M 438,248 H 682" fill="none" stroke="#eb6c36" stroke-width="1.2" marker-end="url(#arrow-open-accent)"/>
+      <rect x="496" y="226" width="116" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="554" y="237" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">实时推送告警 · async</text>
+
+      <!-- 4 中控 → 审查服务：处置指令 -->
+      <path d="M 686,282 H 438" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="476" y="260" width="160" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="556" y="271" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">处置指令（记录 / 断流 / 忽略）</text>
+
+      <!-- 5 审查服务 → 审核：断流指令 -->
+      <path d="M 426,316 H 178" fill="none" stroke="#2e5aa8" stroke-width="1.2" marker-end="url(#arrow-link)"/>
+      <rect x="228" y="294" width="140" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="298" y="305" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">断流指令 DropLiveStream</text>
+
+      <!-- 6 审核 → 审查服务：断流结果（返回） -->
+      <path d="M 174,344 H 422" fill="none" stroke="#4f5d75" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+      <rect x="252" y="322" width="60" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="282" y="333" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">断流结果</text>
+
+      <!-- 7 审核 → 审查服务：L1 断流通知 -->
+      <path d="M 178,404 H 422" fill="none" stroke="#2e5aa8" stroke-width="1.2" marker-end="url(#arrow-link)"/>
+      <rect x="240" y="382" width="120" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="300" y="393" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">L1 断流通知 · 已执行</text>
+
+      <!-- 8 审查服务 → 中控：推送断流结果 -->
+      <path d="M 438,428 H 682" fill="none" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrow-open)"/>
+      <rect x="492" y="406" width="116" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="550" y="417" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">推送断流结果 · async</text>
+
+      <!-- 9 审查服务 → 观众端：擦音指令下发 -->
+      <path d="M 434,472 H 942" fill="none" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrow-open)"/>
+      <rect x="632" y="450" width="116" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="690" y="461" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">擦音指令下发 · async</text>
+
+      <!-- 10 观众端 self：擦音效果 -->
+      <path d="M 954,506 H 998 V 522 H 958" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="1004" y="502" width="92" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="1050" y="513" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif">静音 / 嘀声 2-5 秒</text>
+
+      <!-- 11 审查服务 → 观众端：断流结束通知 -->
+      <path d="M 434,556 H 942" fill="none" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrow-open)"/>
+      <rect x="620" y="534" width="128" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="684" y="545" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">断流结束通知（L1 或运营断流）</text>
+
+      <!-- ===== 参与者 ===== -->
+      <rect x="95" y="64" width="150" height="44" rx="6" fill="#f5f5f5"/>
+      <rect x="95" y="64" width="150" height="44" rx="6" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.30)" stroke-width="1"/>
+      <text x="170" y="84" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">腾讯云审核引擎</text>
+      <text x="170" y="100" fill="#4f5d75" font-size="9" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">EXTERNAL</text>
+
+      <rect x="355" y="64" width="150" height="44" rx="6" fill="#f5f5f5"/>
+      <rect x="355" y="64" width="150" height="44" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1"/>
+      <text x="430" y="84" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">审查服务</text>
+      <text x="430" y="100" fill="#4f5d75" font-size="9" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">PLATFORM · CORE</text>
+
+      <rect x="615" y="64" width="150" height="44" rx="6" fill="#f5f5f5"/>
+      <rect x="615" y="64" width="150" height="44" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="690" y="84" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">直播中控 · 运营</text>
+      <text x="690" y="100" fill="#4f5d75" font-size="9" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">TENANT PC</text>
+
+      <rect x="875" y="64" width="150" height="44" rx="6" fill="#f5f5f5"/>
+      <rect x="875" y="64" width="150" height="44" rx="6" fill="rgba(79,93,117,0.10)" stroke="#7a8399" stroke-width="1"/>
+      <text x="950" y="84" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">观众端 H5</text>
+      <text x="950" y="100" fill="#4f5d75" font-size="9" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">VIEWER · 375px</text>
+
+      <!-- ===== 图例 ===== -->
+      <line x1="40" y1="616" x2="1060" y2="616" stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
+      <text x="40" y="636" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.14em">NOTES</text>
+      <text x="104" y="636" fill="#4f5d75" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif">处置说明必填不少于 10 字；30 秒未处置由系统自动记录并升级提醒（BR-AUDIT-011）；断流为不可撤销操作。</text>
+      <text x="104" y="654" fill="#4f5d75" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif">判定结果未送达时观众端展示「直播中控尚未收到此违规的判定结果」提示，该提示与擦音效果互斥（不会同时出现）。</text>
+    </svg>
+  </div>
+</body>
+</html>

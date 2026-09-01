@@ -467,6 +467,7 @@ export const REPLICA_REQUIREMENTS: Record<string, ReplicaPageRequirement> = {
         { name: '时间', desc: '日期区间，最长90天' },
         { name: '报名人数上限', desc: '0=不限' },
         { name: '报名截止时间', desc: '日期时间选择' },
+        { name: '客户可见范围', desc: '开关，默认关；开启后客户端不展示完整课表（Day1/Day2…），仅展示当前进行中的一节课，排课进度照常推进，后台不受影响' },
         { name: '营期简介', desc: '多行选填' },
         { name: '报名情况', desc: '已报名 N' },
         { name: '状态', desc: '草稿/待审核/已发布/报名中/进行中/已结束' },
@@ -477,6 +478,7 @@ export const REPLICA_REQUIREMENTS: Record<string, ReplicaPageRequirement> = {
         '全免费：无价格与付费模式配置。',
         '报名免审核：报名直接生效，状态统一展示「已报名」。',
         '状态流转由动作与时间驱动：openEnrollment/startCamp/endCamp。',
+        '客户可见范围开关（V2·0901）：开启后客户端营期页不展示完整课表列表，任何时候仅展示当前进行中/最近解锁的一节课；排课与学习进度按正常节奏推进，仅改变客户侧信息展示粒度，后台管理与数据统计不变。',
       ],
       businessFlow: [
         '点「新增」打开弹窗填写标题/模式/时间/上限/截止/简介。',
@@ -501,12 +503,13 @@ export const REPLICA_REQUIREMENTS: Record<string, ReplicaPageRequirement> = {
           { name: '模式', desc: '直播|录播，创建后不可改' },
           { name: '时间', desc: '日期区间，≤90 天' },
           { name: '报名人数上限/截止时间', desc: '0=不限；截止可选' },
+          { name: '客户可见范围', desc: '开关默认关；开启后客户端仅展示当前一节课（不展示完整课表）' },
           { name: '营期简介', desc: '选填多行' },
         ],
         flow: [
           '点「新增营期」打开弹窗。',
           '填写标题、选模式、选时间区间（自动算天数）。',
-          '设置报名上限与截止时间、简介。',
+          '设置报名上限与截止时间、客户可见范围开关、简介。',
           '保存生成草稿营期。',
         ],
         rules: [
@@ -522,7 +525,7 @@ export const REPLICA_REQUIREMENTS: Record<string, ReplicaPageRequirement> = {
         summary: '编辑营期基础信息。模式创建后不可改；审核通过后排课锁定（复制营期可重做）。',
         pre: '列表已有营期。',
         fields: [
-          { name: '可编辑字段', desc: '标题/时间（校验同新建）/上限/截止/简介' },
+          { name: '可编辑字段', desc: '标题/时间（校验同新建）/上限/截止/客户可见范围/简介' },
         ],
         flow: [
           '点「编辑」打开弹窗回填。',
