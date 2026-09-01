@@ -116,12 +116,51 @@ table.tbl{width:100%;border-collapse:collapse;font-size:.84rem;border:1px solid 
 /* ===== 页脚 ===== */
 .colophon{margin-top:48px;padding-top:20px;border-top:1px solid var(--rule);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-family:var(--mono);font-size:.66rem;color:var(--soft);letter-spacing:.1em}
 
+/* ===== 触摸惯性滚动（iOS） ===== */
+.tbl-wrap,.figure .fig-body{-webkit-overflow-scrolling:touch}
+
+/* ===== 移动端适配（≤768px） ===== */
+@media(max-width:768px){
+  body{font-size:13.5px}
+  .doc{padding:20px 12px 56px;gap:20px}
+  .doc-header h1{font-size:1.7rem}
+  .doc-header .subtitle{font-size:.95rem}
+  .meta-grid{grid-template-columns:1fr 1fr}
+  .meta-cell{padding:8px 10px}
+  .meta-cell .v{font-size:.8rem}
+  .chapter{padding:18px 14px;border-radius:6px}
+  .ch-head{flex-wrap:wrap;gap:4px 10px;padding-bottom:10px}
+  .ch-head h2{font-size:1.28rem}
+  .chapter h3{font-size:.98rem;margin:20px 0 8px}
+  .chapter p{max-width:none}
+  .tbl{font-size:.8rem}
+  .tbl th,.tbl td{padding:7px 9px}
+  .fn-card .fn-head{padding:12px 14px;gap:8px}
+  .fn-card .fn-name{font-size:.92rem}
+  .fn-card .fn-auto{margin-left:0;flex-basis:100%}
+  .fn-card .fn-body{padding:14px}
+  .figure{border-radius:6px}
+  .figure .fig-head{flex-wrap:wrap;gap:4px 10px;padding:12px 14px 0}
+  .figure .fig-title{font-size:1rem}
+  .figure .fig-body{padding:2px 2px 4px}
+  .figure .fig-body svg{min-width:680px}
+  .figure .fig-body::before{content:"← 图表较宽 · 左右滑动查看 →";display:block;text-align:center;font-family:var(--mono);font-size:.66rem;color:var(--soft);padding:4px 0}
+  .figure figcaption{padding:8px 14px 12px;font-size:.74rem}
+  .callout{padding:10px 12px;font-size:.84rem}
+  .colophon{flex-direction:column;gap:4px}
+}
+@media(max-width:420px){
+  .meta-grid{grid-template-columns:1fr}
+  .figure .fig-body svg{min-width:640px}
+}
+
 @media print{
   body{background:#fff}
   .doc{grid-template-columns:1fr;padding:0;max-width:none}
   .toc{display:none}
   .chapter{break-inside:avoid-page;border:none;padding:12px 0;margin-bottom:16px}
   .figure .fig-body svg{min-width:0}
+  .figure .fig-body::before{content:""}
 }
 </style>
 </head>
