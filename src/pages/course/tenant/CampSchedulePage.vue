@@ -125,49 +125,30 @@
             </t-form-item>
           </div>
           <div class="form-col-full" v-if="addForm.teach_mode === 'recorded'">
-            <t-form-item label="关联课程" required-mark>
+            <t-form-item label="选择课时" required-mark>
               <div style="display:flex;gap:8px;width:100%">
                 <t-select
-                  v-model="addForm.course_id"
+                  v-model="addForm.lesson_id"
                   filterable
-                  clearable
-                  placeholder="选择课程"
+                  placeholder="选择课时（跨课程平铺·已排禁选）"
                   style="flex:1"
                   @change="onAddCourseChange"
                 >
                   <t-option
-                    v-for="c in filteredCourses"
-                    :key="c.id"
-                    :label="c.title + (c.status !== 'published' ? `（${c.status}·不可排课）` : '')"
-                    :value="c.id"
-                    :disabled="c.status !== 'published'"
+                    v-for="l in allSelectableLessons"
+                    :key="l.id"
+                    :label="`【${l.course_title}】第${l.sort_order}课时：${l.title}${scheduledLessonIds.has(l.id) ? '·已排' : ''}`"
+                    :value="l.id"
+                    :disabled="scheduledLessonIds.has(l.id)"
                   />
                 </t-select>
                 <t-button theme="primary" variant="outline" @click="openQuickCourseDialog">
                   <template #icon><t-icon name="add" /></template> 快捷新建
                 </t-button>
               </div>
-            </t-form-item>
-          </div>
-          <!-- V2·0901 用户裁决：营期排课选的是课时，不是课程——课时必选，本营期已排课时禁选 -->
-          <div v-if="addForm.course_id && selectedCourseLessons.length > 0" class="form-col-full">
-            <t-form-item label="选择课时" required-mark>
-              <div class="lesson-field">
-                <div style="display:flex;gap:8px;width:100%">
-                  <t-select v-model="addForm.lesson_id" placeholder="选择课时（必选·默认顺延下一个未排课时）" style="flex:1">
-                    <t-option
-                      v-for="l in selectedCourseLessons"
-                      :key="l.id"
-                      :label="`第${l.sort_order}课时：${l.title}（${l.mode === 'live' ? '直播' : l.mode === 'qa_live' ? '直播答疑' : '录播'}）${scheduledLessonIds.has(l.id) ? '·已排' : ''}`"
-                      :value="l.id"
-                      :disabled="scheduledLessonIds.has(l.id)"
-                    />
-                  </t-select>
-                </div>
-                <div class="lesson-tip">
-                  <t-icon name="info-circle" />
-                  <span>课程「{{ getCourseName(addForm.course_id) }}」共 {{ selectedCourseLessons.length }} 个课时；同一课时在本营期内仅排一次，标「已排」的不可再选</span>
-                </div>
+              <div class="lesson-tip">
+                <t-icon name="info-circle" />
+                <span>课时按课程分组；同一课时在本营期内仅排一次，标「已排」的不可再选</span>
               </div>
             </t-form-item>
           </div>
@@ -481,8 +462,10 @@ function doAdd() {
   if (!addForm.value.unlock_time) { MessagePlugin.warning('请选择解锁时间'); return; }
   // V2·0901 直播排课：只选直播间，不关联课程
   if (addForm.value.teach_mode === 'live' && !addForm.value.live_room_id) { MessagePlugin.warning('请选择直播间'); return; }
-  if (addForm.value.teach_mode === 'recorded' && !addForm.value.course_id) { MessagePlugin.warning('必须选择课程'); return; }
   if (addForm.value.teach_mode === 'recorded' && !addForm.value.lesson_id) { MessagePlugin.warning('必须选择课时（营期排课以课时为单位）'); return; }
+  // course_id 由所选课时自动带出
+  const pickedLesson = courseStore.lessons.find(l => l.id === addForm.value.lesson_id);
+  const autoCourseId = pickedLesson?.course_id ?? '';
   // 直播排课关联该直播间当前场次（无场次则留空，进入时用排课自身标识兜底）
   let liveSessionId: string | null = null;
   if (addForm.value.teach_mode === 'live') {
@@ -497,7 +480,7 @@ function doAdd() {
     sort_order: dayScheds.length + 1,
     schedule_type: 'course',
     schedule_mode: mode as any,
-    course_id: addForm.value.teach_mode === 'recorded' ? (addForm.value.course_id || null) : null,
+    course_id: addForm.value.teach_mode === 'recorded' ? (autoCourseId || null) : null,
     lesson_id: addForm.value.teach_mode === 'recorded' ? (addForm.value.lesson_id || null) : null,
     live_session_id: liveSessionId,
     unlock_time: Math.floor((addForm.value.unlock_time as Date).getTime() / 1000),
@@ -586,6 +569,10 @@ const selectedCourseLessons = computed(() => {
 });
 // V2·0901 排课选课时：本营期已排课时集合（禁选防重复）
 const scheduledLessonIds = computed(() => new Set(campSchedules.value.map(s => s.lesson_id).filter(Boolean)));
+// 排课直选课时：全部课程的已发布课时平铺（label 含所属课程名）
+const allSelectableLessons = computed(() => courseStore.lessons
+  .filter(l => l.status === 'published')
+  .map(l => ({ ...l, course_title: courseStore.loadCourse(l.course_id)?.title ?? '' })));
 function onAddCourseChange() {
   addForm.value.lesson_id = null;
   // 自动顺延：默认选中该课程在本营期第一个未排的课时

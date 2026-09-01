@@ -93,7 +93,7 @@
                 <t-radio value="public">公开</t-radio>
                 <t-radio value="camp_only">仅营期内</t-radio>
               </t-radio-group>
-              <div class="form-tip">公开=APP独立展示+可独立售卖；仅营期内=APP不独立展示，仅营期内可学</div>
+              <div class="form-tip">公开=APP独立展示；仅营期内=APP不独立展示，仅营期内可学</div>
             </t-form-item>
             <t-form-item label="课程封面">
               <div class="cover-grid">
@@ -215,8 +215,6 @@
             <!-- 以下五项 = 课程业务新增（SaaS 线上无） -->
             <div class="saas-new-group">
               <div class="saas-new-group-title">以下为课程业务新增（SaaS 线上无）<ReplicaMarker :no="6" title="点击查看：内容保护为业务新增项" /></div>
-              <t-form-item label="禁止拖动进度条"><t-switch v-model="form.forbid_seek" /><span class="form-tip" style="margin-left:8px">未学完时禁止拖动</span></t-form-item>
-              <t-form-item label="禁止倍速播放"><t-switch v-model="form.forbid_speed" /><span class="form-tip" style="margin-left:8px">未学完时禁止倍速</span></t-form-item>
               <t-form-item label="防录屏跑马灯"><t-switch v-model="form.watermark_horse" /><span class="form-tip" style="margin-left:8px">播放页展示用户名/ID防录屏</span></t-form-item>
               <t-form-item label="开启水印"><t-switch v-model="form.watermark_text" /><span class="form-tip" style="margin-left:8px">视频区右上角显示水印</span></t-form-item>
             </div>
