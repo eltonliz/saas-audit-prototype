@@ -162,7 +162,7 @@ function doSave() {
     MessagePlugin.success('已更新');
   } else {
     let bankId = store.questionBanks[0]?.id;
-    if (!bankId) { const b = store.createQuestionBank({ course_id: store.courses[0]?.id ?? 'COURSE-202608-00001', title: '通用题库', description: '', creator_id: 'admin-001', creator_role: 'main_lecturer' }); bankId = b.id; }
+    if (!bankId) { const b = store.createQuestionBank({ course_id: store.courses[0]?.id ?? 'COURSE-202608-00001', title: '通用题库', description: '', creator_id: 'admin-001', creator_role: 'admin' }); bankId = b.id; }
     store.createQuestion({ bank_id: bankId, sort_order: enrichedQuestions.value.length + 1, question_type: form.value.question_type, content: form.value.content, intro: '', image_url: '', options, correct_answer: correct, explanation: '', score: form.value.question_type === 'single' ? 1 : 2, trigger_type: 'inline_at_completion', trigger_time: undefined, trigger_threshold: 0.9 } as any);
     MessagePlugin.success('已新增');
   }

@@ -205,7 +205,7 @@ import CampStudentDrawerPage from './CampStudentDrawerPage.vue';
 const store = useCampStore();
 const courseStore = useCourseStore();
 // V2·0829 用户裁决：讲师/助教角色下线；归属关系统一走 SaaS 门店成员（店长/店员），课程业务不带归属
-const search = ref(''); const modeFilter = ref(''); const statusFilter = ref(''); const showCreate = ref(false); const priceYuan = ref(0);
+const search = ref(''); const modeFilter = ref(''); const statusFilter = ref(''); const showCreate = ref(false);
 const editingCamp = ref<any>(null);
 // 营期最大90天约束（行业约束）；兼容字符串/Date（t-date-range-picker 默认输出字符串）
 function daysBetween(start: any, end: any): number { return Math.floor((new Date(end).getTime() - new Date(start).getTime()) / 86400000) + 1; }
@@ -264,17 +264,13 @@ const campCoverPresets = [
   { url: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=400&h=225&fit=crop', label: '封面6' },
 ];
 
-const lecturerRate = ref(60);
-const assistantRate = ref(20);
-const platformRate = ref(20);
-function calcPlatformRate() { platformRate.value = Math.max(0, 100 - lecturerRate.value - assistantRate.value); }
-// V2·0829 用户裁决：价格字段已去除，onPaidChange 不再需要
+// V2·0829 用户裁决：讲师/助教下线、价格字段去除——分成比例配置整体删除
 
 function openCreate() {
   notifyModalOpen('camp-create');
   editingCamp.value = null;
   f.value = { title: '', description: '', mode: 'recorded', capacity: 0, cover_url: '', client_single_view: false };
-  priceYuan.value = 0; lecturerRate.value = 60; assistantRate.value = 20; platformRate.value = 20; dateRange.value = []; enrollDeadline.value = null;
+  dateRange.value = []; enrollDeadline.value = null;
   showCreate.value = true;
 }
 
@@ -330,10 +326,6 @@ function openEdit(row: any) {
   notifyModalOpen('camp-edit');
   editingCamp.value = row;
   f.value = { title: row.title, description: row.description ?? '', mode: row.mode, capacity: row.capacity || 0, cover_url: row.cover_url || '', client_single_view: row.client_single_view ?? false };
-  priceYuan.value = row.is_paid ? row.price / 100 : 0;
-  lecturerRate.value = row.commission_enabled ? Math.round(row.lecturer_rate * 100) : 60;
-  assistantRate.value = row.commission_enabled ? Math.round((row.assistant_rate ?? 0.2) * 100) : 20;
-  platformRate.value = row.commission_enabled ? Math.round((row.platform_rate ?? 0.2) * 100) : 20;
   dateRange.value = [row.start_date, row.end_date];
   enrollDeadline.value = row.enroll_deadline ? new Date(row.enroll_deadline * 1000) : null;
   showCreate.value = true;

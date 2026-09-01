@@ -35,7 +35,6 @@ const campStore = useCampStore();
 const tab = ref('我的课程');
 const courseRecords = computed(() => (courseStore as any).learningRecords?.filter((r: any) => r.student_id === 'STU-001') ?? []);
 const myEnrollments = computed(() => campStore.enrollments.filter(e => e.student_id === 'STU-001'));
-const myCertificates = computed(() => campStore.certificates.filter(c => c.student_id === 'STU-001'));
 const courseName = (cid: string) => courseStore.loadCourse(cid)?.title ?? cid;
 // V2·0829 用户裁决：报名状态只有「已报名」
 const enrollStatusLabel = (s: string) => ({ pending: '已报名', approved: '已报名', enrolled: '已报名', cancelled: '已取消', rejected: '已驳回', refunded: '已退款' }[s] ?? s);

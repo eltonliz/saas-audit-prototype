@@ -466,7 +466,6 @@ const showQuickCourse = ref(false);
 const quickCourseForm = ref({
   title: '',
   category_id: '',
-  main_lecturer_id: '',
   description: '',
 });
 
@@ -483,7 +482,6 @@ function openQuickCourseDialog() {
   quickCourseForm.value = {
     title: '',
     category_id: courseCategories.value[0]?.id ?? '',
-    main_lecturer_id: '',
     description: '',
   };
   showQuickCourse.value = true;
@@ -506,7 +504,7 @@ function doQuickCourse() {
     cover_url: '',
     sub_category: '',
     tags: [],
-    lecturer_id: quickCourseForm.value.main_lecturer_id || null,
+    lecturer_id: null,
     source: 'manual',
     source_live_session_id: null,
     visibility: 'public',

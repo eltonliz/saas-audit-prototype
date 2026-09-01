@@ -87,7 +87,6 @@ const students = computed(() => {
     const totalSeconds = rs.reduce((sum, r) => sum + r.learning_duration, 0);
     const totalMinutes = Math.round(totalSeconds / 60);
     const passRate = rs.length > 0 ? rs.reduce((sum, r) => sum + r.completion_rate, 0) / rs.length : 0;
-    const certificateCount = campStore.certificates.filter(c => c.student_id === s.student_id && !c.is_revoked).length;
     const campCount = new Set(campStore.enrollments.filter(e => e.student_id === s.student_id).map(e => e.camp_id)).size;
     const courses = rs.map(r => ({
       course_id: r.course_id,
@@ -102,7 +101,6 @@ const students = computed(() => {
       camp_count: campCount,
       totalMinutes,
       passRate,
-      certificate_count: certificateCount,
       courses,
     };
   });

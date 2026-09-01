@@ -172,7 +172,6 @@ const courseLearning = computed(() => {
     totalMinutes: c.totalMinutes,
     avgCompletion: c.count > 0 ? c.completionSum / c.count : 0,
     avgQuiz: c.quizCount > 0 ? c.quizSum / c.quizCount : 0,
-    certificateCount: c.certificateCount,
   }));
 });
 

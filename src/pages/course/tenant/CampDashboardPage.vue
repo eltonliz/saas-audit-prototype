@@ -561,7 +561,6 @@ const columns = [
   { colKey: 'time', title: '营期时间', width: 180 },
   { colKey: 'enroll', title: '报名情况', width: 200 },
   { colKey: 'schedule', title: '排课数', width: 80 },
-  { colKey: 'price', title: '价格', width: 80 },
   { colKey: 'status', title: '状态', width: 90 },
 ];
 

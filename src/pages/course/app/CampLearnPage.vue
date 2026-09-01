@@ -34,7 +34,6 @@
           <div class="student-name">{{ e.student_name }}</div>
           <div class="student-meta">{{ enrollStatusLabel(e.status) }} · {{ channelLabel(e.channel) }}</div>
         </div>
-        <span v-if="e.assistant_name" class="student-assistant">助教: {{ e.assistant_name }}</span>
       </div>
       <div v-if="campEnrollments.length === 0" class="empty">暂无学员</div>
     </template>
@@ -129,7 +128,6 @@ function goLesson(s: any) {
 .student-avatar { width: 36px; height: 36px; background: #F9FAFB; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; }
 .student-name { font-size: 14px; font-weight: 500; }
 .student-meta { font-size: 11px; color: #98A2B3; margin-top: 2px; }
-.student-assistant { font-size: 11px; color: #667085; margin-left: auto; }
 .empty-mini { text-align: center; color: #98A2B3; padding: 12px; font-size: 13px; }
 .checkin-reward { font-size: 12px; color: #12B76A; font-weight: 600; margin-top: 4px; }
 .checkin-records { margin-top: 16px; }
