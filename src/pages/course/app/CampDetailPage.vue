@@ -28,8 +28,8 @@
     <!-- 营期模式说明 -->
     <div class="info-card">
       <div class="info-section-title">营期模式说明</div>
-      <div v-if="camp.mode === 'live'" class="info-desc"><t-icon name="play-circle" :size="14" /> <strong>直播模式</strong>：按排课时间实时推流讲课，学员按时参与直播互动。</div>
-      <div v-else class="info-desc"><t-icon name="video-camera" :size="14" /> <strong>录播模式</strong>：上传录制好的课程视频，学员按日历排期自主学习，灵活安排时间。</div>
+      <!-- V2·0901 授课方式不固定：直播+录播混合，以每日排课为准 -->
+      <div class="info-desc"><t-icon name="info-circle" :size="14" /> 授课方式不固定，支持直播+录播混合，具体以每日排课为准；当天任务解锁后可直接进入学习，直播也会在首页「今日直播」推荐。</div>
     </div>
 
     <!-- V2·0829 用户裁决：讲师/助教下线，讲师卡已删除 -->

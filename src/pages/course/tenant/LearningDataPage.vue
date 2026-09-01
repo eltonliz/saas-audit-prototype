@@ -163,7 +163,6 @@ const courseLearning = computed(() => {
         quizSum: r.quiz_accuracy ?? 0,
         quizCount: r.quiz_accuracy > 0 ? 1 : 0,
         count: 1,
-        certificateCount: campStore.certificates.filter(c => false).length, // 证书按课程维度暂不关联
       });
     }
   }
@@ -206,7 +205,6 @@ const top10 = computed(() => {
     }
   }
   return Array.from(m.values())
-    .map(s => ({ student_id: s.student_id, name: s.name, totalMinutes: s.totalMinutes, avgCompletion: s.count > 0 ? s.completionSum / s.count : 0, certificateCount: campStore.certificates.filter(c => c.student_id === s.student_id && !c.is_revoked).length }))
     .sort((a, b) => b.totalMinutes - a.totalMinutes)
     .slice(0, 10);
 });
@@ -234,7 +232,6 @@ const top10Columns = [
   { colKey: 'name', title: '学员', width: 100 },
   { colKey: 'totalMinutes', title: '学习总时长', width: 120 },
   { colKey: 'avgCompletion', title: '平均完播率', width: 100 },
-  { colKey: 'certificateCount', title: '获得证书', width: 80 },
 ];
 </script>
 

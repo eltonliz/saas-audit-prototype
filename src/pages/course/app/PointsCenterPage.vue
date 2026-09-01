@@ -34,7 +34,7 @@ const store = useMemberStore();
 const records = computed(() => store.loadPointRecords('STU-001'));
 const totalPoints = computed(() => records.value.reduce((s, r) => s + r.points, 0));
 const signed = ref(isSignedToday());
-const sourceLabel = (s: string) => ({ checkin: '打卡奖励', signin: '每日签到', completion: '完播奖励', quiz: '答题奖励', task: '任务奖励' }[s] ?? s);
+const sourceLabel = (s: string) => ({ signin: '每日签到', completion: '完播奖励', quiz: '答题奖励', task: '任务奖励' }[s] ?? s);
 function doSign() {
   if (signInToday()) {
     store.addPointRecord({ student_id: 'STU-001', source_type: 'signin', points: 2, growth: 2, source_id: 'signin-' + new Date().toISOString().slice(0, 10) } as any);

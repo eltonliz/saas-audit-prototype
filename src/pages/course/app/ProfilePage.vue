@@ -5,8 +5,7 @@
     <!-- ── 店长/店员态（参考原型 u29/u7）── -->
     <template v-if="isStore">
       <div class="user-card store-card">
-        <div class="invite-badge" @click="showInvite">邀请码</div>
-        <div class="avatar"><EmojiIcon emoji="🧑‍💼" :size="28" /></div>
+      <div class="avatar"><EmojiIcon emoji="🧑‍💼" :size="28" /></div>
         <div class="user-info">
           <div class="user-name-row">
             <span class="user-name">阿远要快快快乐</span>
@@ -130,7 +129,6 @@ function switchRole() {
   router.go(0);
 }
 
-function showInvite() { MessagePlugin.info('我的邀请码：AX8892（复制分享给客户）'); }
 
 const totalPoints = computed(() => memberStore.loadPointRecords('STU-001').reduce((s, r) => s + r.points, 0));
 const myCourseCount = computed(() => courseStore.courses.filter(c => c.status === 'published').length);

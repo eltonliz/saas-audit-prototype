@@ -1,7 +1,6 @@
 <template>
   <div class="camp-learn">
     <header class="app-header"><span @click="$router.back()">←</span><span>{{ camp?.title ?? '营期学习' }}</span></header>
-    <!-- V2·D2-1 本期不做交易：合同/订单/支付链路已下线；测验/答疑按 0828 会议推下期 -->
     <div class="tabs">
       <span v-for="t in ['课程','学员']" :key="t" class="tab" :class="{ active: tab === t }" @click="tab = t">{{ t }}</span>
     </div>
@@ -14,9 +13,9 @@
           <div v-for="s in daySchedules(day)" :key="s.id" class="sched-card" @click="goLesson(s)">
             <div class="sched-info">
               <div class="sched-name">{{ s.title }}</div>
-              <div class="sched-meta"><EmojiIcon :emoji="s.schedule_type === 'course' ? '📖' : '📅'" :size="12" /> {{ s.schedule_type === 'course' ? '课程' : '打卡' }} · <EmojiIcon :emoji="s.schedule_mode === 'live' ? '📺' : '📹'" :size="12" /> {{ s.schedule_mode === 'live' ? '直播' : '录播' }} · Day{{ s.day_number }}</div>
+              <div class="sched-meta"><EmojiIcon emoji="📖" :size="12" /> 课程 · <EmojiIcon :emoji="s.schedule_mode === 'live' ? '📺' : '📹'" :size="12" /> {{ s.schedule_mode === 'live' ? '直播' : '录播' }} · Day{{ s.day_number }}</div>
             </div>
-            <span class="sched-status">{{ s.schedule_type === 'checkin_task' ? '打卡' : '学习' }}</span>
+            <span class="sched-status">学习</span>
           </div>
           <div v-if="daySchedules(day).length === 0" class="empty-mini">暂无排课</div>
         </template>
@@ -25,11 +24,6 @@
           {{ dayStatus(day) === '进行中' ? '今日任务已解锁，点击进入学习' : dayStatus(day) === '未开始' ? '未开始 · 届时首页「直播推荐」可见' : '已结束' }}
         </div>
       </div>
-    </template>
-
-    <!-- V2·0828 会议：测验/答疑推下期，模板与逻辑已下线 -->
-    <template v-else-if="tab === '测验'">
-      <div class="empty">测验功能下期上线</div>
     </template>
 
     <!-- 学员Tab -->
@@ -54,10 +48,9 @@ import { MessagePlugin } from 'tdesign-vue-next';
 import EmojiIcon from './EmojiIcon.vue';
 import { useCampStore } from '../../../stores/camp-store';
 import { useCourseStore } from '../../../stores/course-store';
-import { useMemberStore } from '../../../stores/member-store';
 
 const route = useRoute(); const router = useRouter();
-const campStore = useCampStore(); const courseStore = useCourseStore(); const memberStore = useMemberStore();
+const campStore = useCampStore(); const courseStore = useCourseStore();
 const campId = route.params.id as string;
 const camp = computed(() => campStore.loadCamp(campId));
 const tab = ref('课程');
@@ -69,12 +62,8 @@ const campEnrollments = computed(() => campStore.loadEnrollmentsByCamp(campId));
 const enrollStatusLabel = (s: string) => ({ pending: '已报名', approved: '已报名', enrolled: '已报名', cancelled: '已取消', rejected: '已驳回', refunded: '已退款' }[s] ?? s);
 const channelLabel = (s: string) => ({ direct: '直接报名', admin_assign: '后台添加' }[s] ?? s);
 const schedules = computed(() => campStore.loadSchedulesByCamp(campId));
-const checkinTasks = computed(() => schedules.value.filter(s => s.schedule_type === 'checkin_task'));
-// V2·0828 会议：测验推下期，quiz 状态与逻辑已移除
-const myCheckins = computed(() => campStore.loadCheckinsByStudent('STU-001', campId));
 
 function daySchedules(day: number) { return schedules.value.filter(s => s.day_number === day); }
-function isChecked(scheduleId: string) { return myCheckins.value.some(c => c.schedule_id === scheduleId); }
 
 // V2·0901 门店可见性配置：隐藏每日课程明细（默认隐藏，门店后台可配置）
 const scheduleHidden = (() => { try { return localStorage.getItem('camp-schedule-visibility') !== 'visible'; } catch { return true; } })();
@@ -108,16 +97,7 @@ function goLesson(s: any) {
   if (!s.lesson_id) { MessagePlugin.warning('该排课未关联课时'); return; }
   if (s.course_id) router.push('/app/student/lesson/' + s.lesson_id + '?campId=' + campId);
 }
-
-function doCheckin(s: any) {
-  try {
-    const today = new Date().toISOString().slice(0, 10);
-    campStore.createCheckin({ camp_id: campId, student_id: 'STU-001', schedule_id: s.id, checkin_date: today, day_number: s.day_number, content: '打卡完成' } as any);
-    memberStore.addPointRecord({ student_id: 'STU-001', source_type: 'checkin', points: 5, growth: 5, source_id: s.id, camp_id: campId });
-    MessagePlugin.success('打卡成功 +5积分');
-  } catch (e: any) { MessagePlugin.warning(e.message); }
-}
-// V2·0828 会议：测验4步流程逻辑已移除（下期实现）
+// V2·0901 打卡功能下线（BR-LEARN-004 废止）；测验模板与逻辑已移除
 </script>
 
 <style scoped>

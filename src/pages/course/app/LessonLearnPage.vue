@@ -29,12 +29,7 @@
       </div>
     </div>
 
-    <!-- 打卡（营期内） -->
-    <div v-if="campId" class="checkin-strip">
-      <button class="checkin-btn" :disabled="checkedIn" @click="doCheckin">
-        <EmojiIcon :emoji="checkedIn ? '✅' : '📅'" :size="15" /> {{ checkedIn ? '今日已打卡' : '立即打卡 +5积分' }}
-      </button>
-    </div>
+    <!-- V2·0901 打卡功能下线（签到走积分中心「每日签到」，是领红包前置） -->
 
     <!-- 内容 Tab：简介 | 目录 -->
     <div class="content-tabs">
@@ -146,7 +141,6 @@ const selectedAnswer = ref('');
 const quizResult = ref<any>(null);
 const answeredCount = ref(0);
 const isCompleted = ref(false);
-const checkedIn = ref(false);
 const toast = ref('');
 let toastTimer: any = null;
 
@@ -273,19 +267,6 @@ function closeQuiz() {
   showQuiz.value = false;
   currentQuestion.value = null;
   quizResult.value = null;
-}
-
-function doCheckin() {
-  if (!campId) return;
-  try {
-    const today = new Date().toISOString().slice(0, 10);
-    const schedules = campStore.loadSchedulesByCamp(campId);
-    const todaySchedule = schedules.find(s => s.schedule_type === 'checkin_task') ?? schedules[0];
-    campStore.createCheckin({ camp_id: campId, student_id: 'STU-001', schedule_id: todaySchedule?.id ?? '', checkin_date: today, day_number: 1, content: '打卡学习' } as any);
-    memberStore.addPointRecord({ student_id: 'STU-001', source_type: 'checkin', points: 5, growth: 5, source_id: todaySchedule?.id, camp_id: campId });
-    checkedIn.value = true;
-    showToast('打卡成功 +5积分');
-  } catch (e: any) { showToast(e.message); }
 }
 
 onUnmounted(() => { clearInterval(timer); clearTimeout(toastTimer); });

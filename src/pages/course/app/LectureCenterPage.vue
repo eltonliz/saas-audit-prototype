@@ -30,7 +30,7 @@
         </div>
         <div class="card-body">
           <div class="card-title">{{ c.title }}</div>
-          <div class="card-meta">{{ c.lesson_count }}课时 · ⭐{{ c.rating }}</div>
+          <div class="card-meta">{{ c.lesson_count }}课时 · 免费学习</div>
           <div class="card-bottom">
             <span class="card-learners">学习{{ c.total_learners }}人</span>
             <span class="card-price">免费</span>
@@ -52,7 +52,7 @@
         </div>
         <div class="card-body">
           <div class="card-title">{{ c.title }}</div>
-          <div class="card-meta">{{ c.mode === 'live' ? '直播模式' : '录播模式' }} · {{ c.start_date }}~{{ c.end_date }} · {{ c.total_days }}天</div>
+          <div class="card-meta">{{ c.start_date }}~{{ c.end_date }} · {{ c.total_days }}天</div>
           <div class="card-meta">已报名 {{ c.enrolled_count }} 人</div>
           <div class="card-bottom card-bottom-btn">
             <button class="enroll-btn" :class="'btn-' + campBtn(c).type" @click.stop="campBtnAction(c)">{{ campBtn(c).text }}</button>

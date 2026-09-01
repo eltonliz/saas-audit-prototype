@@ -27,9 +27,7 @@
     </div>
 
     <div class="checkin-strip">
-      <button class="checkin-btn" :disabled="checkedIn" @click="doCheckin">
-        <EmojiIcon :emoji="checkedIn ? '✅' : '📅'" :size="15" /> {{ checkedIn ? '今日已打卡' : '看直播打卡 +5积分' }}
-      </button>
+      <!-- V2·0901 打卡功能下线 -->
     </div>
 
     <!-- 内容 Tab：互动 | 介绍 -->
@@ -106,7 +104,7 @@ onUnmounted(() => clearInterval(tick));
 
 const messages = ref([
   { user: '王五', text: '老师讲得很清楚！' },
-  { user: '赵六', text: '打卡了 +5积分' },
+  { user: '赵六', text: '讲得真好！' },
   { user: '钱七', text: '这节干货多' },
 ]);
 const myMsg = ref('');
@@ -123,15 +121,7 @@ function sendMsg() {
   myMsg.value = '';
 }
 
-const checkedIn = ref(false);
-function doCheckin() {
-  try {
-    const today = new Date().toISOString().slice(0, 10);
-    campStore.createCheckin({ camp_id: campId, student_id: 'STU-001', schedule_id: schedule.value?.id ?? '', checkin_date: today, day_number: schedule.value?.day_number ?? 1, content: '看直播打卡' } as any);
-    memberStore.addPointRecord({ student_id: 'STU-001', source_type: 'checkin', points: 5, growth: 5, source_id: schedule.value?.id, camp_id: campId });
-    checkedIn.value = true;
-  } catch { /* ignore */ }
-}
+// V2·0901 打卡功能下线
 </script>
 
 <style scoped>

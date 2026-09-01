@@ -44,7 +44,6 @@
           <t-descriptions-item label="报名营期数">{{ currentStudent.camp_count }}</t-descriptions-item>
           <t-descriptions-item label="学习时长">{{ currentStudent.totalMinutes }}分钟</t-descriptions-item>
           <t-descriptions-item label="平均完播率">{{ (currentStudent.passRate * 100).toFixed(0) }}%</t-descriptions-item>
-          <t-descriptions-item label="获得证书">{{ currentStudent.certificate_count }}</t-descriptions-item>
         </t-descriptions>
         <h4 style="margin:16px 0 8px">学习记录</h4>
         <t-table :data="currentStudent.courses" :columns="courseRecordColumns" row-key="course_id" bordered size="small">
@@ -165,7 +164,6 @@ const studentColumns = [
   { colKey: 'camp_count', title: '报名营期', width: 90 },
   { colKey: 'totalMinutes', title: '学习时长', width: 100 },
   { colKey: 'passRate', title: '平均完播率', width: 100 },
-  { colKey: 'certificate_count', title: '获得证书', width: 90 },
   { colKey: 'op', title: '操作', width: 80 },
 ];
 

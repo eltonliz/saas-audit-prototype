@@ -2,7 +2,7 @@
   <div class="learning-record">
     <header class="app-header"><span @click="$router.back()">←</span><span>学习记录</span></header>
     <div class="tabs">
-      <span v-for="t in ['我的课程','我的营期','课程证书']" :key="t" class="tab" :class="{ active: tab === t }" @click="tab = t">{{ t }}</span>
+      <span v-for="t in ['我的课程','我的营期']" :key="t" class="tab" :class="{ active: tab === t }" @click="tab = t">{{ t }}</span>
     </div>
     <template v-if="tab === '我的课程'">
       <div v-for="r in courseRecords" :key="r.id" class="record-card" @click="goCourse(r.course_id)">
@@ -19,14 +19,7 @@
       </div>
       <div v-if="myEnrollments.length === 0" class="empty">暂无营期报名</div>
     </template>
-    <!-- V2·D2-1 本期不做交易：营期订单 tab 已下线 -->
-    <template v-else>
-      <div v-for="c in myCertificates" :key="c.id" class="cert-card" :class="{ revoked: c.is_revoked }">
-        <div class="cert-icon"><EmojiIcon :emoji="c.is_revoked ? '❌' : '🏆'" :size="32" /></div>
-        <div class="cert-body"><div class="cert-title">{{ c.camp_title }}</div><div class="cert-no">{{ c.certificate_no }}</div><div class="cert-meta">完成率{{ (c.course_completion_rate*100).toFixed(0) }}% · 打卡率{{ (c.checkin_completion_rate*100).toFixed(0) }}%</div><div class="cert-status" :class="{ revoked: c.is_revoked }">{{ c.is_revoked ? '已撤销' : '有效' }}</div></div>
-      </div>
-      <div v-if="myCertificates.length === 0" class="empty">暂无证书</div>
-    </template>
+    <!-- V2·0901 用户裁决：课程证书 Tab 下线（证书模块已整体下线） -->
   </div>
 </template>
 
