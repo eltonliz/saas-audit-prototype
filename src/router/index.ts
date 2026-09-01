@@ -56,12 +56,12 @@ const routes: RouteRecordRaw[] = [
       { path: 'finance/live-traffic/recharge', name: 'TrafficRecharge', component: () => import('../pages/finance-traffic/tenant/TrafficRecharge.vue'), meta: { terminal: 'pc-tenant', system: 'SAAS租户后台', page: 'PG-LTF-PC-002' } },
       // V2·0829：SaaS 线上系统复刻页面整体删除（复刻对照已下线，直播功能以真实后台为准）
       // V2·0829 结合件：课程业务相关 SaaS 页面 1:1 复刻 + 课程域修改（红框标注）
-      { path: 'replica/customer', name: 'ReplicaCustomer', component: () => import('../pages/saas-replica/customer/CustomerListPage.vue'), meta: { terminal: 'pc-tenant' } },
+      // V2·0901：客户列表（复刻）入口下线
+
       { path: 'replica/marketing/watch-reward', name: 'ReplicaWatchReward', component: () => import('../pages/saas-replica/marketing/WatchRewardPage.vue'), meta: { terminal: 'pc-tenant' } },
       // V2·0901：红包记录/场次管理（复刻）入口下线
       { path: 'replica/marketing/points-task', name: 'ReplicaPointsTask', component: () => import('../pages/saas-replica/marketing/PointsTaskPage.vue'), meta: { terminal: 'pc-tenant' } },
       { path: 'replica/marketing/points-records', name: 'ReplicaPointsRecords', component: () => import('../pages/saas-replica/marketing/PointsRecordsPage.vue'), meta: { terminal: 'pc-tenant' } },
-      { path: 'replica/customer/detail', name: 'ReplicaCustomerDetail', component: () => import('../pages/saas-replica/customer/CustomerDetailPage.vue'), meta: { terminal: 'pc-tenant' } },
       { path: '', redirect: '/tenant/dashboard' },
     ],
   },
