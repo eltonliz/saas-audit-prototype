@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>内容审查域 · 违规处置状态机</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-paper:   #f5f5f5;
+      --color-ink:     #2d3142;
+      --color-muted:   #4f5d75;
+      --color-accent:  #eb6c36;
+      --font-sans:     'Geist', 'Noto Sans SC', system-ui, sans-serif;
+      --font-serif:    'Instrument Serif', 'Noto Serif SC', serif;
+      --font-mono:     'Geist Mono', ui-monospace, monospace;
+    }
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-paper);
+      color: var(--color-ink);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 2rem;
+    }
+    .frame { max-width: 1240px; width: 100%; }
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      margin-bottom: 0.5rem;
+    }
+    h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      color: var(--color-ink);
+      margin-bottom: 1.5rem;
+    }
+    svg { width: 100%; min-width: 960px; display: block; }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <p class="eyebrow">State Machine · 内容审查域 PRD v2.0.0 · 图 9-3</p>
+    <h1>违规处置状态机</h1>
+
+    <svg viewBox="0 0 1100 560" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="audit-vs-title audit-vs-desc">
+      <title id="audit-vs-title">违规处置状态机</title>
+      <desc id="audit-vs-desc">违规处置状态机：违规事件创建后进入待处理，运营可记录、断流或忽略，30 秒超时由系统自动记录，场次结束或审查关闭时归档。</desc>
+      <defs>
+        <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
+        <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#eb6c36"/></marker>
+      </defs>
+
+      <rect width="100%" height="100%" fill="#f5f5f5"/>
+
+      <!-- ===== 转移箭头（先于状态节点） ===== -->
+
+      <!-- start → 待处理 -->
+      <path d="M 76,296 H 146" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="78" y="272" width="72" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="114" y="283" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">L2/L3 回调创建</text>
+
+      <!-- 待处理 → 已记录（上弧 elbow） -->
+      <path d="M 270,270 V 196 H 787 Q 795,196 795,188 V 126" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="500" y="174" width="60" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="530" y="185" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">运营·记录</text>
+
+      <!-- 待处理 → 已超时 -->
+      <path d="M 200,270 V 224 H 413 Q 421,224 421,216 V 186" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="240" y="234" width="72" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="276" y="245" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">30 秒未处置</text>
+
+      <!-- 已超时 → 已记录 -->
+      <path d="M 530,156 H 620 Q 628,156 628,148 V 100 H 716" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="534" y="132" width="88" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="578" y="143" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">系统自动记录+升级</text>
+
+      <!-- 待处理 → 已断流 -->
+      <path d="M 300,296 H 636" fill="none" stroke="#eb6c36" stroke-width="1.2" marker-end="url(#arrow-accent)"/>
+      <rect x="388" y="302" width="168" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="472" y="313" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">运营·断流 / L1 引擎自动断流</text>
+
+      <!-- 待处理 → 已忽略（下弧 elbow） -->
+      <path d="M 270,322 V 392 H 787 Q 795,392 795,400 V 426" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="500" y="398" width="60" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="530" y="409" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">运营·忽略</text>
+
+      <!-- 待处理 → 已归档 -->
+      <path d="M 200,322 V 412 H 413 Q 421,412 421,420 V 426" fill="none" stroke="#4f5d75" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+      <rect x="216" y="388" width="120" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="276" y="399" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">场次结束 / 审查关闭</text>
+
+      <!-- 终态箭头 → ring -->
+      <path d="M 870,96 H 888" fill="none" stroke="#4f5d75" stroke-width="1" marker-end="url(#arrow)"/>
+      <path d="M 790,296 H 808" fill="none" stroke="#eb6c36" stroke-width="1" marker-end="url(#arrow-accent)"/>
+      <path d="M 870,456 H 888" fill="none" stroke="#4f5d75" stroke-width="1" marker-end="url(#arrow)"/>
+      <path d="M 530,456 H 548" fill="none" stroke="#4f5d75" stroke-width="1" marker-end="url(#arrow)"/>
+
+      <!-- ===== 起点与终态 ===== -->
+      <circle cx="70" cy="296" r="6" fill="#2d3142"/>
+
+      <circle cx="896" cy="96" r="8" fill="none" stroke="#2d3142" stroke-width="1.2"/>
+      <circle cx="896" cy="96" r="5" fill="#2d3142"/>
+      <circle cx="816" cy="296" r="8" fill="none" stroke="#eb6c36" stroke-width="1.2"/>
+      <circle cx="816" cy="296" r="5" fill="#eb6c36"/>
+      <circle cx="896" cy="456" r="8" fill="none" stroke="#2d3142" stroke-width="1.2"/>
+      <circle cx="896" cy="456" r="5" fill="#2d3142"/>
+      <circle cx="556" cy="456" r="8" fill="none" stroke="#2d3142" stroke-width="1.2"/>
+      <circle cx="556" cy="456" r="5" fill="#2d3142"/>
+
+      <!-- ===== 状态节点 ===== -->
+
+      <!-- 待处理 -->
+      <rect x="150" y="270" width="150" height="52" rx="8" fill="#f5f5f5"/>
+      <rect x="150" y="270" width="150" height="52" rx="8" fill="#ffffff" stroke="#2d3142" stroke-width="1.2"/>
+      <text x="225" y="292" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">待处理</text>
+      <text x="225" y="310" fill="#4f5d75" font-size="10" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">pending</text>
+
+      <!-- 已超时 -->
+      <rect x="380" y="130" width="150" height="52" rx="8" fill="#f5f5f5"/>
+      <rect x="380" y="130" width="150" height="52" rx="8" fill="#ffffff" stroke="#2d3142" stroke-width="1.2"/>
+      <text x="455" y="152" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">已超时</text>
+      <text x="455" y="170" fill="#4f5d75" font-size="10" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">timeout · 升级提醒</text>
+
+      <!-- 已记录 -->
+      <rect x="720" y="70" width="150" height="52" rx="8" fill="#f5f5f5"/>
+      <rect x="720" y="70" width="150" height="52" rx="8" fill="#ffffff" stroke="#2d3142" stroke-width="1.2"/>
+      <text x="795" y="92" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">已记录</text>
+      <text x="795" y="110" fill="#4f5d75" font-size="10" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">recorded · 存档备查</text>
+
+      <!-- 已断流（coral focal） -->
+      <rect x="640" y="270" width="150" height="52" rx="8" fill="#f5f5f5"/>
+      <rect x="640" y="270" width="150" height="52" rx="8" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1.2"/>
+      <text x="715" y="292" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">已断流</text>
+      <text x="715" y="310" fill="#4f5d75" font-size="10" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">banned · 不可撤销</text>
+
+      <!-- 已忽略 -->
+      <rect x="720" y="430" width="150" height="52" rx="8" fill="#f5f5f5"/>
+      <rect x="720" y="430" width="150" height="52" rx="8" fill="#ffffff" stroke="#2d3142" stroke-width="1.2"/>
+      <text x="795" y="452" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">已忽略</text>
+      <text x="795" y="470" fill="#4f5d75" font-size="10" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">ignored · 非违规</text>
+
+      <!-- 已归档 -->
+      <rect x="380" y="430" width="150" height="52" rx="8" fill="#f5f5f5"/>
+      <rect x="380" y="430" width="150" height="52" rx="8" fill="#ffffff" stroke="#2d3142" stroke-width="1.2"/>
+      <text x="455" y="452" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">已归档</text>
+      <text x="455" y="470" fill="#4f5d75" font-size="10" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">archived · 只读可查</text>
+
+      <!-- ===== 图例 ===== -->
+      <line x1="40" y1="516" x2="1060" y2="516" stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
+      <text x="40" y="536" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.14em">NOTES</text>
+      <text x="104" y="536" fill="#4f5d75" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif">L1 不可降级事件由审核引擎直接断流后回调，进入系统时即携带断流结果；已断流为终态且不可撤销。</text>
+      <text x="104" y="554" fill="#4f5d75" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif">已超时状态由系统自动转入已记录并向上级发送升级提醒；归档记录保留可查，不可再处置。</text>
+    </svg>
+  </div>
+</body>
+</html>

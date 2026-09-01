@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>内容审查域 · 回放生命周期状态机</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-paper:   #f5f5f5;
+      --color-ink:     #2d3142;
+      --color-muted:   #4f5d75;
+      --color-accent:  #eb6c36;
+      --font-sans:     'Geist', 'Noto Sans SC', system-ui, sans-serif;
+      --font-serif:    'Instrument Serif', 'Noto Serif SC', serif;
+      --font-mono:     'Geist Mono', ui-monospace, monospace;
+    }
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-paper);
+      color: var(--color-ink);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 2rem;
+    }
+    .frame { max-width: 1240px; width: 100%; }
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      margin-bottom: 0.5rem;
+    }
+    h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      color: var(--color-ink);
+      margin-bottom: 1.5rem;
+    }
+    svg { width: 100%; min-width: 960px; display: block; }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <p class="eyebrow">State Machine · 内容审查域 PRD v2.0.0 · 图 9-4</p>
+    <h1>回放生命周期状态机（拼接发布 v2.0.0）</h1>
+
+    <svg viewBox="0 0 1100 540" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="audit-rs-title audit-rs-desc">
+      <title id="audit-rs-title">回放生命周期状态机</title>
+      <desc id="audit-rs-desc">回放生命周期状态机：直播结束后生成片段与文件进入待核对，经文件审核、勾选对应与拼接后可发布；拼接可失败重试，发布后可被驳回再重新提交。</desc>
+      <defs>
+        <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
+        <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#eb6c36"/></marker>
+      </defs>
+
+      <rect width="100%" height="100%" fill="#f5f5f5"/>
+
+      <!-- ===== 转移箭头 ===== -->
+
+      <!-- start → 待核对 -->
+      <path d="M 76,260 H 146" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="70" y="234" width="120" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="130" y="245" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">直播结束 · 片段/文件生成</text>
+
+      <!-- 待核对 → 拼接中 -->
+      <path d="M 300,260 H 396" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="290" y="268" width="116" height="28" rx="2" fill="#f5f5f5"/>
+      <text x="348" y="279" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">全部文件审核通过</text>
+      <text x="348" y="293" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">+ 勾选一一对应</text>
+
+      <!-- 拼接中 → 已拼接 -->
+      <path d="M 550,260 H 646" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="548" y="234" width="100" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="598" y="245" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">FFmpeg 拼接成功</text>
+
+      <!-- 待核对 → 已拼接（单文件免拼接，上弧） -->
+      <path d="M 225,234 V 180 H 717 Q 725,180 725,188 V 230" fill="none" stroke="#4f5d75" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+      <rect x="396" y="156" width="104" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="448" y="167" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">单文件 · 免拼接</text>
+
+      <!-- 拼接中 → 拼接失败 -->
+      <path d="M 475,286 V 416" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="487" y="340" width="100" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="537" y="351" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">片段损坏 / 超时</text>
+
+      <!-- 拼接失败 → 拼接中（左侧回环） -->
+      <path d="M 400,446 H 344 Q 336,446 336,438 V 286 Q 336,278 344,278 H 396" fill="none" stroke="#4f5d75" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+      <rect x="264" y="350" width="60" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="294" y="361" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">运营重试</text>
+
+      <!-- 已拼接 → 已发布 -->
+      <path d="M 800,260 H 876" fill="none" stroke="#eb6c36" stroke-width="1.2" marker-end="url(#arrow-accent)"/>
+      <rect x="800" y="234" width="76" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="838" y="245" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">运营·发布</text>
+
+      <!-- 已发布 → 已驳回 -->
+      <path d="M 955,286 V 416" fill="none" stroke="#4f5d75" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+      <rect x="967" y="340" width="60" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="997" y="351" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">发布驳回</text>
+
+      <!-- 已驳回 → 已拼接（右侧回环） -->
+      <path d="M 880,446 H 828 Q 820,446 820,438 V 288 Q 820,280 812,280 H 804" fill="none" stroke="#4f5d75" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+      <rect x="836" y="350" width="60" height="14" rx="2" fill="#f5f5f5"/>
+      <text x="866" y="361" fill="#7a8399" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">重新提交</text>
+
+      <!-- 已发布 → end -->
+      <path d="M 1030,260 H 1052" fill="none" stroke="#eb6c36" stroke-width="1" marker-end="url(#arrow-accent)"/>
+
+      <!-- ===== 起点与终态 ===== -->
+      <circle cx="70" cy="260" r="6" fill="#2d3142"/>
+      <circle cx="1060" cy="260" r="8" fill="none" stroke="#eb6c36" stroke-width="1.2"/>
+      <circle cx="1060" cy="260" r="5" fill="#eb6c36"/>
+
+      <!-- ===== 状态节点 ===== -->
+
+      <!-- 待核对 -->
+      <rect x="150" y="234" width="150" height="52" rx="8" fill="#f5f5f5"/>
+      <rect x="150" y="234" width="150" height="52" rx="8" fill="#ffffff" stroke="#2d3142" stroke-width="1.2"/>
+      <text x="225" y="256" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">待核对</text>
+      <text x="225" y="274" fill="#4f5d75" font-size="10" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">pending · 待审核</text>
+
+      <!-- 拼接中 -->
+      <rect x="400" y="234" width="150" height="52" rx="8" fill="#f5f5f5"/>
+      <rect x="400" y="234" width="150" height="52" rx="8" fill="#ffffff" stroke="#2d3142" stroke-width="1.2"/>
+      <text x="475" y="256" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">拼接中</text>
+      <text x="475" y="274" fill="#4f5d75" font-size="10" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">merging · 进度展示</text>
+
+      <!-- 已拼接 -->
+      <rect x="650" y="234" width="150" height="52" rx="8" fill="#f5f5f5"/>
+      <rect x="650" y="234" width="150" height="52" rx="8" fill="#ffffff" stroke="#2d3142" stroke-width="1.2"/>
+      <text x="725" y="256" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">已拼接</text>
+      <text x="725" y="274" fill="#4f5d75" font-size="10" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">completed · 可发布</text>
+
+      <!-- 已发布（coral focal） -->
+      <rect x="880" y="234" width="150" height="52" rx="8" fill="#f5f5f5"/>
+      <rect x="880" y="234" width="150" height="52" rx="8" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1.2"/>
+      <text x="955" y="256" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">已发布</text>
+      <text x="955" y="274" fill="#4f5d75" font-size="10" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">published · 对观众可见</text>
+
+      <!-- 拼接失败 -->
+      <rect x="400" y="420" width="150" height="52" rx="8" fill="#f5f5f5"/>
+      <rect x="400" y="420" width="150" height="52" rx="8" fill="#ffffff" stroke="#2d3142" stroke-width="1.2"/>
+      <text x="475" y="442" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">拼接失败</text>
+      <text x="475" y="460" fill="#4f5d75" font-size="10" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">failed · 提示原因</text>
+
+      <!-- 已驳回 -->
+      <rect x="880" y="420" width="150" height="52" rx="8" fill="#f5f5f5"/>
+      <rect x="880" y="420" width="150" height="52" rx="8" fill="#ffffff" stroke="#2d3142" stroke-width="1.2"/>
+      <text x="955" y="442" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle">已驳回</text>
+      <text x="955" y="460" fill="#4f5d75" font-size="10" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle">rejected · 可重新提交</text>
+
+      <!-- ===== 图例 ===== -->
+      <line x1="40" y1="502" x2="1060" y2="502" stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
+      <text x="40" y="522" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.14em">NOTES</text>
+      <text x="104" y="522" fill="#4f5d75" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif">顺序铁律（BR-AUDIT-030）：先全部审核 → 再勾选一一对应 → 再拼接 → 拼接完成后才可发布；任一环节不满足则按钮锁定。</text>
+      <text x="104" y="540" fill="#4f5d75" font-size="10" font-family="'Geist','Noto Sans SC',sans-serif">无违规场次免擦音，源码文件即对外发布版；已发布场次再次进入回放页时自动进入「已发布查看模式」。</text>
+    </svg>
+  </div>
+</body>
+</html>
