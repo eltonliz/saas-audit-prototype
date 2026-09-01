@@ -130,25 +130,17 @@
                 <t-select
                   v-model="addForm.lesson_id"
                   filterable
-                  placeholder="选择课时（跨课程平铺·已排禁选）"
+                  :options="addLessonOptions"
+                  placeholder="选择课时（跨课程·已排自动过滤）"
                   style="flex:1"
-                  @change="onAddCourseChange"
-                >
-                  <t-option
-                    v-for="l in allSelectableLessons"
-                    :key="l.id"
-                    :label="`【${l.course_title}】第${l.sort_order}课时：${l.title}${scheduledLessonIds.has(l.id) ? '·已排' : ''}`"
-                    :value="l.id"
-                    :disabled="scheduledLessonIds.has(l.id)"
-                  />
-                </t-select>
+                />
                 <t-button theme="primary" variant="outline" @click="openQuickCourseDialog">
                   <template #icon><t-icon name="add" /></template> 快捷新建
                 </t-button>
               </div>
               <div class="lesson-tip">
                 <t-icon name="info-circle" />
-                <span>课时按课程分组；同一课时在本营期内仅排一次，标「已排」的不可再选</span>
+                <span>课时按课程标注；同一课时在本营期内仅排一次，已排的自动过滤</span>
               </div>
             </t-form-item>
           </div>
@@ -560,25 +552,17 @@ function doQuickCourse() {
   showQuickCourse.value = false;
 }
 
-// ===== 单条新增：具体课时选项（决策3-2 A模式） =====
-const selectedCourseLessons = computed(() => {
-  if (!addForm.value.course_id) return [];
-  return courseStore.lessons
-    .filter(l => l.course_id === addForm.value.course_id && l.status === 'published')
-    .sort((a, b) => a.sort_order - b.sort_order);
-});
-// V2·0901 排课选课时：本营期已排课时集合（禁选防重复）
+// ===== 单条新增：课时直选（V2·0901 排课以课时为单位） =====
+// V2·0901 排课选课时：本营期已排课时自动过滤（不可再选）
 const scheduledLessonIds = computed(() => new Set(campSchedules.value.map(s => s.lesson_id).filter(Boolean)));
-// 排课直选课时：全部课程的已发布课时平铺（label 含所属课程名）
+// 排课直选课时：全部课程的已发布课时平铺（label 含所属课程名），已排的过滤
 const allSelectableLessons = computed(() => courseStore.lessons
-  .filter(l => l.status === 'published')
+  .filter(l => l.status === 'published' && !scheduledLessonIds.value.has(l.id))
   .map(l => ({ ...l, course_title: courseStore.loadCourse(l.course_id)?.title ?? '' })));
-function onAddCourseChange() {
-  addForm.value.lesson_id = null;
-  // 自动顺延：默认选中该课程在本营期第一个未排的课时
-  const next = selectedCourseLessons.value.find(l => !scheduledLessonIds.value.has(l.id));
-  if (next) addForm.value.lesson_id = next.id;
-}
+const addLessonOptions = computed(() => allSelectableLessons.value.map(l => ({
+  label: `【${l.course_title}】第${l.sort_order}课时：${l.title}`,
+  value: l.id,
+})));
 
 // ===== 单条新增：一键排整个课程提示 =====
 const wholeCourseLoading = ref(false);
