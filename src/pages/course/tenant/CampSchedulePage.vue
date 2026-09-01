@@ -234,17 +234,10 @@
             <t-option v-for="cat in courseCategories" :key="cat.id" :label="cat.name" :value="cat.id" />
           </t-select>
         </t-form-item>
-        <!-- V2·0829：讲师/助教角色下线，主讲人改为选填文本 -->
-        <t-form-item label="主讲人">
-          <t-input v-model="quickCourseForm.main_lecturer_id" clearable placeholder="选填，仅作为课程内容展示" style="width: 100%" />
-        </t-form-item>
+        <!-- V2·0901 主讲人字段与直播提示卡移除（课程固定录播组课） -->
         <t-form-item label="课程简介">
           <t-textarea v-model="quickCourseForm.description" placeholder="简要描述课程内容（可后续补充）" :autosize="{ minRows: 2, maxRows: 4 }" />
         </t-form-item>
-        <div class="quick-course-tip">
-          <t-icon name="check-circle" />
-          <span>快捷创建的直播课程将直接发布，可立即排课。直播课无需上传视频，排课时即开播和结束时间，保存后自动创建直播间。默认仅营期可见。</span>
-        </div>
       </t-form>
     </t-dialog>
 
