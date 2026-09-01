@@ -154,6 +154,11 @@
             <ReplicaMarker :no="2" title="新增助教角色关联" />
           </div>
           <div class="form-row"><span class="form-label">是否支持自提：</span><el-switch model-value="false" /></div>
+          <div class="form-row">
+            <span class="form-label">学员端隐藏每日课程明细：</span>
+            <el-switch v-model="storeScheduleHidden" @change="persistScheduleVisibility" />
+            <span style="font-size:12px;color:#999;margin-left:8px">开启后学员端营期学习仅显示 Day 进度，到课当天在首页「直播推荐」展示（V2·0901）</span>
+          </div>
           <div class="form-row"><span class="form-label">资质状态：</span>
             <el-select placeholder="请选择" size="small" style="width:160px">
               <el-option label="全部" value="" />
@@ -194,6 +199,13 @@ import { ElMessage } from 'element-plus';
 import StoreEditDialog from './StoreEditDialog.vue';
 import ReplicaMarker from '../../../components/replica/ReplicaMarker.vue';
 import { notifyModalOpen } from '../../../utils/modal-spec-bridge';
+import { ref as vueRef } from 'vue';
+
+// V2·0901 门店可见性配置：学员端隐藏每日课程明细（演示：全局单开关，实际按门店维度存储）
+const storeScheduleHidden = vueRef((() => { try { return localStorage.getItem('camp-schedule-visibility') !== 'visible'; } catch { return true; } })());
+function persistScheduleVisibility() {
+  try { localStorage.setItem('camp-schedule-visibility', storeScheduleHidden.value ? 'hidden' : 'visible'); } catch { /* */ }
+}
 
 /** 门店实体（ENT-STM-001） */
 interface Store {

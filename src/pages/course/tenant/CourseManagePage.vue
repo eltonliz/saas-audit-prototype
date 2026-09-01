@@ -89,11 +89,12 @@
             <t-form-item label="课程介绍"><t-textarea v-model="form.description" :autosize="{ minRows: 3 }" placeholder="请输入课程介绍" /></t-form-item>
             <div class="saas-new-box saas-new-wrap">
               <div class="saas-new-badge">红框 = 课程业务新增（SaaS 线上无）<ReplicaMarker :no="1" title="点击查看：授课模式为课程业务新增字段" /></div>
-              <t-form-item label="授课方式" required-mark>
+              <t-form-item label="默认授课方式">
                 <t-radio-group v-model="form.mode">
                   <t-radio value="recorded"><template #label><t-icon name="video" /> 录播</template></t-radio>
                   <t-radio value="live"><template #label><t-icon name="play-circle" /> 直播</template></t-radio>
                 </t-radio-group>
+                <div class="form-tip">V2·0901：授课方式不固定，课时支持直播+录播混合，具体以每条课时的设置为准</div>
               </t-form-item>
             </div>
             <t-form-item v-if="form.mode === 'live'" label="直播联动">
@@ -126,11 +127,11 @@
           <!-- 区块2：内容管理 -->
           <div class="section-card">
             <div class="section-header"><t-icon name="layers" class="section-icon" /><span>内容管理</span></div>
-            <template v-if="form.mode === 'recorded'">
+            <template v-if="true">
               <div class="content-actions">
                 <t-button theme="primary" size="small" @click="openContentPicker('video')"><template #icon><t-icon name="add" /></template>选择视频</t-button>
                 <t-button theme="primary" size="small" @click="openContentPicker('audio')"><template #icon><t-icon name="add" /></template>选择音频</t-button>
-                <span class="pool-tip">从「视频课程/音频课程」内容池选择已发布课节</span>
+                <span class="pool-tip">从素材中心选择素材组课（V2·0901：支持直播+录播混合，直播课时在排课表配置）</span>
               </div>
               <t-table :data="form.videos" row-key="video_no" :columns="videoColumns" bordered size="small" style="margin-top:12px">
                 <template #ctype="{ row }"><t-tag :theme="row.ctype === 'audio' ? 'primary' : 'success'" variant="light" size="small">{{ row.ctype === 'audio' ? '音频' : '视频' }}</t-tag></template>
@@ -208,7 +209,7 @@
           </div>
 
           <!-- 区块6：课程设置 -->
-          <div class="section-card" v-if="form.mode === 'recorded'">
+          <div class="section-card">
             <div class="section-header"><t-icon name="setting" class="section-icon" /><span>课程设置</span><ReplicaMarker :no="5" label="编号⑤ 1:1线上六项" /></div>
             <!-- 以下六项 = SaaS 线上 1:1（2026-08-27 实测） -->
             <t-form-item label="是否显示课程介绍"><t-switch v-model="form.show_intro" /></t-form-item>

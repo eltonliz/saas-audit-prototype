@@ -34,15 +34,10 @@ export const PAGE_REGISTRY: ModuleRegItem[] = [
         ],
       },
       {
-        key: 'videos', title: '视频课程', route: '/tenant/course/videos',
+        // V2·0901 素材中心：合并原视频课程/音频课程（音视频上传不区分）
+        key: 'materials', title: '素材中心', route: '/tenant/course/materials',
         modals: [
-          { key: 'video-edit', title: '新增视频（编辑页）', chain: ['新增视频'] },
-        ],
-      },
-      {
-        key: 'audios', title: '音频课程', route: '/tenant/course/audios',
-        modals: [
-          { key: 'audio-edit', title: '新增音频（编辑页）', chain: ['新增音频'] },
+          { key: 'material-edit', title: '上传/编辑素材', chain: ['上传素材'] },
         ],
       },
       {

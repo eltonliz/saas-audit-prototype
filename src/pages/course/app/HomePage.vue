@@ -38,7 +38,7 @@
     <!-- 直播广场（横滑） -->
     <div class="section live-plaza">
       <div class="section-header">
-        <span class="section-title">直播广场</span>
+        <span class="section-title">今日直播</span>
         <span class="plaza-tag">查看</span>
       </div>
       <div class="live-scroll">

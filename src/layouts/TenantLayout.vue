@@ -43,8 +43,7 @@
           </template>
           <el-menu-item index="/tenant/course/course-types">课程分类</el-menu-item>
           <el-menu-item index="/tenant/course/courses">课程库</el-menu-item>
-          <el-menu-item index="/tenant/course/videos">视频课程</el-menu-item>
-          <el-menu-item index="/tenant/course/audios">音频课程</el-menu-item>
+          <el-menu-item index="/tenant/course/materials">素材中心</el-menu-item>
           <el-menu-item index="/tenant/course/questions">题目库</el-menu-item>
         </el-sub-menu>
 

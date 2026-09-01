@@ -100,6 +100,8 @@
 <script setup lang="ts">
 import { ref, computed, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { DialogPlugin, MessagePlugin } from 'tdesign-vue-next';
+import { isSignedToday, signInToday, todayKey } from '../../../utils/signin';
 import EmojiIcon from './EmojiIcon.vue';
 import { useCourseStore } from '../../../stores/course-store';
 import { useMemberStore } from '../../../stores/member-store';
@@ -239,6 +241,16 @@ function submitAnswer() {
 }
 
 function grantRedPacket(triggerType: string) {
+  // V2·0901 签到前置：领取课堂红包需当日已在 SaaS 商城签到（强制）
+  if (!isSignedToday()) {
+    showQuiz.value = false;
+    DialogPlugin.confirm({
+      header: '今日未签到', body: '商城签到后才能领取课堂红包，是否立即前往签到？', theme: 'warning',
+      confirmBtn: '去签到', cancelBtn: '稍后',
+      onConfirm: () => { signInToday(); memberStore.addPointRecord({ student_id: 'STU-001', source_type: 'signin', points: 2, growth: 2, source_id: 'signin-' + todayKey(), course_id: courseId.value, camp_id: campId || undefined }); MessagePlugin.success('签到成功 +2积分，可继续领取红包'); },
+    });
+    return;
+  }
   const rules = walletStore.loadRedPacketRules();
   const rule = rules.find(r => r.rule_type === triggerType && r.status === 'active');
   if (!rule) { showToast('答题正确'); return; }

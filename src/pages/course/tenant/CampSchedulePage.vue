@@ -10,9 +10,7 @@
               <t-option v-for="c in campStore.camps" :key="c.id" :value="c.id" :label="c.title + ' · ' + (c.mode === 'live' ? '直播' : '录播') + ' · ' + campStatusLabel(c.status)" />
             </t-select>
             <template v-if="camp">
-              <t-tag :theme="camp.mode === 'live' ? 'danger' : 'primary'" size="small">
-                {{ camp.mode === 'live' ? '直播授课' : '录播授课' }}
-              </t-tag>
+              <t-tag theme="primary" size="small">直播+录播混合授课</t-tag>
               <span class="camp-info">{{ camp.title }} · {{ camp.total_days }}天 · 共{{ campSchedules.length }}个排课</span>
               <t-tag v-if="isLocked" theme="warning" size="small">已审核通过·排课锁定</t-tag>
             </template>
@@ -191,7 +189,7 @@
               :value="c.id"
             />
           </t-select>
-          <div class="course-tip">仅显示与营期授课方式一致（{{ camp?.mode === 'live' ? '直播' : '录播' }}）的课程</div>
+          <div class="course-tip">列出全部课程（V2·0901：授课方式不固定，支持直播+录播混合排课）</div>
         </t-form-item>
       </t-form>
     </t-dialog>
@@ -309,11 +307,8 @@ const isLocked = computed(() => {
 });
 const campStatusLabel = (s: string): string => ({ draft: '草稿·可排课', pending_review: '待审核', published: '已发布', enrolling: '报名中', in_progress: '进行中', ended: '已结束', offline: '已下架', rejected: '已驳回' }[s] ?? s);
 
-// 按营期mode过滤课程（只显示与营期授课方式一致的课程）
-const filteredCourses = computed(() => {
-  if (!camp.value?.mode) return courseStore.courses;
-  return courseStore.courses.filter(c => c.mode === camp.value!.mode);
-});
+// V2·0901 用户裁决：授课方式不固定，直播+录播可混合排课——不再按营期mode过滤课程
+const filteredCourses = computed(() => courseStore.courses);
 
 // 按天分组
 const sortedDaySchedules = computed(() => {

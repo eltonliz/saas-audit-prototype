@@ -7,16 +7,23 @@
     </div>
 
     <template v-if="tab === '课程'">
+      <!-- V2·0901 运营需求：门店开启「隐藏每日课程明细」后，Day 卡不显示具体课程，到点在首页直播推荐展示 -->
       <div v-for="day in totalDays" :key="day" class="day-group">
-        <div class="day-title">Day {{ day }}</div>
-        <div v-for="s in daySchedules(day)" :key="s.id" class="sched-card" @click="goLesson(s)">
-          <div class="sched-info">
-            <div class="sched-name">{{ s.title }}</div>
-            <div class="sched-meta"><EmojiIcon :emoji="s.schedule_type === 'course' ? '📖' : '📅'" :size="12" /> {{ s.schedule_type === 'course' ? '课程' : '打卡' }} · <EmojiIcon :emoji="s.schedule_mode === 'live' ? '📺' : '📹'" :size="12" /> {{ s.schedule_mode === 'live' ? '直播' : '录播' }} · Day{{ s.day_number }}</div>
+        <div class="day-title">Day {{ day }} · {{ dayDate(day) }} <span class="day-status" :class="dayStatus(day)">{{ dayStatus(day) }}</span></div>
+        <template v-if="!scheduleHidden">
+          <div v-for="s in daySchedules(day)" :key="s.id" class="sched-card" @click="goLesson(s)">
+            <div class="sched-info">
+              <div class="sched-name">{{ s.title }}</div>
+              <div class="sched-meta"><EmojiIcon :emoji="s.schedule_type === 'course' ? '📖' : '📅'" :size="12" /> {{ s.schedule_type === 'course' ? '课程' : '打卡' }} · <EmojiIcon :emoji="s.schedule_mode === 'live' ? '📺' : '📹'" :size="12" /> {{ s.schedule_mode === 'live' ? '直播' : '录播' }} · Day{{ s.day_number }}</div>
+            </div>
+            <span class="sched-status">{{ s.schedule_type === 'checkin_task' ? '打卡' : '学习' }}</span>
           </div>
-          <span class="sched-status">{{ s.schedule_type === 'checkin_task' ? '打卡' : '学习' }}</span>
+          <div v-if="daySchedules(day).length === 0" class="empty-mini">暂无排课</div>
+        </template>
+        <div v-else class="day-brief" @click="goTodayTask(day)">
+          <EmojiIcon :emoji="dayStatus(day) === '进行中' ? '📺' : dayStatus(day) === '已完成' ? '✅' : '⏰'" :size="14" />
+          {{ dayStatus(day) === '进行中' ? '今日任务已解锁，点击进入学习' : dayStatus(day) === '未开始' ? '未开始 · 届时首页「直播推荐」可见' : '已结束' }}
         </div>
-        <div v-if="daySchedules(day).length === 0" class="empty-mini">暂无排课</div>
       </div>
     </template>
 
@@ -68,6 +75,28 @@ const myCheckins = computed(() => campStore.loadCheckinsByStudent('STU-001', cam
 
 function daySchedules(day: number) { return schedules.value.filter(s => s.day_number === day); }
 function isChecked(scheduleId: string) { return myCheckins.value.some(c => c.schedule_id === scheduleId); }
+
+// V2·0901 门店可见性配置：隐藏每日课程明细（默认隐藏，门店后台可配置）
+const scheduleHidden = (() => { try { return localStorage.getItem('camp-schedule-visibility') !== 'visible'; } catch { return true; } })();
+function dayDate(day: number): string {
+  const base = camp.value?.start_date ? new Date(camp.value.start_date) : new Date();
+  base.setDate(base.getDate() + (day - 1));
+  return `${base.getMonth() + 1}月${base.getDate()}日`;
+}
+function dayStatus(day: number): '进行中' | '未开始' | '已结束' {
+  const base = camp.value?.start_date ? new Date(camp.value.start_date) : new Date();
+  base.setDate(base.getDate() + (day - 1));
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  if (base > today) return '未开始';
+  const end = new Date(base); end.setDate(end.getDate() + 1);
+  if (today >= end) return '已结束';
+  return '进行中';
+}
+function goTodayTask(day: number) {
+  const list = daySchedules(day);
+  if (list.length === 0) { MessagePlugin.info('当天暂无任务'); return; }
+  goLesson(list[0]);
+}
 
 function goLesson(s: any) {
   if (s.schedule_type === 'checkin_task') { MessagePlugin.info('该任务类型暂不支持学习跳转'); return; }
@@ -133,6 +162,11 @@ function doCheckin(s: any) {
 .tab.active { color: #12B76A; font-weight: 600; border-bottom: 2px solid #12B76A; }
 .day-group { margin-bottom: 16px; }
 .day-title { font-size: 14px; font-weight: 600; color: #12B76A; margin-bottom: 8px; }
+.day-status { font-size: 11px; padding: 1px 8px; border-radius: 8px; margin-left: 6px; font-weight: 500; }
+.day-status.进行中 { background: #E6F9F1; color: #12B76A; }
+.day-status.未开始 { background: #F2F4F7; color: #98A2B3; }
+.day-status.已结束 { background: #F2F4F7; color: #98A2B3; }
+.day-brief { display: flex; align-items: center; gap: 8px; padding: 14px; background: #fff; border-radius: 10px; font-size: 13px; color: #667085; cursor: pointer; }
 .sched-card { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #fff; border-radius: 10px; margin-bottom: 8px; }
 .sched-name { font-size: 14px; font-weight: 500; color: #1F2C3E; }
 .sched-meta { font-size: 12px; color: #98A2B3; margin-top: 2px; }

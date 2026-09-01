@@ -114,7 +114,7 @@
     >
       <t-form :data="f" label-width="110px" label-align="right">
         <t-form-item label="营期名称" name="title" required-mark><t-input v-model="f.title" placeholder="请输入营期名称" /></t-form-item>
-        <t-form-item label="模式" required-mark>
+        <t-form-item label="默认模式">
           <div class="mode-cards mode-cards-two">
             <div class="mode-card mode-card-live" :class="{ active: f.mode === 'live', disabled: !!editingCamp }" @click="!editingCamp && (f.mode = 'live')">
               <t-icon name="video-camera" class="mode-icon" />
@@ -124,6 +124,11 @@
               <t-icon name="play-circle" class="mode-icon" />
               <div class="mode-title">录播模式</div>
             </div>
+          </div>
+          <!-- V2·0901 授课方式不固定：排课支持直播+录播混合 -->
+          <div class="live-auto-tip" style="margin-top:8px">
+            <t-icon name="info-circle" style="color:#2E90FA" />
+            <div style="font-size:12px;color:#667085">默认模式仅作初始设置；排课时支持直播+录播混合编排，具体以每条排课为准。</div>
           </div>
           <!-- 直播模式提示卡：审核通过自动创建直播间三联 -->
           <div v-if="f.mode === 'live'" class="live-auto-tip">

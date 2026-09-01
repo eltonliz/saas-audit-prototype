@@ -114,6 +114,8 @@ export const CourseSchema = z.object({
   lecturer_id: z.string().optional(),
   /** 主讲人姓名（V2·0829：内容属性快照，选填） */
   lecturer_name: z.string().optional(),
+  /** 讲师角色类型（V2 讲师下线后仅历史数据兼容展示） */
+  lecturer_role_type: z.string().optional(),
 
   /** 课程来源（D3保留直播回放转课程） */
   source: CourseSourceEnum,
@@ -153,7 +155,7 @@ export const CourseSchema = z.object({
   reviewed_at: z.number().int().nullable().optional(),
 
   /** 课程画面方向（取首个课时视频方向，冗余便于列表/详情判定·V2·0831） */
-  orientation: CourseOrientationEnum.default('landscape'),
+  orientation: CourseOrientationEnum.optional(),
 
   /** —— 红包配置（D35·积分与红包可共存）—— */
   /** 完播即领开关 */
@@ -196,7 +198,7 @@ export const LessonSchema = z.object({
   /** 视频时长（秒·mode=recorded时） */
   video_duration: z.number().int().min(0).default(0),
   /** 画面方向（上传按视频宽高自动判定，宽<高=竖屏·V2·0831） */
-  orientation: CourseOrientationEnum.default('landscape'),
+  orientation: CourseOrientationEnum.optional(),
   /** 直播场次ID（mode=live/qa_live时关联LiveSession） */
   live_session_id: z.string().nullable().optional(),
 
