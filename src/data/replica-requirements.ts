@@ -882,5 +882,6 @@ export const REPLICA_REQUIREMENTS: Record<string, ReplicaPageRequirement> = {
         { scene: '音频已被课程引用时删除', handle: '拦截并提示先在课程中移除' },
       ],
     },
+  },
 
 }

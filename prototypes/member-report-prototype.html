@@ -524,9 +524,9 @@
               <thead><tr><th>课程</th><th>类型</th><th>观看UV</th><th>完播UV</th><th>完播率</th><th>答题UV</th><th>正确率</th><th>红包金额</th><th>新客</th><th>新客占比</th><th></th></tr></thead>
               <tbody>
                 <tr><td><button class="link" onclick="openCourseDetail('产品知识')">产品知识</button></td><td><span class="tag t-gray">录播</span></td><td>1,860</td><td>1,420</td><td>76.3%</td><td>1,100</td><td>82%</td><td>¥320</td><td>280</td><td>15.1%</td><td><button class="link" onclick="openCourseDetail('产品知识')">详情 →</button></td></tr>
-                <tr><td>销售技巧</td><td><span class="tag t-blue">直播</span></td><td>1,520</td><td>1,080</td><td>71.1%</td><td>920</td><td>78%</td><td>¥280</td><td>320</td><td>21.1%</td><td></td></tr>
-                <tr><td>新品培训</td><td><span class="tag t-gray">录播</span></td><td>1,280</td><td>880</td><td>68.8%</td><td>720</td><td>80%</td><td>¥200</td><td>180</td><td>14.1%</td><td></td></tr>
-                <tr><td>话术训练</td><td><span class="tag t-blue">直播</span></td><td>980</td><td>620</td><td>63.3%</td><td>520</td><td>75%</td><td>¥180</td><td>160</td><td>16.3%</td><td></td></tr>
+                <tr><td><button class="link" onclick="openCourseDetail('销售技巧')">销售技巧</button></td><td><span class="tag t-blue">直播</span></td><td>1,520</td><td>1,080</td><td>71.1%</td><td>920</td><td>78%</td><td>¥280</td><td>320</td><td>21.1%</td><td><button class="link" onclick="openCourseDetail('销售技巧')">详情 →</button></td></tr>
+                <tr><td><button class="link" onclick="openCourseDetail('新品培训')">新品培训</button></td><td><span class="tag t-gray">录播</span></td><td>1,280</td><td>880</td><td>68.8%</td><td>720</td><td>80%</td><td>¥200</td><td>180</td><td>14.1%</td><td><button class="link" onclick="openCourseDetail('新品培训')">详情 →</button></td></tr>
+                <tr><td><button class="link" onclick="openCourseDetail('话术训练')">话术训练</button></td><td><span class="tag t-blue">直播</span></td><td>980</td><td>620</td><td>63.3%</td><td>520</td><td>75%</td><td>¥180</td><td>160</td><td>16.3%</td><td><button class="link" onclick="openCourseDetail('话术训练')">详情 →</button></td></tr>
               </tbody>
             </table>
             <div class="legend"><b>字段口径</b>：完播率=完播UV÷观看UV；正确率=correct_count÷answer_count；红包金额=reward_status=1 的发放合计；新客=首次观看该课程的会员；类型由 sa_live_room.front_style 区分（2=课程）。</div>
@@ -921,7 +921,66 @@ function openSpecs(){
 }
 function closeSpecs(){ el('spec-modal').classList.remove('open'); }
 el('spec-modal').addEventListener('click',e=>{ if(e.target.id==='spec-modal') closeSpecs(); });
-document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeSpecs(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeSpecs(); closeModal(); } });
+
+/* ================= v5.1 全量交互 ================= */
+let currentTabKey='tenant';
+const _switchTab=switchTab;
+switchTab=function(key){ currentTabKey=key; _switchTab(key); };
+function toast(msg){
+  const w=el('toastWrap');
+  const t=document.createElement('div'); t.className='toast'; t.innerHTML='<i></i>'+msg;
+  w.appendChild(t); setTimeout(()=>{ t.style.opacity='0'; t.style.transition='opacity .3s'; setTimeout(()=>t.remove(),320); },2600);
+}
+function openModal(title,html){ el('gm-title').textContent=title; el('gm-body').innerHTML=html; el('gm').classList.add('open'); }
+function closeModal(){ el('gm').classList.remove('open'); }
+el('gm').addEventListener('click',e=>{ if(e.target.id==='gm') closeModal(); });
+
+/* 漏斗逐级明细 */
+const FUNNEL_SRC={'触达':'直播推广群发 / 预约提醒 / 导购私发','预约/进入':'预约成功或进入直播间','观看≥1min':'累计有效观看满 1 分钟','互动':'点赞 / 评论 / 分享','点击商品':'点击直播间购物袋','下单':'创建订单（含未支付）','支付成交':'订单完成支付'};
+function openFunnelDetail(stage,count){
+  const rows=[['王女士','张三','直播推广·群发','08-25'],['李先生','李四','预约提醒','08-25'],['陈小姐','王五','导购私发','08-24']];
+  openModal('「'+stage+'」环节客户明细 · 共 '+count.toLocaleString()+' 人（示例前 3 条）',
+    '<div class="caliber" style="margin-bottom:12px;">行为定义：'+(FUNNEL_SRC[stage]||'—')+'。明细按「客户 × 直播场次」归集。</div>'
+    +'<table><thead><tr><th>客户</th><th>归属店员</th><th>来源/行为</th><th>日期</th></tr></thead><tbody>'
+    +rows.map(r=>'<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td><td class="num">'+r[3]+'</td></tr>').join('')
+    +'</tbody></table><div class="legend">店长/店员视角仅见名下客户（归属快照隔离）；完整清单支持导出跟进。</div>');
+}
+/* 商品明细 */
+function openProductDetail(name){
+  openModal('商品明细 · '+name,
+    '<div class="caliber" style="margin-bottom:12px;">带货表现 = 挂车场次去重数、点击UV、成交订单与金额；转化链 = 点击购物袋 → 加购 → 下单 → 支付。</div>'
+    +'<table><thead><tr><th>指标</th><th>数值</th><th>口径</th></tr></thead><tbody>'
+    +'<tr><td>直播成交金额</td><td>¥25,800</td><td>live_id 非空已支付订单合计</td></tr>'
+    +'<tr><td>带货场次数</td><td>6</td><td>sa_live_cart_item 去重场次</td></tr>'
+    +'<tr><td>商品点击UV</td><td>3,240</td><td>点击购物袋去重客户数</td></tr>'
+    +'<tr><td>新客占比</td><td>38.9%</td><td>首次下单客户 ÷ 成交客户</td></tr></tbody></table>'
+    +'<div class="legend">示例数据 · 完整的商品×直播场次明细与客户清单可在开发版下钻。</div>');
+}
+/* 流量口径 */
+function openFlowCaliber(){
+  openModal('消耗总流量 · 口径说明',
+    '<div class="caliber" style="margin-bottom:12px;"><b>消耗总流量</b> = 统计周期内全部直播场次产生的流量合计，由两部分构成。</div>'
+    +'<table><thead><tr><th>构成</th><th>说明</th><th>计费归属</th></tr></thead><tbody>'
+    +'<tr><td>直播流量</td><td>推流上行 + 观众播放下行，按场次开始日归属</td><td>直播场次（BR-LTF-008）</td></tr>'
+    +'<tr><td>回放流量</td><td>回放点播产生的播放流量，按回放观看日归属</td><td>对应回放日期</td></tr></tbody></table>'
+    +'<div class="legend">单位 MB，账单按 1GB=1024MB 折算；场次级流量明细与成本分摊对接直播流量域（STR-SAAS-002）；T+1 更新。</div>');
+}
+/* 统计周期说明 */
+function openDateInfo(){
+  openModal('统计周期与环比口径',
+    '<table><thead><tr><th>规则</th><th>说明</th></tr></thead><tbody>'
+    +'<tr><td>查看日期</td><td>可选任意一天，限制单天不可跨天，默认今日</td></tr>'
+    +'<tr><td>环比比对日期</td><td>默认 = 查看日 −1；可手动调整，选择后存入浏览器缓存（localStorage），下次进入自动沿用</td></tr>'
+    +'<tr><td>数据更新</td><td>直播域 T+1（每日 11:00 前更新昨日）；会员/商品/订单域 5 分钟刷新；沉睡/活跃/复购状态每日 02:30 预计算</td></tr>'
+    +'<tr><td>重置</td><td>清除缓存或点「重置为昨日」恢复默认</td></tr></tbody></table>');
+}
+/* 导出 */
+function doExport(){
+  toast('「'+(TAB_NAMES[currentTabKey]||'报表')+'」已导出 Excel（演示），实际版本将按当前筛选与统计周期导出');
+}
+/* 课程全行详情 */
+function openCourseDetail2(name){ openCourseDetail(name); }
 </script>
 </body>
 </html>
