@@ -205,28 +205,41 @@
 
       <div class="batch-table-header">
         <span class="required">Day</span>
-        <span class="required">类型</span>
         <span class="required">标题</span>
-        <span>关联课程</span>
+        <span class="required">课程</span>
+        <span class="required">课时</span>
         <span class="required">解锁时间</span>
         <span>截止时间</span>
         <span>必学</span>
         <span>操作</span>
       </div>
       <div v-for="(row, idx) in batchRows" :key="idx" class="batch-row">
-        <t-input-number v-model="row.day_number" :min="1" :max="camp?.total_days ?? 30" placeholder="1" theme="normal" style="width: 110px; flex-shrink: 0" />
-        <t-select v-model="row.schedule_type" style="width: 110px; flex-shrink: 0">
-          <t-option label="课程学习" value="course" />
-        </t-select>
-        <t-input v-model="row.title" placeholder="如Day1开营" style="width: 160px; flex-shrink: 0" />
+        <t-input-number v-model="row.day_number" :min="1" :max="camp?.total_days ?? 30" placeholder="1" theme="normal" style="width: 90px; flex-shrink: 0" />
+        <t-input v-model="row.title" placeholder="如Day1开营" style="width: 140px; flex-shrink: 0" />
         <t-select
           v-model="row.course_id"
           filterable
           clearable
           placeholder="选择课程"
-          style="width: 160px; flex-shrink: 0"
+          style="width: 150px; flex-shrink: 0"
+          @change="onBatchCourseChange(idx)"
         >
           <t-option v-for="c in filteredCourses" :key="c.id" :label="c.title" :value="c.id" />
+        </t-select>
+        <!-- V2·0901 排课以课时为单位：课时必选，已排/本批次已选禁选 -->
+        <t-select
+          v-model="row.lesson_id"
+          filterable
+          placeholder="选择课时"
+          style="width: 180px; flex-shrink: 0"
+        >
+          <t-option
+            v-for="l in batchLessonsOf(row.course_id)"
+            :key="l.id"
+            :label="`第${l.sort_order}课时：${l.title}${isLessonUsed(l.id, idx) ? '·已排' : ''}`"
+            :value="l.id"
+            :disabled="isLessonUsed(l.id, idx)"
+          />
         </t-select>
         <t-date-picker v-model="row.unlock_time" enable-time-picker placeholder="请选择日期" style="width: 170px; flex-shrink: 0" />
         <t-date-picker v-model="row.deadline" enable-time-picker placeholder="请选择日期" style="width: 170px; flex-shrink: 0" />
@@ -350,7 +363,24 @@ const batchRows = ref<Array<{
   description: string; completion_criteria: string;
 }>>([]);
 function createEmptyBatchRow() {
-  return { day_number: 1, schedule_type: 'course' as const, title: '', course_id: '', unlock_time: new Date(), deadline: null, is_required: true, description: '', completion_criteria: '' };
+  return { day_number: 1, schedule_type: 'course' as const, title: '', course_id: '', lesson_id: null as string | null, unlock_time: new Date(), deadline: null, is_required: true, description: '', completion_criteria: '' };
+}
+// V2·0901 批量排课课时化：课时必选（一课时一营期一次），选课程后自动顺延
+function batchLessonsOf(courseId: string) {
+  return courseId ? courseStore.loadLessonsByCourse(courseId).filter(l => l.status === 'published') : [];
+}
+const batchUsedLessonIds = computed(() => new Set(campSchedules.value.map(s => s.lesson_id).filter(Boolean)));
+function isLessonUsed(lessonId: string, rowIdx: number): boolean {
+  if (batchUsedLessonIds.value.has(lessonId)) return true;
+  return batchRows.value.some((r, i) => i !== rowIdx && r.lesson_id === lessonId);
+}
+function onBatchCourseChange(idx: number) {
+  const row = batchRows.value[idx];
+  row.lesson_id = null;
+  const used = new Set<string>(batchUsedLessonIds.value);
+  batchRows.value.forEach((r, i) => { if (i !== idx && r.lesson_id) used.add(r.lesson_id); });
+  const next = batchLessonsOf(row.course_id).find(l => !used.has(l.id));
+  if (next) row.lesson_id = next.id;
 }
 function cloneLastBatchRow() {
   const last = batchRows.value[batchRows.value.length - 1];
@@ -368,33 +398,34 @@ function doBatch() {
   if (batchRows.value.length > 30) { MessagePlugin.warning('批量新增一次最多30条'); return; }
   for (let i = 0; i < batchRows.value.length; i++) {
     if (!batchRows.value[i].title) { MessagePlugin.warning(`第 ${i + 1} 行标题为空`); return; }
-    if (!batchRows.value[i].course_id) { MessagePlugin.warning(`第 ${i + 1} 行未关联课程`); return; }
+    if (!batchRows.value[i].course_id) { MessagePlugin.warning(`第 ${i + 1} 行未选择课程`); return; }
+    if (!batchRows.value[i].lesson_id) { MessagePlugin.warning(`第 ${i + 1} 行未选择课时`); return; }
     if (!batchRows.value[i].unlock_time) { MessagePlugin.warning(`第 ${i + 1} 行未选择解锁时间`); return; }
-    // 课程 mode 匹配校验
-    if (batchRows.value[i].course_id) {
-      const course = courseStore.courses.find(c => c.id === batchRows.value[i].course_id);
-      if (course) {
-        if (camp.value?.mode === 'live' && course.mode === 'recorded') { MessagePlugin.warning(`第 ${i + 1} 行：直播营期不允许排录播课程`); return; }
-        if (camp.value?.mode === 'recorded' && course.mode === 'live') { MessagePlugin.warning(`第 ${i + 1} 行：录播营期不允许排直播课程`); return; }
-      }
-    }
+  }
+  // V2·0901 课时唯一性：与营期已排 + 批次内重复校验
+  const usedIds = new Set(batchUsedLessonIds.value);
+  for (let i = 0; i < batchRows.value.length; i++) {
+    const lid = batchRows.value[i].lesson_id;
+    if (lid && usedIds.has(lid)) { MessagePlugin.warning(`第 ${i + 1} 行：该课时已被排过（或本批次内重复）`); return; }
+    if (lid) usedIds.add(lid);
   }
   batchSubmitting.value = true;
   try {
     const dayCountMap = new Map<number, number>();
     for (const s of campSchedules.value) dayCountMap.set(s.day_number, (dayCountMap.get(s.day_number) || 0) + 1);
-    const mode = camp.value?.mode === 'live' ? 'live' : 'recorded';
     const inputs = batchRows.value.map(row => {
       const currentCount = (dayCountMap.get(row.day_number) || 0) + 1;
       dayCountMap.set(row.day_number, currentCount);
+      const lesson = courseStore.lessons.find(l => l.id === row.lesson_id);
+      const lessonMode = lesson?.mode === 'live' || lesson?.mode === 'qa_live' ? 'live' : 'recorded';
       return {
         camp_id: campId.value,
         day_number: row.day_number,
         sort_order: currentCount,
         schedule_type: 'course',
-        schedule_mode: mode as any,
+        schedule_mode: lessonMode as any,
         course_id: row.course_id || null,
-        lesson_id: null,
+        lesson_id: row.lesson_id || null,
         live_session_id: null,
         unlock_time: Math.floor(row.unlock_time.getTime() / 1000),
         deadline: row.deadline ? Math.floor(row.deadline.getTime() / 1000) : null,
