@@ -173,8 +173,12 @@ const routes: RouteRecordRaw[] = [
       // { path: 'camp-quizzes', name: 'CampFinalQuizManage', component: () => import('../pages/course/tenant/CampFinalQuizManagePage.vue'), meta: { terminal: 'pc-tenant' } },
       // { path: 'camp-qas', name: 'CampQaManage', component: () => import('../pages/course/tenant/CampQaManagePage.vue'), meta: { terminal: 'pc-tenant' } },
       // { path: 'certificate-tutorial-edit', name: 'CertificateTutorialEdit', component: () => import('../pages/course/tenant/CertificateTutorialEditPage.vue'), meta: { terminal: 'pc-tenant' } },
-      // V2·0901 素材中心：合并原视频课程/音频课程（音视频上传不区分）
-      { path: 'materials', name: 'MaterialCenter', component: () => import('../pages/course/tenant/MaterialCenterPage.vue'), meta: { terminal: 'pc-tenant' } },
+      { path: 'videos', name: 'VideoList', component: () => import('../pages/course/tenant/VideoListPage.vue'), meta: { terminal: 'pc-tenant' } },
+      { path: 'video-edit', name: 'VideoEdit', component: () => import('../pages/course/tenant/VideoEditPage.vue'), meta: { terminal: 'pc-tenant' } },
+      { path: 'video-batch-add', name: 'VideoBatchAdd', component: () => import('../pages/course/tenant/VideoBatchAddPage.vue'), meta: { terminal: 'pc-tenant' } },
+      { path: 'audios', name: 'AudioList', component: () => import('../pages/course/tenant/AudioListPage.vue'), meta: { terminal: 'pc-tenant' } },
+      { path: 'audio-edit', name: 'AudioEdit', component: () => import('../pages/course/tenant/AudioEditPage.vue'), meta: { terminal: 'pc-tenant' } },
+      { path: 'audio-batch-add', name: 'AudioBatchAdd', component: () => import('../pages/course/tenant/AudioBatchAddPage.vue'), meta: { terminal: 'pc-tenant' } },
       // ── V2·D2-1 本期不做交易：课程分成记录下线 ──
       // { path: 'share-records', name: 'CourseShareRecords', component: () => import('../pages/course/tenant/CampCommissionPage.vue'), meta: { terminal: 'pc-tenant' } },
       // { path: 'share-data', name: 'CourseShareData', component: () => import('../pages/course/tenant/CourseShareDataPage.vue'), meta: { terminal: 'pc-tenant' } },
