@@ -71,7 +71,6 @@
                   </div>
                   <div class="sc-times">
                     <span class="sc-time"><t-icon name="unlock" />解锁 {{ formatTime(s.unlock_time) }}</span>
-                    <span v-if="s.deadline" class="sc-time"><t-icon name="time" />截止 {{ formatTime(s.deadline) }}</span>
                   </div>
                 </div>
                 <t-popconfirm v-if="!isLocked" content="确认删除此排课？" theme="danger" @confirm="del(s)">
@@ -149,11 +148,6 @@
               <t-date-picker v-model="addForm.unlock_time" enable-time-picker placeholder="选择解锁时间" style="width: 100%" />
             </t-form-item>
           </div>
-          <div class="form-col">
-            <t-form-item label="截止时间">
-              <t-date-picker v-model="addForm.deadline" enable-time-picker placeholder="可选·设置学习截止时间" style="width: 100%" />
-            </t-form-item>
-          </div>
           <div class="form-col-full">
             <t-form-item label="完成判定">
               <t-select v-model="addForm.completion_criteria" clearable placeholder="请选择完成判定标准" style="width:100%">
@@ -182,7 +176,6 @@
         <span class="required">课程</span>
         <span class="required">课时</span>
         <span class="required">解锁时间</span>
-        <span>截止时间</span>
         <span>必学</span>
         <span>操作</span>
       </div>
@@ -215,7 +208,6 @@
           />
         </t-select>
         <t-date-picker v-model="row.unlock_time" enable-time-picker placeholder="请选择日期" style="width: 170px; flex-shrink: 0" />
-        <t-date-picker v-model="row.deadline" enable-time-picker placeholder="请选择日期" style="width: 170px; flex-shrink: 0" />
         <t-switch v-model="row.is_required" size="small" />
         <t-button variant="text" theme="danger" @click="batchRows.splice(idx, 1)" :disabled="batchRows.length === 1">
           <template #icon><t-icon name="delete" /></template>
