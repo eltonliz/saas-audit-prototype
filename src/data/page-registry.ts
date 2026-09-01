@@ -61,7 +61,6 @@ export const PAGE_REGISTRY: ModuleRegItem[] = [
         key: 'camp-schedule', title: '排课表', route: '/tenant/course/camp-schedule',
         modals: [
           { key: 'schedule-add', title: '新增排课', chain: ['新增排课'] },
-          { key: 'schedule-oneclick', title: '一键排整个课程', chain: ['一键排课'] },
           { key: 'schedule-batch', title: '批量排课', chain: ['批量排课'] },
           { key: 'schedule-quick-course', title: '快捷新建课程', chain: ['快捷新建'] },
         ],
