@@ -52,14 +52,7 @@ export const PAGE_REGISTRY: ModuleRegItem[] = [
           // V2·0829 用户裁决：题库管理菜单项删除（操作统一在编辑模块内）
         ],
       },
-      {
-        key: 'reviews', title: '课程评价', route: '/tenant/course/reviews',
-        modals: [
-          { key: 'review-detail', title: '评价详情（含二级回复）', chain: ['详情'] },
-          { key: 'review-reply', title: '回复评价', chain: ['回复'] },
-          { key: 'review-reject', title: '驳回评价', chain: ['驳回'] },
-        ],
-      },
+      // V2·0901 用户裁决：评价模块整体下线
     ],
   },
   {

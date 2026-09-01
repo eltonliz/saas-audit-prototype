@@ -74,14 +74,6 @@ export const CourseVisibilityEnum = z.enum([
 ]);
 export type CourseVisibility = z.infer<typeof CourseVisibilityEnum>;
 
-/** 评价审核状态（BR-COURSE-009·审核未通过模糊回显） */
-export const ReviewStatusEnum = z.enum([
-  'pending',    // 审核中（回显时模糊处理）
-  'approved',   // 审核通过（正常显示）
-  'rejected',   // 审核驳回（模糊+未通过提示）
-]);
-export type ReviewStatus = z.infer<typeof ReviewStatusEnum>;
-
 /** 奖励类型（D35·积分与红包可共存·课程配置决定） */
 export const CourseRewardTypeEnum = z.enum([
   'points',            // 积分奖励
@@ -150,10 +142,6 @@ export const CourseSchema = z.object({
   /** 学习统计（聚合字段） */
   total_learners: z.number().int().min(0).default(0),
   total_learning_minutes: z.number().int().min(0).default(0),
-  /** 课程评分（1.0~5.0·聚合自CourseReview） */
-  rating: z.number().min(0).max(5).default(0),
-  /** 评价数（聚合字段） */
-  review_count: z.number().int().min(0).default(0),
 
   /** 课程状态（状态机·集中定义） */
   status: CourseStatusEnum.default('draft'),
@@ -410,78 +398,7 @@ export const CourseQuizConfigSchema = z.object({
 });
 export type CourseQuizConfig = z.infer<typeof CourseQuizConfigSchema>;
 
-/** ENT-COURSE-007 课程评价（含审核模糊回显BR-COURSE-009） */
-export const CourseReviewSchema = z.object({
-  /** 主键ID·格式REVIEW-YYYYMM-NNNNN */
-  id: z.string(),
-  /** 关联课程ID */
-  course_id: z.string(),
-  /** 关联营期ID（可选） */
-  camp_id: z.string().nullable().optional(),
-  /** 学员ID */
-  student_id: z.string(),
-  /** 学员姓名·快照 */
-  student_name: z.string(),
-  /** 学员头像·快照 */
-  student_avatar: z.string().optional(),
-
-  /** 评分（1~5星） */
-  rating: z.number().int().min(1).max(5),
-  /** 评价内容 */
-  content: z.string().min(1).max(500),
-  /** 配图URL列表 */
-  images: z.array(z.string()).default([]),
-
-  /** 审核状态（BR-COURSE-009·审核未通过模糊回显） */
-  review_status: ReviewStatusEnum.default('pending'),
-  /** 审核人ID */
-  reviewer_id: z.string().nullable().optional(),
-  /** 审核备注（驳回时） */
-  review_remark: z.string().optional(),
-  /** 审核时间 */
-  reviewed_at: z.number().int().nullable().optional(),
-
-  /** 回复数（聚合字段·子单CourseReviewReply变化时聚合） */
-  reply_count: z.number().int().min(0).default(0),
-  /** 点赞数 */
-  like_count: z.number().int().min(0).default(0),
-
-  /** 是否隐藏（学员主动删除） */
-  is_hidden: z.boolean().default(false),
-
-  /** 创建时间 */
-  created_at: z.number().int(),
-  /** 更新时间 */
-  updated_at: z.number().int(),
-});
-export type CourseReview = z.infer<typeof CourseReviewSchema>;
-
-/** ENT-COURSE-008 评价回复（CourseReview子实体·父子关系） */
-export const CourseReviewReplySchema = z.object({
-  /** 主键ID·格式REPLY-YYYYMM-NNNNN */
-  id: z.string(),
-  /** 父评价ID·关联CourseReview.id */
-  review_id: z.string(),
-  /** 回复人ID */
-  replier_id: z.string(),
-  /** 回复人姓名·快照 */
-  replier_name: z.string(),
-  /** 回复人角色（学员/讲师/助教） */
-  replier_role: z.enum(['student', 'main_lecturer', 'assistant']),
-  /** 回复内容 */
-  content: z.string().min(1).max(500),
-  /** 父回复ID（二级回复·null为一级回复） */
-  parent_reply_id: z.string().nullable().optional(),
-
-  /** 审核状态（同评价·审核未通过模糊回显） */
-  review_status: ReviewStatusEnum.default('pending'),
-
-  /** 创建时间 */
-  created_at: z.number().int(),
-  /** 更新时间 */
-  updated_at: z.number().int(),
-});
-export type CourseReviewReply = z.infer<typeof CourseReviewReplySchema>;
+// V2·0901 用户裁决：评价模块整体下线（CourseReview/CourseReviewReply 实体已移除）
 
 // ============================================
 // 辅助类型（入参）
@@ -558,7 +475,6 @@ export const CourseContracts = {
   CourseSourceEnum,
   CourseModeEnum,
   CourseVisibilityEnum,
-  ReviewStatusEnum,
   CourseRewardTypeEnum,
   // Schema
   CourseSchema,
@@ -567,8 +483,6 @@ export const CourseContracts = {
   QuestionSchema,
   AnswerRecordSchema,
   CourseQuizConfigSchema,
-  CourseReviewSchema,
-  CourseReviewReplySchema,
   // Input
   CreateCourseInputSchema,
   CreateLessonInputSchema,

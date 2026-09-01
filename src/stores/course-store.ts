@@ -10,13 +10,13 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import type {
   Course, Lesson, QuestionBank, Question, AnswerRecord,
-  CourseQuizConfig, CourseReview, CourseReviewReply,
+  CourseQuizConfig,
   CreateCourseInput, CreateLessonInput, CreateQuestionInput,
 } from '../contracts/schemas/course-schemas';
 import type { LearningRecord } from '../contracts/schemas/camp-schemas';
 import {
   SEED_COURSES, SEED_LESSONS, SEED_QUESTION_BANKS, SEED_QUESTIONS,
-  SEED_QUIZ_CONFIGS, SEED_REVIEWS, SEED_REVIEW_REPLIES, SEED_ANSWER_RECORDS,
+  SEED_QUIZ_CONFIGS, SEED_ANSWER_RECORDS,
 } from '../adapters/sim/course-sim-data';
 import { SEED_LEARNING_RECORDS } from '../adapters/sim/camp-sim-data';
 import {
@@ -35,8 +35,6 @@ export const useCourseStore = defineStore('course', () => {
   const questions = ref<Question[]>([...SEED_QUESTIONS]);
   const answerRecords = ref<AnswerRecord[]>([...SEED_ANSWER_RECORDS]);
   const quizConfigs = ref<CourseQuizConfig[]>([...SEED_QUIZ_CONFIGS]);
-  const reviews = ref<CourseReview[]>([...SEED_REVIEWS]);
-  const reviewReplies = ref<CourseReviewReply[]>([...SEED_REVIEW_REPLIES]);
   const learningRecords = ref<LearningRecord[]>([...SEED_LEARNING_RECORDS]);
 
   // ── 课程 Action ──
@@ -54,8 +52,6 @@ export const useCourseStore = defineStore('course', () => {
       camp_ref_count: 0,
       total_learners: 0,
       total_learning_minutes: 0,
-      rating: 0,
-      review_count: 0,
       completion_reward_enabled: input.completion_reward_enabled ?? false,
       answer_reward_enabled: input.answer_reward_enabled ?? false,
       reward_type: input.reward_type ?? 'points',
@@ -326,93 +322,7 @@ export const useCourseStore = defineStore('course', () => {
     return record;
   }
 
-  // ── 评价 Action ──
-
-  function createReview(input: { course_id: string; camp_id?: string; student_id: string; student_name: string; rating: number; content: string; images?: string[] }): CourseReview {
-    const review: CourseReview = {
-      id: genId('REVIEW'),
-      course_id: input.course_id,
-      camp_id: input.camp_id ?? null,
-      student_id: input.student_id,
-      student_name: input.student_name,
-      student_avatar: '',
-      rating: input.rating,
-      content: input.content,
-      images: input.images ?? [],
-      review_status: 'pending',
-      reply_count: 0,
-      like_count: 0,
-      is_hidden: false,
-      created_at: now(),
-      updated_at: now(),
-    } as CourseReview;
-    reviews.value.push(review);
-    return review;
-  }
-
-  function updateReview(id: string, patch: Partial<CourseReview>): void {
-    const idx = reviews.value.findIndex(r => r.id === id);
-    if (idx >= 0) {
-      reviews.value[idx] = { ...reviews.value[idx], ...patch, review_status: 'pending', updated_at: now() };
-    }
-  }
-
-  function loadReviewsByCourse(courseId: string): CourseReview[] {
-    return reviews.value.filter(r => r.course_id === courseId && !r.is_hidden && r.review_status === 'approved');
-  }
-
-  function approveReview(id: string, reviewerId: string): void {
-    const review = reviews.value.find(r => r.id === id);
-    if (review) {
-      review.review_status = 'approved';
-      review.reviewer_id = reviewerId;
-      review.reviewed_at = now();
-      review.updated_at = now();
-      // 聚合 Course.rating
-      const course = courses.value.find(c => c.id === review.course_id);
-      if (course) {
-        const approved = reviews.value.filter(r => r.course_id === course.id && r.review_status === 'approved');
-        course.review_count = approved.length;
-        course.rating = approved.length > 0 ? approved.reduce((sum, r) => sum + r.rating, 0) / approved.length : 0;
-        course.updated_at = now();
-      }
-    }
-  }
-
-  function rejectReview(id: string, reviewerId: string, remark: string): void {
-    const review = reviews.value.find(r => r.id === id);
-    if (review) {
-      review.review_status = 'rejected';
-      review.reviewer_id = reviewerId;
-      review.review_remark = remark;
-      review.reviewed_at = now();
-      review.updated_at = now();
-    }
-  }
-
-  function toggleReviewHidden(id: string): void {
-    const review = reviews.value.find(r => r.id === id);
-    if (review) { review.is_hidden = !review.is_hidden; review.updated_at = now(); }
-  }
-
-  function createReviewReply(input: { review_id: string; replier_id: string; replier_name: string; replier_role: 'student' | 'main_lecturer' | 'assistant'; content: string; parent_reply_id?: string }): CourseReviewReply {
-    const reply: CourseReviewReply = {
-      id: genId('REPLY'),
-      review_id: input.review_id,
-      replier_id: input.replier_id,
-      replier_name: input.replier_name,
-      replier_role: input.replier_role,
-      content: input.content,
-      parent_reply_id: input.parent_reply_id ?? null,
-      review_status: 'approved',
-      created_at: now(),
-      updated_at: now(),
-    } as CourseReviewReply;
-    reviewReplies.value.push(reply);
-    const review = reviews.value.find(r => r.id === input.review_id);
-    if (review) { review.reply_count++; review.updated_at = now(); }
-    return reply;
-  }
+  // V2·0901 用户裁决：评价模块整体下线（评价相关 store/schema/页面已移除）
 
   // ── 排课联动：只读课时生成（source=camp_schedule） ──
 
@@ -545,8 +455,6 @@ export const useCourseStore = defineStore('course', () => {
     quizConfigs.value.push(config); return config;
   }
   function loadAnswerRecords(studentId?: string): AnswerRecord[] { return studentId ? answerRecords.value.filter(a => a.student_id === studentId) : answerRecords.value; }
-  function loadAllReviews(): CourseReview[] { return reviews.value; }
-  function isReviewBlurNeeded(review: CourseReview): boolean { return review.review_status === 'pending' || review.review_status === 'rejected'; }
   function loadLearningRecords(studentId?: string): LearningRecord[] { return studentId ? learningRecords.value.filter((r: any) => r.student_id === studentId) : learningRecords.value; }
 
   // P1: 只读课时守卫（source=camp_schedule 不可编辑/删除）
@@ -637,7 +545,7 @@ export const useCourseStore = defineStore('course', () => {
   return {
     // State
     courses, lessons, questionBanks, questions, answerRecords, quizConfigs,
-    reviews, reviewReplies, learningRecords,
+    learningRecords,
     // 课程 Action
     createCourse, updateCourse, deleteCourse, loadCourseList, reloadCourseList, loadCourse,
     transitionCourseStatus, submitCourseForReview, approveCourse, rejectCourse,
@@ -648,12 +556,10 @@ export const useCourseStore = defineStore('course', () => {
     // 题库/题目 Action
     createQuestionBank, loadQuestionBank, createQuestion, loadQuestionsByBank, loadQuizConfig,
     checkQuizTrigger, submitAnswer,
-    // 评价 Action
-    createReview, updateReview, loadReviewsByCourse, approveReview, rejectReview, toggleReviewHidden, createReviewReply,
     // 学习记录 Action
     updateLearningRecord, loadLearningRecords,
     // P1 补齐
-    createQuizConfig, loadAnswerRecords, loadAllReviews, isReviewBlurNeeded, updateLessonSafe, deleteLessonSafe,
+    createQuizConfig, loadAnswerRecords, updateLessonSafe, deleteLessonSafe,
     // P2 补齐：内容池
     loadContentPool,
     contentPool, addContent, updateContent, removeContent, toggleContentStatus,

@@ -7,21 +7,13 @@
     </div>
     <h2 class="title">{{ course.title }}</h2>
     <div class="meta">{{ course.category_name }} · {{ course.lesson_count }}课时 · {{ course.mode === 'live' ? '直播' : '录播' }}</div>
-    <div class="rating-row">
-      <span class="rating"><t-icon name="star-filled" :size="16" />{{ course.rating }}</span>
-      <span class="rating-count">{{ course.review_count }}条评价</span>
-      <span class="learners">{{ course.total_learners }}人学习</span>
-    </div>
+    <div class="learners-row">{{ course.total_learners }}人学习</div>
     <!-- P1: 课程简介 -->
     <div v-if="course.description" class="course-desc">{{ course.description }}</div>
     <!-- P1: 可见性拦截 -->
     <div v-if="course.visibility === 'camp_only'" class="intercept-banner"><t-icon name="lock-on" :size="14" /> 此课程仅营期内可学，请先加入营期</div>
-    <!-- V2·0829 用户裁决：讲师/助教下线，讲师卡已删除 -->
-    <div class="tabs">
-      <!-- V2·0828 会议：测验/答疑推下期 -->
-      <span v-for="t in ['课时','评价']" :key="t" class="tab" :class="{ active: tab === t }" @click="tab = t">{{ t }}<span v-if="t === '评价' && hasReviewFeedback" class="tab-dot"></span></span>
-    </div>
-    <template v-if="tab === '课时'">
+    <!-- V2·0829 用户裁决：讲师/助教下线，讲师卡已删除；V2·0901 评价模块下线 -->
+    <div class="lesson-list">
       <div v-for="l in lessons" :key="l.id" class="lesson-item" @click="goLesson(l)">
         <div class="lesson-left">
           <span class="lesson-status"><t-icon :name="isLessonCompleted(l.id) ? 'check-circle' : 'play-circle'" :size="18" /></span>
@@ -34,31 +26,7 @@
         <span v-else-if="!isLessonCompleted(l.id)" class="lesson-go">›</span>
         <span v-else class="lesson-done-text">已完成</span>
       </div>
-    </template>
-    <!-- V2·0828 会议：测验/答疑推下期，模板已移除 -->
-    <template v-else-if="tab === '评价'">
-      <div class="review-overview">
-        <div class="review-score"><t-icon name="star-filled" :size="32" />{{ course.rating }}</div>
-        <div class="review-bars">
-          <div v-for="n in [5,4,3,2,1]" :key="n" class="review-bar-row">
-            <span class="bar-star">{{ n }}星</span>
-            <div class="bar-track"><div class="bar-fill" :style="{ width: getBarWidth(n) + '%' }"></div></div>
-          </div>
-        </div>
-      </div>
-      <button class="write-review-btn" :class="{ 'write-disabled': !canReview }" @click="goWriteReview"><EmojiIcon emoji="✍️" :size="16" /> {{ canReview ? (myReview ? '修改我的评价' : '写评价') : '报名后可评价' }}</button>
-      <div v-for="r in reviews" :key="r.id" class="review-item">
-        <div class="review-user">
-          {{ r.student_name }} · <t-icon name="star-filled" :size="12" /> {{ r.rating }}
-          <span v-if="r.student_id === 'STU-001' && r.review_status !== 'approved'" class="mine-status" :class="r.review_status">
-            {{ r.review_status === 'pending' ? '审核中' : '未通过·' + (r.review_remark || '内容待改进') }}
-          </span>
-        </div>
-        <div class="review-content">{{ r.content }}</div>
-        <div class="review-date">{{ new Date(r.created_at * 1000).toLocaleDateString() }}</div>
-      </div>
-      <div v-if="reviews.length === 0" class="empty">暂无评价</div>
-    </template>
+    </div>
     <div class="cta-bar">
       <!-- V2·D2-1 本期不做交易：全免费模式，无购买/权益链路 -->
       <button v-if="course.mode === 'live'" class="cta-btn live" @click="goLive"><EmojiIcon emoji="📺" :size="16" /> 进入直播</button>
@@ -81,24 +49,9 @@ const tab = ref('课时');
 const course = computed(() => store.loadCourse(route.params.id as string));
 
 const lessons = computed(() => store.loadLessonsByCourse(route.params.id as string));
-// V2·0831 评价可见性：审核通过对所有人可见；本人待审/被驳仅本人可见（含驳回原因）
-const reviews = computed(() => store.reviews.filter((r: any) => r.course_id === route.params.id && !r.is_hidden && (r.review_status === 'approved' || r.student_id === 'STU-001')));
-// 评价资格：报名过该课程任一营期（以学习记录存在为准）
-const canReview = computed(() => store.learningRecords.some((r: any) => r.student_id === 'STU-001' && r.course_id === route.params.id));
-const myReview = computed(() => store.reviews.find((r: any) => r.course_id === route.params.id && r.student_id === 'STU-001'));
-// V2·0831 驳回/审核中提醒：本人评价非「已通过」时，评价 Tab 显示红点引导查看结果
-const hasReviewFeedback = computed(() => !!myReview.value && myReview.value.review_status !== 'approved');
-function goWriteReview() {
-  if (!canReview.value) { MessagePlugin.warning('报名该课程任一营期后才能评价'); return; }
-  router.push('/app/student/course/' + route.params.id + '/review');
-}
 
 function isLessonCompleted(lessonId: string) {
   return store.learningRecords.some((r: any) => r.student_id === 'STU-001' && r.lesson_id === lessonId && r.completion_rate >= 0.9);
-}
-function getBarWidth(stars: number) {
-  const total = reviews.value.length || 1;
-  return (reviews.value.filter(r => r.rating === stars).length / total) * 100;
 }
 function goLesson(l: any) { if (l.mode === 'live') return; router.push('/app/student/lesson/' + l.id); }
 function goLive() { const sessionId = course.value?.source_live_session_id || 'LIVE-202608-00002'; router.push('/app/student/live/' + sessionId); }
@@ -116,10 +69,7 @@ function goFirstLesson() { const first = lessons.value.find(l => l.mode !== 'liv
 .cover-icon { font-size: 48px; }
 .title { font-size: 20px; font-weight: 700; color: #1F2C3E; }
 .meta { font-size: 13px; color: #667085; margin: 4px 0; }
-.rating-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
-.rating { font-size: 16px; color: #F79009; font-weight: 600; }
-.rating-count { font-size: 13px; color: #667085; }
-.learners { font-size: 13px; color: #667085; margin-left: auto; }
+.learners-row { font-size: 13px; color: #667085; margin-bottom: 16px; }
 .course-desc { font-size: 13px; color: #667085; line-height: 1.6; margin-bottom: 12px; padding: 12px; background: #fff; border-radius: 10px; }
 .intercept-banner { padding: 10px 14px; background: rgba(247,144,9,0.1); border-radius: 8px; font-size: 13px; color: #F79009; margin-bottom: 12px; }
 .lecturer-card { display: flex; align-items: center; gap: 12px; background: #fff; border-radius: 10px; padding: 14px; margin-bottom: 16px; }

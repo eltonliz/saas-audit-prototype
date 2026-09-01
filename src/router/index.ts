@@ -117,7 +117,7 @@ const routes: RouteRecordRaw[] = [
       { path: 'store-list', name: 'AppStoreList', component: () => import('../pages/course/app/StoreListPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-STORE'], role: 'student' } },
       // ── 共享页面（学员主属，meta.shared 允许讲师/助教跨角色访问）──
       { path: 'course/:id', name: 'AppCourseDetail', component: () => import('../pages/course/app/CourseDetailPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-002'], shared: true } },
-      { path: 'course/:id/review', name: 'AppCourseReview', component: () => import('../pages/course/app/CourseReviewPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-009'], shared: true } },
+      { path: 'course/:id/review', redirect: '/app/student/home' },
       { path: 'lesson/:id', name: 'AppLessonLearn', component: () => import('../pages/course/app/LessonLearnPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-003'], shared: true } },
       { path: 'camp/:id', name: 'AppCampDetail', component: () => import('../pages/course/app/CampDetailPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-004'], shared: true } },
       { path: 'camp/:id/learn', name: 'AppCampLearn', component: () => import('../pages/course/app/CampLearnPage.vue'), meta: { terminal: 'app', fn: ['FN-APP-005'], shared: true } },
@@ -154,7 +154,7 @@ const routes: RouteRecordRaw[] = [
       // { path: 'orders', redirect: '/tenant/orders?businessType=knowledge' },
       // { path: 'aftersale', name: 'CampAftersale', component: () => import('../pages/course/tenant/CampAftersalePage.vue'), meta: { terminal: 'pc-tenant' } },
       // { path: 'withdraw', name: 'WithdrawReview', component: () => import('../pages/course/tenant/WithdrawReviewPage.vue'), meta: { terminal: 'pc-tenant' } },
-      { path: 'reviews', name: 'CourseReviewManage', component: () => import('../pages/course/tenant/CourseReviewManagePage.vue'), meta: { terminal: 'pc-tenant', fn: ['FN-PC-014'] } },
+      { path: 'reviews', redirect: '/tenant/course/courses' },
       // { path: 'contracts', name: 'ContractManage', component: () => import('../pages/course/tenant/ContractManagePage.vue'), meta: { terminal: 'pc-tenant' } },
       // { path: 'certificates', name: 'CertificateManage', component: () => import('../pages/course/tenant/CertificateManagePage.vue'), meta: { terminal: 'pc-tenant', fn: ['FN-PC-015'] } },
       { path: 'dashboard', name: 'CampDashboard', component: () => import('../pages/course/tenant/CampDashboardPage.vue'), meta: { terminal: 'pc-tenant', fn: ['FN-PC-016'] } },

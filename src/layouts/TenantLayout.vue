@@ -46,7 +46,6 @@
           <el-menu-item index="/tenant/course/videos">视频课程</el-menu-item>
           <el-menu-item index="/tenant/course/audios">音频课程</el-menu-item>
           <el-menu-item index="/tenant/course/questions">题目库</el-menu-item>
-          <el-menu-item index="/tenant/course/reviews">课程评价</el-menu-item>
         </el-sub-menu>
 
         <!-- 营期管理 -->
