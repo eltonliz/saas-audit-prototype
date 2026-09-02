@@ -132,6 +132,16 @@ export const CourseSchema = z.object({
   /** V2·0902 触发答题（课程级默认）：开关+触发时机，排课可覆盖 */
   quiz_enabled: z.boolean().default(false),
   quiz_trigger: z.enum(['start', 'half', 'eighty', 'end']).default('half'),
+  /** V2·0902 奖励配置（课程级·原单视频奖励上移）：答题红包（现金红包选择器）+答题积分 */
+  quiz_reward_cash_enabled: z.boolean().default(false),
+  quiz_reward: z.object({
+    no: z.string(),
+    amount: z.number().int(),
+    count: z.number().int(),
+    type: z.string(),
+  }).nullable().default(null),
+  answer_reward_points_enabled: z.boolean().default(false),
+  answer_reward_points: z.number().int().min(0).default(20),
   /** 课程可见性（public/camp_only） */
   visibility: CourseVisibilityEnum.default('public'),
 
@@ -433,6 +443,10 @@ export const CreateCourseInputSchema = CourseSchema.pick({
   display_style: true,
   quiz_enabled: true,
   quiz_trigger: true,
+  quiz_reward_cash_enabled: true,
+  quiz_reward: true,
+  answer_reward_points_enabled: true,
+  answer_reward_points: true,
   visibility: true,
 }).extend({
   question_bank_id: z.string().optional(),

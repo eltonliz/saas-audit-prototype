@@ -135,13 +135,6 @@
                     </template>
                   </div>
                 </template>
-                <template #reward="{ row }">
-                  <t-button v-if="!row.reward" variant="text" size="small" theme="primary" @click="openRewardPicker(row)">添加奖励</t-button>
-                  <div v-else class="reward-cell" @click="openRewardPicker(row)">
-                    <span class="reward-name">{{ row.reward.no }}</span>
-                    <span class="reward-meta">¥{{ row.reward.amount }} / {{ row.reward.count }}个 · {{ row.reward.type }}</span>
-                  </div>
-                </template>
                 <template #file="{ row }"><t-button variant="text" size="small" theme="primary" @click="MessagePlugin.info(`共 ${row.files_count ?? 1} 个文件：${row.file_name ?? row.name}`)">查看{{ row.files_count ?? 1 }}文件</t-button></template>
                 <template #vop="{ row }"><t-button variant="text" size="small" theme="danger" @click="removeVideo(row)">移除</t-button></template>
               </t-table>
@@ -219,6 +212,24 @@
               <span style="font-size:13px;color:#475467">视频播放进度到达</span>
               <t-input-number v-model="form.completion_percent" :min="1" :max="100" theme="column" size="small" style="width:90px;margin:0 6px" />
               <span style="font-size:13px;color:#475467">%</span>
+            </t-form-item>
+            <!-- V2·0902 奖励配置（课程级·红包按原单视频奖励交互选择，积分直接配置） -->
+            <t-form-item label="红包奖励">
+              <t-switch v-model="(form as any).quiz_reward_cash_enabled" />
+              <template v-if="(form as any).quiz_reward_cash_enabled">
+                <div v-if="(form as any).quiz_reward" class="reward-cell" style="margin-left:8px" @click="openRewardPicker()">
+                  <span class="reward-name">{{ (form as any).quiz_reward.no }}</span>
+                  <span class="reward-meta">¥{{ (form as any).quiz_reward.amount }} / {{ (form as any).quiz_reward.count }}个 · {{ (form as any).quiz_reward.type }}</span>
+                </div>
+                <t-button v-else variant="text" size="small" theme="primary" style="margin-left:8px" @click="openRewardPicker()">选择红包</t-button>
+              </template>
+            </t-form-item>
+            <t-form-item label="积分奖励">
+              <t-switch v-model="(form as any).answer_reward_points_enabled" />
+              <template v-if="(form as any).answer_reward_points_enabled">
+                <t-input-number v-model="(form as any).answer_reward_points" :min="1" :step="5" theme="column" size="small" style="width:90px;margin:0 6px" />
+                <span class="switch-label">积分 / 次</span>
+              </template>
             </t-form-item>
             <!-- V2·0902 答题触发时机（课程级默认时机，题库/奖励在排课层配置） -->
             <t-form-item label="答题触发时机" required-mark>
@@ -429,6 +440,11 @@ function defaultForm() {
     show_progress: 'allow' as 'allow' | 'disallow', allow_pause: 'disallow' as 'allow' | 'disallow', completion_percent: 100,
     // V2·0902 触发答题（课程级默认）：开关+时机+题库
     quiz_trigger: 'half' as 'start' | 'half' | 'eighty' | 'end',
+    // V2·0902 奖励配置（课程级）：红包按现金红包选择器，积分直接配置
+    quiz_reward_cash_enabled: false,
+    quiz_reward: null as { no: string; amount: number; count: number; type: string } | null,
+    answer_reward_points_enabled: false,
+    answer_reward_points: 20,
     // D35 完课奖励配置（业务新增·现金红包与积分可同选）
     completion_reward_enabled: false,
     reward_cash_enabled: true, reward_amount: 1, red_packet_rule_id: '',
@@ -462,7 +478,6 @@ const videoColumns = [
   { colKey: 'duration', title: '视频时长', width: 95 },
   { colKey: 'category', title: '所属分类', width: 90 },
   { colKey: 'quiz', title: '是否答题', width: 200 },
-  { colKey: 'reward', title: '奖励', width: 130 },
   { colKey: 'vop', title: '操作', width: 70, fixed: 'right' },
 ];
 
@@ -615,15 +630,15 @@ const rewardColumns = [
   { colKey: 'created', title: '创建时间', width: 150 },
 ];
 function onRewardSelect(_keys: (string | number)[], ctx: any) { rewardSelectedKeys.value = _keys; }
-function openRewardPicker(row: any) {
-  rewardPickerRow.value = row;
-  rewardSelectedKeys.value = row.reward ? [row.reward.no] : [];
+// V2·0902 奖励配置上移课程级：红包按原单视频奖励交互（现金红包选择器）
+function openRewardPicker() {
+  rewardSelectedKeys.value = (form.value as any).quiz_reward ? [(form.value as any).quiz_reward.no] : [];
   rewardPickerVisible.value = true;
 }
 function confirmRewardPicker() {
   const hit = rewardList.value.find(r => rewardSelectedKeys.value.includes(r.no));
   if (!hit) { MessagePlugin.warning('请选择一个现金红包'); return; }
-  if (rewardPickerRow.value) rewardPickerRow.value.reward = { no: hit.no, amount: hit.amount, count: hit.count, type: hit.type };
+  (form.value as any).quiz_reward = { no: hit.no, amount: hit.amount, count: hit.count, type: hit.type };
   MessagePlugin.success(`已关联现金红包 ${hit.no}`);
   rewardPickerVisible.value = false;
 }
@@ -646,6 +661,10 @@ function openEditDrawer(row: any) {
     show_in_app: (row as any).show_in_app ?? true,
     show_intro: true, virtual_viewers: true, virtual_min: 1, virtual_max: 100, comment_enabled: true, comment_max_words: 50, show_progress: 'allow', allow_pause: 'disallow', completion_percent: 100,
     quiz_trigger: (row as any).quiz_trigger || 'half',
+    quiz_reward_cash_enabled: (row as any).quiz_reward_cash_enabled ?? false,
+    quiz_reward: (row as any).quiz_reward ?? null,
+    answer_reward_points_enabled: (row as any).answer_reward_points_enabled ?? false,
+    answer_reward_points: (row as any).answer_reward_points ?? 20,
     forbid_seek: false, forbid_speed: false, watermark_horse: false, watermark_text: false,
     completion_reward_enabled: false, reward_cash_enabled: true, reward_amount: 1, red_packet_rule_id: '', reward_points_enabled: false, reward_points: 20,
   };
@@ -671,21 +690,19 @@ function doSave() {
     }
   }
   if (editing.value) {
-    store.updateCourse(editing.value.id, { title: form.value.title, category_name: form.value.category_name, description: form.value.description, mode: form.value.mode, visibility: form.value.visibility, cover_url: form.value.cover_url, is_paid: isPaid, price, commission_enabled: false, show_in_app: form.value.show_in_app, lecturer_id: '', lecturer_name: '', live_room_id: form.value.mode === 'live' ? liveRoomId : null, live_display_title: (form.value as any).live_display_title || '', display_style: form.value.mode === 'recorded' ? (form.value as any).display_style : undefined, quiz_trigger: (form.value as any).quiz_trigger || 'half' } as any);
+    store.updateCourse(editing.value.id, { title: form.value.title, category_name: form.value.category_name, description: form.value.description, mode: form.value.mode, visibility: form.value.visibility, cover_url: form.value.cover_url, is_paid: isPaid, price, commission_enabled: false, show_in_app: form.value.show_in_app, lecturer_id: '', lecturer_name: '', live_room_id: form.value.mode === 'live' ? liveRoomId : null, live_display_title: (form.value as any).live_display_title || '', display_style: form.value.mode === 'recorded' ? (form.value as any).display_style : undefined, quiz_trigger: (form.value as any).quiz_trigger || 'half', quiz_reward_cash_enabled: form.value.mode === 'recorded' ? (form.value as any).quiz_reward_cash_enabled : false, quiz_reward: form.value.mode === 'recorded' ? (form.value as any).quiz_reward : null, answer_reward_points_enabled: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points_enabled : false, answer_reward_points: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points : 0 } as any);
     if (form.value.mode === 'recorded') {
       form.value.videos.forEach((v: any) => {
         const existing = store.lessons.find((l: any) => l.lesson_no === v.video_no);
         if (!existing) {
-          store.createLesson({ course_id: editing.value.id, content_type: v.ctype === 'audio' ? 'audio' : 'video', sort_order: store.loadLessonsByCourse(editing.value.id).length + 1, title: v.name, description: '', mode: 'recorded', video_url: '', video_duration: v.ctype === 'audio' ? 1200 : 3036, live_session_id: null, question_bank_id: v.has_quiz ? (store.courses.find(c => c.id === editing.value.id)?.question_bank_id ?? null) : null, is_free_preview: false, reward: v.reward ?? null } as any);
-        } else if (v.reward) {
-          // V2·0829：课时行「添加奖励」同步到 lesson（C 端答题激励数据源）
-          store.updateLesson(existing.id, { reward: v.reward } as any);
+          // V2·0902 奖励配置上移课程级：课时不再单独配置 reward
+          store.createLesson({ course_id: editing.value.id, content_type: v.ctype === 'audio' ? 'audio' : 'video', sort_order: store.loadLessonsByCourse(editing.value.id).length + 1, title: v.name, description: '', mode: 'recorded', video_url: '', video_duration: v.ctype === 'audio' ? 1200 : 3036, live_session_id: null, question_bank_id: v.has_quiz ? (store.courses.find(c => c.id === editing.value.id)?.question_bank_id ?? null) : null, is_free_preview: false, reward: null } as any);
         }
       });
     }
     MessagePlugin.success('课程已更新');
   } else {
-    store.createCourse({ title: form.value.title, description: form.value.description, cover_url: form.value.cover_url, category_id: 'cat-' + Date.now(), category_name: form.value.category_name, tags: [], lecturer_id: '', lecturer_name: '', source: 'upload', mode: form.value.mode, source_live_session_id: null, visibility: form.value.visibility, price, is_paid: isPaid, commission_enabled: false, show_in_app: form.value.show_in_app, live_room_id: form.value.mode === 'live' ? liveRoomId : null, live_display_title: (form.value as any).live_display_title || '', display_style: form.value.mode === 'recorded' ? (form.value as any).display_style : undefined, quiz_trigger: (form.value as any).quiz_trigger || 'half' } as any);
+    store.createCourse({ title: form.value.title, description: form.value.description, cover_url: form.value.cover_url, category_id: 'cat-' + Date.now(), category_name: form.value.category_name, tags: [], lecturer_id: '', lecturer_name: '', source: 'upload', mode: form.value.mode, source_live_session_id: null, visibility: form.value.visibility, price, is_paid: isPaid, commission_enabled: false, show_in_app: form.value.show_in_app, live_room_id: form.value.mode === 'live' ? liveRoomId : null, live_display_title: (form.value as any).live_display_title || '', display_style: form.value.mode === 'recorded' ? (form.value as any).display_style : undefined, quiz_trigger: (form.value as any).quiz_trigger || 'half', quiz_reward_cash_enabled: form.value.mode === 'recorded' ? (form.value as any).quiz_reward_cash_enabled : false, quiz_reward: form.value.mode === 'recorded' ? (form.value as any).quiz_reward : null, answer_reward_points_enabled: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points_enabled : false, answer_reward_points: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points : 0 } as any);
     MessagePlugin.success('课程已新增');
   }
   // D35 完课奖励同步营销域复刻观看奖励页（真实系统：课程表单保存→营销中心创建红包规则）；积分奖励走积分事件不建红包规则
