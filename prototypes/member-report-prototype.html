@@ -812,17 +812,17 @@
           <div class="n-card">
             <h3><span class="chip c-violet">店长视角</span>陈总 · 管辖 3 店 8 店员</h3>
             <ul>
-              <li>总览：管辖直播观看 / 成交 / 新增会员 + 待跟进客户</li>
-              <li>直播：全部场次 → 单场三视角（漏斗 / 商品成交 / 名下客户观看分钟）</li>
-              <li>客户：管辖范围内全部会员，按归属店员展示</li>
+              <li>总览：四维基础盘 + 客户路径漏斗 + 门店成交对比</li>
+              <li>直播：全部场次（周期过滤）→ 单场数据（指标 / 漏斗 / 商品成交 / 客户观看分钟）</li>
+              <li>客户：客户 × 直播参与明细（场次 / 分钟 / 下单 / 消费，含汇总）</li>
             </ul>
           </div>
           <div class="n-card">
             <h3><span class="chip c-blue">店员视角</span>张三 · 名下会员 186</h3>
             <ul>
-              <li>总览：我的会员核心卡 + 今日动态（谁在直播间下单）</li>
-              <li>我的会员：仅 staff_id 名下客户，状态筛选（VIP/活跃/沉睡）</li>
-              <li>直播：最近场次 + 我名下客户的参与与下单标记</li>
+              <li>总览：名下会员核心指标 + 状态分布 + 等级分布</li>
+              <li>会员明细：名下会员列表（积分 / 余额 / 累计消费 / 状态筛选）</li>
+              <li>直播参与 / 课程参与：名下会员的参与数据（含汇总）</li>
             </ul>
           </div>
           <div class="n-card">
@@ -1469,6 +1469,7 @@ function applyPeriod(s,e){
   set('l-ord-total',orders); set('l-amt-total','¥'+amt.toFixed(2));
   set('t-kpi-watch',watch); set('t-kpi-gmv','¥'+amt.toFixed(2)); set('t-kpi-flow',flow.toLocaleString());
   renderLive(currentSort);
+  if(typeof appRoleKey!=='undefined'){ renderAppHead(); renderAppBody(); }
   toast('统计周期 '+ (s===e? s : s.slice(5)+' ~ '+e.slice(5)) +' · '+n+' 场 · 指标已按 10 分钟聚合口径模拟重算');
 }
 const AI={
@@ -1476,15 +1477,16 @@ const AI={
  live:'<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="1" y="5" width="15" height="14" rx="2"/><path d="M23 7l-7 5 7 5V7z"/></svg>',
  cust:'<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/></svg>',
  members:'<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>',
+ course:'<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>',
  me:'<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>'
 };
-const APP_TABS={manager:[['home','总览'],['live','直播'],['cust','客户'],['me','我的']],staff:[['home','总览'],['members','我的会员'],['live','直播'],['me','我的']]};
+const APP_TABS={manager:[['home','总览'],['live','直播'],['cust','客户'],['course','课程与营期'],['me','我的']],staff:[['home','总览'],['members','会员明细'],['live','直播参与'],['course','课程参与'],['me','我的']]};
 const APP_MEMBERS=[
- {n:'王女士',lvl:'黑卡',c:'t-amber',staff:'张三',watch:326.5,spend:'¥920',active:1,pts:580,bal:'¥120',total:'¥3,200',last:'08-25',live:'直播76 · 45min · 下单¥320',course:'产品知识 · 已完成'},
- {n:'刘女士',lvl:'银卡',c:'t-gray',staff:'张三',watch:88.0,spend:'¥520',active:1,pts:180,bal:'¥40',total:'¥920',last:'08-24',live:'直播78 · 22min · 未下单',course:'新品培训 · 学习中 65%'},
- {n:'周小姐',lvl:'普通',c:'t-gray',staff:'张三',watch:12.5,spend:'—',active:0,pts:20,bal:'¥0',total:'¥0',last:'04-18',live:'—',course:'—'},
- {n:'李先生',lvl:'金卡',c:'t-amber',staff:'李四',watch:142.0,spend:'¥300',active:1,pts:320,bal:'¥80',total:'¥1,800',last:'08-23',live:'直播76 · 32min · 未下单',course:'销售技巧 · 学习中 78%'},
- {n:'陈小姐',lvl:'普通',c:'t-gray',staff:'王五',watch:36.2,spend:'—',active:0,pts:50,bal:'¥0',total:'¥0',last:'05-12',live:'直播74 · 18min · 未下单',course:'—'}
+ {n:'王女士',lvl:'黑卡',c:'t-amber',staff:'张三',sess:8,it:46,od:3,watch:326.5,spend:'¥920',active:1,pts:580,bal:'¥120',total:'¥3,200',last:'08-25',live:'直播76 · 45min · 下单¥320',course:'产品知识 · 已完成'},
+ {n:'刘女士',lvl:'银卡',c:'t-gray',staff:'张三',sess:4,it:8,od:0,watch:88.0,spend:'¥520',active:1,pts:180,bal:'¥40',total:'¥920',last:'08-24',live:'直播78 · 22min · 未下单',course:'新品培训 · 学习中 65%'},
+ {n:'周小姐',lvl:'普通',c:'t-gray',staff:'张三',sess:1,it:0,od:0,watch:12.5,spend:'—',active:0,pts:20,bal:'¥0',total:'¥0',last:'04-18',live:'—',course:'—'},
+ {n:'李先生',lvl:'金卡',c:'t-amber',staff:'李四',sess:5,it:9,od:1,watch:142.0,spend:'¥300',active:1,pts:320,bal:'¥80',total:'¥1,800',last:'08-23',live:'直播76 · 32min · 未下单',course:'销售技巧 · 学习中 78%'},
+ {n:'陈小姐',lvl:'普通',c:'t-gray',staff:'王五',sess:2,it:2,od:0,watch:36.2,spend:'—',active:0,pts:50,bal:'¥0',total:'¥0',last:'05-12',live:'直播74 · 18min · 未下单',course:'—'}
 ];
 function switchAppRoleBtns(r){
  el('seg-manager').classList.toggle('active',r==='manager');
@@ -1496,8 +1498,8 @@ function appRole(r){
 }
 function renderAppHead(){
  el('ph-head').innerHTML = appRoleKey==='manager'
-  ? '<div class="role-row"><div class="p-avatar">陈</div><div><div class="p-name">陈总 · 店长</div><div class="p-sub">管辖 3 家门店 · 8 名店员 · 数据范围=管辖门店全部</div></div><div class="p-period">统计周期<br>08-27</div></div>'
-  : '<div class="role-row"><div class="p-avatar">张</div><div><div class="p-name">张三 · 店员</div><div class="p-sub">天河旗舰店 · 名下会员 186 · 数据范围=staff_id 归属快照</div></div><div class="p-period">统计周期<br>08-27</div></div>';
+  ? '<div class="role-row"><div class="p-avatar">陈</div><div><div class="p-name">陈总 · 店长</div><div class="p-sub">管辖 3 家门店 · 8 名店员 · 数据范围=管辖门店全部</div></div><div class="p-period">统计周期<br>'+periodStart.slice(5)+'~'+periodEnd.slice(5)+'</div></div>'
+  : '<div class="role-row"><div class="p-avatar">张</div><div><div class="p-name">张三 · 店员</div><div class="p-sub">天河旗舰店 · 名下会员 186 · 数据范围=归属快照</div></div><div class="p-period">统计周期<br>'+periodStart.slice(5)+'~'+periodEnd.slice(5)+'</div></div>';
 }
 function renderAppTabs(){
  el('p-tabbar').innerHTML=APP_TABS[appRoleKey].map(t=>
@@ -1506,45 +1508,87 @@ function renderAppTabs(){
 function appTab(t){ appTabKey=t; renderAppTabs(); renderAppBody(); el('p-body').scrollTop=0; }
 function renderAppBody(){ el('p-body').innerHTML = appRoleKey==='manager'? mgrBody(): staffBody(); }
 function kpiRow(arr){ return '<div class="a-card"><div class="a-kpis">'+arr.map(k=>'<div class="a-kpi '+(k[2]||'')+'"><div class="v">'+k[1]+'</div><div class="l">'+k[0]+'</div></div>').join('')+'</div></div>'; }
+function appHbar(rows,color,fmt){
+ const max=Math.max(...rows.map(r=>r[1]))||1;
+ return '<div class="a-card">'+rows.map(r=>'<div style="display:grid;grid-template-columns:76px 1fr 64px;gap:8px;align-items:center;padding:5px 0;font-size:11.5px;">'
+  +'<span style="color:var(--fg-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+r[0]+'</span>'
+  +'<div class="bar-track" style="height:14px;border-radius:4px;"><div class="bar-fill" style="width:'+(r[1]/max*100).toFixed(1)+'%;background:'+color+';"></div></div>'
+  +'<b style="text-align:right;font-variant-numeric:tabular-nums;">'+fmt(r[1])+'</b></div>').join('')+'</div>';
+}
+function appMiniFunnel(stages){
+ const shades=['#C3D4F7','#9FBCF3','#7BA3EE','#5A8AE6','#3E6FD6','#2B55BE','#1E40AF'];
+ return '<div class="a-funnel-mini">'+stages.map((f,i)=>'<div class="fm"><div class="fn">'+f[0]+'</div><div class="ft"><div class="ff" style="width:'+Math.max(8,f[1]/stages[0][1]*100)+'%;background:'+shades[Math.min(i,6)]+';color:'+(i<3?'#1E3A8A':'#fff')+';">'+f[1].toLocaleString()+'</div></div><div class="fv">'+f[2]+'</div></div>').join('')+'</div>';
+}
 function mgrBody(){
- if(appTabKey==='home') return   kpiRow([['观看人数','286','b'],['直播成交','¥25,800','g'],['新增会员','45','v2']])
-  +'<div class="a-banner" onclick="toast(\'直播推广已复制，可粘贴到客户群（演示）\')"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"><rect x="1" y="5" width="15" height="14" rx="2"/><path d="M23 7l-7 5 7 5V7z"/></svg><div><div class="bt">一键推广直播</div><div class="bd">把当前直播分享给名下客户群，自动追踪触达</div></div></div>'
-  +'<div class="a-card"><div class="a-title">待跟进客户<span class="more">2 人 · 点击处理</span></div>'
-  +'<div class="a-row clickable" onclick="toast(\'已生成跟进任务（演示）\')"><div class="av">李</div><div class="a-main"><div class="a-name">李先生 <span class="tag t-blue">待跟进</span></div><div class="a-desc">直播76 点击商品未下单 · 归属 李四</div></div><div class="a-right"><div class="a-val">¥300</div><div class="a-sub">意向金额</div></div></div>'
-  +'<div class="a-row clickable" onclick="toast(\'已生成跟进任务（演示）\')"><div class="av">陈</div><div class="a-main"><div class="a-name">陈小姐 <span class="tag t-red">流失风险</span></div><div class="a-desc">加购未付 48h · 归属 王五</div></div><div class="a-right"><div class="a-val">—</div><div class="a-sub">洁面乳 120ml</div></div></div></div>'
-  +'<div class="a-card clickable" onclick="appTab(\'live\')"><div class="a-title">最近直播<span class="more">全部 24 场 →</span></div>'
-  +'<div class="a-row"><div class="av" style="background:linear-gradient(135deg,#D97706,#DB2777);">76</div><div class="a-main"><div class="a-name">直播76 · 带货场</div><div class="a-desc">观看 4 · 峰值 0 · 订单 7</div></div><div class="a-right"><div class="a-val">¥0.03</div><div class="a-sub">07-06</div></div></div></div>';
- if(appTabKey==='live') return   '<div class="a-section">全部场次（线上真实 · T+1）</div>'
-  +LIVE.slice(0,8).map((s,i)=>'<div class="a-card clickable" onclick="openAppLive('+LIVE.indexOf(s)+')"><div class="a-title" style="margin-bottom:6px;">'+s[0]+(s[6]>0?' <span class="tag t-amber">带货</span>':'')+'<span class="more">'+s[3].slice(5,10)+'</span></div>'
-   +'<div style="display:flex;gap:14px;font-size:11px;color:var(--fg-2);" class="num"><span>观看 '+s[4]+'</span><span>峰值 '+s[5]+'</span><span>订单 '+s[6]+'</span><span>¥'+s[7]+'</span><span style="color:var(--fg-3);">'+s[8]+'分</span></div></div>').join('');
- if(appTabKey==='cust') return   '<div class="a-chips"><button class="a-chip active" onclick="toast(\'管辖范围：3 店全部会员（示例）\')">管辖 1,420</button><button class="a-chip" onclick="toast(\'VIP 180 人（示例）\')">VIP 180</button><button class="a-chip" onclick="toast(\'沉睡 52 人（示例）\')">沉睡 52</button></div>'
-  +'<div class="a-card">'+APP_MEMBERS.map((m,i)=>appMemberRow(m,i)).join('')+'</div>';
- return '<div class="a-card"><div class="a-title">我的权限</div><div style="font-size:12px;color:var(--fg-2);line-height:2;">店长可查看：管辖门店全部直播数据、名下全部会员、店员排行与单场三视角（漏斗 / 商品成交 / 客户观看分钟）。<br>数据范围按查询时点归属快照，不追溯历史。</div></div>'
-  +'<div class="a-card"><div class="a-title">数据更新</div><div style="font-size:12px;color:var(--fg-2);line-height:2;">直播域 T+1（每日 11:00 前更新昨日数据）<br>会员 / 订单域 5 分钟刷新<br>实时数据请进入单场直播分析</div></div>';
+ const watch=Number(el('l-kpi-watch').textContent)||0, amt=el('t-kpi-gmv').textContent, flow=el('l-kpi-flow').textContent, sess=el('l-kpi-sessions').textContent;
+ if(appTabKey==='home') return   kpiRow([['会员总数','12,560','v2'],['营业门店','156',''],['观看人数·周期',watch,'b']])
+  +kpiRow([['直播场数·周期',sess,''],['成交金额·周期',amt,'g'],['消耗流量(MB)',flow,'a2']])
+  +'<div class="a-card"><div class="a-title">客户路径漏斗<span class="more">触达 → 成交</span></div>'
+  +appMiniFunnel([['触达',12560,'100%'],['预约/进入',8920,'71%'],['观看≥1min',5540,'44%'],['互动',3260,'26%'],['点击商品',1760,'14%'],['下单',1004,'8%'],['支付成交',752,'6%']])
+  +'</div>'
+  +'<div class="a-card"><div class="a-title">门店直播成交对比<span class="more">示例数据</span></div>'
+  +appHbar([['天河旗舰店',25800],['白云店',15600],['番禺店',8400]],'#059669',v=>'¥'+v.toLocaleString());
+ if(appTabKey==='live') return   kpiRow([['直播场数',sess,'b'],['观看人数',watch,'v2'],['成交订单','9','g']])
+  +kpiRow([['成交金额',amt,'g'],['消耗流量',flow,'a2'],['场均时长',el('l-avg-dur').textContent,'']])
+  +'<div class="a-section">场次明细（'+periodStart.slice(5)+' ~ '+periodEnd.slice(5)+' · T+1）</div>'
+  +(function(){const sel=LIVE.filter(r=>{const d=r[3].slice(0,10);return d>=periodStart&&d<=periodEnd;});
+    return sel.length? sel.map((s)=>'<div class="a-card clickable" onclick="openAppLive('+LIVE.indexOf(s)+')"><div class="a-title" style="margin-bottom:6px;">'+s[0]+(s[6]>0?' <span class="tag t-amber">带货</span>':'')+'<span class="more">'+s[3].slice(5,10)+'</span></div>'
+    +'<div style="display:flex;gap:12px;font-size:11px;color:var(--fg-2);" class="num"><span>观看 '+s[4]+'</span><span>峰值 '+s[5]+'</span><span>订单 '+s[6]+'</span><span>¥'+s[7]+'</span><span style="color:var(--fg-3);">'+s[8]+'分</span></div></div>').join('')
+    +'<div class="a-card" style="background:#EFF4FE;"><div class="a-title" style="margin-bottom:4px;">汇总（'+sel.length+' 场）</div><div style="display:flex;gap:12px;font-size:11.5px;color:var(--primary);font-weight:700;" class="num"><span>观看 '+sel.reduce((a,r)=>a+r[4],0)+'</span><span>订单 '+sel.reduce((a,r)=>a+r[6],0)+'</span><span>¥'+sel.reduce((a,r)=>a+parseFloat(r[7]),0).toFixed(2)+'</span></div></div>'
+    :'<div class="empty">该统计周期内无直播场次</div>';})();
+ if(appTabKey==='cust') return   kpiRow([['观看客户','5,540','b'],['人均观看','28.6分','v2'],['转化率','13.6%','a2']])
+  +'<div class="a-card"><div class="a-title">客户 × 直播参与<span class="more">示例数据</span></div>'
+  +'<div style="font-size:10px;color:var(--fg-3);display:flex;gap:12px;padding:0 0 6px;"><span style="flex:1">客户</span><span style="width:52px;text-align:right">场次</span><span style="width:56px;text-align:right">分钟</span><span style="width:40px;text-align:right">下单</span><span style="width:56px;text-align:right">消费</span></div>'
+  +APP_MEMBERS.map(m=>'<div class="a-row clickable" onclick="openAppMember('+APP_MEMBERS.indexOf(m)+')"><div class="av">'+m.n.slice(0,1)+'</div><div class="a-main"><div class="a-name">'+m.n+' <span class="tag '+m.c+'">'+m.lvl+'</span></div><div class="a-desc">归属 '+m.staff+'</div></div><div class="a-right num" style="display:flex;gap:12px;font-size:11px;align-items:center;"><span style="width:52px;text-align:right">'+(m.sess||'—')+'</span><span style="width:56px;text-align:right">'+m.watch+'</span><span style="width:40px;text-align:right">'+(m.od||0)+'</span><span style="width:56px;text-align:right">'+m.spend+'</span></div></div>').join('')
+  +'<div class="a-row" style="border:none;"><div class="a-main" style="color:var(--primary);font-weight:700;font-size:12px;">汇总（5 人示例）</div><div class="a-right num" style="display:flex;gap:12px;font-size:11.5px;font-weight:700;color:var(--primary);"><span style="width:52px;text-align:right">20</span><span style="width:56px;text-align:right">605.2</span><span style="width:40px;text-align:right">4</span><span style="width:56px;text-align:right">¥1,740</span></div></div></div>';
+ if(appTabKey==='course') return   kpiRow([['营期总数','5','b'],['报名总数','1,006','v2'],['已通过','840','g']])
+  +kpiRow([['已加入','731','g'],['报名转化','83.5%','a2'],['进行中','2','']])
+  +'<div class="a-card"><div class="a-title">报名转化漏斗</div>'
+  +appMiniFunnel([['报名',1006,'100%'],['审核通过',840,'83.5%'],['加入营期',731,'87%']])
+  +'</div>'
+  +'<div class="a-card"><div class="a-title">营期明细<span class="more">5 期</span></div>'
+  +[['短视频运营实战 8月期','直播','加入 260 · 报名 320','已结束'],['职场写作训练营','录播','加入 205 · 报名 260','进行中'],['时间管理训练营','直播','加入 138 · 报名 180','进行中'],['新产品知识营','录播','通过 60 · 报名 96','报名中'],['销售话术集训营','直播','加入 128 · 报名 150','已结束']]
+    .map(c=>'<div class="a-row"><div class="a-main"><div class="a-name">'+c[0]+' <span class="tag '+(c[1]==='直播'?'t-red':'t-green')+'">'+c[1]+'</span></div><div class="a-desc">'+c[2]+'</div></div><div class="a-right"><span class="tag '+(c[3]==='进行中'?'t-violet':c[3]==='报名中'?'t-green':'t-gray')+'">'+c[3]+'</span></div></div>').join('')
+  +'<div class="a-row" style="border:none;"><div class="a-main" style="color:var(--primary);font-weight:700;font-size:12px;">汇总（5 期）</div><div class="a-right" style="color:var(--primary);font-weight:700;font-size:12px;">加入 731 · 报名 1,006</div></div></div>';
+ return '<div class="a-card"><div class="a-title">我的权限</div><div style="font-size:12px;color:var(--fg-2);line-height:2;">店长可查看：管辖门店全部直播数据、名下全部会员、单场三视角（漏斗 / 商品成交 / 客户观看分钟）。<br>数据范围按查询时点归属快照，不追溯历史。</div></div>'
+  +'<div class="a-card"><div class="a-title">数据更新</div><div style="font-size:12px;color:var(--fg-2);line-height:2;">直播域 T+1（每日 11:00 前更新昨日数据）<br>指标层 10 分钟聚合 · 会员/订单域 5 分钟刷新<br>实时数据请进入单场直播分析</div></div>';
 }
 function staffBody(){
- if(appTabKey==='home') return   kpiRow([['名下会员','186','v2'],['活跃','152','g'],['贡献GMV','¥28,000','a2']])
-  +'<div class="a-card"><div class="a-title">今日动态<span class="more">仅我名下客户</span></div>'
-  +'<div class="a-row"><div class="av">王</div><div class="a-main"><div class="a-name">王女士 <span class="tag t-green">下单</span></div><div class="a-desc">直播76 观看 45 分钟 · 下单 ¥320</div></div><div class="a-right"><div class="a-sub num">10:02</div></div></div>'
-  +'<div class="a-row"><div class="av">刘</div><div class="a-main"><div class="a-name">刘女士 <span class="tag t-blue">观看中</span></div><div class="a-desc">直播78 累计观看 22 分钟</div></div><div class="a-right"><div class="a-sub num">09:15</div></div></div></div>'
-  +'<div class="a-card clickable" onclick="appTab(\'members\')"><div class="a-title">沉睡提醒<span class="more">1 人 →</span></div>'
-  +'<div class="a-row"><div class="av" style="background:linear-gradient(135deg,#DC2626,#D97706);">陈</div><div class="a-main"><div class="a-name">陈小姐 <span class="tag t-red">沉睡</span></div><div class="a-desc">90 天无消费且无登录（is_dormant=1）</div></div></div></div>'
-  +'<div class="a-banner" onclick="toast(\'直播推广已复制，可发给名下客户（演示）\')"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"><rect x="1" y="5" width="15" height="14" rx="2"/><path d="M23 7l-7 5 7 5V7z"/></svg><div><div class="bt">推广直播给客户</div><div class="bd">分享当前直播，自动记录触达与转化</div></div></div>';
+ if(appTabKey==='home') return   kpiRow([['名下会员','186','v2'],['新增会员','12','b'],['活跃会员','152','g']])
+  +kpiRow([['沉睡会员','34',''],['贡献金额','¥28,000','a2'],['覆盖课程','2 门','']])
+  +'<div class="a-card"><div class="a-title">会员状态分布</div>'
+  +'<div class="dist-row"><div class="dist-name">活跃</div><div class="dist-track"><div class="dist-fill" style="width:82%;background:var(--green);"></div></div><div class="dist-num">152</div></div>'
+  +'<div class="dist-row"><div class="dist-name">沉睡</div><div class="dist-track"><div class="dist-fill" style="width:18%;background:var(--red);"></div></div><div class="dist-num">34</div></div></div>'
+  +'<div class="a-card"><div class="a-title">会员等级分布</div>'
+  +'<div class="dist-row"><div class="dist-name">黑卡</div><div class="dist-track"><div class="dist-fill" style="width:52%;background:var(--violet);"></div></div><div class="dist-num">68</div></div>'
+  +'<div class="dist-row"><div class="dist-name">金卡</div><div class="dist-track"><div class="dist-fill" style="width:40%;background:var(--amber);"></div></div><div class="dist-num">52</div></div>'
+  +'<div class="dist-row"><div class="dist-name">银卡</div><div class="dist-track"><div class="dist-fill" style="width:30%;background:var(--fg-3);"></div></div><div class="dist-num">40</div></div>'
+  +'<div class="dist-row"><div class="dist-name">普通</div><div class="dist-track"><div class="dist-fill" style="width:20%;background:#CBD5E1;"></div></div><div class="dist-num">26</div></div></div>';
  if(appTabKey==='members'){
   const mine=APP_MEMBERS.filter(m=>m.staff==='张三');
   const chips=[['all','全部 '+mine.length],['vip','VIP'],['active','活跃'],['dormant','沉睡']];
   const list=mine.filter(m=> appMFilterKey==='all' || (appMFilterKey==='vip'&&m.lvl!=='普通') || (appMFilterKey==='active'&&m.active) || (appMFilterKey==='dormant'&&!m.active));
   return '<div class="a-chips">'+chips.map(c=>'<button class="a-chip'+(appMFilterKey===c[0]?' active':'')+'" onclick="appMFilter(\''+c[0]+'\')">'+c[1]+'</button>').join('')+'</div>'
-   +'<div class="a-card">'+(list.length?list.map((m)=>appMemberRow(m,APP_MEMBERS.indexOf(m))).join(''):'<div class="empty">该状态下暂无会员</div>')+'</div>';
+   +'<div class="a-card">'+(list.length?list.map(m=>'<div class="a-row clickable" onclick="openAppMember('+APP_MEMBERS.indexOf(m)+')"><div class="av">'+m.n.slice(0,1)+'</div>'
+    +'<div class="a-main"><div class="a-name">'+m.n+' <span class="tag '+m.c+'">'+m.lvl+'</span></div><div class="a-desc">积分 '+m.pts+' · 余额 '+m.bal+'</div></div>'
+    +'<div class="a-right"><div class="a-val">'+m.total+'</div><div class="a-sub">末次 '+m.last+'</div></div></div>').join('')
+    :'<div class="empty">该状态下暂无会员</div>')
+   +'<div class="a-row" style="border:none;"><div class="a-main" style="color:var(--primary);font-weight:700;font-size:12px;">汇总（'+list.length+' 人）</div><div class="a-right" style="color:var(--primary);font-weight:700;font-size:12px;">累计消费 ¥'+list.reduce((a,m)=>a+parseInt(m.total.replace(/[¥,]/g,''))||0,0).toLocaleString()+'</div></div></div>';
  }
- if(appTabKey==='live') return   '<div class="a-section">最近直播 · 我名下客户参与</div>'
-  +'<div class="a-card clickable" onclick="openAppLive(11)"><div class="a-title" style="margin-bottom:6px;">直播76 · 带货<span class="more">07-06</span></div>'
-  +'<div class="a-row"><div class="av">王</div><div class="a-main"><div class="a-name">王女士</div><div class="a-desc">观看 45 分钟 · 下单 ¥320</div></div><div class="a-right"><span class="tag t-green">已成交</span></div></div>'
-  +'<div class="a-row"><div class="av">刘</div><div class="a-main"><div class="a-name">刘女士</div><div class="a-desc">观看 22 分钟 · 未下单</div></div><div class="a-right"><span class="tag t-blue">待跟进</span></div></div></div>'
-  +'<div class="a-card clickable" onclick="openAppLive(10)"><div class="a-title" style="margin-bottom:6px;">直播78 · 带货<span class="more">07-08</span></div>'
-  +'<div class="a-row"><div class="av">王</div><div class="a-main"><div class="a-name">王女士</div><div class="a-desc">观看 18 分钟 · 下单 ¥120</div></div><div class="a-right"><span class="tag t-green">已成交</span></div></div></div>';
- return '<div class="a-card"><div class="a-title">我的权限</div><div style="font-size:12px;color:var(--fg-2);line-height:2;">店员仅可查看 staff_id 归属快照下的名下会员（186 人），含会员明细 / 课程参与 / 直播参与。<br>不可见他人会员与门店汇总数据。</div></div>'
-  +'<div class="a-card"><div class="a-title">数据更新</div><div style="font-size:12px;color:var(--fg-2);line-height:2;">直播域 T+1（每日 11:00 前）<br>会员 / 订单域 5 分钟刷新</div></div>';
+ if(appTabKey==='live'){
+  const mine=APP_MEMBERS.filter(m=>m.staff==='张三'&&m.live&&m.live!=='—');
+  return '<div class="a-section">名下会员 · 直播参与（示例数据）</div>'
+  +'<div class="a-card">'+mine.map(m=>'<div class="a-row"><div class="av">'+m.n.slice(0,1)+'</div><div class="a-main"><div class="a-name">'+m.n+'</div><div class="a-desc">'+m.live+'</div></div><div class="a-right"><div class="a-val">'+m.watch+'</div><div class="a-sub">分钟</div></div></div>').join('')
+  +'<div class="a-row" style="border:none;"><div class="a-main" style="color:var(--primary);font-weight:700;font-size:12px;">汇总（'+mine.length+' 人）</div><div class="a-right" style="color:var(--primary);font-weight:700;font-size:12px;">消费 ¥'+mine.reduce((a,m)=>a+parseInt(m.spend.replace(/[¥,]/g,''))||0,0).toLocaleString()+'</div></div></div>';
+ }
+ if(appTabKey==='course'){
+  const mine=APP_MEMBERS.filter(m=>m.staff==='张三'&&m.course&&m.course!=='—');
+  return '<div class="a-section">名下会员 · 课程参与（示例数据）</div>'
+  +'<div class="a-card">'+mine.map(m=>'<div class="a-row"><div class="av">'+m.n.slice(0,1)+'</div><div class="a-main"><div class="a-name">'+m.n+'</div><div class="a-desc">'+m.course+'</div></div><div class="a-right"><span class="tag '+(m.course.includes('已完成')?'t-green':'t-blue')+'">'+(m.course.includes('已完成')?'已完成':'学习中')+'</span></div></div>').join('')
+  +'<div class="a-row" style="border:none;"><div class="a-main" style="color:var(--primary);font-weight:700;font-size:12px;">汇总（'+mine.length+' 人）</div><div class="a-right" style="color:var(--primary);font-weight:700;font-size:12px;">完课 1 人</div></div></div>';
+ }
+ return '<div class="a-card"><div class="a-title">我的权限</div><div style="font-size:12px;color:var(--fg-2);line-height:2;">店员仅可查看归属快照下的名下会员（186 人），含会员明细 / 直播参与 / 课程参与。<br>不可见他人会员与门店汇总数据。</div></div>'
+  +'<div class="a-card"><div class="a-title">数据更新</div><div style="font-size:12px;color:var(--fg-2);line-height:2;">直播域 T+1（每日 11:00 前）<br>指标层 10 分钟聚合 · 会员/订单域 5 分钟刷新</div></div>';
 }
 function appMemberRow(m,i){
  return '<div class="a-row clickable" onclick="openAppMember('+i+')"><div class="av">'+m.n.slice(0,1)+'</div>'
