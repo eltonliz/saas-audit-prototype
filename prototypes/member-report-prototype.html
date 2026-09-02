@@ -412,10 +412,6 @@
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
         客户报表
       </button>
-      <button class="nav-item" data-page="course" onclick="switchTab('course')">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
-        课程与营期报表
-      </button>
       <button class="nav-item" data-page="staff" onclick="switchTab('staff')">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         店员报表
@@ -1213,16 +1209,19 @@ function showSub(pane,id){
   window.scrollTo(0,0);
 }
 function openStoreDetail(name){
+  if(typeof currentTabKey!=='undefined'&&currentTabKey!=='store') switchTab('store');
   document.getElementById('sd-name').textContent=name;
   document.getElementById('sd-avatar').textContent=name.slice(0,1);
   showSub('store','store-detail');
 }
 function openMemberDetail(name,role){
+  if(typeof currentTabKey!=='undefined'&&currentTabKey!=='store') switchTab('store');
   document.getElementById('md-name').textContent=name+' · '+role;
   document.getElementById('md-avatar').textContent=name.slice(0,1);
   showSub('store','member-detail');
 }
 function openCourseDetail(name){
+  if(typeof currentTabKey!=='undefined'&&currentTabKey!=='course') switchTab('course');
   document.getElementById('cd-name').innerHTML=name+' <span class="tag t-gray">录播</span>';
   showSub('course','course-detail');
 }
