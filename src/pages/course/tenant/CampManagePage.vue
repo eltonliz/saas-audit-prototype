@@ -199,7 +199,6 @@ import { notifyModalOpen } from '../../../utils/modal-spec-bridge';
 import { useCourseStore } from '../../../stores/course-store';
 import CampStudentDrawerPage from './CampStudentDrawerPage.vue';
 import CustomerScopeDialog from './CustomerScopeDialog.vue';
-import CustomerScopeDialog from './CustomerScopeDialog.vue';
 
 const store = useCampStore();
 const courseStore = useCourseStore();
