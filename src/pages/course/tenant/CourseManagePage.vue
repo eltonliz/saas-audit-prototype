@@ -80,10 +80,6 @@
             <t-form-item label="课程名称" required-mark><t-input v-model="form.title" placeholder="请输入课程名称" maxlength="45" /></t-form-item>
             <t-form-item label="所属分类" required-mark><t-select v-model="form.category_name" placeholder="请选择所属分类" style="width:100%"><t-option v-for="c in categories" :key="c" :label="c" :value="c" /></t-select></t-form-item>
             <t-form-item label="课程介绍"><t-textarea v-model="form.description" :autosize="{ minRows: 3 }" placeholder="请输入课程介绍" /></t-form-item>
-            <div class="saas-new-box saas-new-wrap">
-              <!-- V2·0901 用户裁决：课程固定为录播组课；直播在「直播列表」独立创建（直播间三联），直播回放可转课程 -->
-              <div class="saas-new-badge">V2·0901：课程=录播组课；直播请在「直播列表」创建，直播回放可转课程</div>
-            </div>
             <!-- V2·0902 用户裁决：「是否公开」配置下线，课程统一公开（APP 独立展示），数据字段固定 public -->
             <t-form-item label="课程封面">
               <div class="cover-grid">

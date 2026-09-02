@@ -19,7 +19,7 @@
       <div class="metric-card metric-primary">
         <div class="metric-label">营期总数</div>
         <div class="metric-value">{{ totalCamps }}</div>
-        <div class="metric-foot"><t-icon name="layers" /> 直播 {{ liveCount }} · 录播 {{ recordedCount }}</div>
+        <div class="metric-foot"><t-icon name="layers" /> 全部营期</div>
       </div>
       <!-- V2·0829 用户裁决：报名总数与学员总数卡片冲突，仅保留学员总数 -->
       <div class="metric-card metric-success">
@@ -103,7 +103,6 @@
               <div class="donut-legend">
                 <div class="dl-row"><i class="lg lg-done"></i>答对 {{ dailyTotal.correct_users }} 人</div>
                 <div class="dl-row"><i class="lg lg-wrong"></i>答错 {{ quizDonut.wrong }} 人</div>
-                <div class="dl-row"><i class="lg lg-view"></i>答题红包 {{ dailyTotal.quiz_red_packets }} 个 · ¥{{ dailyTotal.quiz_red_amount }}</div>
               </div>
             </div>
           </div>
@@ -225,7 +224,6 @@
               <span class="camp-no">{{ row.camp_no }}</span>
             </div>
           </template>
-          <template #mode="{ row }"><t-tag size="small" :theme="row.mode === 'live' ? 'danger' : 'success'" variant="light">{{ row.mode === 'live' ? '直播' : '录播' }}</t-tag></template>
           <template #time="{ row }">{{ row.start_date }} ~ {{ row.end_date }}</template>
           <template #enroll="{ row }">
             <span class="enroll-cell">已报名 {{ row.enrolled_count }}</span>
@@ -284,8 +282,7 @@ const statusTheme = (s: string): string => ({ draft: 'default', pending_review: 
 const filteredCamps = computed(() => selectedCampId.value ? campStore.camps.filter(c => c.id === selectedCampId.value) : campStore.camps);
 
 const totalCamps = computed(() => filteredCamps.value.length);
-const liveCount = computed(() => filteredCamps.value.filter(c => c.mode === 'live').length);
-const recordedCount = computed(() => filteredCamps.value.filter(c => c.mode === 'recorded').length);
+
 const inProgressCount = computed(() => filteredCamps.value.filter(c => c.status === 'in_progress').length);
 const endedCount = computed(() => filteredCamps.value.filter(c => c.status === 'ended').length);
 // PC-016：平均完成率 = 学员学习记录完成率均值（全量筛选营期范围）
@@ -516,7 +513,6 @@ const statPager = { defaultPageSize: 5, defaultCurrent: 1 };
 // 营期统计表（纯报表：与列表页列解耦，不含状态列）
 const campStatColumns = [
   { colKey: 'title', title: '营期名称', minWidth: 180, ellipsis: true },
-  { colKey: 'mode', title: '授课模式', width: 90 },
   { colKey: 'time', title: '营期时间', width: 180 },
   { colKey: 'enroll', title: '报名情况', width: 200 },
   { colKey: 'schedule', title: '排课数', width: 80 },
@@ -557,7 +553,6 @@ function avgCompletionRate(campId: string): number {
 
 const columns = [
   { colKey: 'title', title: '营期名称', minWidth: 180, ellipsis: true },
-  { colKey: 'mode', title: '授课模式', width: 90 },
   { colKey: 'time', title: '营期时间', width: 180 },
   { colKey: 'enroll', title: '报名情况', width: 200 },
   { colKey: 'schedule', title: '排课数', width: 80 },
