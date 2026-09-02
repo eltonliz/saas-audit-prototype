@@ -226,6 +226,58 @@
   .app-report .grid{grid-template-columns:repeat(2,1fr)!important;}
   .app-report .page-head h1{font-size:17px;}
   .app-report .g2,.app-report .g2e{grid-template-columns:1fr!important;}
+  /* ===== v5.12 APP 课程管理（绿主题，按截图） ===== */
+  .app-course{position:absolute;inset:0;background:#F6F7F9;z-index:70;display:none;flex-direction:column;}
+  .app-course.open{display:flex;}
+  .ac-top{background:#fff;padding:8px 10px;display:flex;align-items:center;gap:8px;flex-shrink:0;border-bottom:1px solid #F1F5F9;}
+  .ac-back{background:none;border:none;color:var(--fg);padding:4px;}
+  .ac-search{flex:1;display:flex;align-items:center;gap:6px;background:#F2F4F7;border-radius:99px;padding:7px 12px;min-width:0;}
+  .ac-search input{flex:1;border:none;background:none;font-size:12px;font-family:var(--font);color:var(--fg);min-width:0;}
+  .ac-search input:focus{outline:none;}
+  .ac-searchbtn{border:none;background:none;color:#12B76A;font-size:12.5px;font-weight:600;flex-shrink:0;}
+  .ac-tabs{background:#fff;display:flex;padding:0 6px;flex-shrink:0;border-bottom:1px solid #F1F5F9;}
+  .ac-tab{flex:1;padding:11px 4px;font-size:13.5px;color:var(--fg-2);background:none;border:none;border-bottom:2px solid transparent;font-family:var(--font);position:relative;}
+  .ac-tab.active{color:#12B76A;font-weight:700;border-bottom-color:#12B76A;}
+  .ac-body{flex:1;overflow-y:auto;padding:12px 12px 24px;}
+  .ac-body::-webkit-scrollbar{width:0;}
+  .ac-card{background:#fff;border-radius:14px;padding:12px;margin-bottom:10px;box-shadow:0 1px 3px rgba(15,23,42,.06);cursor:pointer;transition:transform .15s;}
+  .ac-card:active{transform:scale(.98);}
+  .ac-card .cover-row{display:flex;gap:10px;}
+  .ac-cover{width:86px;height:64px;border-radius:9px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:19px;font-weight:700;flex-shrink:0;}
+  .ac-card .c-title{font-size:13.5px;font-weight:700;line-height:1.4;}
+  .ac-card .c-time{font-size:11px;color:var(--fg-3);margin-top:3px;font-variant-numeric:tabular-nums;}
+  .ac-card .c-stats{display:flex;gap:18px;margin-top:9px;}
+  .ac-card .c-stats .cs .v{font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;}
+  .ac-card .c-stats .cs .l{font-size:10px;color:var(--fg-3);margin-top:1px;}
+  .ac-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:10px;}
+  .ac-kpi{background:#fff;border-radius:12px;padding:12px 10px;box-shadow:0 1px 3px rgba(15,23,42,.06);}
+  .ac-kpi .v{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums;}
+  .ac-kpi .l{font-size:10.5px;color:var(--fg-3);margin-top:3px;}
+  .ac-kpi .ic{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;margin-bottom:6px;color:#fff;}
+  .ac-camp{background:#fff;border-radius:14px;padding:12px;margin-bottom:10px;box-shadow:0 1px 3px rgba(15,23,42,.06);}
+  .ac-camp .camp-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+  .ac-camp .camp-logo{width:44px;height:44px;border-radius:9px;background:linear-gradient(135deg,#FDBA74,#F87171);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:15px;flex-shrink:0;}
+  .ac-camp .camp-name{font-size:13.5px;font-weight:700;}
+  .ac-camp .camp-no{font-size:10.5px;color:var(--fg-3);margin-top:2px;font-family:var(--mono);}
+  .ac-camp .camp-btn{margin-left:auto;background:#12B76A;color:#fff;border:none;border-radius:99px;padding:7px 12px;font-size:11.5px;font-weight:600;cursor:pointer;}
+  .ac-camp .camp-btn:active{opacity:.8;}
+  .ac-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px 6px;}
+  .ac-grid .g .v{font-size:13.5px;font-weight:700;font-variant-numeric:tabular-nums;}
+  .ac-grid .g .l{font-size:9.5px;color:var(--fg-3);margin-top:2px;}
+  .ac-core{display:grid;grid-template-columns:repeat(3,1fr);gap:12px 8px;}
+  .ac-core .g{text-align:center;background:#F8FAFC;border-radius:9px;padding:10px 4px;}
+  .ac-core .g .v{font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;}
+  .ac-core .g .l{font-size:9.5px;color:var(--fg-3);margin-top:2px;}
+  .ac-section{font-size:13px;font-weight:700;margin:4px 0 10px;}
+  .ac-custrow{background:#fff;border-radius:14px;padding:12px;margin-bottom:10px;box-shadow:0 1px 3px rgba(15,23,42,.06);}
+  .ac-custrow .cu-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+  .ac-custrow .cu-av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#38BDF8,#818CF8);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;}
+  .ac-custrow .cu-name{font-size:13.5px;font-weight:700;}
+  .ac-custrow .cu-no{font-size:10.5px;color:var(--fg-3);font-family:var(--mono);}
+  .ac-custrow .cu-tag{margin-left:auto;}
+  .ac-bigbtn{width:100%;background:#12B76A;color:#fff;border:none;border-radius:99px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;margin-top:4px;}
+  .ac-bigbtn:active{opacity:.85;}
+  .ac-empty{padding:30px;text-align:center;color:var(--fg-3);font-size:12px;}
   /* APP 报表移动适配 */
   .app-report .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
   .app-report .tbl-wrap table{min-width:620px;}
@@ -936,6 +988,22 @@
             <div class="p-head" id="ph-head" style="display:none;"></div>
             <div class="p-body" id="p-body"></div>
             <div class="p-tabbar" id="p-tabbar"></div>
+            <div class="app-course" id="app-course">
+              <div class="ac-top">
+                <button class="ac-back" onclick="closeAppCourse()" aria-label="返回"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+                <div class="ac-search"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8A94A6" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input id="ac-search-input" placeholder="请输入课程编号或课程标题" oninput="acFilter()"><button class="ac-searchbtn" onclick="acFilter()">搜索</button></div>
+              </div>
+              <div class="ac-tabs">
+                <button class="ac-tab active" onclick="acTab('data')">课程数据</button>
+                <button class="ac-tab" onclick="acTab('conv')">课程转化</button>
+                <button class="ac-tab" onclick="acTab('promo')">课程推广</button>
+              </div>
+              <div class="ac-body" id="ac-body"></div>
+              <div class="app-course" id="app-camp-students" style="display:none;z-index:5;">
+                <div class="ac-top"><button class="ac-back" onclick="closeCampStudents()" aria-label="返回"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></button><span style="font-size:14px;font-weight:600;" id="cs-title">客户概况</span></div>
+                <div class="ac-body" id="cs-body"></div>
+              </div>
+            </div>
             <div class="app-report" id="app-report" style="display:none;">
               <div class="ar-top"><button class="ar-back" onclick="closeAppReport()" aria-label="返回"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></button><span class="ar-title">数据报表</span><button class="pill amber" style="margin-left:auto;height:28px;font-size:11px;" onclick="openPeriodMenu(event,'ar-period')"><b class="num" id="ar-period-text">—</b></button></div>
               <div class="ar-chips" id="ar-chips">
@@ -1774,7 +1842,7 @@ function renderMe(){
  const mgr=appRoleKey==='manager';
  const user=mgr?{n:'阿远要快快乐乐',role:'店长',av:'阿'}:{n:'张三',role:'店员',av:'张'};
  const stats=wStats(appRoleKey,wChipIdx);
- const gridItems=mgr?['自提核销','核销优惠券','订单管理','客户管理','售后管理','直播管理','添加渠道','审核门店','门店商品','虚拟账户','营销管理','核销记录','课程管理']:['客户管理','订单查询','直播参与','课程参与'];
+ const gridItems=mgr?['自提核销','核销优惠券','订单管理','客户管理','售后管理','直播管理','添加渠道','审核门店','门店商品','虚拟账户','营销管理','核销记录']:['客户管理','订单查询','直播参与'];
  const gi=['<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 01-8 0"/></svg>',
   '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>',
   '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><line x1="8" y1="13" x2="16" y2="13"/></svg>',
@@ -1789,7 +1857,7 @@ function renderMe(){
   +'<div class="w-stats" style="margin-bottom:0;">'+stats[1].map(x=>'<div class="w-stat"><div class="v">'+x[0]+'</div><div class="l">'+x[1]+'</div></div>').join('')+'</div></div>'
   +'<div class="w-block"><div class="w-btitle">'+(mgr?'门店管理':'常用功能')+'</div><div class="w-grid">'
   +gridItems.map((g,i)=>'<button class="w-gitem"><span style="display:flex;">'+gi[i%gi.length]+'</span><span>'+g+'</span></button>').join('')
-  +'<button class="w-gitem hot" onclick="openAppReport()"><span style="display:flex;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M3 3v18h18"/><path d="M7 15l4-6 4 3 5-8"/></svg></span><span>数据报表</span></button>'
+  +'<button class="w-gitem hot" onclick="openAppCourse()"><span style="display:flex;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg></span><span>课程管理</span></button>'
   +'</div></div>';
 }
 function toggleRole(){ appRoleKey=appRoleKey==='manager'?'staff':'manager'; renderMe(); toast('已切换为'+(appRoleKey==='manager'?'店长':'店员')+'视角'); }
@@ -1943,6 +2011,108 @@ function initPanels(){
 }
 document.addEventListener('click',e=>{ /* 兜底：新面板导出按钮 */ });
 initPanels();
+
+/* ================= v5.12 APP 课程管理（绿主题 · 课程数据/转化/推广） ================= */
+const AC_COURSES=[
+ {name:'产品知识',time:'08-01 ~ 08-24',dur:'775h',sales:'¥52,000',views:'1,860',bg:'linear-gradient(135deg,#34D399,#0E9C5C)',
+  core:[['观看人数','1,860'],['累计观看时长','775h'],['峰值在线','320'],['平均在线','85'],['评论人数','1,100'],['点赞人数','4,860'],['分享人数','940'],['互动人数','3,260'],['完播人数','4,000'],['完播率','76.3%'],['答题人数','1,100'],['正确率','82%'],['红包金额','¥320'],['新客人数','280'],['新客占比','15.1%']]},
+ {name:'销售技巧',time:'08-05 ~ 08-30',dur:'633h',sales:'¥41,000',views:'1,520',bg:'linear-gradient(135deg,#60A5FA,#2563EB)',
+  core:[['观看人数','1,520'],['累计观看时长','633h'],['峰值在线','260'],['平均在线','72'],['评论人数','900'],['点赞人数','4,100'],['分享人数','800'],['互动人数','2,800'],['完播人数','1,080'],['完播率','71.1%'],['答题人数','920'],['正确率','78%'],['红包金额','¥280'],['新客人数','320'],['新客占比','21.1%']]},
+ {name:'新品培训',time:'08-12 ~ 09-05',dur:'533h',sales:'¥33,000',views:'1,280',bg:'linear-gradient(135deg,#A78BFA,#7C3AED)',
+  core:[['观看人数','1,280'],['累计观看时长','533h'],['峰值在线','210'],['平均在线','64'],['评论人数','760'],['点赞人数','3,400'],['分享人数','700'],['互动人数','2,400'],['完播人数','880'],['完播率','68.8%'],['答题人数','720'],['正确率','80%'],['红包金额','¥200'],['新客人数','180'],['新客占比','14.1%']]},
+ {name:'话术训练',time:'07-05 ~ 07-20',dur:'409h',sales:'¥10,600',views:'980',bg:'linear-gradient(135deg,#FBBF24,#D97706)',
+  core:[['观看人数','980'],['累计观看时长','409h'],['峰值在线','150'],['平均在线','52'],['评论人数','580'],['点赞人数','2,600'],['分享人数','600'],['互动人数','1,900'],['完播人数','620'],['完播率','63.3%'],['答题人数','520'],['正确率','75%'],['红包金额','¥180'],['新客人数','160'],['新客占比','16.3%']]}
+];
+const AC_CAMPS=[
+ {name:'短视频运营实战 8月期',no:'CAMP-20260801',enrolled:'320',approved:'280',joined:'260',watch:'260',done:'208',rate:'80.0%',rev:'¥77,740',newc:'98',
+  students:[{n:'王女士',no:'8934355601',st:'watch',dur:'42.0h',rate:'92%',camp:'2 期',red:'¥10'},{n:'刘女士',no:'8934355602',st:'watch',dur:'36.0h',rate:'85%',camp:'2 期',red:'—'}]},
+ {name:'职场写作训练营',no:'CAMP-20260805',enrolled:'260',approved:'218',joined:'205',watch:'205',done:'164',rate:'80.0%',rev:'免费',newc:'72',
+  students:[{n:'李先生',no:'8934355603',st:'watch',dur:'18.0h',rate:'78%',camp:'1 期',red:'¥5'}]},
+ {name:'时间管理训练营',no:'CAMP-20260812',enrolled:'180',approved:'150',joined:'138',watch:'138',done:'110',rate:'79.7%',rev:'¥27,462',newc:'52',
+  students:[{n:'王女士',no:'8934355601',st:'watch',dur:'12.0h',rate:'88%',camp:'2 期',red:'—'}]},
+ {name:'新产品知识营',no:'CAMP-20260902',enrolled:'96',approved:'60',joined:'0',watch:'0',done:'0',rate:'—',rev:'免费',newc:'—',students:[]},
+ {name:'销售话术集训营',no:'CAMP-20260705',enrolled:'150',approved:'132',joined:'128',watch:'128',done:'102',rate:'79.7%',rev:'¥25,472',newc:'46',
+  students:[{n:'陈小姐',no:'8934355605',st:'unwatch',dur:'—',rate:'—',camp:'1 期',red:'—'}]}
+];
+let acTabKey='data', acQuery='', acCampIdx=0;
+function openAppCourse(){ el('app-course').classList.add('open'); acTabKey='data'; acQuery=''; el('ac-search-input').value=''; renderAcTabs(); renderAcBody(); }
+function closeAppCourse(){ el('app-course').classList.remove('open'); closeCampStudents(); }
+function acTab(t){ acTabKey=t; renderAcTabs(); renderAcBody(); el('ac-body').scrollTop=0; }
+function renderAcTabs(){ document.querySelectorAll('.ac-tab').forEach(t=>{ const n=t.textContent.trim(); t.classList.toggle('active',(n==='课程数据'&&acTabKey==='data')||(n==='课程转化'&&acTabKey==='conv')||(n==='课程推广'&&acTabKey==='promo')); }); }
+function acFilter(){ acQuery=(el('ac-search-input').value||'').trim().toLowerCase(); if(acTabKey==='data') renderAcBody(); }
+function renderAc(){
+ renderAcTabs();
+ if(acTabKey==='data'){
+  const list=AC_COURSES.filter(c=>!acQuery||c.name.toLowerCase().includes(acQuery));
+  el('ac-body').innerHTML=(list.length?list.map(c=>{
+   const i=AC_COURSES.indexOf(c);
+   return '<div class="ac-card" onclick="openCourseCore('+i+')"><div class="cover-row"><div class="ac-cover" style="background:'+c.bg+'">'+c.name.slice(0,1)+'</div>'
+    +'<div style="flex:1;min-width:0;"><div class="c-title">'+c.name+'</div><div class="c-time">'+c.time+'</div>'
+    +'<div class="c-stats"><div class="cs"><div class="v">'+c.dur+'</div><div class="l">总时长</div></div><div class="cs"><div class="v">'+c.sales+'</div><div class="l">销售额</div></div><div class="cs"><div class="v">'+c.views+'</div><div class="l">观看数</div></div></div></div></div></div>';
+  }).join(''):'<div class="ac-empty">未找到匹配「'+acQuery+'」的课程</div>');
+  return;
+ }
+ if(acTabKey==='conv'){
+  el('ac-body').innerHTML=
+   '<div class="ac-kpis">'
+   +'<div class="ac-kpi"><div class="ic" style="background:#3B82F6;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div class="v">1,006</div><div class="l">报名总人数</div></div>'
+   +'<div class="ac-kpi"><div class="ic" style="background:#F59E0B;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div><div class="v">¥130,674</div><div class="l">收入总额</div></div>'
+   +'<div class="ac-kpi"><div class="ic" style="background:#EF4444;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg></div><div class="v">731</div><div class="l">加入总数</div></div>'
+   +'</div>'
+   +AC_CAMPS.map((c,i)=>'<div class="ac-camp"><div class="camp-row"><div class="camp-logo">'+c.name.slice(0,1)+'</div><div><div class="camp-name">'+c.name+'</div><div class="camp-no">编号：'+c.no.slice(-6)+'</div></div><button class="camp-btn" onclick="openCampStudents('+i+')">客户概况</button></div>'
+    +'<div class="ac-grid">'
+    +'<div class="g"><div class="v">'+c.enrolled+'</div><div class="l">报名人数</div></div>'
+    +'<div class="g"><div class="v">'+c.approved+'</div><div class="l">通过人数</div></div>'
+    +'<div class="g"><div class="v">'+c.joined+'</div><div class="l">加入人数</div></div>'
+    +'<div class="g"><div class="v">'+c.watch+'</div><div class="l">观看人数</div></div>'
+    +'<div class="g"><div class="v">'+c.done+'</div><div class="l">完课人数</div></div>'
+    +'<div class="g"><div class="v">'+c.rate+'</div><div class="l">完课率</div></div>'
+    +'<div class="g"><div class="v">'+c.rev+'</div><div class="l">收入</div></div>'
+    +'<div class="g"><div class="v">'+c.newc+'</div><div class="l">新客客户数</div></div>'
+    +'</div></div>').join('')+
+   '<div class="legend" style="padding:8px 2px;color:var(--fg-3);font-size:10.5px;">口径：报名人数含待审核；完课率=完课人数÷加入人数；收入=已支付报名费合计（免费营期为 0）。数据与后台「课程与营期报表」同源。</div>';
+  return;
+ }
+ el('ac-body').innerHTML='<div class="ac-empty">课程推广 · 演示占位（分享课程/推广追踪在开发版提供）</div>';
+}
+function openCourseCore(i){
+ acCoreIdx=i; const c=AC_COURSES[i];
+ el('ac-body').innerHTML=
+  '<button class="ac-back" style="margin-bottom:8px;" onclick="acTab(\'data\')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg> 返回课程列表</button>'
+  +'<div class="ac-card"><div class="cover-row"><div class="ac-cover" style="background:'+c.bg+';width:74px;height:56px;">'+c.name.slice(0,1)+'</div>'
+  +'<div style="flex:1;min-width:0;"><div class="c-title">'+c.name+'</div><div class="c-time">'+c.time+'</div><div class="c-stats" style="margin-top:6px;"><div class="cs"><div class="v">'+c.dur+'</div><div class="l">总时长</div></div></div></div></div></div>'
+  +'<div class="ac-section">核心数据</div>'
+  +'<div class="ac-core">'+c.core.map(g=>'<div class="g"><div class="v">'+g[1]+'</div><div class="l">'+g[0]+'</div></div>').join('')+'</div>';
+ el('ac-body').scrollTop=0;
+}
+function openCampStudents(i){
+ acCampIdx=i; const c=AC_CAMPS[i];
+ el('cs-title').textContent='客户概况 · '+c.name;
+ const all=c.students.length;
+ const w=c.students.filter(x=>x.st==='watch').length;
+ el('cs-body').innerHTML=
+  '<div class="ac-kpis">'
+  +'<div class="ac-kpi" style="border:1.5px solid #12B76A;"><div class="v" style="color:#12B76A;">'+all+'</div><div class="l">全部</div></div>'
+  +'<div class="ac-kpi"><div class="v">'+w+'</div><div class="l">已观看人数</div></div>'
+  +'<div class="ac-kpi"><div class="v">'+(all-w)+'</div><div class="l">未观看人数</div></div>'
+  +'</div>'
+  +(c.students.length? c.students.map(x=>'<div class="ac-custrow"><div class="cu-row"><div class="cu-av">'+x.n.slice(0,1)+'</div><div><div class="cu-name">'+x.n+'</div><div class="cu-no">编号：'+x.no+'</div></div><span class="cu-tag tag '+(x.st==='watch'?'t-green':'t-red')+'">'+(x.st==='watch'?'已观看':'未观看')+'</span></div>'
+    +'<div class="ac-grid" style="grid-template-columns:repeat(4,1fr);gap:8px 6px;">'
+    +'<div class="g"><div class="v">'+x.camp+'</div><div class="l">报名营期</div></div>'
+    +'<div class="g"><div class="v">'+x.dur+'</div><div class="l">学习时长</div></div>'
+    +'<div class="g"><div class="v">'+x.rate+'</div><div class="l">完播率</div></div>'
+    +'<div class="g"><div class="v">'+x.red+'</div><div class="l">红包金额</div></div>'
+    +'</div></div>').join('')
+   :'<div class="ac-empty">该营期暂无加入学员</div>')
+  +'<button class="ac-bigbtn" onclick="toast(\'群通知已发送给未观看学员（演示）\')">群通知观看</button>';
+ el('app-camp-students').classList.add('open');
+}
+function closeCampStudents(){ el('app-camp-students').classList.remove('open'); }
+/* APP 初始化 */
+appTabKey='me';
+renderAppNav(); renderTabbar(); renderAppBody();
+const _t0=new Date(),_e=fmtDate(_t0);const _s=new Date(_t0);_s.setDate(_s.getDate()-6);
+applyPeriod(fmtDate(_s),_e);
 </script>
 </body>
 </html>

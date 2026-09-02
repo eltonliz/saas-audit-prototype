@@ -160,6 +160,10 @@ export const CampSchema = z.object({
   /** 每日红包模式（D35） */
   daily_red_packet_mode: DailyRedPacketModeEnum.default('by_course'),
 
+  /** V2·0902 客户可见范围（营期级全局）：排课层可按条覆盖 */
+  customer_scope_mode: z.enum(['all', 'new_only']).default('all'),
+  customer_scope_staff_ids: z.array(z.string()).default([]),
+
   /** 状态机（D15·8状态） */
   status: CampStatusEnum.default('draft'),
   review_remark: z.string().optional(),
@@ -482,6 +486,7 @@ export const CreateCampInputSchema = CampSchema.pick({
   store_id: true, store_name: true,
   certificate_checkin_threshold: true,
   capacity: true, enroll_deadline: true,
+  customer_scope_mode: true, customer_scope_staff_ids: true,
 });
 export type CreateCampInput = z.infer<typeof CreateCampInputSchema>;
 

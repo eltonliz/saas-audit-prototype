@@ -124,11 +124,21 @@
           <t-date-picker v-model="enrollDeadline" enable-time-picker placeholder="选择报名截止时间" style="width:100%" />
           <span class="form-tip-inline">截止后自动开营（未填默认创建时间+7天）</span>
         </t-form-item>
+        <!-- V2·0902 客户可见范围（营期级全局）：设置客户范围弹窗，排课层可按条覆盖 -->
+        <t-form-item label="客户可见范围">
+          <t-button variant="outline" size="small" theme="primary" @click="openCampScope()">
+            <template #icon><t-icon name="user-group" /></template> 设置客户范围
+          </t-button>
+          <span class="form-tip-inline">{{ campScopeLabel }}</span>
+        </t-form-item>
         <!-- V2·0902 客户范围改到排课层（对齐 SaaS「设置客户范围」），营期级开关下线 -->
         <!-- V2·0829 用户裁决：归属关系统一由 SaaS 后台门店成员（店长/店员）承接，课程业务不带归属 -->
         <t-form-item label="营期简介"><t-textarea v-model="f.description" placeholder="营期简介（选填）" :autosize="{ minRows: 2, maxRows: 4 }" /></t-form-item>
       </t-form>
     </t-dialog>
+
+    <!-- V2·0902 营期级客户范围（全局） -->
+    <CustomerScopeDialog ref="campScopeDialogRef" @confirm="onCampScopeConfirm" />
 
     <CampStudentDrawerPage v-model="studentDrawerVisible" :camp-id="activeCampId" />
 
@@ -189,6 +199,7 @@ import { notifyModalOpen } from '../../../utils/modal-spec-bridge';
 import { useCourseStore } from '../../../stores/course-store';
 import CampStudentDrawerPage from './CampStudentDrawerPage.vue';
 import CustomerScopeDialog from './CustomerScopeDialog.vue';
+import CustomerScopeDialog from './CustomerScopeDialog.vue';
 
 const store = useCampStore();
 const courseStore = useCourseStore();
@@ -240,7 +251,12 @@ const columns = [
   { colKey: 'op', title: '操作', width: 360, fixed: 'right' },
 ];
 
-const f = ref<{ title: string; description: string; mode: 'live' | 'recorded'; capacity: number; cover_url: string }>({ title: '', description: '', mode: 'recorded', capacity: 0, cover_url: '' });
+const f = ref<{ title: string; description: string; mode: 'live' | 'recorded'; capacity: number; cover_url: string }>({
+  title: '', description: '', mode: 'recorded' as 'live' | 'recorded', capacity: 0, cover_url: '',
+  // V2·0902 客户可见范围（营期级全局）
+  customer_scope_mode: 'all' as 'all' | 'new_only',
+  customer_scope_staff_ids: [] as string[],
+});
 
 // V2·0901 营期封面预设（与课程封面同源）
 const campCoverPresets = [
@@ -257,7 +273,7 @@ const campCoverPresets = [
 function openCreate() {
   notifyModalOpen('camp-create');
   editingCamp.value = null;
-  f.value = { title: '', description: '', mode: 'recorded', capacity: 0, cover_url: '' };
+  f.value = { title: '', description: '', mode: 'recorded', capacity: 0, cover_url: '', customer_scope_mode: 'all', customer_scope_staff_ids: [] };
   dateRange.value = []; enrollDeadline.value = null;
   showCreate.value = true;
 }
@@ -277,6 +293,9 @@ function doSave() {
     capacity: f.value.capacity,
     enroll_deadline: enrollDeadline.value ? Math.floor(new Date(enrollDeadline.value).getTime() / 1000) : Math.floor(Date.now() / 1000) + 86400 * 7,
     daily_red_packet_mode: 'by_course',
+    // V2·0902 客户可见范围（营期级全局）
+    customer_scope_mode: (f.value as any).customer_scope_mode,
+    customer_scope_staff_ids: [...(f.value as any).customer_scope_staff_ids],
   } as any;
   if (editingCamp.value) {
     store.updateCamp(editingCamp.value.id, data);
@@ -294,7 +313,7 @@ function delCamp(row: any) {
 function openEdit(row: any) {
   notifyModalOpen('camp-edit');
   editingCamp.value = row;
-  f.value = { title: row.title, description: row.description ?? '', mode: row.mode, capacity: row.capacity || 0, cover_url: row.cover_url || '' };
+  f.value = { title: row.title, description: row.description ?? '', mode: row.mode, capacity: row.capacity || 0, cover_url: row.cover_url || '', customer_scope_mode: (row as any).customer_scope_mode || 'all', customer_scope_staff_ids: [...((row as any).customer_scope_staff_ids || [])] };
   dateRange.value = [row.start_date, row.end_date];
   enrollDeadline.value = row.enroll_deadline ? new Date(row.enroll_deadline * 1000) : null;
   showCreate.value = true;
@@ -305,6 +324,26 @@ function openStudentDrawer(row: any) { activeCampId.value = row.id; studentDrawe
 
 // V2·0902 自动流转：进入页面时刷新（报名截止自动开营/结束时间自动结营）
 onMounted(() => { store.refreshCampStatuses(); });
+
+// ===== V2·0902 客户可见范围（营期级全局）=====
+const campScopeDialogRef = ref<InstanceType<typeof CustomerScopeDialog> | null>(null);
+const campScopeLabel = computed(() => {
+  const ids: string[] = (f.value as any).customer_scope_staff_ids || [];
+  const mode = (f.value as any).customer_scope_mode || 'all';
+  if (ids.length === 0) return mode === 'new_only' ? '当前：仅新客户 · 全部店长/店员' : '当前：全部客户 · 全部店长/店员';
+  return `当前：${mode === 'new_only' ? '仅新客户 · ' : ''}${ids.length} 名店长/店员可见`;
+});
+function openCampScope() {
+  campScopeDialogRef.value?.openWith({
+    mode: (f.value as any).customer_scope_mode || 'all',
+    staff_ids: [...((f.value as any).customer_scope_staff_ids || [])],
+  });
+}
+function onCampScopeConfirm(scope: { mode: 'all' | 'new_only'; staff_ids: string[] }) {
+  (f.value as any).customer_scope_mode = scope.mode;
+  (f.value as any).customer_scope_staff_ids = scope.staff_ids;
+  MessagePlugin.success('客户可见范围已更新');
+}
 
 // V2·0829 用户裁决：邀请码/口令体系整体下线，邀请码管理 Drawer 与二维码生成逻辑已删除
 
