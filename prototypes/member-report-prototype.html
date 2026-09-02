@@ -149,6 +149,14 @@
   .toast{background:#0F172A;color:#fff;padding:9px 18px;border-radius:99px;font-size:12.5px;box-shadow:var(--shadow-2);animation:toastIn .2s ease-out;display:flex;align-items:center;gap:8px;}
   .toast i{width:7px;height:7px;border-radius:50%;background:#34D399;display:inline-block;}
   @keyframes toastIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+  /* 周期下拉 */
+  .period-menu{position:fixed;z-index:6000;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow-2);padding:6px;width:250px;animation:pop .15s ease-out;}
+  .pm-item{display:flex;align-items:center;width:100%;padding:9px 12px;border:none;background:none;border-radius:7px;font-size:13px;color:var(--fg-2);min-height:40px;font-family:var(--font);transition:background .15s;}
+  .pm-item:hover{background:var(--muted);}
+  .pm-item.active{color:var(--primary);font-weight:600;background:#EFF4FE;}
+  .pm-item .pm-range{margin-left:auto;font-size:11px;color:var(--fg-3);font-variant-numeric:tabular-nums;}
+  .pm-item .pm-check{margin-left:8px;color:var(--primary);}
+  .pm-foot{font-size:10.5px;color:var(--fg-3);padding:7px 10px 2px;border-top:1px dashed var(--border);margin-top:4px;}
 
   /* ===== v5.2 APP 端（移动端报表 · 店长/店员双角色） ===== */
   .app-stage{display:flex;gap:30px;align-items:flex-start;justify-content:center;flex-wrap:wrap;padding:8px 0 30px;}
@@ -278,7 +286,7 @@
     <header class="topbar">
       <span class="page-title" id="pageTitle">租户总览</span>
       <div class="topbar-right">
-        <span class="pill amber clickable" id="periodPill" onclick="openDatePicker()" title="点击选择统计周期（30 天可查窗口）"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> 统计周期 <b class="num" id="periodText">2026-09-01</b></span>
+        <span class="pill amber clickable" id="periodPill" onclick="openPeriodMenu(event)" title="点击选择统计周期（下拉选择，窗口上限 30 天）"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> 统计周期 <b class="num" id="periodText">2026-09-01</b></span>
         <button class="btn ghost" onclick="openSpecs()">指标字典</button>
         <button class="btn" onclick="doExport()">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -1388,27 +1396,33 @@ function switchView(v){
 }
 
 /* ================= v5.3 周期选择（30 天窗口）+ 模拟重算 ================= */
-const CAL_START='2026-08-03', CAL_END='2026-09-01', FLOW_TOTAL=644141, FLOW_DUR_TOTAL=LIVE.reduce((a,r)=>a+parseFloat(r[8].replace(/,/g,'')),0);
+const FLOW_TOTAL=644141, FLOW_DUR_TOTAL=LIVE.reduce((a,r)=>a+parseFloat(r[8].replace(/,/g,'')),0);
 
-function enumerateDays(a,b){ const out=[],d0=new Date(a),d1=new Date(b); for(let d=new Date(d0);d<=d1;d.setDate(d.getDate()+1)) out.push(d.toISOString().slice(0,10)); return out; }
-function openDatePicker(){
-  const days=enumerateDays(CAL_START,CAL_END);
-  const cal='<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;">'+days.map(d=>{
-    const inSel=d>=periodStart&&d<=periodEnd, isPick=d===pickStart;
-    return '<button class="a-chip'+(inSel||isPick?' active':'')+'" style="min-width:0;padding:8px 0;text-align:center;font-size:11.5px;font-variant-numeric:tabular-nums;" onclick="pickDay(\''+d+'\')">'+d.slice(5)+'</button>';
-  }).join('')+'</div>';
-  openModal('选择统计周期（30 天可查窗口）',
-    '<div class="caliber" style="margin-bottom:10px;">点击<b>起始日</b>、再点<b>结束日</b>（同日=单日）。指标按 10 分钟聚合、报表 T+1 口径<b>模拟重算</b>；场次列表按周期过滤。</div>'
-    +'<div class="a-chips" style="margin-bottom:12px;">'
-    +[['今日','2026-09-01','2026-09-01'],['近7天','2026-08-26','2026-09-01'],['近14天','2026-08-19','2026-09-01'],['近30天','2026-08-03','2026-09-01']]
-      .map(c=>'<button class="a-chip'+(periodStart===c[1]&&periodEnd===c[2]?' active':'')+'" onclick="applyPeriod(\''+c[1]+'\',\''+c[2]+'\');closeModal();pickStart=null;">'+c[0]+'</button>').join('')+'</div>'
-    +'<div class="a-section">日历 '+CAL_START.slice(5)+' ~ '+CAL_END.slice(5)+'</div>'+cal
-    +'<div class="legend">窗口上限 30 天；「按月查（不可跨月）」模式在开发版提供。</div>');
+function fmtDate(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+/* 统计周期下拉：预设周期直接选择（窗口上限 30 天） */
+const PERIOD_OPTS=[['今日',0,0],['昨日',1,1],['近7天',6,0],['近14天',13,0],['近30天',29,0]];
+function openPeriodMenu(ev){
+  ev.stopPropagation();
+  closePeriodMenu();
+  const today=new Date();
+  const menu=document.createElement('div');
+  menu.className='period-menu';
+  menu.innerHTML=PERIOD_OPTS.map(o=>{
+    const eD=new Date(today); eD.setDate(eD.getDate()-o[2]);
+    const sD=new Date(today); sD.setDate(sD.getDate()-o[1]);
+    const s=fmtDate(sD), e=fmtDate(eD);
+    const act=periodStart===s&&periodEnd===e;
+    return '<button class="pm-item'+(act?' active':'')+'" onclick="pickPeriod(\''+s+'\',\''+e+'\')"><span>'+o[0]+'</span><span class="pm-range">'+s.slice(5)+' ~ '+e.slice(5)+'</span>'+(act?'<span class="pm-check">✓</span>':'')+'</button>';
+  }).join('')+'<div class="pm-foot">可查窗口上限 30 天 · 指标按周期模拟重算</div>';
+  document.body.appendChild(menu);
+  const r=document.getElementById('periodPill').getBoundingClientRect();
+  menu.style.top=(r.bottom+6)+'px';
+  menu.style.left=Math.max(10,Math.min(innerWidth-260,r.left-40))+'px';
+  setTimeout(()=>document.addEventListener('click',outsideClose),0);
 }
-function pickDay(d){
-  if(!pickStart || d<pickStart){ pickStart=d; toast('已选起始日 '+d+'，再点结束日'); openDatePicker(); }
-  else { const s=pickStart; pickStart=null; applyPeriod(s,d); closeModal(); }
-}
+function outsideClose(e){ if(!e.target.closest('.period-menu')&&!e.target.closest('#periodPill')) closePeriodMenu(); }
+function closePeriodMenu(){ document.querySelectorAll('.period-menu').forEach(m=>m.remove()); document.removeEventListener('click',outsideClose); }
+function pickPeriod(s,e){ closePeriodMenu(); applyPeriod(s,e); }
 function applyPeriod(s,e){
   periodStart=s; periodEnd=e; pickStart=null;
   el('periodText').textContent = s===e? s : s.slice(5)+' ~ '+e.slice(5);
@@ -1544,7 +1558,9 @@ function openAppMember(i){
   el('p-sheet').classList.add('open');
 }
 function closeSheet(){ el('p-sheet').classList.remove('open'); }
-renderAppHead(); renderAppTabs(); renderAppBody(); applyPeriod('2026-08-26','2026-09-01');
+renderAppHead(); renderAppTabs(); renderAppBody();
+const _t0=new Date(),_e=fmtDate(_t0);const _s=new Date(_t0);_s.setDate(_s.getDate()-6);
+applyPeriod(fmtDate(_s),_e);
 </script>
 </body>
 </html>
