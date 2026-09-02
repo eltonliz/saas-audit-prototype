@@ -17,6 +17,12 @@
               {{ campEnabled ? '开启：APP 正常展示营期入口与学习记录中的营期数据' : '关闭：APP 端隐藏营期 Tab，学习记录不再展示营期（PC 后台管理不受影响）' }}
             </span>
           </t-form-item>
+          <t-form-item label="结营后可看课">
+            <t-switch v-model="campEndedVisible" @change="onEndedVisibleChange" />
+            <span class="cfg-tip">
+              {{ campEndedVisible ? '开启：营期结束后客户仍可进入查看/回看课程内容' : '关闭：营期结束后客户不可再进入看课，仅保留报名与完成数据' }}
+            </span>
+          </t-form-item>
         </t-form>
       </div>
 
@@ -44,9 +50,10 @@ import { MessagePlugin } from 'tdesign-vue-next';
 import { useGeneralConfigStore } from '../../../stores/general-config-store';
 
 const configStore = useGeneralConfigStore();
-const { campEnabled, courseDisplayMode } = storeToRefs(configStore);
+const { campEnabled, courseDisplayMode, campEndedVisible } = storeToRefs(configStore);
 
 function onCampChange(v: boolean) { MessagePlugin.success(v ? '营期功能已开启，APP 恢复展示' : '营期功能已关闭，APP 端隐藏营期入口与学习记录营期数据'); }
+function onEndedVisibleChange(v: boolean) { MessagePlugin.success(v ? '结营后客户可继续看课' : '结营后客户不可再进入看课'); }
 function onModeChange(v: string) { MessagePlugin.success(v === 'lesson' ? 'APP 课堂频道已切换为「仅展示单独的课时」' : 'APP 课堂频道已切换为「展示全部课程」'); }
 </script>
 

@@ -1,6 +1,14 @@
 <template>
   <div class="camp-learn">
     <header class="app-header"><span @click="$router.back()">←</span><span>{{ camp?.title ?? '营期学习' }}</span></header>
+    <!-- V2·0902 通用配置：营期结束后是否可看课 -->
+    <div v-if="blocked" class="ended-block">
+      <t-icon name="lock-on" :size="28" />
+      <div class="ended-title">营期已结束</div>
+      <div class="ended-desc">该营期已结束，内容不再开放查看</div>
+      <t-button theme="default" variant="outline" size="small" @click="$router.back()">返回</t-button>
+    </div>
+    <template v-else>
     <div class="tabs">
       <span v-for="t in ['课程','学员']" :key="t" class="tab" :class="{ active: tab === t }" @click="tab = t">{{ t }}</span>
     </div>
@@ -37,6 +45,7 @@
       </div>
       <div v-if="campEnrollments.length === 0" class="empty">暂无学员</div>
     </template>
+    </template>
   </div>
 </template>
 
@@ -47,11 +56,15 @@ import { MessagePlugin } from 'tdesign-vue-next';
 import EmojiIcon from './EmojiIcon.vue';
 import { useCampStore } from '../../../stores/camp-store';
 import { useCourseStore } from '../../../stores/course-store';
+import { useGeneralConfigStore } from '../../../stores/general-config-store';
 
 const route = useRoute(); const router = useRouter();
 const campStore = useCampStore(); const courseStore = useCourseStore();
+const configStore = useGeneralConfigStore();
 const campId = route.params.id as string;
 const camp = computed(() => campStore.loadCamp(campId));
+// V2·0902 通用配置：结营后是否可看课
+const blocked = computed(() => camp.value?.status === 'ended' && !configStore.campEndedVisible);
 const tab = ref('课程');
 const totalDays = computed(() => camp.value?.total_days ?? 7);
 
@@ -220,6 +233,11 @@ function goLesson(s: any) {
 .review-opt.opt-correct { border-color: #12B76A; background: #E6F9F1; }
 .review-opt.opt-wrong { border-color: #F04438; background: #FEF3F2; }
 .review-opt-label { width: 24px; height: 24px; border-radius: 50%; background: #F2F4F7; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: #667085; flex-shrink: 0; }
+
+/* V2·0902 结营拦截视图 */
+.ended-block { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 80px 20px; color: #98A2B3; }
+.ended-title { font-size: 16px; font-weight: 600; color: #1F2C3E; }
+.ended-desc { font-size: 13px; margin-bottom: 8px; }
 .review-opt.opt-correct .review-opt-label { background: #12B76A; color: #fff; }
 .review-opt.opt-wrong .review-opt-label { background: #F04438; color: #fff; }
 .review-opt-text { flex: 1; }

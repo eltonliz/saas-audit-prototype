@@ -9,9 +9,12 @@ import { ref } from 'vue';
 export const useGeneralConfigStore = defineStore('general-config', () => {
   const campEnabled = ref(true);
   const courseDisplayMode = ref<'course' | 'lesson'>('course');
+  // V2·0902 追加：营期结束后是否还给客户看课（回看）
+  const campEndedVisible = ref(true);
 
   function setCampEnabled(v: boolean) { campEnabled.value = v; }
   function setCourseDisplayMode(v: 'course' | 'lesson') { courseDisplayMode.value = v; }
+  function setCampEndedVisible(v: boolean) { campEndedVisible.value = v; }
 
-  return { campEnabled, courseDisplayMode, setCampEnabled, setCourseDisplayMode };
+  return { campEnabled, courseDisplayMode, campEndedVisible, setCampEnabled, setCourseDisplayMode, setCampEndedVisible };
 });

@@ -35,6 +35,11 @@
 
         <!-- SaaS-Class 课程域菜单（v-if 开关控制：当前仅显示「页面导航」，其他菜单隐藏可随时恢复） -->
         <template v-else>
+        <!-- V2·0902 通用配置（老板需求：一级入口，不受 legacy 菜单开关影响） -->
+        <el-menu-item index="/tenant/course/general-config">
+          <el-icon><Setting /></el-icon>
+          <span>通用配置</span>
+        </el-menu-item>
         <!-- 内容管理 -->
         <el-sub-menu v-if="SHOW_LEGACY_MENU" index="content">
           <template #title>
@@ -43,7 +48,6 @@
           </template>
           <el-menu-item index="/tenant/course/course-types">课程分类</el-menu-item>
           <el-menu-item index="/tenant/course/courses">课程库</el-menu-item>
-          <el-menu-item index="/tenant/course/general-config">通用配置</el-menu-item>
           <el-menu-item index="/tenant/course/videos">视频课程</el-menu-item>
           <el-menu-item index="/tenant/course/audios">音频课程</el-menu-item>
           <el-menu-item index="/tenant/course/questions">题目库</el-menu-item>
@@ -146,7 +150,7 @@
 <script setup lang="ts">
 import { computed, watch, ref, onMounted, nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { Notebook, Calendar, Medal, Wallet, Histogram, Aim, Warning } from '@element-plus/icons-vue';
+import { Notebook, Calendar, Medal, Wallet, Histogram, Aim, Warning, Setting } from '@element-plus/icons-vue';
 import TerminalSwitcher from '../components/TerminalSwitcher.vue';
 import { ElMessage } from 'element-plus';
 import ReplicaRequirementPanel from '../components/replica/ReplicaRequirementPanel.vue';
