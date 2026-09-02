@@ -1186,7 +1186,7 @@
 
 <script>
 /* ================= 页签与子视图 ================= */
-const TAB_NAMES = {tenant:'总览',store:'门店报表',live:'直播报表',product:'商品报表',customer:'客户报表',course:'课程与营期报表',staff:'店员报表',manager:'店长报表'};
+const TAB_NAMES = {tenant:'总览',store:'门店报表',live:'直播报表',product:'商品报表',customer:'客户报表',course:'课程报表',staff:'店员报表',manager:'店长报表'};
 function syncNav(key){
   document.querySelectorAll('.nav-item').forEach(n=>{
     const hit = n.dataset.page===key;
@@ -2071,7 +2071,7 @@ function renderAc(){
     +'<div class="g"><div class="v">'+c.sched+'</div><div class="l">排课数</div></div>'
     +'<div class="g"><div class="v">'+c.status+'</div><div class="l">营期状态</div></div>'
     +'</div></div>').join('')+
-   '<div class="legend" style="padding:8px 2px;color:var(--fg-3);font-size:10.5px;">口径：报名即通过并加入营期（无审核环节）；完课率=完课人数÷报名人数；收入=已支付报名费合计。数据与后台「课程与营期报表」同源。</div>';
+   '<div class="legend" style="padding:8px 2px;color:var(--fg-3);font-size:10.5px;">口径：报名即通过并加入营期（无审核环节）；完课率=完课人数÷报名人数；收入=已支付报名费合计。数据与后台课程报表同源。</div>';
   return;
  }
  el('ac-body').innerHTML='<div class="ac-empty">课程推广 · 演示占位（分享课程/推广追踪在开发版提供）</div>';
