@@ -293,16 +293,16 @@
       <section class="pane active" id="pane-tenant">
         <div class="grid g4">
           <div class="card tone-blue clickable" onclick="switchTab('live')" title="点击进入直播报表"><div class="card-label">观看总人数<span class="demo">T+1 · 线上真实</span></div>
-            <div class="card-value" id="t-kpi-watch" data-def="统计周期内进入过直播间的去重客户数（UV）。同一客户多次进出、观看多场均只计 1 人。" data-calc="COUNT(DISTINCT customer_id)，type=3" data-source="sa_live_watch_record">54</div>
+            <div class="card-value" id="t-kpi-watch" data-def="统计周期内进入过直播间的去重客户数（UV）。同一客户多次进出、观看多场均只计 1 人。" data-calc="按"客户"去重计数（仅统计顾客）" data-source="直播观看明细">54</div>
             <div class="card-foot"><svg class="spark" data-spark="6,8,7,9,8,10,6" data-color="#2563EB" width="64" height="20"></svg></div></div>
           <div class="card tone-green clickable" onclick="switchTab('product')" title="点击进入商品报表"><div class="card-label">成交订单总金额<span class="demo">T+1 · 线上真实</span></div>
-            <div class="card-value" id="t-kpi-gmv" data-def="直播期间挂车商品订单中已完成支付部分的金额合计（元），不含未支付订单。" data-calc="SUM(pay_amount) WHERE live_id非空 AND 已支付" data-source="sto_order.pay_amount">¥0.63</div>
+            <div class="card-value" id="t-kpi-gmv" data-def="直播期间挂车商品订单中已完成支付部分的金额合计（元），不含未支付订单。" data-calc="直播引导的已支付订单金额合计" data-source="订单表 · 支付金额">¥0.63</div>
             <div class="card-foot"><svg class="spark" data-spark="0.2,0,0.1,0,0.6,0.03,0" data-color="#059669" width="64" height="20"></svg></div></div>
           <div class="card tone-violet clickable" onclick="switchTab('customer')" title="点击进入客户报表"><div class="card-label">会员总数<span class="demo">5min · 示例</span></div>
-            <div class="card-value" id="t-kpi-member" data-def="项目下状态正常的 C 端客户总数（type=3），含 VIP 与普通会员。" data-calc="COUNT(customer_id) WHERE type=3 AND status=1" data-source="sa_customer_entity">12,560</div>
+            <div class="card-value" id="t-kpi-member" data-def="项目下状态正常的顾客总数，含 VIP 与普通会员。" data-calc="状态正常的顾客数量" data-source="客户档案表">12,560</div>
             <div class="card-foot"><svg class="spark" data-spark="9,9.4,10,10.5,11,12,12.5" data-color="#7C3AED" width="64" height="20"></svg></div></div>
           <div class="card tone-cyan clickable" onclick="openFlowCaliber()" title="点击查看流量口径"><div class="card-label">消耗总流量 (MB)<span class="demo">T+1 · 线上真实</span></div>
-            <div class="card-value" id="t-kpi-flow" data-def="全部直播场次产生的流量合计：直播推流/播放流量 + 回放点播流量。用于流量成本核算与对账。" data-calc="SUM(直播流量 + 回放流量)" data-source="sa_live_session_stat（对接 STR-SAAS-002）">644,141</div>
+            <div class="card-value" id="t-kpi-flow" data-def="全部直播场次产生的流量合计：直播推流/播放流量 + 回放点播流量。用于流量成本核算与对账。" data-calc="直播流量 ＋ 回放流量" data-source="直播场次统计（对接直播流量成本模块）">644,141</div>
             <div class="card-foot"><svg class="spark" data-spark="70,76,72,80,78,86,84" data-color="#0891B2" width="64" height="20"></svg></div></div>
         </div>
 
@@ -317,7 +317,7 @@
             <div class="panel-head"><div><div class="panel-title">会员等级构成<span class="chip c-violet" style="margin-left:4px;">结构</span></div>
             <div class="panel-sub">全部会员按 VIP 等级分布（示例数据）</div></div></div>
             <div class="chart-wrap"><div class="donut-flex" id="memberDonut"></div></div>
-            <div class="legend"><b>口径</b>：等级取 sa_customer_vip.level，level&gt;1 为 VIP；占比分母为会员总数。</div>
+            <div class="legend"><b>口径</b>：等级取 会员等级表，level&gt;1 为 VIP；占比分母为会员总数。</div>
           </div>
         </div>
 
@@ -339,10 +339,10 @@
               <tr><td><button class="link" onclick="openStoreDetail('天河旗舰店')">天河旗舰店</button></td><td>12</td><td>286</td><td>4,120</td><td>86</td><td>¥25,800</td><td>32</td><td>72</td><td>25.2%</td><td><button class="link" onclick="switchTab('live')">直播明细 →</button></td></tr>
               <tr><td><button class="link" onclick="openStoreDetail('白云店')">白云店</button></td><td>8</td><td>198</td><td>2,860</td><td>52</td><td>¥15,600</td><td>24</td><td>48</td><td>24.2%</td><td><button class="link" onclick="switchTab('live')">直播明细 →</button></td></tr>
               <tr><td><button class="link" onclick="openStoreDetail('番禺店')">番禺店</button></td><td>4</td><td>120</td><td>1,540</td><td>28</td><td>¥8,400</td><td>18</td><td>26</td><td>21.7%</td><td><button class="link" onclick="switchTab('live')">直播明细 →</button></td></tr>
-              <tr class="tot"><td>汇总（3 家门店）</td><td>24</td><td>604</td><td>8,520</td><td>166</td><td>¥49,800</td><td>74</td><td>146</td><td>27.5%</td><td>—</td></tr>
+              <tr class="tot"><td>汇总（3 家门店）</td><td>24</td><td>604</td><td>8,520</td><td>166</td><td>¥49,800</td><td>74</td><td>146</td><td>24.2%</td><td>—</td></tr>
             </tbody>
           </table>
-          <div class="legend"><b>字段口径</b>：直播场数=该门店关联场次数（sa_live_session）；累计观看(分)=该门店会员 watch_duration 求和÷60；动销商品=有成交的去重 SPU 数；观看→成交=成交客户÷观看人数（汇总行为加权值）。</div>
+          <div class="legend"><b>字段口径</b>：直播场数=该门店关联场次数（直播场次表）；累计观看(分)=该门店会员 watch_duration 求和÷60；动销商品=有成交的去重 SPU 数；观看→成交=成交客户÷观看人数（汇总行为加权值）。</div>
         </div>
       </section>
 
@@ -350,11 +350,11 @@
       <section class="pane" id="pane-store">
         <div class="subview active" id="store-list">
           <div class="grid g5">
-            <div class="card tone-blue"><div class="card-label">门店总数</div><div class="card-value" data-def="项目下状态为营业中的门店数量。" data-calc="COUNT(DISTINCT store_id) WHERE status=1" data-source="sa_store_entity">156<small>家</small></div></div>
-            <div class="card tone-violet"><div class="card-label">门店总会员</div><div class="card-value" data-def="全部门店名下 C 端客户总数，按客户归属门店（store_id）统计。" data-calc="COUNT(customer_id) WHERE type=3 AND status=1" data-source="sa_customer_entity.store_id">12,560</div></div>
-            <div class="card tone-green"><div class="card-label">门店贡献GMV</div><div class="card-value" data-def="全部门店会员已支付订单金额合计。" data-calc="SUM(pay_amount) WHERE 已支付" data-source="sto_order × customer.store_id">¥1.85M</div></div>
-            <div class="card tone-amber"><div class="card-label">门店复购率</div><div class="card-value" data-def="90 天内有 ≥2 次已支付订单的会员占同期有消费会员的比例。" data-calc="COUNT(is_repeat_buyer=1) / 有消费会员数" data-source="dws_member_asset.is_repeat_buyer">38%</div></div>
-            <div class="card tone-cyan"><div class="card-label">活跃率</div><div class="card-value" data-def="活跃会员（is_active=1，每日 02:30 预计算）占会员总数比例。" data-calc="COUNT(is_active=1) / 会员数" data-source="dws_member_asset.is_active">85%</div></div>
+            <div class="card tone-blue"><div class="card-label">门店总数</div><div class="card-value" data-def="项目下状态为营业中的门店数量。" data-calc="营业中门店数量" data-source="门店档案表">156<small>家</small></div></div>
+            <div class="card tone-violet"><div class="card-label">门店总会员</div><div class="card-value" data-def="全部门店名下的顾客总数，按顾客所属门店统计。" data-calc="状态正常的顾客数量" data-source="客户档案 · 所属门店">12,560</div></div>
+            <div class="card tone-green"><div class="card-label">门店贡献GMV</div><div class="card-value" data-def="全部门店会员已支付订单金额合计。" data-calc="已支付订单金额合计" data-source="订单表 × 客户所属门店">¥1.85M</div></div>
+            <div class="card tone-amber"><div class="card-label">门店复购率</div><div class="card-value" data-def="90 天内有 ≥2 次已支付订单的会员占同期有消费会员的比例。" data-calc="90 天内下单 ≥2 次的会员数 ÷ 有消费会员数" data-source="会员状态汇总 · 复购标记">38%</div></div>
+            <div class="card tone-cyan"><div class="card-label">活跃率</div><div class="card-value" data-def="活跃会员占会员总数的比例（每日凌晨预计算的前一日状态）。" data-calc="活跃会员数 ÷ 会员总数" data-source="会员状态汇总 · 活跃标记">85%</div></div>
           </div>
           <div class="panel">
             <div class="panel-head"><div><div class="panel-title">门店会员对比</div><div class="panel-sub">点击门店名进入门店详情（示例数据）</div></div></div>
@@ -364,7 +364,7 @@
                 <tr><td><button class="link" onclick="openStoreDetail('天河旗舰店')">天河旗舰店</button></td><td>486</td><td>36.5%</td><td>32</td><td>52</td><td>¥78,000</td><td>¥160</td><td>42%</td><td>89%</td><td><button class="link" onclick="openStoreDetail('天河旗舰店')">详情 →</button></td></tr>
                 <tr><td><button class="link" onclick="openStoreDetail('白云店')">白云店</button></td><td>380</td><td>32.1%</td><td>25</td><td>48</td><td>¥56,000</td><td>¥147</td><td>38%</td><td>85%</td><td><button class="link" onclick="openStoreDetail('白云店')">详情 →</button></td></tr>
                 <tr><td><button class="link" onclick="openStoreDetail('番禺店')">番禺店</button></td><td>320</td><td>28.8%</td><td>20</td><td>45</td><td>¥45,000</td><td>¥140</td><td>35%</td><td>82%</td><td><button class="link" onclick="openStoreDetail('番禺店')">详情 →</button></td></tr>
-                <tr class="tot"><td>汇总（3 家）</td><td>1,186</td><td>33.1%</td><td>77</td><td>145</td><td>¥179,000</td><td>¥151</td><td>38.8%</td><td>85.7%</td><td>—</td></tr>
+                <tr class="tot"><td>汇总（3 家）</td><td>1,186</td><td>33.1%</td><td>77</td><td>145</td><td>¥179,000</td><td>¥151</td><td>38.8%</td><td>85.8%</td><td>—</td></tr>
               </tbody>
             </table>
             <div class="legend"><b>字段口径</b>：名下会员=store_id 归属该店的客户数；新增=first_bind_time 落在统计周期；沉睡=90 天无消费且无登录（is_dormant=1）；人均贡献=门店GMV÷名下会员数；VIP占比=VIP会员数÷名下会员数。</div>
@@ -378,7 +378,7 @@
             <button class="btn ghost back" onclick="showSub('store','store-list')">← 返回门店列表</button>
           </div>
           <div class="grid g5">
-            <div class="card tone-blue"><div class="card-label">门店成员数</div><div class="card-value" data-def="该门店在职员工数（店长 type=2 + 店员 type=1）。" data-calc="COUNT WHERE shop_id=X AND type IN (1,2)" data-source="sa_store_employee">31</div></div>
+            <div class="card tone-blue"><div class="card-label">门店成员数</div><div class="card-value" data-def="该门店在职员工数（店长＋店员）。" data-calc="该门店店长＋店员人数" data-source="员工档案表">31</div></div>
             <div class="card tone-violet"><div class="card-label">店长 / 店员</div><div class="card-value">3<small>/</small>28</div></div>
             <div class="card tone-green"><div class="card-label">门店会员总数</div><div class="card-value">1,480</div></div>
             <div class="card tone-amber"><div class="card-label">门店贡献GMV</div><div class="card-value">¥222,000</div></div>
@@ -395,7 +395,7 @@
                 <tr><td><span class="rank rn">4</span></td><td><b>刘总</b></td><td><span class="tag t-violet">店长</span></td><td>480</td><td>32</td><td>120</td><td>48</td><td>¥72,000</td><td>36%</td><td><button class="link" onclick="openMemberDetail('刘总','店长')">明细 →</button></td></tr>
               </tbody>
             </table>
-            <div class="legend"><b>字段口径</b>：名下会员=staff_id 归属快照（按查询时点，不追溯历史归属）；身份取 sa_store_employee.type（1=店员，2=店长）。</div>
+            <div class="legend"><b>字段口径</b>：名下会员=staff_id 归属快照（按查询时点，不追溯历史归属）；身份取 员工档案 · 身份（1=店员，2=店长）。</div>
           </div>
         </div>
 
@@ -406,7 +406,7 @@
             <button class="btn ghost back" onclick="openStoreDetail(document.getElementById('sd-name').textContent)">← 返回门店</button>
           </div>
           <div class="grid g5">
-            <div class="card tone-violet"><div class="card-label">名下会员</div><div class="card-value" data-def="staff_id 归属该成员且状态正常的客户数。" data-calc="COUNT WHERE staff_id=X AND type=3 AND status=1" data-source="sa_customer_entity">186</div></div>
+            <div class="card tone-violet"><div class="card-label">名下会员</div><div class="card-value" data-def="归属在该成员名下且状态正常的客户数。" data-calc="归属该成员名下的正常客户数量" data-source="客户档案表">186</div></div>
             <div class="card tone-blue"><div class="card-label">新增会员</div><div class="card-value">12</div></div>
             <div class="card tone-amber"><div class="card-label">VIP占比</div><div class="card-value">36.5%</div></div>
             <div class="card tone-green"><div class="card-label">活跃会员</div><div class="card-value">152</div></div>
@@ -429,7 +429,7 @@
                   <tr><td>陈小姐</td><td class="num">137****5555</td><td><span class="tag t-gray">普通</span></td><td>50</td><td>¥0</td><td>¥0</td><td>05-10</td><td>05-12</td><td><span class="tag t-red">沉睡</span></td></tr>
                 </tbody>
               </table>
-              <div class="legend"><b>字段口径</b>：累计消费=该会员历史已支付订单金额合计；沉睡=90 天无消费且无登录；积分/余额来自 sa_user_points / sa_user_wallet。</div>
+              <div class="legend"><b>字段口径</b>：累计消费=该会员历史已支付订单金额合计；沉睡=90 天无消费且无登录；积分/余额来自 积分账户 / 钱包账户。</div>
             </div>
             <div id="md-course" hidden>
               <table>
@@ -462,25 +462,25 @@
           <div class="caliber"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:2px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
             <span><b>统计口径</b>：直播域数据 T+1 更新（每日 11:00 前更新昨日数据）；<b>观看人数</b>=进入直播间的去重客户数；<b>观看峰值人数</b>=单场同时在线最大值；<b>成交订单</b>=挂车商品已支付订单；<b>直播时长</b>=开播至下播时长。本 Tab 指标为线上真实数据。</span></div>
           <div class="grid g5">
-            <div class="card tone-blue"><div class="card-label">直播场数</div><div class="card-value" id="l-kpi-sessions" data-def="统计周期内创建的直播场次总数（含未开播）。" data-calc="COUNT(DISTINCT session_id)" data-source="sa_live_session">24<small>场</small></div></div>
-            <div class="card tone-violet"><div class="card-label">观看总人数</div><div class="card-value" id="l-kpi-watch" data-def="各场次去重观看客户数之和（跨场次不去重，场次内去重）。" data-calc="SUM(场次观看人数)" data-source="sa_live_watch_record">54</div></div>
-            <div class="card tone-green"><div class="card-label">成交订单总数</div><div class="card-value" id="l-kpi-orders" data-def="直播挂车商品产生的已支付订单数。" data-calc="COUNT WHERE live_id非空 AND 已支付" data-source="sto_order">9</div></div>
-            <div class="card tone-amber"><div class="card-label">成交订单总金额</div><div class="card-value" id="l-kpi-amount" data-def="已支付直播订单的支付金额合计（元）。" data-calc="SUM(pay_amount)" data-source="sto_order.pay_amount">¥0.63</div></div>
-            <div class="card tone-cyan"><div class="card-label">消耗总流量 (MB)</div><div class="card-value" id="l-kpi-flow" data-def="全部场次直播流量与回放流量之和，用于流量成本分摊与对账。" data-calc="SUM(直播流量+回放流量)" data-source="sa_live_session_stat">644,141</div></div>
+            <div class="card tone-blue"><div class="card-label">直播场数</div><div class="card-value" id="l-kpi-sessions" data-def="统计周期内创建的直播场次总数（含未开播）。" data-calc="去重后的直播场次数" data-source="直播场次表">24<small>场</small></div></div>
+            <div class="card tone-violet"><div class="card-label">观看总人数</div><div class="card-value" id="l-kpi-watch" data-def="各场次去重观看客户数之和（跨场次不去重，场次内去重）。" data-calc="各场次观看人数相加" data-source="直播观看明细">54</div></div>
+            <div class="card tone-green"><div class="card-label">成交订单总数</div><div class="card-value" id="l-kpi-orders" data-def="直播挂车商品产生的已支付订单数。" data-calc="直播引导的已支付订单数" data-source="订单表">9</div></div>
+            <div class="card tone-amber"><div class="card-label">成交订单总金额</div><div class="card-value" id="l-kpi-amount" data-def="已支付直播订单的支付金额合计（元）。" data-calc="已支付订单金额合计" data-source="订单表 · 支付金额">¥0.63</div></div>
+            <div class="card tone-cyan"><div class="card-label">消耗总流量 (MB)</div><div class="card-value" id="l-kpi-flow" data-def="全部场次直播流量与回放流量之和，用于流量成本分摊与对账。" data-calc="直播流量 ＋ 回放流量" data-source="直播场次统计">644,141</div></div>
           </div>
           <div class="grid g6">
-            <div class="card tone-blue"><div class="card-label">场均直播时长</div><div class="card-value" id="l-avg-dur" data-def="平均每场从开播到下播的持续时长。" data-calc="SUM(直播时长)/场数" data-source="sa_live_session">4,496.79<small>分</small></div></div>
-            <div class="card tone-blue"><div class="card-label">场均回放时长</div><div class="card-value" id="l-avg-replay" data-def="平均每场回放可观看时长。" data-calc="SUM(回放时长)/场数" data-source="sa_live_session_stat.replay_duration">24,171.29<small>分</small></div></div>
+            <div class="card tone-blue"><div class="card-label">场均直播时长</div><div class="card-value" id="l-avg-dur" data-def="平均每场从开播到下播的持续时长。" data-calc="各场直播时长合计 ÷ 场数" data-source="直播场次表">4,496.79<small>分</small></div></div>
+            <div class="card tone-blue"><div class="card-label">场均回放时长</div><div class="card-value" id="l-avg-replay" data-def="平均每场回放可观看时长。" data-calc="各场回放时长合计 ÷ 场数" data-source="直播场次统计 · 回放时长">24,171.29<small>分</small></div></div>
             <div class="card tone-violet"><div class="card-label">场均观看人数</div><div class="card-value" id="l-avg-watch" data-def="观看总人数 ÷ 直播场数。" data-calc="观看总人数/场数" data-source="派生">2.25</div></div>
-            <div class="card tone-violet"><div class="card-label">场均峰值人数</div><div class="card-value" id="l-avg-peak" data-def="各场次峰值在线人数的平均值。" data-calc="SUM(峰值人数)/场数" data-source="sa_live_session_stat.peak_uv">0.54</div></div>
-            <div class="card tone-green"><div class="card-label">人均观看直播时长</div><div class="card-value" id="l-per-live" data-def="观看总时长 ÷ 观看总人数，衡量单客观看深度。" data-calc="SUM(watch_duration)/观看总人数 ÷60" data-source="sa_live_watch_record">5.7<small>分</small></div></div>
-            <div class="card tone-green"><div class="card-label">人均观看回放时长</div><div class="card-value" id="l-per-replay" data-def="回放观看总时长 ÷ 回放观看人数。" data-calc="SUM(回放时长)/回放人数 ÷60" data-source="sa_live_watch_record（回放）">52.41<small>分</small></div></div>
+            <div class="card tone-violet"><div class="card-label">场均峰值人数</div><div class="card-value" id="l-avg-peak" data-def="各场次峰值在线人数的平均值。" data-calc="各场峰值人数合计 ÷ 场数" data-source="直播场次统计 · 峰值在线">0.54</div></div>
+            <div class="card tone-green"><div class="card-label">人均观看直播时长</div><div class="card-value" id="l-per-live" data-def="观看总时长 ÷ 观看总人数，衡量单客观看深度。" data-calc="观看总时长 ÷ 观看总人数，换算为分钟" data-source="直播观看明细">5.7<small>分</small></div></div>
+            <div class="card tone-green"><div class="card-label">人均观看回放时长</div><div class="card-value" id="l-per-replay" data-def="回放观看总时长 ÷ 回放观看人数。" data-calc="回放观看总时长 ÷ 回放人数，换算为分钟" data-source="直播观看明细 · 回放记录">52.41<small>分</small></div></div>
           </div>
           <div class="grid g7">
-            <div class="card tone-pink"><div class="card-label">场均点赞次数</div><div class="card-value" data-def="各场次点赞总次数平均值。" data-calc="SUM(点赞)/场数" data-source="sa_live_session_stat.like_count">0.08</div></div>
-            <div class="card tone-pink"><div class="card-label">场均评论人数</div><div class="card-value" data-def="各场次评论去重用户数平均值。" data-calc="SUM(评论UV)/场数" data-source="sa_live_session_stat.comment_uv">0.08</div></div>
-            <div class="card tone-amber"><div class="card-label">带货直播场次</div><div class="card-value" id="l-bring-sessions" data-def="挂载商品且产生成交的直播场次。" data-calc="COUNT WHERE 挂车 AND 成交>0" data-source="sa_live_cart_item + sto_order">2<small>场</small></div></div>
-            <div class="card tone-amber"><div class="card-label">场均成交商品人数</div><div class="card-value" id="l-avg-cust" data-def="带货场次成交客户数平均值。" data-calc="成交客户/带货场数" data-source="sto_order">0.13</div></div>
+            <div class="card tone-pink"><div class="card-label">场均点赞次数</div><div class="card-value" data-def="各场次点赞总次数平均值。" data-calc="点赞次数合计 ÷ 场数" data-source="直播场次统计 · 点赞">0.08</div></div>
+            <div class="card tone-pink"><div class="card-label">场均评论人数</div><div class="card-value" data-def="各场次评论去重用户数平均值。" data-calc="评论人数合计 ÷ 场数" data-source="直播场次统计 · 评论">0.08</div></div>
+            <div class="card tone-amber"><div class="card-label">带货直播场次</div><div class="card-value" id="l-bring-sessions" data-def="挂载商品且产生成交的直播场次。" data-calc="挂载商品且产生成交的场次数" data-source="直播挂车明细 ＋ 订单表">2<small>场</small></div></div>
+            <div class="card tone-amber"><div class="card-label">场均成交商品人数</div><div class="card-value" id="l-avg-cust" data-def="带货场次成交客户数平均值。" data-calc="成交客户/带货场数" data-source="订单表">0.13</div></div>
             <div class="card tone-amber"><div class="card-label">场均成交商品订单</div><div class="card-value" id="l-avg-orders" data-def="带货场次成交订单数平均值。" data-calc="成交订单/带货场数" data-source="派生">0.38</div></div>
             <div class="card tone-amber"><div class="card-label">带货订单总数</div><div class="card-value" id="l-ord-total">9</div></div>
             <div class="card tone-amber"><div class="card-label">带货订单总额</div><div class="card-value" id="l-amt-total">¥0.63</div></div>
@@ -532,11 +532,11 @@
       <!-- ============ Tab 4 商品报表 ============ -->
       <section class="pane" id="pane-product">
         <div class="grid g5">
-          <div class="card tone-blue"><div class="card-label">在售商品</div><div class="card-value" data-def="商品状态为上架的 SPU 数量。" data-calc="COUNT WHERE spu_status=上架" data-source="商品中心">1,286</div></div>
-          <div class="card tone-green"><div class="card-label">动销商品</div><div class="card-value" data-def="统计周期内产生成交（含直播引导）的去重商品数。" data-calc="COUNT(DISTINCT spu_id) WHERE 已支付" data-source="sto_order">486</div></div>
-          <div class="card tone-amber"><div class="card-label">直播带货GMV</div><div class="card-value" data-def="由直播间引导产生的已支付订单金额合计。" data-calc="SUM(pay_amount) WHERE live_id非空" data-source="sto_order">¥58,600</div></div>
-          <div class="card tone-amber"><div class="card-label">直播成交订单</div><div class="card-value" data-def="由直播间引导产生的已支付订单数。" data-calc="COUNT WHERE live_id非空 AND 已支付" data-source="sto_order">186</div></div>
-          <div class="card tone-violet"><div class="card-label">直播引流成交占比</div><div class="card-value" data-def="直播GMV 占全渠道 GMV 的比例，衡量直播渠道贡献。" data-calc="直播GMV / 全渠道GMV" data-source="派生">31.5%</div></div>
+          <div class="card tone-blue"><div class="card-label">在售商品</div><div class="card-value" data-def="商品状态为"上架中"的商品数量。" data-calc="处于"上架"状态的商品数" data-source="商品中心">1,286</div></div>
+          <div class="card tone-green"><div class="card-label">动销商品</div><div class="card-value" data-def="统计周期内产生成交（含直播引导）的去重商品数。" data-calc="有已支付订单的去重商品数" data-source="订单表">486</div></div>
+          <div class="card tone-amber"><div class="card-label">直播带货GMV</div><div class="card-value" data-def="由直播间引导产生的已支付订单金额合计。" data-calc="直播引导的已支付订单金额合计" data-source="订单表">¥58,600</div></div>
+          <div class="card tone-amber"><div class="card-label">直播成交订单</div><div class="card-value" data-def="由直播间引导产生的已支付订单数。" data-calc="直播引导的已支付订单数" data-source="订单表">186</div></div>
+          <div class="card tone-violet"><div class="card-label">直播引流成交占比</div><div class="card-value" data-def="直播成交额占全渠道成交额的比例，衡量直播渠道贡献。" data-calc="直播成交额 ÷ 全渠道成交额" data-source="派生">31.5%</div></div>
         </div>
         <div class="panel">
           <div class="panel-head"><div><div class="panel-title">商品直播成交 Top（示例数据）</div><div class="panel-sub">按直播成交金额排序</div></div></div>
@@ -550,10 +550,10 @@
               <tr><td>玻尿酸精华液 30ml</td><td>6</td><td>3,240</td><td>86</td><td>¥25,800</td><td>72</td><td>¥300</td><td>38.9%</td><td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:64%;background:var(--green);"></div></div>2.7%</div></td></tr>
               <tr><td>修护面霜 50g</td><td>4</td><td>2,180</td><td>52</td><td>¥15,600</td><td>48</td><td>¥300</td><td>33.3%</td><td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:56%;background:var(--green);"></div></div>2.4%</div></td></tr>
               <tr><td>洁面乳 120ml</td><td>3</td><td>960</td><td>12</td><td>¥2,160</td><td>12</td><td>¥180</td><td>25.0%</td><td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:30%;background:var(--green);"></div></div>1.3%</div></td></tr>
-              <tr class="tot"><td>汇总（3 个商品）</td><td>13</td><td>6,380</td><td>150</td><td>¥43,560</td><td>132</td><td>¥290</td><td>35.5%</td><td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:47%;background:var(--green);"></div></div>2.4%</div></td></tr>
+              <tr class="tot"><td>汇总（3 个商品）</td><td>13</td><td>6,380</td><td>150</td><td>¥43,560</td><td>132</td><td>¥290</td><td>35.6%</td><td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:47%;background:var(--green);"></div></div>2.4%</div></td></tr>
             </tbody>
           </table>
-          <div class="legend"><b>字段口径</b>：带货场次数=该商品被挂车的去重场次（sa_live_cart_item）；商品点击UV=直播中点击购物袋该商品的去重客户数；新客占比=首次下单客户数÷成交客户数；点击→成交=成交订单数÷商品点击UV。</div>
+          <div class="legend"><b>字段口径</b>：带货场次数=该商品被挂车的去重场次（直播挂车明细）；商品点击UV=直播中点击购物袋该商品的去重客户数；新客占比=首次下单客户数÷成交客户数；点击→成交=成交订单数÷商品点击UV。</div>
         </div>
         <div class="panel">
           <div class="panel-head"><div><div class="panel-title">商品 × 客户交叉（客户看商品）</div><div class="panel-sub">直播引导的行为链，供店员按状态跟进转化（示例数据）</div></div></div>
@@ -573,10 +573,10 @@
       <!-- ============ Tab 5 客户报表 ============ -->
       <section class="pane" id="pane-customer">
         <div class="grid g5">
-          <div class="card tone-blue"><div class="card-label">观看直播客户数</div><div class="card-value" data-def="统计周期内有直播观看记录的去重客户数。" data-calc="COUNT(DISTINCT customer_id)" data-source="sa_live_watch_record">5,540</div></div>
-          <div class="card tone-violet"><div class="card-label">人均累计观看分钟</div><div class="card-value" data-def="全部客户观看总时长 ÷ 观看客户数（含回放）。" data-calc="SUM(watch_duration)/人数 ÷60" data-source="sa_live_watch_record">28.6<small>分</small></div></div>
-          <div class="card tone-pink"><div class="card-label">互动客户数</div><div class="card-value" data-def="有点赞/评论/分享任一行为的去重客户数。" data-calc="COUNT(DISTINCT customer_id) WHERE 互动行为" data-source="互动明细">3,260</div></div>
-          <div class="card tone-green"><div class="card-label">直播成交客户数</div><div class="card-value" data-def="有直播已支付订单的去重客户数。" data-calc="COUNT(DISTINCT customer_id) WHERE live_id非空" data-source="sto_order">752</div></div>
+          <div class="card tone-blue"><div class="card-label">观看直播客户数</div><div class="card-value" data-def="统计周期内有直播观看记录的去重客户数。" data-calc="有观看记录的去重客户数" data-source="直播观看明细">5,540</div></div>
+          <div class="card tone-violet"><div class="card-label">人均累计观看分钟</div><div class="card-value" data-def="全部客户观看总时长 ÷ 观看客户数（含回放）。" data-calc="观看总时长 ÷ 人数，换算为分钟" data-source="直播观看明细">28.6<small>分</small></div></div>
+          <div class="card tone-pink"><div class="card-label">互动客户数</div><div class="card-value" data-def="有点赞/评论/分享任一行为的去重客户数。" data-calc="有点赞、评论或分享任一行为的去重客户数" data-source="互动明细">3,260</div></div>
+          <div class="card tone-green"><div class="card-label">直播成交客户数</div><div class="card-value" data-def="有直播已支付订单的去重客户数。" data-calc="有直播已支付订单的去重客户数" data-source="订单表">752</div></div>
           <div class="card tone-amber"><div class="card-label">观看→成交转化率</div><div class="card-value" data-def="直播成交客户数 ÷ 观看直播客户数。" data-calc="成交客户/观看客户" data-source="派生">13.6%</div></div>
         </div>
         <div class="grid g2">
@@ -619,12 +619,12 @@
           <!-- 营期数据看板（融合 CampDashboard） -->
           <div class="sec">营期报名总览<span class="chip c-green">报名漏斗</span></div>
           <div class="grid g6">
-            <div class="card tone-blue"><div class="card-label">营期总数</div><div class="card-value" data-def="统计周期内创建的营期总数，按授课模式区分直播/录播。" data-calc="COUNT(camp) WHERE mode IN (live,recorded)" data-source="camp-store.camps">5<small>期</small></div><div class="card-note">直播 3 · 录播 2</div></div>
-            <div class="card tone-violet"><div class="card-label">报名总数</div><div class="card-value" data-def="全部营期的报名人数合计（含待审核）。" data-calc="Σ enrolled_count" data-source="camp enrollment">1,006</div><div class="card-note">已通过 840</div></div>
-            <div class="card tone-green"><div class="card-label">已加入营期</div><div class="card-value" data-def="报名审核通过并正式加入营期学习的人数。" data-calc="Σ joined_count" data-source="camp enrollment">731</div><div class="card-note">加入/通过 87.0%</div></div>
+            <div class="card tone-blue"><div class="card-label">营期总数</div><div class="card-value" data-def="统计周期内创建的营期总数，按授课模式区分直播/录播。" data-calc="营期数量（按直播/录播区分）" data-source="营期管理数据">5<small>期</small></div><div class="card-note">直播 3 · 录播 2</div></div>
+            <div class="card tone-violet"><div class="card-label">报名总数</div><div class="card-value" data-def="全部营期的报名人数合计（含待审核）。" data-calc="各营期报名人数相加" data-source="营期报名数据">1,006</div><div class="card-note">已通过 840</div></div>
+            <div class="card tone-green"><div class="card-label">已加入营期</div><div class="card-value" data-def="报名审核通过并正式加入营期学习的人数。" data-calc="各营期加入人数相加" data-source="营期报名数据">731</div><div class="card-note">加入/通过 87.0%</div></div>
             <div class="card tone-amber"><div class="card-label">报名→通过转化</div><div class="card-value" data-def="报名审核通过人数 ÷ 报名总人数。" data-calc="840 ÷ 1,006 × 100%" data-source="派生">83.5%</div></div>
-            <div class="card tone-cyan"><div class="card-label">累计收入</div><div class="card-value" data-def="付费营期已支付报名费的金额合计（元）。" data-calc="Σ 已支付报名订单金额" data-source="commission bills">¥136,600</div><div class="card-note">待结算 12 单</div></div>
-            <div class="card tone-red"><div class="card-label">进行中营期</div><div class="card-value" data-def="状态为进行中的营期数。" data-calc="COUNT WHERE status=in_progress" data-source="camp-store">2<small>期</small></div><div class="card-note">已结束 2 · 报名中 1</div></div>
+            <div class="card tone-cyan"><div class="card-label">累计收入</div><div class="card-value" data-def="付费营期已支付报名费的金额合计（元）。" data-calc="Σ 已支付报名订单金额" data-source="报名费收入账单">¥136,600</div><div class="card-note">待结算 12 单</div></div>
+            <div class="card tone-red"><div class="card-label">进行中营期</div><div class="card-value" data-def="状态为进行中的营期数。" data-calc="状态为"进行中"的营期数" data-source="营期管理数据">2<small>期</small></div><div class="card-note">已结束 2 · 报名中 1</div></div>
           </div>
 
           <div class="grid g2">
@@ -675,7 +675,7 @@
                 <tr><td>刘女士</td><td class="num">136****2222</td><td>张三</td><td>2 期</td><td>36.0h</td><td>85%</td><td>1 张</td></tr>
                 <tr><td>李先生</td><td class="num">139****6666</td><td>李四</td><td>1 期</td><td>18.0h</td><td>78%</td><td>—</td></tr>
                 <tr><td>陈小姐</td><td class="num">137****5555</td><td>王五</td><td>1 期</td><td>6.0h</td><td>40%</td><td>—</td></tr>
-                <tr class="tot"><td>汇总</td><td>4 人</td><td>—</td><td>6 期次</td><td>102.0h</td><td>加权 78.2%</td><td>2 张</td></tr>
+                <tr class="tot"><td>汇总</td><td>4 人</td><td>—</td><td>6 期次</td><td>102.0h</td><td>平均 73.8%</td><td>2 张</td></tr>
               </tbody>
             </table>
             <div class="legend"><b>字段口径</b>：报名营期=该学员加入的营期数（重复报名多期分别计）；学习时长=Σ课程 watch_duration；平均完播率=各期完播率均值；证书=按完成条件发放数。</div>
@@ -683,11 +683,11 @@
 
           <div class="sec">课程维度<span class="chip c-blue">课程粒度</span></div>
           <div class="grid g5">
-            <div class="card tone-blue"><div class="card-label">课程总数</div><div class="card-value" data-def="状态正常的课程数（直播间 front_style=2 视为课程）。" data-calc="COUNT(*) WHERE status=1" data-source="sa_course_tpl_entity">128</div></div>
-            <div class="card tone-violet"><div class="card-label">观看会员</div><div class="card-value" data-def="有课程观看记录的去重客户数。" data-calc="COUNT(DISTINCT customer_id)" data-source="sa_live_watch_record">8,520</div></div>
-            <div class="card tone-green"><div class="card-label">完播会员</div><div class="card-value" data-def="观看进度达到课程配置完播阈值的会员。" data-calc="COUNT WHERE watch_duration >= 时长×complete_percentage" data-source="watch_duration + complete_percentage">4,860</div></div>
-            <div class="card tone-pink"><div class="card-label">答题会员</div><div class="card-value" data-def="参与课程答题的去重会员数。" data-calc="COUNT(DISTINCT user_id)" data-source="gm_course_day_stat">3,200</div></div>
-            <div class="card tone-cyan"><div class="card-label">人均时长</div><div class="card-value" data-def="观看总时长 ÷ 观看会员数。" data-calc="SUM(watch_duration)/人数 ÷60" data-source="sa_live_watch_record">18<small>分</small></div></div>
+            <div class="card tone-blue"><div class="card-label">课程总数</div><div class="card-value" data-def="状态正常的课程数量。" data-calc="状态正常的课程数" data-source="课程模板表">128</div></div>
+            <div class="card tone-violet"><div class="card-label">观看会员</div><div class="card-value" data-def="有课程观看记录的去重客户数。" data-calc="有观看记录的去重客户数" data-source="直播观看明细">8,520</div></div>
+            <div class="card tone-green"><div class="card-label">完播会员</div><div class="card-value" data-def="观看进度达到课程配置完播阈值的会员。" data-calc="观看时长达到"总时长×完播阈值"的人数" data-source="观看明细 · 时长 ＋ 课程完播阈值">4,860</div></div>
+            <div class="card tone-pink"><div class="card-label">答题会员</div><div class="card-value" data-def="参与课程答题的去重会员数。" data-calc="去重参与人数" data-source="课程每日统计">3,200</div></div>
+            <div class="card tone-cyan"><div class="card-label">人均时长</div><div class="card-value" data-def="观看总时长 ÷ 观看会员数。" data-calc="观看总时长 ÷ 人数，换算为分钟" data-source="直播观看明细">18<small>分</small></div></div>
           </div>
           <div class="panel">
             <div class="panel-head"><div><div class="panel-title">课程列表</div><div class="panel-sub">点击课程名进入课程详情（示例数据）</div></div></div>
@@ -698,10 +698,10 @@
                 <tr><td><button class="link" onclick="openCourseDetail('销售技巧')">销售技巧</button></td><td><span class="tag t-blue">直播</span></td><td>1,520</td><td>1,080</td><td>71.1%</td><td>920</td><td>78%</td><td>¥280</td><td>320</td><td>21.1%</td><td><button class="link" onclick="openCourseDetail('销售技巧')">详情 →</button></td></tr>
                 <tr><td><button class="link" onclick="openCourseDetail('新品培训')">新品培训</button></td><td><span class="tag t-gray">录播</span></td><td>1,280</td><td>880</td><td>68.8%</td><td>720</td><td>80%</td><td>¥200</td><td>180</td><td>14.1%</td><td><button class="link" onclick="openCourseDetail('新品培训')">详情 →</button></td></tr>
                 <tr><td><button class="link" onclick="openCourseDetail('话术训练')">话术训练</button></td><td><span class="tag t-blue">直播</span></td><td>980</td><td>620</td><td>63.3%</td><td>520</td><td>75%</td><td>¥180</td><td>160</td><td>16.3%</td><td><button class="link" onclick="openCourseDetail('话术训练')">详情 →</button></td></tr>
-                <tr class="tot"><td>汇总（4 门课程）</td><td>—</td><td>5,640</td><td>4,000</td><td>70.8%</td><td>3,260</td><td>78.8%</td><td>¥980</td><td>940</td><td>16.7%</td><td>—</td></tr>
+                <tr class="tot"><td>汇总（4 门课程）</td><td>—</td><td>5,640</td><td>4,000</td><td>70.9%</td><td>3,260</td><td>78.8%</td><td>¥980</td><td>940</td><td>16.7%</td><td>—</td></tr>
               </tbody>
             </table>
-            <div class="legend"><b>字段口径</b>：完播率=完播UV÷观看UV；正确率=correct_count÷answer_count；红包金额=reward_status=1 的发放合计；新客=首次观看该课程的会员；类型由 sa_live_room.front_style 区分（2=课程）。</div>
+            <div class="legend"><b>字段口径</b>：完播率=完播UV÷观看UV；正确率=correct_count÷answer_count；红包金额=reward_status=1 的发放合计；新客=首次观看该课程的会员；类型由 直播间类型配置 区分（2=课程）。</div>
           </div>
         </div>
         <div class="subview" id="course-detail">
@@ -739,11 +739,11 @@
       <!-- ============ Tab 7 店员报表 ============ -->
       <section class="pane" id="pane-staff">
         <div class="grid g5">
-          <div class="card tone-blue"><div class="card-label">店员人数</div><div class="card-value" data-def="项目下在职店员总数（type=1）。" data-calc="COUNT WHERE type=1" data-source="sa_store_employee">286</div></div>
-          <div class="card tone-violet"><div class="card-label">名下会员总数</div><div class="card-value" data-def="全部店员名下会员合计（staff_id 归属快照）。" data-calc="SUM(店员名下会员数)" data-source="sa_customer_entity.staff_id">1,256</div></div>
-          <div class="card tone-green"><div class="card-label">贡献 GMV</div><div class="card-value" data-def="全部店员名下会员已支付订单金额合计。" data-calc="SUM(pay_amount)" data-source="sto_order × customer.staff_id">¥185k</div></div>
-          <div class="card tone-cyan"><div class="card-label">活跃会员</div><div class="card-value" data-def="全部店员名下活跃会员合计（每日 02:30 预计算）。" data-calc="COUNT(is_active=1)" data-source="dws_member_asset">1,058</div></div>
-          <div class="card tone-amber"><div class="card-label">复购率</div><div class="card-value" data-def="90 天消费 ≥2 次会员占同期有消费会员比例。" data-calc="COUNT(is_repeat_buyer=1)/有消费会员" data-source="dws_member_asset">38%</div></div>
+          <div class="card tone-blue"><div class="card-label">店员人数</div><div class="card-value" data-def="项目下在职店员总数。" data-calc="在职店员人数" data-source="员工档案表">286</div></div>
+          <div class="card tone-violet"><div class="card-label">名下会员总数</div><div class="card-value" data-def="全部店员名下会员合计（按归属快照）。" data-calc="各店员名下会员数相加" data-source="客户档案 · 归属店员">1,256</div></div>
+          <div class="card tone-green"><div class="card-label">贡献 GMV</div><div class="card-value" data-def="全部店员名下会员已支付订单金额合计。" data-calc="已支付订单金额合计" data-source="订单表 × 客户归属店员">¥185k</div></div>
+          <div class="card tone-cyan"><div class="card-label">活跃会员</div><div class="card-value" data-def="全部店员名下活跃会员合计（每日 02:30 预计算）。" data-calc="活跃会员数量" data-source="会员状态汇总（每日凌晨预计算）">1,058</div></div>
+          <div class="card tone-amber"><div class="card-label">复购率</div><div class="card-value" data-def="90 天消费 ≥2 次会员占同期有消费会员比例。" data-calc="90 天内下单 ≥2 次的会员数 ÷ 有消费会员数" data-source="会员状态汇总（每日凌晨预计算）">38%</div></div>
         </div>
         <div class="panel">
           <div class="panel-head"><div><div class="panel-title">店员贡献 Top（示例数据）</div><div class="panel-sub">按名下会员贡献 GMV 排序</div></div></div>
@@ -758,7 +758,7 @@
               <tr><td><span class="rank r2">2</span></td><td>李四</td><td>天河旗舰店</td><td><span class="tag t-blue">店员</span></td><td>152</td><td>9</td><td>52</td><td>15</td><td>¥22,500</td><td>38%</td><td><button class="link" onclick="openMemberDetail('李四','店员')">明细 →</button></td></tr>
               <tr><td><span class="rank r3">3</span></td><td>王五</td><td>白云店</td><td><span class="tag t-blue">店员</span></td><td>140</td><td>8</td><td>45</td><td>22</td><td>¥19,200</td><td>35%</td><td><button class="link" onclick="openMemberDetail('王五','店员')">明细 →</button></td></tr>
               <tr><td><span class="rank rn">4</span></td><td>赵六</td><td>番禺店</td><td><span class="tag t-violet">店长</span></td><td>128</td><td>6</td><td>40</td><td>16</td><td>¥18,000</td><td>31%</td><td><button class="link" onclick="openMemberDetail('赵六','店长')">明细 →</button></td></tr>
-              <tr class="tot"><td>汇总（前 4）</td><td>—</td><td>—</td><td>606</td><td>35</td><td>205</td><td>71</td><td>¥87,700</td><td>36.7%</td><td>—</td></tr>
+              <tr class="tot"><td>汇总（前 4）</td><td>—</td><td>—</td><td>606</td><td>35</td><td>205</td><td>71</td><td>¥87,700</td><td>36.5%</td><td>—</td></tr>
             </tbody>
           </table>
           <div class="legend"><b>字段口径</b>：归属口径=按查询时点 staff_id 快照，不追溯历史；新增=first_bind_time 在统计周期内；VIP=非普通等级会员。</div>
@@ -768,11 +768,11 @@
       <!-- ============ Tab 8 店长报表 ============ -->
       <section class="pane" id="pane-manager">
         <div class="grid g5">
-          <div class="card tone-violet"><div class="card-label">店长人数</div><div class="card-value" data-def="项目下在职店长总数（type=2）。" data-calc="COUNT WHERE type=2" data-source="sa_store_employee">18<small>人</small></div></div>
+          <div class="card tone-violet"><div class="card-label">店长人数</div><div class="card-value" data-def="项目下在职店长总数。" data-calc="在职店长人数" data-source="员工档案表">18<small>人</small></div></div>
           <div class="card tone-blue"><div class="card-label">管辖会员总数</div><div class="card-value" data-def="店长管辖门店全部店员名下会员之和。">1,256</div></div>
           <div class="card tone-amber"><div class="card-label">管辖 VIP 会员</div><div class="card-value">320</div></div>
           <div class="card tone-green"><div class="card-label">管辖贡献 GMV</div><div class="card-value">¥185k</div></div>
-          <div class="card tone-cyan"><div class="card-label">管辖人均贡献</div><div class="card-value" data-def="管辖贡献GMV ÷ 管辖会员总数。">¥147</div></div>
+          <div class="card tone-cyan"><div class="card-label">管辖人均贡献</div><div class="card-value" data-def="管辖成交金额 ÷ 管辖会员总数。">¥147</div></div>
         </div>
         <div class="panel">
           <div class="panel-head"><div><div class="panel-title">店长管辖总览</div><div class="panel-sub">店长数据 = 管辖门店内所有店员名下会员数据之和（示例数据）</div></div></div>
@@ -782,10 +782,10 @@
               <tr><td>陈总</td><td>8 人</td><td>3 家</td><td>620</td><td>45</td><td>180</td><td>¥98,000</td><td>¥158</td><td>40%</td><td>85%</td></tr>
               <tr><td>刘总</td><td>6 人</td><td>2 家</td><td>480</td><td>32</td><td>120</td><td>¥72,000</td><td>¥150</td><td>36%</td><td>82%</td></tr>
               <tr><td>周总</td><td>5 人</td><td>2 家</td><td>380</td><td>25</td><td>95</td><td>¥52,000</td><td>¥137</td><td>33%</td><td>78%</td></tr>
-              <tr class="tot"><td>汇总（3 位店长）</td><td>19 人</td><td>7 家</td><td>1,480</td><td>102</td><td>395</td><td>¥222,000</td><td>¥150</td><td>36.5%</td><td>81.9%</td></tr>
+              <tr class="tot"><td>汇总（3 位店长）</td><td>19 人</td><td>7 家</td><td>1,480</td><td>102</td><td>395</td><td>¥222,000</td><td>¥150</td><td>36.3%</td><td>81.7%</td></tr>
             </tbody>
           </table>
-          <div class="legend"><b>字段口径</b>：管辖关系按 sa_store_employee 所属门店聚合；人均贡献=管辖GMV÷管辖会员数；活跃率=活跃会员÷管辖会员数；管辖范围变动按查询时点快照，不追溯。</div>
+          <div class="legend"><b>字段口径</b>：管辖关系按 员工档案表 所属门店聚合；人均贡献=管辖GMV÷管辖会员数；活跃率=活跃会员÷管辖会员数；管辖范围变动按查询时点快照，不追溯。</div>
         </div>
       </section>
      </div>
@@ -1238,50 +1238,50 @@ document.addEventListener('mouseout',e=>{ if(e.target.closest('[data-def]')) tip
 /* ================= 指标字典 ================= */
 const SPECS={
  '租户总览':[
-  ['观看总人数','统计周期内进入过直播间的去重客户数（UV），同客户多场次只计 1 次','COUNT(DISTINCT customer_id)，type=3','sa_live_watch_record'],
-  ['成交订单总金额','直播挂车商品订单中已支付部分的金额合计','SUM(pay_amount) WHERE live_id非空 AND 已支付','sto_order.pay_amount'],
-  ['会员总数','项目下状态正常的 C 端客户总数','COUNT WHERE type=3 AND status=1','sa_customer_entity'],
-  ['消耗总流量','直播推流/播放流量 + 回放点播流量合计','SUM(直播+回放)','sa_live_session_stat（STR-SAAS-002）'],
+  ['观看总人数','统计周期内进入过直播间的去重客户数（UV），同客户多场次只计 1 次','按"客户"去重计数（仅统计顾客）','直播观看明细'],
+  ['成交订单总金额','直播挂车商品订单中已支付部分的金额合计','直播引导的已支付订单金额合计','订单表 · 支付金额'],
+  ['会员总数','项目下状态正常的 C 端客户总数','COUNT WHERE type=3 AND status=1','客户档案表'],
+  ['消耗总流量','直播推流/播放流量 + 回放点播流量合计','SUM(直播+回放)','直播场次统计（STR-SAAS-002）'],
   ['四维交叉矩阵','门店为行落点，直播×客户×商品为交叉列','跨实体 JOIN 汇总','—'],
   ['路径漏斗','触达→预约/进入→观看≥1min→互动→点击商品→下单→支付，逐级标注留存率','行为链按客户×场次归集','—'],
  ],
  '直播报表（线上口径）':[
-  ['直播场数','统计周期内创建的直播场次总数（含未开播）','COUNT(DISTINCT session_id)','sa_live_session'],
-  ['观看总人数','各场次去重观看客户数之和（跨场次不去重，场次内去重）','SUM(场次观看人数)','sa_live_watch_record'],
-  ['观看峰值人数','单场同时在线人数的最大值','MAX(同时在线)','sa_live_session_stat.peak_uv'],
-  ['场均直播时长','开播至下播持续时长的场次平均','SUM(直播时长)/场数','sa_live_session'],
-  ['场均回放时长','回放可观看时长的场次平均','SUM(回放时长)/场数','sa_live_session_stat.replay_duration'],
-  ['人均观看直播时长','单客观看深度：观看总时长÷观看总人数','SUM(watch_duration)/UV ÷60','sa_live_watch_record'],
-  ['场均点赞/评论人数','互动强度指标','SUM/场数','sa_live_session_stat.like_count / comment_uv'],
-  ['带货直播场次','挂载商品且产生成交的场次','COUNT WHERE 挂车 AND 成交>0','sa_live_cart_item + sto_order'],
+  ['直播场数','统计周期内创建的直播场次总数（含未开播）','去重后的直播场次数','直播场次表'],
+  ['观看总人数','各场次去重观看客户数之和（跨场次不去重，场次内去重）','各场次观看人数相加','直播观看明细'],
+  ['观看峰值人数','单场同时在线人数的最大值','MAX(同时在线)','直播场次统计 · 峰值在线'],
+  ['场均直播时长','开播至下播持续时长的场次平均','各场直播时长合计 ÷ 场数','直播场次表'],
+  ['场均回放时长','回放可观看时长的场次平均','各场回放时长合计 ÷ 场数','直播场次统计 · 回放时长'],
+  ['人均观看直播时长','单客观看深度：观看总时长÷观看总人数','SUM(watch_duration)/UV ÷60','直播观看明细'],
+  ['场均点赞/评论人数','互动强度指标','SUM/场数','直播场次统计 · 点赞 / comment_uv'],
+  ['带货直播场次','挂载商品且产生成交的场次','挂载商品且产生成交的场次数','直播挂车明细 ＋ 订单表'],
   ['更新机制','T+1：每日 11:00 前更新昨日数据；实时数据走单场分析','—','线上「直播分析」约定'],
  ],
  '商品报表':[
-  ['动销商品','周期内产生成交（含直播引导）的去重 SPU 数','COUNT(DISTINCT spu_id)','sto_order'],
-  ['直播带货GMV','直播间引导的已支付订单金额合计','SUM(pay_amount) WHERE live_id非空','sto_order'],
-  ['直播引流成交占比','直播GMV ÷ 全渠道GMV','派生','—'],
-  ['商品点击UV','直播中点击购物袋该商品的去重客户数','item_click 去重','sa_live_session_stat.item_click_uv'],
-  ['新客占比','首次下单客户数 ÷ 成交客户数','派生','sa_live_watch_record.is_new_customer'],
+  ['动销商品','周期内产生成交（含直播引导）的去重 SPU 数','COUNT(DISTINCT spu_id)','订单表'],
+  ['直播带货GMV','直播间引导的已支付订单金额合计','直播引导的已支付订单金额合计','订单表'],
+  ['直播引流成交占比','直播成交额 ÷ 全渠道成交额','派生','—'],
+  ['商品点击UV','直播中点击购物袋该商品的去重客户数','item_click 去重','直播场次统计 · 商品点击'],
+  ['新客占比','首次下单客户数 ÷ 成交客户数','派生','直播观看明细 · 新客标记'],
  ],
  '客户报表':[
-  ['累计观看分钟','该客户全部场次观看时长求和（直播+回放）÷60','SUM(watch_duration) ÷60','sa_live_watch_record'],
-  ['互动客户数','有点赞/评论/分享任一行为的去重客户','COUNT(DISTINCT customer_id)','互动明细'],
+  ['累计观看分钟','该客户全部场次观看时长求和（直播+回放）÷60','SUM(watch_duration) ÷60','直播观看明细'],
+  ['互动客户数','有点赞/评论/分享任一行为的去重客户','有观看记录的去重客户数','互动明细'],
   ['直播贡献占比','直播引导金额 ÷ 累计消费','派生','—'],
   ['观看深度分层','深度≥60min / 中度15-60 / 浅度1-15 / 流失边缘<1min','分层数值可配置','—'],
-  ['归属隔离','店长/店员仅见名下客户，按查询时点 staff_id 快照','—','sa_customer_entity.staff_id'],
+  ['归属隔离','店长/店员仅见名下客户，按查询时点 staff_id 快照','—','客户档案 · 归属店员'],
  ],
  '门店 / 店员 / 店长':[
-  ['名下会员','staff_id 归属快照统计（不追溯历史归属）','COUNT WHERE staff_id=X AND type=3','sa_customer_entity'],
-  ['贡献GMV','名下会员已支付订单金额合计','SUM(pay_amount)','sto_order × customer.staff_id'],
-  ['沉睡会员','90 天无消费且无登录（is_dormant=1，每日 02:30 预计算）','COUNT(is_dormant=1)','dws_member_asset'],
-  ['复购率','90 天消费 ≥2 次会员 ÷ 有消费会员','COUNT(is_repeat_buyer=1)/有消费会员','dws_member_asset'],
-  ['店长数据','= 管辖门店全部店员名下会员数据之和','SUM(店员数据)','sa_store_employee 聚合'],
+  ['名下会员','staff_id 归属快照统计（不追溯历史归属）','COUNT WHERE staff_id=X AND type=3','客户档案表'],
+  ['贡献GMV','名下会员已支付订单金额合计','已支付订单金额合计','订单表 × 客户归属店员'],
+  ['沉睡会员','90 天无消费且无登录（is_dormant=1，每日 02:30 预计算）','COUNT(is_dormant=1)','会员状态汇总（每日凌晨预计算）'],
+  ['复购率','90 天消费 ≥2 次会员 ÷ 有消费会员','90 天内下单 ≥2 次的会员数 ÷ 有消费会员数','会员状态汇总（每日凌晨预计算）'],
+  ['店长数据','= 管辖门店全部店员名下会员数据之和','SUM(店员数据)','员工档案表 聚合'],
  ],
  '课程报表':[
-  ['完播UV','观看进度≥课程配置阈值（complete_percentage）','watch_duration ≥ 时长×阈值','sa_live_watch_record + sa_course_tpl_entity'],
-  ['正确率','correct_count ÷ answer_count','gm_course_day_stat','gm_course_day_stat'],
-  ['红包金额','发放成功（reward_status=1）的答题红包合计','SUM(reward_money)','gm_course_day_stat'],
-  ['新客','首次观看该课程的会员','is_new_customer=1','sa_live_watch_record'],
+  ['完播UV','观看进度≥课程配置阈值（complete_percentage）','watch_duration ≥ 时长×阈值','直播观看明细 + 课程模板表'],
+  ['正确率','correct_count ÷ answer_count','课程每日统计','课程每日统计'],
+  ['红包金额','发放成功（reward_status=1）的答题红包合计','SUM(reward_money)','课程每日统计'],
+  ['新客','首次观看该课程的会员','is_new_customer=1','直播观看明细'],
  ],
 };
 function openSpecs(){
@@ -1327,7 +1327,7 @@ function openProductDetail(name){
     '<div class="caliber" style="margin-bottom:12px;">带货表现 = 挂车场次去重数、点击UV、成交订单与金额；转化链 = 点击购物袋 → 加购 → 下单 → 支付。</div>'
     +'<table><thead><tr><th>指标</th><th>数值</th><th>口径</th></tr></thead><tbody>'
     +'<tr><td>直播成交金额</td><td>¥25,800</td><td>live_id 非空已支付订单合计</td></tr>'
-    +'<tr><td>带货场次数</td><td>6</td><td>sa_live_cart_item 去重场次</td></tr>'
+    +'<tr><td>带货场次数</td><td>6</td><td>直播挂车明细 去重场次</td></tr>'
     +'<tr><td>商品点击UV</td><td>3,240</td><td>点击购物袋去重客户数</td></tr>'
     +'<tr><td>新客占比</td><td>38.9%</td><td>首次下单客户 ÷ 成交客户</td></tr></tbody></table>'
     +'<div class="legend">示例数据 · 完整的商品×直播场次明细与客户清单可在开发版下钻。</div>');
@@ -1437,6 +1437,7 @@ const APP_TABS={manager:[['home','总览'],['live','直播'],['cust','客户'],[
 const APP_MEMBERS=[
  {n:'王女士',lvl:'黑卡',c:'t-amber',staff:'张三',watch:326.5,spend:'¥920',active:1,pts:580,bal:'¥120',total:'¥3,200',last:'08-25',live:'直播76 · 45min · 下单¥320',course:'产品知识 · 已完成'},
  {n:'刘女士',lvl:'银卡',c:'t-gray',staff:'张三',watch:88.0,spend:'¥520',active:1,pts:180,bal:'¥40',total:'¥920',last:'08-24',live:'直播78 · 22min · 未下单',course:'新品培训 · 学习中 65%'},
+ {n:'周小姐',lvl:'普通',c:'t-gray',staff:'张三',watch:12.5,spend:'—',active:0,pts:20,bal:'¥0',total:'¥0',last:'04-18',live:'—',course:'—'},
  {n:'李先生',lvl:'金卡',c:'t-amber',staff:'李四',watch:142.0,spend:'¥300',active:1,pts:320,bal:'¥80',total:'¥1,800',last:'08-23',live:'直播76 · 32min · 未下单',course:'销售技巧 · 学习中 78%'},
  {n:'陈小姐',lvl:'普通',c:'t-gray',staff:'王五',watch:36.2,spend:'—',active:0,pts:50,bal:'¥0',total:'¥0',last:'05-12',live:'直播74 · 18min · 未下单',course:'—'}
 ];
