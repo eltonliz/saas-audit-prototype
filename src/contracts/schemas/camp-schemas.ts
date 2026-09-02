@@ -243,6 +243,11 @@ export const CourseScheduleSchema = z.object({
   is_required: z.boolean().default(true),
   completion_criteria: z.string(),
 
+  /** V2·0902 学员端可见性：false=隐藏（APP 排课列表不下发该节） */
+  client_visible: z.boolean().default(true),
+  /** V2·0902 录播展示风格：live_room=直播间风格，course=课程风格（仅录播排课生效） */
+  display_style: z.enum(['live_room', 'course']).default('live_room'),
+
   /** 打卡积分奖励（D7·checkin_task专用） */
   points_reward: z.number().int().min(0).default(0).optional(),
   growth_reward: z.number().int().min(0).default(0).optional(),

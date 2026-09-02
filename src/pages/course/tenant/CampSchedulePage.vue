@@ -25,6 +25,10 @@
             <t-button theme="primary" variant="text" @click="openQuickCourseDialog">
               <template #icon><t-icon name="add" /></template> 快捷新建课程
             </t-button>
+            <!-- V2·0902 学员端可见性批量配置 -->
+            <t-button theme="default" variant="outline" :disabled="campSchedules.length === 0" @click="openBatchVisible">
+              <template #icon><t-icon name="eye" /></template> 批量设置可见性
+            </t-button>
           </div>
           <div class="actions" v-else>
             <t-tag theme="default" size="small">审核通过后不可编辑，如需修改请复制营期重做</t-tag>
@@ -73,9 +77,27 @@
                     <span class="sc-time"><t-icon name="unlock" />解锁 {{ formatTime(s.unlock_time) }}</span>
                   </div>
                 </div>
-                <t-popconfirm v-if="!isLocked" content="确认删除此排课？" theme="danger" @confirm="del(s)">
-                  <t-button variant="text" theme="danger" size="small" class="sc-del"><t-icon name="delete" /></t-button>
-                </t-popconfirm>
+                <div class="sc-side">
+                  <!-- V2·0902 学员端可见性：点击切换 -->
+                  <t-tag
+                    v-if="!isLocked"
+                    :theme="s.client_visible === false ? 'default' : 'success'"
+                    variant="light"
+                    size="small"
+                    class="sc-vis"
+                    style="cursor: pointer"
+                    @click="toggleVisible(s)"
+                  >
+                    <t-icon :name="s.client_visible === false ? 'eye-closed' : 'eye'" style="margin-right: 2px" />
+                    {{ s.client_visible === false ? '对学员隐藏' : '对学员可见' }}
+                  </t-tag>
+                  <t-tag v-else :theme="s.client_visible === false ? 'default' : 'success'" variant="light" size="small">
+                    {{ s.client_visible === false ? '对学员隐藏' : '对学员可见' }}
+                  </t-tag>
+                  <t-popconfirm v-if="!isLocked" content="确认删除此排课？" theme="danger" @confirm="del(s)">
+                    <t-button variant="text" theme="danger" size="small" class="sc-del"><t-icon name="delete" /></t-button>
+                  </t-popconfirm>
+                </div>
               </div>
             </div>
           </div>
@@ -117,23 +139,27 @@
             </t-form-item>
           </div>
           <div v-if="addForm.teach_mode === 'live'" class="form-col-full">
-            <t-form-item label="选择直播间" required-mark>
-              <div style="display:flex;gap:8px;width:100%">
-                <t-select v-model="addForm.live_room_id" filterable placeholder="选择直播间" style="flex:1">
-                  <template #empty>
-                    <div class="live-room-empty">暂无直播间，请点右侧「新建直播间」创建</div>
-                  </template>
-                  <t-option v-for="r in liveStore.rooms" :key="r.id" :label="r.name + '（' + (r.status === 'live' ? '直播中' : '空闲') + '）'" :value="r.id" />
-                </t-select>
-                <!-- V2·0902 无直播间时就近创建：创建后自动返回本表单并选中 -->
-                <t-button theme="primary" variant="outline" @click="showCreateRoom = true">
-                  <template #icon><t-icon name="add" /></template> 新建直播间
-                </t-button>
-              </div>
-              <div v-if="liveStore.rooms.length === 0" class="lesson-tip">
-                <t-icon name="info-circle" />
-                <span>当前还没有直播间，创建完成后会自动返回本表单并选中</span>
-              </div>
+            <t-form-item label="选择直播间">
+              <t-select v-model="addForm.live_room_id" filterable clearable placeholder="选择直播间（留空则按下方配置创建新直播间）" style="width:100%">
+                <template #empty>
+                  <div class="live-room-empty">暂无直播间，可直接按下方配置创建新直播间</div>
+                </template>
+                <t-option v-for="r in liveStore.rooms" :key="r.id" :label="r.name + '（' + (r.status === 'live' ? '直播中' : '空闲') + '）'" :value="r.id" />
+              </t-select>
+            </t-form-item>
+          </div>
+          <!-- V2·0902 直播间配置穿插在排课表单内（未选直播间=创建新直播间；已选=更新其配置） -->
+          <div v-if="addForm.teach_mode === 'live'" class="form-col-full live-room-config-block">
+            <LiveRoomConfigForm v-model="addForm.room_config" />
+          </div>
+          <!-- V2·0902 录播展示风格：直播间/课程 -->
+          <div v-if="addForm.teach_mode === 'recorded'" class="form-col-full">
+            <t-form-item label="展示风格" required-mark>
+              <t-radio-group v-model="addForm.display_style">
+                <t-radio value="live_room">直播间</t-radio>
+                <t-radio value="course">课程</t-radio>
+              </t-radio-group>
+              <span class="switch-label" style="margin-left:8px">直播间=APP 按直播间样式展示该节内容；课程=按普通课程样式展示</span>
             </t-form-item>
           </div>
           <div class="form-col-full" v-if="addForm.teach_mode === 'recorded'">
@@ -244,14 +270,39 @@
       </t-form>
     </t-dialog>
 
-    <!-- V2·0902 创建直播间（就近创建·创建后返回排课表单并自动选中） -->
-    <CreateLiveRoomDialog v-model:visible="showCreateRoom" from="营期排课" @created="onRoomCreated" />
+    <!-- V2·0902 批量设置可见性 -->
+    <t-dialog v-model:visible="showBatchVisible" header="批量设置可见性" width="520px" :on-confirm="doBatchVisible" :confirm-btn="{ content: '确定', theme: 'primary' }" :cancel-btn="{ content: '取消' }">
+      <t-form label-width="100px" label-align="right">
+        <t-form-item label="设为" required-mark>
+          <t-radio-group v-model="batchVisibleForm.target">
+            <t-radio :value="true">对学员可见</t-radio>
+            <t-radio :value="false">对学员隐藏</t-radio>
+          </t-radio-group>
+        </t-form-item>
+        <t-form-item label="生效范围" required-mark>
+          <div style="width:100%">
+            <t-radio-group v-model="batchVisibleForm.scope">
+              <t-radio value="all">全部排课</t-radio>
+              <t-radio value="days">按天选择</t-radio>
+            </t-radio-group>
+            <div v-if="batchVisibleForm.scope === 'days'" class="batch-days">
+              <t-checkbox-group v-model="batchVisibleForm.days">
+                <t-checkbox v-for="[day] in sortedDaySchedules" :key="day" :value="day">Day{{ day }}</t-checkbox>
+              </t-checkbox-group>
+            </div>
+          </div>
+        </t-form-item>
+        <t-form-item label="">
+          <span class="form-tip-inline">隐藏后 APP 排课列表不展示该节，但解锁时间与学习进度统计照常</span>
+        </t-form-item>
+      </t-form>
+    </t-dialog>
 
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { MessagePlugin } from 'tdesign-vue-next';
 import { useCampStore } from '../../../stores/camp-store';
@@ -259,7 +310,7 @@ import { useLiveStore } from '../../../stores/live-store';
 import { notifyModalOpen } from '../../../utils/modal-spec-bridge';
 import { useCourseStore } from '../../../stores/course-store';
 import type { CourseSchedule } from '../../../contracts/schemas/camp-schemas';
-import CreateLiveRoomDialog from './CreateLiveRoomDialog.vue';
+import LiveRoomConfigForm from './LiveRoomConfigForm.vue';
 
 const route = useRoute();
 const campStore = useCampStore();
@@ -392,6 +443,8 @@ function doBatch() {
         description: row.description,
         is_required: row.is_required,
         completion_criteria: row.completion_criteria || '完播率≥90%',
+        client_visible: true,
+        display_style: 'live_room',
       } as any;
     });
     const result = campStore.batchCreateSchedules(inputs);
@@ -422,6 +475,19 @@ const addForm = ref({
   description: '',
   teach_mode: 'recorded' as 'recorded' | 'live',
   live_room_id: '',
+  display_style: 'live_room' as 'live_room' | 'course',
+  room_config: {
+    name: '',
+    cover_picked: false,
+    start_at: '',
+    end_at: '',
+    anchor_type: 'real' as 'real' | 'virtual',
+    anchor_id: '',
+    avatar_picked: false,
+    allow_replay: 'yes' as 'yes' | 'no',
+    has_cart: 'yes' as 'yes' | 'no',
+    muted: 'no' as 'yes' | 'no',
+  },
   course_id: '',
   lesson_id: null as string | null,
   unlock_time: new Date(),
@@ -429,17 +495,41 @@ const addForm = ref({
   completion_criteria: '',
   is_required: true,
 });
+// V2·0902 选中已有直播间时预填配置（可改，保存时更新该直播间）
+watch(() => addForm.value.live_room_id, (rid) => {
+  const r = rid ? liveStore.loadRoom(rid) : null;
+  if (r) {
+    addForm.value.room_config.name = r.name;
+    addForm.value.room_config.anchor_id = r.anchor_id;
+    addForm.value.room_config.cover_picked = true;
+    addForm.value.room_config.avatar_picked = true;
+    if (!addForm.value.room_config.start_at) addForm.value.room_config.start_at = new Date((r.created_at || Math.floor(Date.now() / 1000)) * 1000).toISOString().slice(0, 19).replace('T', ' ');
+    if (!addForm.value.room_config.end_at) addForm.value.room_config.end_at = addForm.value.room_config.start_at;
+  }
+});
 function openAddDialog() {
   if (isLocked.value) { MessagePlugin.warning('审核通过后排课已锁定，如需修改请复制营期重做'); return; }
-  addForm.value = { day_number: 1, title: '', description: '', teach_mode: 'recorded', live_room_id: '', course_id: '', lesson_id: null, unlock_time: new Date(), deadline: null, completion_criteria: '', is_required: true };
+  addForm.value = { day_number: 1, title: '', description: '', teach_mode: 'recorded', live_room_id: '', display_style: 'live_room', room_config: { name: '', cover_picked: false, start_at: '', end_at: '', anchor_type: 'real', anchor_id: '', avatar_picked: false, allow_replay: 'yes', has_cart: 'yes', muted: 'no' }, course_id: '', lesson_id: null, unlock_time: new Date(), deadline: null, completion_criteria: '', is_required: true };
   showAdd.value = true;
   notifyModalOpen('schedule-add');
 }
 function doAdd() {
   if (!addForm.value.title) { MessagePlugin.warning('请填写排课标题'); return; }
   if (!addForm.value.unlock_time) { MessagePlugin.warning('请选择解锁时间'); return; }
-  // V2·0901 直播排课：只选直播间，不关联课程
-  if (addForm.value.teach_mode === 'live' && !addForm.value.live_room_id) { MessagePlugin.warning('请选择直播间'); return; }
+  // V2·0902 直播排课：配置穿插在表单内——已选直播间=更新其配置；未选=按配置创建新直播间
+  if (addForm.value.teach_mode === 'live') {
+    const cfg = addForm.value.room_config;
+    if (!cfg.name.trim()) { MessagePlugin.warning('请填写直播间名称（或选择已有直播间）'); return; }
+    if (!addForm.value.live_room_id) {
+      const anchor = liveStore.anchors.find(a => a.id === cfg.anchor_id);
+      const fallback = cfg.anchor_type === 'virtual' ? '虚拟主播' : '默认主播';
+      const room = liveStore.createRoom({ name: cfg.name.trim(), anchor_id: anchor?.id || 'ANCHOR-001', anchor_name: anchor?.name || fallback });
+      addForm.value.live_room_id = room.id;
+      MessagePlugin.success(`直播间「${room.name}」已创建`);
+    } else {
+      liveStore.updateRoom(addForm.value.live_room_id, { name: cfg.name.trim() });
+    }
+  }
   if (addForm.value.teach_mode === 'recorded' && !addForm.value.lesson_id) { MessagePlugin.warning('必须选择课时（营期排课以课时为单位）'); return; }
   // course_id 由所选课时自动带出
   const pickedLesson = courseStore.lessons.find(l => l.id === addForm.value.lesson_id);
@@ -467,6 +557,8 @@ function doAdd() {
     description: addForm.value.description,
     is_required: addForm.value.is_required,
     completion_criteria: addForm.value.teach_mode === 'live' ? '' : (addForm.value.completion_criteria || '完播率≥90%'),
+    client_visible: true,
+    display_style: addForm.value.teach_mode === 'recorded' ? addForm.value.display_style : undefined,
   } as any);
   MessagePlugin.success('排课添加成功');
   showAdd.value = false;
@@ -477,10 +569,29 @@ function del(s: CourseSchedule) {
   MessagePlugin.success('已删除');
 }
 
-// ===== 新建直播间（V2·0902：无直播间时就近创建，创建后返回并自动选中）=====
-const showCreateRoom = ref(false);
-function onRoomCreated(roomId: string) {
-  addForm.value.live_room_id = roomId;
+// ===== V2·0902 学员端可见性（单条切换 + 批量设置）=====
+function toggleVisible(s: any) {
+  s.client_visible = s.client_visible === false;
+  MessagePlugin.success(s.client_visible === false ? '已设为对学员隐藏' : '已设为对学员可见');
+}
+const showBatchVisible = ref(false);
+const batchVisibleForm = ref<{ target: boolean; scope: 'all' | 'days'; days: number[] }>({ target: true, scope: 'all', days: [] });
+function openBatchVisible() {
+  if (isLocked.value) { MessagePlugin.warning('审核通过后排课已锁定'); return; }
+  if (campSchedules.value.length === 0) { MessagePlugin.warning('暂无排课可设置'); return; }
+  batchVisibleForm.value = { target: true, scope: 'all', days: [] };
+  showBatchVisible.value = true;
+}
+function doBatchVisible() {
+  const { target, scope, days } = batchVisibleForm.value;
+  let list = campSchedules.value;
+  if (scope === 'days') {
+    if (days.length === 0) { MessagePlugin.warning('请至少选择一天'); return; }
+    list = list.filter(s => days.includes(s.day_number));
+  }
+  for (const s of list) (s as any).client_visible = target;
+  MessagePlugin.success(`已将 ${list.length} 条排课设为${target ? '对学员可见' : '对学员隐藏'}`);
+  showBatchVisible.value = false;
 }
 
 // ===== 快捷新建课程（V2·0829：主讲人为内容属性文本，无讲师档案）=====
@@ -721,5 +832,11 @@ async function doOneClickFromAdd() {
 }
 /* V2·0902 直播间下拉空态 */
 .live-room-empty { padding: 16px 0; text-align: center; font-size: 12px; color: #98A2B3; }
+/* V2·0902 卡片右侧操作区（可见性+删除） */
+.sc-side { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; }
+.sc-vis { white-space: nowrap; }
+/* 直播间配置穿插块 */
+.live-room-config-block { border-top: 1px dashed #EAECF0; margin-top: 4px; padding-top: 8px; }
+.batch-days { margin-top: 8px; padding: 8px 12px; background: #F9FAFB; border-radius: 6px; }
 .batch-actions { display: flex; gap: 12px; margin-top: 16px; }
 </style>
