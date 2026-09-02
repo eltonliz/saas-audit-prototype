@@ -120,24 +120,6 @@
           <t-input-number v-model="f.capacity" :min="0" style="width:160px" />
           <span class="form-tip-inline">0=不限</span>
         </t-form-item>
-        <!-- V2·0902 营期红包奖励：现金红包选择器（对齐单视频奖励交互） -->
-        <t-form-item label="红包奖励">
-          <t-switch v-model="(f as any).red_packet_enabled" />
-          <template v-if="(f as any).red_packet_enabled">
-            <div v-if="(f as any).red_packet" class="reward-cell" style="margin-left:8px" @click="openCampRedPacketPicker()">
-              <span class="reward-name">{{ (f as any).red_packet.no }}</span>
-              <span class="reward-meta">¥{{ (f as any).red_packet.amount }} / {{ (f as any).red_packet.count }}个 · {{ (f as any).red_packet.type }}</span>
-            </div>
-            <t-button v-else variant="text" size="small" theme="primary" style="margin-left:8px" @click="openCampRedPacketPicker()">选择红包</t-button>
-          </template>
-        </t-form-item>
-        <!-- V2·0902 客户范围（全局）：设置客户范围弹窗，作用于整个营期 -->
-        <t-form-item label="客户范围">
-          <t-button variant="outline" size="small" theme="primary" @click="openCampScope()">
-            <template #icon><t-icon name="user-group" /></template> 设置客户范围
-          </t-button>
-          <span class="form-tip-inline">{{ campScopeLabel }}</span>
-        </t-form-item>
         <t-form-item label="报名截止时间">
           <t-date-picker v-model="enrollDeadline" enable-time-picker placeholder="选择报名截止时间" style="width:100%" />
           <span class="form-tip-inline">截止后自动开营（未填默认创建时间+7天）</span>
@@ -147,25 +129,6 @@
         <t-form-item label="营期简介"><t-textarea v-model="f.description" placeholder="营期简介（选填）" :autosize="{ minRows: 2, maxRows: 4 }" /></t-form-item>
       </t-form>
     </t-dialog>
-
-    <!-- V2·0902 营期红包选择器 + 全局客户范围 -->
-    <t-dialog v-model:visible="campRedPacketVisible" header="现金红包" width="860px">
-      <div class="reward-toolbar">
-        <t-input v-model="campRedPacketKw" placeholder="请输入红包编号" clearable style="width:180px" />
-        <t-button theme="primary" size="small">筛选</t-button>
-        <t-button size="small">重置</t-button>
-        <t-button theme="primary" variant="outline" size="small">新建红包</t-button>
-        <t-button size="small">刷新</t-button>
-      </div>
-      <t-table :data="campRedPacketList" row-key="no" :columns="campRedPacketColumns" bordered size="small" v-model:selected-row-keys="campRedPacketSelectedKeys">
-        <template #amount="{ row }">¥{{ row.amount }}</template>
-      </t-table>
-      <template #footer>
-        <t-button @click="campRedPacketVisible = false">取消</t-button>
-        <t-button theme="primary" @click="confirmCampRedPacket">确定</t-button>
-      </template>
-    </t-dialog>
-    <CustomerScopeDialog ref="campScopeDialogRef" @confirm="onCampScopeConfirm" />
 
     <CampStudentDrawerPage v-model="studentDrawerVisible" :camp-id="activeCampId" />
 
@@ -277,14 +240,7 @@ const columns = [
   { colKey: 'op', title: '操作', width: 360, fixed: 'right' },
 ];
 
-const f = ref<{ title: string; description: string; mode: 'live' | 'recorded'; capacity: number; cover_url: string }>({
-  title: '', description: '', mode: 'recorded' as 'live' | 'recorded', capacity: 0, cover_url: '',
-  // V2·0902 营期红包奖励 + 全局客户范围
-  red_packet_enabled: false,
-  red_packet: null as { no: string; amount: number; count: number; type: string } | null,
-  customer_scope_mode: 'all' as 'all' | 'new_only',
-  customer_scope_staff_ids: [] as string[],
-});
+const f = ref<{ title: string; description: string; mode: 'live' | 'recorded'; capacity: number; cover_url: string }>({ title: '', description: '', mode: 'recorded', capacity: 0, cover_url: '' });
 
 // V2·0901 营期封面预设（与课程封面同源）
 const campCoverPresets = [
@@ -301,7 +257,7 @@ const campCoverPresets = [
 function openCreate() {
   notifyModalOpen('camp-create');
   editingCamp.value = null;
-  f.value = { title: '', description: '', mode: 'recorded', capacity: 0, cover_url: '', red_packet_enabled: false, red_packet: null, customer_scope_mode: 'all', customer_scope_staff_ids: [] };
+  f.value = { title: '', description: '', mode: 'recorded', capacity: 0, cover_url: '' };
   dateRange.value = []; enrollDeadline.value = null;
   showCreate.value = true;
 }
@@ -321,11 +277,6 @@ function doSave() {
     capacity: f.value.capacity,
     enroll_deadline: enrollDeadline.value ? Math.floor(new Date(enrollDeadline.value).getTime() / 1000) : Math.floor(Date.now() / 1000) + 86400 * 7,
     daily_red_packet_mode: 'by_course',
-    // V2·0902 营期红包奖励 + 全局客户范围
-    red_packet_enabled: (f.value as any).red_packet_enabled,
-    red_packet: (f.value as any).red_packet,
-    customer_scope_mode: (f.value as any).customer_scope_mode,
-    customer_scope_staff_ids: [...(f.value as any).customer_scope_staff_ids],
   } as any;
   if (editingCamp.value) {
     store.updateCamp(editingCamp.value.id, data);
@@ -343,7 +294,7 @@ function delCamp(row: any) {
 function openEdit(row: any) {
   notifyModalOpen('camp-edit');
   editingCamp.value = row;
-  f.value = { title: row.title, description: row.description ?? '', mode: row.mode, capacity: row.capacity || 0, cover_url: row.cover_url || '', red_packet_enabled: (row as any).red_packet_enabled ?? false, red_packet: (row as any).red_packet ?? null, customer_scope_mode: (row as any).customer_scope_mode || 'all', customer_scope_staff_ids: [...((row as any).customer_scope_staff_ids || [])] };
+  f.value = { title: row.title, description: row.description ?? '', mode: row.mode, capacity: row.capacity || 0, cover_url: row.cover_url || '' };
   dateRange.value = [row.start_date, row.end_date];
   enrollDeadline.value = row.enroll_deadline ? new Date(row.enroll_deadline * 1000) : null;
   showCreate.value = true;
@@ -354,61 +305,6 @@ function openStudentDrawer(row: any) { activeCampId.value = row.id; studentDrawe
 
 // V2·0902 自动流转：进入页面时刷新（报名截止自动开营/结束时间自动结营）
 onMounted(() => { store.refreshCampStatuses(); });
-
-// ===== V2·0902 营期红包奖励（现金红包选择器）=====
-const campRedPacketVisible = ref(false);
-const campRedPacketKw = ref('');
-const campRedPacketSelectedKeys = ref<(string | number)[]>([]);
-const campRedPacketList = ref([
-  { no: 'XJHB260806000009', amount: 1, count: 1, type: '等分红包', claimed_count: 0, claimed_amount: 0, remain_amount: 1, remain_count: 1, created: '2026-08-06 15:35:20' },
-  { no: 'XJHB260806000008', amount: 1, count: 1, type: '拼手气红包', claimed_count: 0, claimed_amount: 0, remain_amount: 1, remain_count: 1, created: '2026-08-06 15:32:24' },
-  { no: 'XJHB260806000002', amount: 150, count: 10, type: '等分红包', claimed_count: 3, claimed_amount: 45, remain_amount: 105, remain_count: 7, created: '2026-08-06 11:46:33' },
-  { no: 'XJHB260805000005', amount: 500, count: 10, type: '拼手气红包', claimed_count: 1, claimed_amount: 32.28, remain_amount: 467.72, remain_count: 9, created: '2026-08-05 14:35:23' },
-  { no: 'XJHB260726000012', amount: 113, count: 1, type: '拼手气红包', claimed_count: 0, claimed_amount: 0, remain_amount: 113, remain_count: 1, created: '2026-07-26 17:01:52' },
-]);
-const campRedPacketColumns = [
-  { colKey: 'row-select', type: 'single', width: 50 },
-  { colKey: 'no', title: '红包编号', width: 150 },
-  { colKey: 'amount', title: '红包总金额', width: 100 },
-  { colKey: 'count', title: '红包总数量', width: 95 },
-  { colKey: 'type', title: '发放类型', width: 100 },
-  { colKey: 'claimed_count', title: '已领取数量', width: 95 },
-  { colKey: 'claimed_amount', title: '已领取金额', width: 95 },
-  { colKey: 'remain_amount', title: '剩余金额', width: 90 },
-  { colKey: 'remain_count', title: '剩余个数', width: 90 },
-  { colKey: 'created', title: '创建时间', width: 150 },
-];
-function openCampRedPacketPicker() {
-  campRedPacketSelectedKeys.value = (f.value as any).red_packet ? [(f.value as any).red_packet.no] : [];
-  campRedPacketVisible.value = true;
-}
-function confirmCampRedPacket() {
-  const hit = campRedPacketList.value.find(r => campRedPacketSelectedKeys.value.includes(r.no));
-  if (!hit) { MessagePlugin.warning('请选择一个现金红包'); return; }
-  (f.value as any).red_packet = { no: hit.no, amount: hit.amount, count: hit.count, type: hit.type };
-  MessagePlugin.success(`已关联现金红包 ${hit.no}`);
-  campRedPacketVisible.value = false;
-}
-
-// ===== V2·0902 营期级客户范围（全局）=====
-const campScopeDialogRef = ref<InstanceType<typeof CustomerScopeDialog> | null>(null);
-const campScopeLabel = computed(() => {
-  const ids: string[] = (f.value as any).customer_scope_staff_ids || [];
-  const mode = (f.value as any).customer_scope_mode || 'all';
-  if (ids.length === 0) return mode === 'new_only' ? '当前：仅新客户 · 全部店长/店员' : '当前：全部客户 · 全部店长/店员';
-  return `当前：${mode === 'new_only' ? '仅新客户 · ' : ''}${ids.length} 名店长/店员可见`;
-});
-function openCampScope() {
-  campScopeDialogRef.value?.openWith({
-    mode: (f.value as any).customer_scope_mode || 'all',
-    staff_ids: [...((f.value as any).customer_scope_staff_ids || [])],
-  });
-}
-function onCampScopeConfirm(scope: { mode: 'all' | 'new_only'; staff_ids: string[] }) {
-  (f.value as any).customer_scope_mode = scope.mode;
-  (f.value as any).customer_scope_staff_ids = scope.staff_ids;
-  MessagePlugin.success('客户范围已更新');
-}
 
 // V2·0829 用户裁决：邀请码/口令体系整体下线，邀请码管理 Drawer 与二维码生成逻辑已删除
 

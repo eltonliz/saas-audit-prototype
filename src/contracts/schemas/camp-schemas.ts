@@ -160,17 +160,6 @@ export const CampSchema = z.object({
   /** 每日红包模式（D35） */
   daily_red_packet_mode: DailyRedPacketModeEnum.default('by_course'),
 
-  /** V2·0902 营期红包奖励（现金红包选择器）+ 客户范围（全局） */
-  red_packet_enabled: z.boolean().default(false),
-  red_packet: z.object({
-    no: z.string(),
-    amount: z.number().int(),
-    count: z.number().int(),
-    type: z.string(),
-  }).nullable().default(null),
-  customer_scope_mode: z.enum(['all', 'new_only']).default('all'),
-  customer_scope_staff_ids: z.array(z.string()).default([]),
-
   /** 状态机（D15·8状态） */
   status: CampStatusEnum.default('draft'),
   review_remark: z.string().optional(),
@@ -261,6 +250,14 @@ export const CourseScheduleSchema = z.object({
   display_style: z.enum(['live_room', 'course']).default('live_room'),
   /** V2·0902 触发答题：学习该节时触发，绑定题库（答对联动答题红包） */
   quiz_bank_id: z.string().nullable().default(null),
+  /** V2·0902 红包奖励（排课级）：现金红包选择器 */
+  red_packet_enabled: z.boolean().default(false),
+  red_packet: z.object({
+    no: z.string(),
+    amount: z.number().int(),
+    count: z.number().int(),
+    type: z.string(),
+  }).nullable().default(null),
   /** V2·0902 答题奖励：现金红包/积分（答对发放，可同选） */
   quiz_reward_cash_enabled: z.boolean().default(false),
   quiz_reward_amount: z.number().int().min(0).default(100),
@@ -485,8 +482,6 @@ export const CreateCampInputSchema = CampSchema.pick({
   store_id: true, store_name: true,
   certificate_checkin_threshold: true,
   capacity: true, enroll_deadline: true,
-  red_packet_enabled: true, red_packet: true,
-  customer_scope_mode: true, customer_scope_staff_ids: true,
 });
 export type CreateCampInput = z.infer<typeof CreateCampInputSchema>;
 

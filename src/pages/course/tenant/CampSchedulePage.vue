@@ -73,6 +73,9 @@
                     <t-tag v-if="(s as any).quiz_bank_id && (s as any).quiz_reward_points_enabled" theme="success" variant="light" size="small">
                       积分{{ (s as any).quiz_reward_points || 0 }}
                     </t-tag>
+                    <t-tag v-if="(s as any).red_packet_enabled && (s as any).red_packet" theme="warning" variant="light" size="small">
+                      红包奖励 ¥{{ (s as any).red_packet.amount }}/{{ (s as any).red_packet.count }}个
+                    </t-tag>
                   </div>
                   <div v-if="s.description" class="sc-desc">{{ s.description }}</div>
                   <div v-if="s.course_id" class="sc-course">
@@ -246,6 +249,19 @@
               </t-select>
             </t-form-item>
           </div>
+          <!-- V2·0902 红包奖励（排课级）：现金红包选择器 -->
+          <div class="form-col-full">
+            <t-form-item label="红包奖励">
+              <t-switch v-model="addForm.red_packet_enabled" />
+              <template v-if="addForm.red_packet_enabled">
+                <div v-if="addForm.red_packet" class="reward-cell" style="margin-left:8px" @click="redPacketPickerRef?.openWith(addForm.red_packet.no)">
+                  <span class="reward-name">{{ addForm.red_packet.no }}</span>
+                  <span class="reward-meta">¥{{ addForm.red_packet.amount }} / {{ addForm.red_packet.count }}个 · {{ addForm.red_packet.type }}</span>
+                </div>
+                <t-button v-else variant="text" size="small" theme="primary" style="margin-left:8px" @click="redPacketPickerRef?.openWith('')">选择红包</t-button>
+              </template>
+            </t-form-item>
+          </div>
         </div>
       </t-form>
     </t-dialog>
@@ -328,6 +344,9 @@
     <!-- V2·0902 题库选择弹窗 -->
     <QuizPickerDialog ref="quizPickerRef" @confirm="onQuizPicked" />
 
+    <!-- V2·0902 现金红包选择弹窗 -->
+    <RedPacketPickerDialog ref="redPacketPickerRef" @confirm="onRedPacketPicked" />
+
   </div>
 </template>
 
@@ -343,6 +362,7 @@ import type { CourseSchedule } from '../../../contracts/schemas/camp-schemas';
 import LiveRoomConfigForm from './LiveRoomConfigForm.vue';
 import CustomerScopeDialog from './CustomerScopeDialog.vue';
 import QuizPickerDialog from './QuizPickerDialog.vue';
+import RedPacketPickerDialog from './RedPacketPickerDialog.vue';
 
 const route = useRoute();
 const campStore = useCampStore();
@@ -479,6 +499,8 @@ function doBatch() {
         client_visible: true,
         customer_scope_mode: 'all',
         customer_scope_staff_ids: [],
+        red_packet_enabled: false,
+        red_packet: null,
         display_style: 'live_room',
       } as any;
     });
@@ -532,6 +554,8 @@ const addForm = ref({
   quiz_enabled: false,
   quiz_trigger: 'half' as 'start' | 'half' | 'eighty' | 'end',
   quiz_bank_id: '' as string,
+  red_packet_enabled: false,
+  red_packet: null as { no: string; amount: number; count: number; type: string } | null,
   quiz_reward_cash_enabled: true,
   quiz_reward_amount_yuan: 1,
   quiz_reward_points_enabled: false,
@@ -540,7 +564,7 @@ const addForm = ref({
 });
 function openAddDialog() {
   if (isLocked.value) { MessagePlugin.warning('开营后排课已锁定，如需修改请复制营期重做'); return; }
-  addForm.value = { day_number: 1, title: '', description: '', teach_mode: 'recorded', live_room_id: '', display_style: 'live_room', live_display_title: '', room_config: { name: '', cover_picked: false, start_at: '', end_at: '', anchor_type: 'hq', anchor_id: '', avatar_picked: false, allow_replay: 'yes', has_cart: 'yes', muted: 'no' }, course_id: '', lesson_id: null, unlock_time: new Date(), deadline: null, completion_criteria: '', quiz_enabled: false, quiz_trigger: 'half', quiz_bank_id: '', quiz_reward_cash_enabled: true, quiz_reward_amount_yuan: 1, quiz_reward_points_enabled: false, quiz_reward_points: 20, is_required: true };
+  addForm.value = { day_number: 1, title: '', description: '', teach_mode: 'recorded', live_room_id: '', display_style: 'live_room', live_display_title: '', room_config: { name: '', cover_picked: false, start_at: '', end_at: '', anchor_type: 'hq', anchor_id: '', avatar_picked: false, allow_replay: 'yes', has_cart: 'yes', muted: 'no' }, course_id: '', lesson_id: null, unlock_time: new Date(), deadline: null, completion_criteria: '', quiz_enabled: false, quiz_trigger: 'half', quiz_bank_id: '', red_packet_enabled: false, red_packet: null, quiz_reward_cash_enabled: true, quiz_reward_amount_yuan: 1, quiz_reward_points_enabled: false, quiz_reward_points: 20, is_required: true };
   showAdd.value = true;
   notifyModalOpen('schedule-add');
 }
@@ -594,6 +618,8 @@ function doAdd() {
     quiz_reward_amount: addForm.value.quiz_enabled ? Math.round(addForm.value.quiz_reward_amount_yuan * 100) : 0,
     quiz_reward_points_enabled: addForm.value.quiz_enabled ? addForm.value.quiz_reward_points_enabled : false,
     quiz_reward_points: addForm.value.quiz_enabled ? addForm.value.quiz_reward_points : 0,
+    red_packet_enabled: addForm.value.red_packet_enabled,
+    red_packet: addForm.value.red_packet_enabled ? addForm.value.red_packet : null,
     display_style: addForm.value.teach_mode === 'recorded' ? addForm.value.display_style : undefined,
     live_display_title: addForm.value.teach_mode === 'recorded' && addForm.value.display_style === 'live_room' ? addForm.value.live_display_title.trim() : '',
   } as any);
@@ -616,6 +642,10 @@ const quizBankTitle = computed(() => {
 });
 function onQuizPicked(bankId: string) {
   addForm.value.quiz_bank_id = bankId;
+}
+const redPacketPickerRef = ref<InstanceType<typeof RedPacketPickerDialog> | null>(null);
+function onRedPacketPicked(p: { no: string; amount: number; count: number; type: string }) {
+  addForm.value.red_packet = p;
 }
 const quizTriggerLabel = (t: string) => ({ start: '开始时', half: '播放至50%', eighty: '播放至80%', end: '结束时' }[t] ?? t);
 
