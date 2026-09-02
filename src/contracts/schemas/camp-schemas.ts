@@ -248,6 +248,8 @@ export const CourseScheduleSchema = z.object({
   customer_scope_staff_ids: z.array(z.string()).default([]),
   /** V2·0902 录播展示风格：live_room=直播间风格，course=课程风格（仅录播排课生效） */
   display_style: z.enum(['live_room', 'course']).default('live_room'),
+  /** V2·0902 触发答题：学习该节时触发，绑定题库（答对联动答题红包） */
+  quiz_bank_id: z.string().nullable().default(null),
   /** V2·0902 直播展示标题：展示风格=直播间时 APP 直播间样式标题（空则用排课标题） */
   live_display_title: z.string().default(''),
 

@@ -184,6 +184,21 @@
               <t-date-picker v-model="addForm.unlock_time" enable-time-picker placeholder="选择解锁时间" style="width: 100%" />
             </t-form-item>
           </div>
+          <!-- V2·0902 触发答题：学习该节时弹出答题，答对联动答题红包 -->
+          <div class="form-col-full">
+            <t-form-item label="触发答题">
+              <t-switch v-model="addForm.quiz_enabled" />
+              <span class="switch-label">{{ addForm.quiz_enabled ? '答题后计完播并联动答题红包' : '不触发' }}</span>
+            </t-form-item>
+          </div>
+          <div v-if="addForm.quiz_enabled" class="form-col-full">
+            <t-form-item label="选择题库" required-mark>
+              <t-select v-model="addForm.quiz_bank_id" filterable placeholder="选择题目（从题目库）" style="width:100%">
+                <template #empty><div class="live-room-empty">题库为空，请先在「题目库」维护题目</div></template>
+                <t-option v-for="b in courseStore.questionBanks" :key="b.id" :label="b.title" :value="b.id" />
+              </t-select>
+            </t-form-item>
+          </div>
           <div class="form-col-full">
             <t-form-item label="完成判定">
               <t-select v-model="addForm.completion_criteria" clearable placeholder="请选择完成判定标准" style="width:100%">
@@ -469,11 +484,13 @@ const addForm = ref({
   unlock_time: new Date(),
   deadline: null as Date | null,
   completion_criteria: '',
+  quiz_enabled: false,
+  quiz_bank_id: '' as string,
   is_required: true,
 });
 function openAddDialog() {
   if (isLocked.value) { MessagePlugin.warning('审核通过后排课已锁定，如需修改请复制营期重做'); return; }
-  addForm.value = { day_number: 1, title: '', description: '', teach_mode: 'recorded', live_room_id: '', display_style: 'live_room', live_display_title: '', room_config: { name: '', cover_picked: false, start_at: '', end_at: '', anchor_type: 'hq', anchor_id: '', avatar_picked: false, allow_replay: 'yes', has_cart: 'yes', muted: 'no' }, course_id: '', lesson_id: null, unlock_time: new Date(), deadline: null, completion_criteria: '', is_required: true };
+  addForm.value = { day_number: 1, title: '', description: '', teach_mode: 'recorded', live_room_id: '', display_style: 'live_room', live_display_title: '', room_config: { name: '', cover_picked: false, start_at: '', end_at: '', anchor_type: 'hq', anchor_id: '', avatar_picked: false, allow_replay: 'yes', has_cart: 'yes', muted: 'no' }, course_id: '', lesson_id: null, unlock_time: new Date(), deadline: null, completion_criteria: '', quiz_enabled: false, quiz_bank_id: '', is_required: true };
   showAdd.value = true;
   notifyModalOpen('schedule-add');
 }
@@ -489,6 +506,8 @@ function doAdd() {
     addForm.value.live_room_id = room.id;
   }
   if (addForm.value.teach_mode === 'recorded' && !addForm.value.lesson_id) { MessagePlugin.warning('必须选择课时（营期排课以课时为单位）'); return; }
+  // V2·0902 触发答题：开启时必须绑定题库
+  if (addForm.value.quiz_enabled && !addForm.value.quiz_bank_id) { MessagePlugin.warning('请选择题库'); return; }
   // course_id 由所选课时自动带出
   const pickedLesson = courseStore.lessons.find(l => l.id === addForm.value.lesson_id);
   const autoCourseId = pickedLesson?.course_id ?? '';
@@ -518,6 +537,7 @@ function doAdd() {
     client_visible: true,
     customer_scope_mode: 'all',
     customer_scope_staff_ids: [],
+    quiz_bank_id: addForm.value.quiz_enabled ? (addForm.value.quiz_bank_id || null) : null,
     display_style: addForm.value.teach_mode === 'recorded' ? addForm.value.display_style : undefined,
     live_display_title: addForm.value.teach_mode === 'recorded' && addForm.value.display_style === 'live_room' ? addForm.value.live_display_title.trim() : '',
   } as any);

@@ -164,6 +164,58 @@
   .pm-dates input[type=date]{flex:1;min-width:0;height:32px;border:1px solid var(--border);border-radius:6px;padding:0 6px;font-size:11.5px;font-family:var(--font);color:var(--fg);background:var(--surface);}
   .pm-dates input[type=date]:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 2px rgba(30,64,175,.12);}
   .pm-dates .sep{color:var(--fg-3);font-size:11px;flex-shrink:0;}
+  /* ===== v5.11 APP 工作台/占位/数据报表 ===== */
+  .p-nav{height:44px;background:#fff;display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0;border-bottom:1px solid #F1F5F9;}
+  .p-nav .p-back{position:absolute;left:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--fg);padding:6px;}
+  .p-nav .p-nav-title{font-size:15px;font-weight:600;}
+  .p-body.pad{padding:10px 12px 20px;background:#F4F6FA;}
+  .w-user{background:#fff;border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px;margin-bottom:10px;box-shadow:var(--shadow-1);}
+  .w-user .w-av{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#34D399,#12B76A);display:flex;align-items:center;justify-content:center;color:#fff;font-size:17px;font-weight:700;flex-shrink:0;}
+  .w-user .w-name{font-size:15px;font-weight:700;}
+  .w-user .w-role{font-size:11px;color:#12B76A;margin-top:2px;display:flex;align-items:center;gap:4px;cursor:pointer;}
+  .w-user .w-invite{margin-left:auto;background:#12B76A;color:#fff;border:none;border-radius:99px;padding:6px 10px;font-size:11px;display:flex;align-items:center;gap:3px;}
+  .w-shop{background:#fff;border-radius:14px;padding:13px 14px;display:flex;gap:11px;margin-bottom:10px;box-shadow:var(--shadow-1);align-items:center;}
+  .w-shop .w-shoplogo{width:52px;height:52px;border-radius:10px;background:linear-gradient(135deg,#FDE68A,#FCA5A5);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .w-shop .w-shopname{font-size:14px;font-weight:700;}
+  .w-shop .w-shopinfo{font-size:11px;color:var(--fg-3);margin-top:3px;display:flex;align-items:center;gap:4px;}
+  .w-block{background:#fff;border-radius:14px;padding:14px;margin-bottom:10px;box-shadow:var(--shadow-1);}
+  .w-block .w-btitle{font-size:14px;font-weight:700;margin-bottom:12px;}
+  .w-chips{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;}
+  .w-chips::-webkit-scrollbar{height:0;}
+  .w-chip{flex-shrink:0;padding:5px 12px;border-radius:99px;font-size:11.5px;background:#F2F4F7;color:var(--fg-2);border:none;min-height:28px;}
+  .w-chip.active{background:#D9F5EA;color:#0E9C5C;font-weight:600;}
+  .w-chip.more{color:var(--fg-3);}
+  .w-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;}
+  .w-stat .v{font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;}
+  .w-stat .l{font-size:10px;color:var(--fg-3);margin-top:2px;}
+  .w-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px 6px;}
+  .w-gitem{display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:none;padding:4px 0;cursor:default;min-height:52px;justify-content:flex-start;}
+  .w-gitem svg{color:var(--fg);}
+  .w-gitem span{font-size:11px;color:var(--fg);}
+  .w-gitem.hot{cursor:pointer;}
+  .w-gitem.hot span{color:var(--destructive);font-weight:600;}
+  .w-gitem:active{opacity:.6;}
+  .placeholder-page{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--fg-3);}
+  .placeholder-page svg{opacity:.4;}
+  .placeholder-page .pt{font-size:15px;font-weight:600;color:var(--fg-2);}
+  .placeholder-page .pd{font-size:11px;}
+  /* APP 数据报表页 */
+  .app-report{position:absolute;inset:0;background:var(--bg);z-index:60;display:flex;flex-direction:column;}
+  .app-report .ar-top{height:44px;background:#fff;display:flex;align-items:center;gap:8px;padding:0 10px;flex-shrink:0;border-bottom:1px solid #F1F5F9;}
+  .app-report .ar-back{background:none;border:none;color:var(--fg);padding:6px;}
+  .app-report .ar-title{font-size:15px;font-weight:600;}
+  .app-report .ar-period{margin-left:auto;}
+  .app-report .ar-chips{display:flex;gap:6px;padding:8px 10px;background:#fff;overflow-x:auto;flex-shrink:0;border-bottom:1px solid #F1F5F9;}
+  .app-report .ar-chips::-webkit-scrollbar{height:0;}
+  .app-report .ar-chip{flex-shrink:0;padding:6px 13px;border-radius:99px;font-size:12px;background:var(--muted);color:var(--fg-2);border:none;min-height:30px;}
+  .app-report .ar-chip.active{background:var(--primary);color:#fff;font-weight:600;}
+  .app-report .ar-body{flex:1;overflow-y:auto;padding:12px 12px 24px;}
+  .app-report .ar-body::-webkit-scrollbar{width:0;}
+  .app-report table{min-width:600px;}
+  .app-report .tbl-wrap{overflow-x:auto;margin-bottom:4px;}
+  .app-report .grid{grid-template-columns:repeat(2,1fr)!important;}
+  .app-report .page-head h1{font-size:17px;}
+  .app-report .g2,.app-report .g2e{grid-template-columns:1fr!important;}
 
   /* ===== v5.2 APP 端（移动端报表 · 店长/店员双角色） ===== */
   .app-stage{display:flex;gap:30px;align-items:flex-start;justify-content:center;flex-wrap:wrap;padding:8px 0 30px;}
@@ -835,18 +887,29 @@
           </div>
         </div>
         <div>
-          <div class="seg" style="margin-bottom:16px;">
-            <button class="active" id="seg-manager" onclick="appRole('manager')">店长视角 · 陈总</button>
-            <button id="seg-staff" onclick="appRole('staff')">店员视角 · 张三</button>
-          </div>
           <div class="phone"><div class="phone-screen">
             <div class="p-status"><span>9:41</span><span style="display:flex;gap:5px;align-items:center;">
               <svg width="15" height="11" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="5" y="4" width="3" height="8" rx="1"/><rect x="10" y="1" width="3" height="11" rx="1"/></svg>
               <svg width="22" height="11" viewBox="0 0 25 12" fill="none" stroke="currentColor"><rect x="1" y="1" width="20" height="10" rx="3"/><rect x="3" y="3" width="13" height="6" rx="1.5" fill="currentColor" stroke="none"/><path d="M23 4v4" stroke-linecap="round"/></svg>
             </span></div>
-            <div class="p-head" id="ph-head"></div>
+            <div class="p-nav" id="p-nav"></div>
+            <div class="p-head" id="ph-head" style="display:none;"></div>
             <div class="p-body" id="p-body"></div>
             <div class="p-tabbar" id="p-tabbar"></div>
+            <div class="app-report" id="app-report" style="display:none;">
+              <div class="ar-top"><button class="ar-back" onclick="closeAppReport()" aria-label="返回"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></button><span class="ar-title">数据报表</span><button class="pill amber" style="margin-left:auto;height:28px;font-size:11px;" onclick="openPeriodMenu(event,'ar-period')"><b class="num" id="ar-period-text">—</b></button></div>
+              <div class="ar-chips" id="ar-chips">
+                <button class="ar-chip active" data-key="tenant" onclick="appReportGo('tenant')">总览</button>
+                <button class="ar-chip" data-key="store" onclick="appReportGo('store')">门店</button>
+                <button class="ar-chip" data-key="live" onclick="appReportGo('live')">直播</button>
+                <button class="ar-chip" data-key="product" onclick="appReportGo('product')">商品</button>
+                <button class="ar-chip" data-key="customer" onclick="appReportGo('customer')">客户</button>
+                <button class="ar-chip" data-key="course" onclick="appReportGo('course')">课程与营期</button>
+                <button class="ar-chip" data-key="staff" onclick="appReportGo('staff')">店员</button>
+                <button class="ar-chip" data-key="manager" onclick="appReportGo('manager')">店长</button>
+              </div>
+              <div class="ar-body" id="ar-body"></div>
+            </div>
             <div class="p-sheet" id="p-sheet"><div class="p-sheet-body"><div class="sh-handle"></div>
               <div class="sh-title"><span id="sh-title"></span><button class="sh-close" onclick="closeSheet()" aria-label="关闭">×</button></div>
               <div id="sh-body"></div></div></div>
@@ -1626,7 +1689,155 @@ function openAppMember(i){
   el('p-sheet').classList.add('open');
 }
 function closeSheet(){ el('p-sheet').classList.remove('open'); }
-renderAppHead(); renderAppTabs(); renderAppBody();
+
+/* ================= v5.11 APP 改版：底部5Tab + 工作台 + 数据报表 ================= */
+let reportOpen=false, appReportKey='tenant', appReportStack=[], wChipIdx=0;
+const BOTTOM_TABS=[['home','首页'],['cat','分类'],['fun','娱乐'],['msg','消息'],['me','我的']];
+const BICON={
+ home:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>',
+ cat:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>',
+ fun:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M10 8.5l5 3.5-5 3.5V8.5z"/></svg>',
+ msg:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 11.5a8.38 8.38 0 01-8.5 8.5c-1.6 0-3.1-.4-4.4-1.2L3 20l1.2-4.1A8.5 8.5 0 1121 11.5z"/></svg>',
+ me:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>'
+};
+const PLACEHOLDER={home:'首页',cat:'分类',fun:'娱乐',msg:'消息'};
+function renderAppNav(){
+ if(reportOpen){
+  el('p-nav').innerHTML='<button class="p-back" onclick="closeAppReport()" aria-label="返回"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></button><span class="p-nav-title">数据报表</span><button class="pill amber" style="margin-left:auto;height:28px;font-size:11px;cursor:pointer;" onclick="openPeriodMenu(event,\'ar-period\')"><b class="num" id="ar-period-text">'+periodStart.slice(5)+' ~ '+periodEnd.slice(5)+'</b></button>';
+ } else {
+  const names={home:'首页',cat:'分类',fun:'娱乐',msg:'消息',me:'工作台'};
+  el('p-nav').innerHTML='<span class="p-nav-title">'+names[appTabKey]+'</span>';
+ }
+}
+function renderTabbar(){
+ el('p-tabbar').innerHTML=BOTTOM_TABS.map(t=>'<button class="p-tab'+(appTabKey===t[0]&&!reportOpen?' active':'')+'" onclick="appTab(\''+t[0]+'\')">'+BICON[t[0]]+'<span>'+t[1]+'</span></button>').join('');
+}
+function placeholderPage(name){
+ return '<div class="placeholder-page"><svg width="54" height="54" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/></svg><div class="pt">'+name+'</div><div class="pd">演示占位页 · 无实际内容</div></div>';
+}
+function wStats(role,i){
+ const F=[1,5.8,21,52][i];
+ if(role==='manager'){
+  const m=v=>'¥'+(v*F).toLocaleString('zh-CN',{maximumFractionDigits:2});
+  const n=v=>Math.round(v*F).toLocaleString();
+  return [[[m(37624.03),'订单金额'],[m(3762.03),'交易金额'],[m(372.03),'退款金额'],['¥32.03','客单价']],
+          [[n(636),'订单总数'],[n(925),'签收总数'],[n(925),'退款总数'],[n(14393),'客户总数']]];
+ }
+ const n=v=>Math.round(v*F).toLocaleString();
+ return [[[n(186),'名下会员'],[n(12),'本月新增'],[n(152),'活跃会员'],[n(34),'沉睡会员']],
+         [['¥'+n(28000),'贡献金额'],[n(427),'累计观看(分)'],['2','覆盖课程'],['83.5%','报名转化']]];
+}
+function wChip(i){ wChipIdx=i; if(appTabKey==='me') renderMe(); }
+function renderMe(){
+ el('p-body').className='p-body pad';
+ const mgr=appRoleKey==='manager';
+ const user=mgr?{n:'阿远要快快乐乐',role:'店长',av:'阿'}:{n:'张三',role:'店员',av:'张'};
+ const stats=wStats(appRoleKey,wChipIdx);
+ const gridItems=mgr?['自提核销','核销优惠券','订单管理','客户管理','售后管理','直播管理','添加渠道','审核门店','门店商品','虚拟账户','营销管理','核销记录','课程管理']:['客户管理','订单查询','直播参与','课程参与'];
+ const gi=['<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 01-8 0"/></svg>',
+  '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>',
+  '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><line x1="8" y1="13" x2="16" y2="13"/></svg>',
+  '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>'];
+ el('p-body').innerHTML=
+  '<div class="w-user"><div class="w-av">'+user.av+'</div><div><div class="w-name">'+user.n+'</div><div class="w-role" onclick="toggleRole()">'+user.role+' · 切换角色 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></div></div><button class="w-invite"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="9" r="3"/><path d="M15 9a3 3 0 11-1 6"/><path d="M3 20c0-3 3-5 6-5"/></svg>邀请码</button></div>'
+  +'<div class="w-shop"><div class="w-shoplogo"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="1.6" stroke-linecap="round"><path d="M3 9l1.5-5h15L21 9"/><path d="M3 9v11a1 1 0 001 1h16a1 1 0 001-1V9"/></svg></div><div><div class="w-shopname">百货商城商城商城</div><div class="w-shopinfo"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72"/></svg>15554174768</div><div class="w-shopinfo"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>西华路439号之一(星玺广场对面)</div></div></div>'
+  +'<div class="w-block"><div class="w-btitle">经营数据</div><div class="w-chips">'
+  +['昨日','近7天','近30天','近90天'].map((c,i)=>'<button class="w-chip'+(wChipIdx===i?' active':'')+'" onclick="wChip('+i+')">'+c+'</button>').join('')
+  +'<button class="w-chip more" onclick="toast(\'更多周期可在「数据报表」中选择\')">更多</button></div>'
+  +'<div class="w-stats">'+stats[0].map(x=>'<div class="w-stat"><div class="v">'+x[0]+'</div><div class="l">'+x[1]+'</div></div>').join('')+'</div>'
+  +'<div class="w-stats" style="margin-bottom:0;">'+stats[1].map(x=>'<div class="w-stat"><div class="v">'+x[0]+'</div><div class="l">'+x[1]+'</div></div>').join('')+'</div></div>'
+  +'<div class="w-block"><div class="w-btitle">'+(mgr?'门店管理':'常用功能')+'</div><div class="w-grid">'
+  +gridItems.map((g,i)=>'<button class="w-gitem"><span style="display:flex;">'+gi[i%gi.length]+'</span><span>'+g+'</span></button>').join('')
+  +'<button class="w-gitem hot" onclick="openAppReport()"><span style="display:flex;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M3 3v18h18"/><path d="M7 15l4-6 4 3 5-8"/></svg></span><span>数据报表</span></button>'
+  +'</div></div>';
+}
+function toggleRole(){ appRoleKey=appRoleKey==='manager'?'staff':'manager'; renderMe(); toast('已切换为'+(appRoleKey==='manager'?'店长':'店员')+'视角'); }
+/* 数据报表（克隆后台详细报表） */
+function appRewrite(root){
+ root.querySelectorAll('[onclick]').forEach(e=>{
+  let o=e.getAttribute('onclick');
+  o=o.replace(/switchTab\(/g,'appReportGo(')
+     .replace(/openStoreDetail\(/g,'appOpenStoreDetail(')
+     .replace(/openMemberDetail\(/g,'appOpenMemberDetail(')
+     .replace(/openCourseDetail\(/g,'appOpenCourseDetail(')
+     .replace(/openLiveDetail\(/g,'appOpenLiveDetail(')
+     .replace(/showSub\('store','store-list'\)/g,'appReportBack()')
+     .replace(/showSub\('live','live-list'\)/g,'appReportBack()')
+     .replace(/showSub\('course','course-list'\)/g,'appReportBack()')
+     .replace(/closeSub\('store'\)/g,'appReportBack()')
+     .replace(/closeSub\('live'\)/g,'appReportBack()')
+     .replace(/closeSub\('course'\)/g,'appReportBack()')
+     .replace(/mdSub\(this,/g,'appMdSub(this,');
+  e.setAttribute('onclick',o);
+ });
+ root.querySelectorAll('[id]').forEach(x=>{ x.id='appc-'+x.id; });
+}
+function appShowPane(paneId,subId,push){
+ if(push) appReportStack.push(el('ar-body').innerHTML);
+ const clone=document.getElementById(paneId).cloneNode(true);
+ clone.removeAttribute('id');
+ clone.classList.add('active');
+ appRewrite(clone);
+ if(subId){ clone.querySelectorAll('.subview').forEach(x=>x.classList.toggle('active', x.id==='appc-'+subId)); }
+ const body=el('ar-body'); body.innerHTML=''; body.appendChild(clone); body.scrollTop=0;
+ syncArChips();
+}
+function appOpenStoreDetail(name){ openStoreDetail(name); appShowPane('pane-store','store-detail',true); }
+function appOpenMemberDetail(n,r){ openMemberDetail(n,r); appShowPane('pane-store','member-detail',true); }
+function appOpenCourseDetail(n){ openCourseDetail(n); appShowPane('pane-course','course-detail',true); }
+function appOpenLiveDetail(orig){ openLiveDetail(orig); appShowPane('pane-live','live-detail',true); }
+function appReportGo(k){ appReportKey=k; appShowPane('pane-'+k,null,false); }
+function appReportBack(){ if(appReportStack.length){ el('ar-body').innerHTML=appReportStack.pop(); syncArChips(); } else closeAppReport(); }
+function appMdSub(btn,key){ const root=btn.closest('.page,.pane')||document; ['list','course','live'].forEach(k=>{const x=root.querySelector('#appc-md-'+k); if(x)x.hidden=(k!==key);}); btn.parentElement.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t===btn)); }
+function syncArChips(){ const c=el('ar-chips'); if(c) c.querySelectorAll('.ar-chip').forEach(x=>x.classList.toggle('active',x.dataset.key===appReportKey)); }
+function openAppReport(){ reportOpen=true; appReportKey='tenant'; appReportStack=[]; renderAppNav(); renderTabbar(); appShowPane('pane-tenant',null,false); }
+function closeAppReport(){ reportOpen=false; renderAppNav(); renderTabbar(); renderAppBody(); }
+/* 覆盖渲染入口 */
+renderAppHead=function(){ /* APP 模式下 p-nav 由 renderAppNav 管理 */ };
+renderAppTabs=function(){ renderTabbar(); };
+renderAppBody=function(){ if(reportOpen) return; if(appTabKey==='me'){ renderMe(); return; } el('p-body').className='p-body'; el('p-body').innerHTML=placeholderPage(PLACEHOLDER[appTabKey]||''); };
+const _oldApplyPeriod=applyPeriod;
+applyPeriod=function(s,e){ _oldApplyPeriod(s,e); const t=el('ar-period-text'); if(t) t.textContent=s.slice(5)+' ~ '+e.slice(5); if(reportOpen) appShowPane('pane-'+appReportKey, null, false); if(appTabKey==='me') renderMe(); };
+/* 周期下拉（支持自定义锚点，覆盖 v5.8 版本） */
+openPeriodMenu=function(ev,anchorId){
+ ev.stopPropagation(); closePeriodMenu();
+ const anchor=anchorId?document.getElementById(anchorId):document.getElementById('periodPill');
+ const today=new Date();
+ const menu=document.createElement('div');
+ menu.className='period-menu';
+ menu.innerHTML=PERIOD_OPTS.map(o=>{
+  const eD=new Date(today); eD.setDate(eD.getDate()-o[2]);
+  const sD=new Date(today); sD.setDate(sD.getDate()-o[1]);
+  const s=fmtDate(sD), e=fmtDate(eD);
+  const act=periodStart===s&&periodEnd===e;
+  return '<button class="pm-item'+(act?' active':'')+'" onclick="pickPeriod(\''+s+'\',\''+e+'\')"><span>'+o[0]+'</span><span class="pm-range">'+s.slice(5)+' ~ '+e.slice(5)+'</span>'+(act?'<span class="pm-check">✓</span>':'')+'</button>';
+ }).join('')
+ +'<div class="pm-sep"></div>'
+ +'<div class="pm-custom-title">自定义周期<span class="hint">跨度 ≤ 30 天</span></div>'
+ +'<div class="pm-dates">'
+ +'<input type="date" id="pm-start" value="'+periodStart+'" max="'+fmtDate(today)+'" aria-label="起始日期">'
+ +'<span class="sep">至</span>'
+ +'<input type="date" id="pm-end" value="'+periodEnd+'" max="'+fmtDate(today)+'" aria-label="截止日期">'
+ +'</div>'
+ +'<div style="padding:0 6px 4px;"><button class="btn" style="width:100%;justify-content:center;" onclick="applyCustomPeriod()">应用</button></div>'
+ +'<div class="pm-foot">指标按周期模拟重算 · 截止日期不晚于今天</div>';
+ document.body.appendChild(menu);
+ const r=anchor.getBoundingClientRect();
+ menu.style.top=(r.bottom+6)+'px';
+ menu.style.left=Math.max(10,Math.min(innerWidth-260,r.left-40))+'px';
+ setTimeout(()=>document.addEventListener('click',outsideClose),0);
+};
+function applyCustomPeriod(){
+ const s=document.getElementById('pm-start').value, e=document.getElementById('pm-end').value;
+ if(!s||!e){ toast('请选择起始日期与截止日期'); return; }
+ if(s>e){ toast('起始日期不能晚于截止日期'); return; }
+ const days=Math.round((new Date(e)-new Date(s))/86400000)+1;
+ if(days>30){ toast('查询窗口上限 30 天，当前选择 '+days+' 天，请调整起始日期'); return; }
+ closePeriodMenu(); applyPeriod(s,e);
+}
+/* 初始化 */
+appTabKey='me';
+renderAppNav(); renderTabbar(); renderAppBody();
 const _t0=new Date(),_e=fmtDate(_t0);const _s=new Date(_t0);_s.setDate(_s.getDate()-6);
 applyPeriod(fmtDate(_s),_e);
 </script>
