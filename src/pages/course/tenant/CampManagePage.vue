@@ -39,7 +39,7 @@
         </div>
         <div class="filter-item">
           <t-select v-model="statusFilter" placeholder="状态" clearable style="width:120px">
-            <t-option v-for="s in ['draft','pending_review','published','enrolling','in_progress','ended','offline','rejected']" :key="s" :label="statusLabel(s)" :value="s" />
+            <t-option v-for="s in ['enrolling','in_progress','ended']" :key="s" :label="statusLabel(s)" :value="s" />
           </t-select>
         </div>
         <div class="filter-actions">
@@ -77,22 +77,12 @@
         <template #op="{ row }">
           <t-space :size="2">
             <t-button variant="text" size="small" theme="primary" @click="openDetail(row)">课时</t-button>
-            <!-- V2·0831 排课仅草稿/待审核可编辑（审核通过后锁定）；学员仅报名阶段后有 -->
-            <t-button v-if="['draft','pending_review'].includes(row.status)" variant="text" size="small" @click="$router.push('/tenant/course/camp-schedule?campId=' + row.id)">排课</t-button>
-            <t-button v-if="!['draft','pending_review'].includes(row.status)" variant="text" size="small" @click="openStudentDrawer(row)">学员</t-button>
+            <!-- V2·0902 状态机简化：创建即报名→报名截止自动开营→结束时间自动结营；报名中可排课/编辑 -->
+            <t-button v-if="row.status === 'enrolling'" variant="text" size="small" @click="$router.push('/tenant/course/camp-schedule?campId=' + row.id)">排课</t-button>
+            <t-button v-if="['in_progress','ended'].includes(row.status)" variant="text" size="small" @click="openStudentDrawer(row)">学员</t-button>
             <t-button variant="text" size="small" @click="openDetail(row)">详情</t-button>
-            <t-button v-if="row.status === 'draft'" variant="text" size="small" theme="primary" @click="openEdit(row)">编辑</t-button>
-            <t-button v-if="row.status === 'draft'" variant="text" size="small" theme="danger" @click="delCamp(row)">删除</t-button>
-            <t-button v-if="row.status === 'draft'" variant="text" size="small" theme="primary" @click="submitReview(row)">提审</t-button>
-            <t-button v-if="row.status === 'pending_review'" variant="text" size="small" theme="success" @click="approveCamp(row)">通过</t-button>
-            <t-button v-if="row.status === 'pending_review'" variant="text" size="small" theme="danger" @click="rejectCamp(row)">驳回</t-button>
-            <t-button v-if="row.status === 'rejected'" variant="text" size="small" theme="primary" @click="backToDraft(row)">回草稿</t-button>
-            <t-button v-if="row.status === 'published'" variant="text" size="small" theme="primary" @click="openEnroll(row)">开始报名</t-button>
-            <t-button v-if="row.status === 'enrolling'" variant="text" size="small" theme="success" @click="startCamp(row)">开营</t-button>
-            <t-button v-if="row.status === 'in_progress'" variant="text" size="small" theme="warning" @click="endCamp(row)">结营</t-button>
-            <t-button v-if="['published','enrolling'].includes(row.status)" variant="text" size="small" theme="danger" @click="offlineCamp(row)">下架</t-button>
-            <t-button v-if="row.status === 'offline'" variant="text" size="small" theme="success" @click="relistCamp(row)">上架</t-button>
-            <t-button v-if="row.status === 'offline'" variant="text" size="small" theme="primary" @click="backToDraft(row)">回草稿</t-button>
+            <t-button v-if="row.status === 'enrolling'" variant="text" size="small" theme="primary" @click="openEdit(row)">编辑</t-button>
+            <t-button v-if="row.status === 'enrolling'" variant="text" size="small" theme="danger" @click="delCamp(row)">删除</t-button>
           </t-space>
         </template>
       </t-table>
@@ -120,7 +110,7 @@
         </t-form-item>
         <!-- V2·0901 用户裁决：营期不再设授课模式，直播/录播在排课处逐条配置 -->
         <t-form-item label="时间" required-mark>
-          <t-date-range-picker v-model="dateRange" :placeholder="['开始日期', '结束日期']" clearable style="width:100%" />
+          <t-date-range-picker v-model="dateRange" :placeholder="['开始日期', '结束日期（到点自动结营）']" clearable style="width:100%" />
         </t-form-item>
         <div v-if="dateRange && dateRange.length === 2 && daysBetween(dateRange[0], dateRange[1]) > 90" class="form-error">营期最长90天（行业约束），当前 {{ daysBetween(dateRange[0], dateRange[1]) }} 天</div>
         <!-- V2·0829 用户裁决：价格字段去除（全部免费） -->
@@ -132,6 +122,7 @@
         </t-form-item>
         <t-form-item label="报名截止时间">
           <t-date-picker v-model="enrollDeadline" enable-time-picker placeholder="选择报名截止时间" style="width:100%" />
+          <span class="form-tip-inline">截止后自动开营（未填默认创建时间+7天）</span>
         </t-form-item>
         <!-- V2·0902 客户范围改到排课层（对齐 SaaS「设置客户范围」），营期级开关下线 -->
         <!-- V2·0829 用户裁决：归属关系统一由 SaaS 后台门店成员（店长/店员）承接，课程业务不带归属 -->
@@ -191,7 +182,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import { DialogPlugin, MessagePlugin } from 'tdesign-vue-next';
 import { useCampStore } from '../../../stores/camp-store';
 import { notifyModalOpen } from '../../../utils/modal-spec-bridge';
@@ -291,30 +282,12 @@ function doSave() {
     MessagePlugin.success('营期已更新');
   } else {
     store.createCamp(data);
-    MessagePlugin.success('营期创建成功');
+    MessagePlugin.success('营期已创建，报名已自动开启（报名截止后自动开营）');
   }
   showCreate.value = false; editingCamp.value = null;
 }
-function submitReview(row: any) { store.submitCampForReview(row.id); MessagePlugin.success('已提交审核'); }
-function approveCamp(row: any) { store.approveCamp(row.id, 'admin-001'); MessagePlugin.success('审核通过，营期已发布 → 排课已锁定'); }
-const rejectCampVisible = ref(false); const rejectCampReason = ref(''); const rejectCampTarget = ref<any>(null);
-function rejectCamp(row: any) { rejectCampTarget.value = row; rejectCampReason.value = ''; rejectCampVisible.value = true; notifyModalOpen('camp-reject'); }
-function doRejectCamp() {
-  if (!rejectCampReason.value) { MessagePlugin.warning('请填写驳回原因'); return; }
-  store.rejectCamp(rejectCampTarget.value.id, 'admin-001', rejectCampReason.value); MessagePlugin.warning('已驳回');
-  rejectCampVisible.value = false;
-}
-function openEnroll(row: any) { store.openEnrollment(row.id); MessagePlugin.success('报名已开启'); }
-function startCamp(row: any) { store.startCamp(row.id); MessagePlugin.success('营期已开营，学员可进入学习'); }
-function endCamp(row: any) {
-  // V2.0：证书模块已下线，结营仅确认不可恢复
-  DialogPlugin.confirm({ header: '结束营期', body: '确认结束营期？结束后不可恢复，营期学习与激励发放将随之截止。', theme: 'warning', onConfirm: () => { store.endCamp(row.id); MessagePlugin.success('营期已结束'); } });
-}
-function offlineCamp(row: any) {
-  DialogPlugin.confirm({ header: '下架营期', body: '确认下架营期？', theme: 'warning', onConfirm: () => { store.transitionCampStatus(row.id, 'offline'); MessagePlugin.warning('已下架'); } });
-}
 function delCamp(row: any) {
-  DialogPlugin.confirm({ header: '删除营期', body: '确认删除营期？仅草稿可删除。', theme: 'warning', onConfirm: () => { store.deleteCamp(row.id); MessagePlugin.success('已删除'); } });
+  DialogPlugin.confirm({ header: '删除营期', body: '确认删除营期？报名中的营期可删除。', theme: 'warning', onConfirm: () => { store.deleteCamp(row.id); MessagePlugin.success('已删除'); } });
 }
 
 function openEdit(row: any) {
@@ -329,9 +302,8 @@ function openEdit(row: any) {
 const studentDrawerVisible = ref(false); const activeCampId = ref('');
 function openStudentDrawer(row: any) { activeCampId.value = row.id; studentDrawerVisible.value = true; notifyModalOpen('camp-student-drawer'); }
 
-// ===== 状态补齐：回草稿 / 上架 =====
-function backToDraft(row: any) { if (store.transitionCampStatus(row.id, 'draft')) { MessagePlugin.success('已退回草稿'); } else { MessagePlugin.warning('当前状态不可回草稿'); } }
-function relistCamp(row: any) { if (store.transitionCampStatus(row.id, 'published')) { MessagePlugin.success('已重新上架'); } else { MessagePlugin.warning('当前状态不可上架'); } }
+// V2·0902 自动流转：进入页面时刷新（报名截止自动开营/结束时间自动结营）
+onMounted(() => { store.refreshCampStatuses(); });
 
 // V2·0829 用户裁决：邀请码/口令体系整体下线，邀请码管理 Drawer 与二维码生成逻辑已删除
 

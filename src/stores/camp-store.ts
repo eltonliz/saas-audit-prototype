@@ -39,7 +39,8 @@ export const useCampStore = defineStore('camp', () => {
     if (input.total_days > 90) throw new Error('营期最长90天（行业约束）');
     const same = camps.value.filter(c => c.series_id === input.series_id);
     if (!validateCampCalendarNoOverlap(input.start_date, input.end_date, same)) throw new Error('同专题营期时间交叉（BR-CAMP-CAL-04）');
-    const camp = { ...input, id: genId('CAMP'), camp_no: genId('CAMP'), status: 'draft', enrolled_count: 0, approved_count: 0, joined_count: 0, course_count: 0, schedule_count: 0, created_at: now(), updated_at: now() } as Camp;
+    // V2·0902 用户裁决：营期创建即自动开启报名（跳过草稿/审核），报名截止自动开营，结束时间自动结营
+    const camp = { ...input, id: genId('CAMP'), camp_no: genId('CAMP'), status: 'enrolling', enrolled_count: 0, approved_count: 0, joined_count: 0, course_count: 0, schedule_count: 0, created_at: now(), updated_at: now() } as Camp;
     camps.value.push(camp);
     // P1: 自动建 CampLecturer（主讲）
     if (camp.main_lecturer_id) {
@@ -470,8 +471,17 @@ export const useCampStore = defineStore('camp', () => {
     console.log(msgs[event] || `[SAAS联动] ${event}`, data);
   }
 
+  /** V2·0902 自动流转：报名截止→自动开营；结束时间（end_date 当天末刻）→自动结营（含发证）。页面加载时调用 */
+  const refreshCampStatuses = () => {
+    const t = now();
+    for (const c of camps.value) {
+      if (c.status === 'enrolling' && t >= c.enroll_deadline) { transitionCampStatus(c.id, 'in_progress'); continue; }
+      if (c.status === 'in_progress' && t >= new Date(c.end_date + ' 23:59:59').getTime() / 1000) { endCamp(c.id); }
+    }
+  };
+
   return { camps, enrollments, checkins, schedules, campLecturers, campGroups, finalQuizzes, learningRecords, qas, certificates, certTemplates, seriesList,
-    createCamp, updateCamp, deleteCamp, loadCampList, loadCamp, transitionCampStatus, submitCampForReview, approveCamp, rejectCamp, openEnrollment, startCamp, endCamp,
+    createCamp, updateCamp, deleteCamp, loadCampList, loadCamp, transitionCampStatus, submitCampForReview, approveCamp, rejectCamp, openEnrollment, startCamp, endCamp, refreshCampStatuses,
     createEnrollment, approveEnrollment, rejectEnrollment, cancelEnrollment, loadEnrollmentsByCamp, loadEnrollmentsByStudent, transitionEnrollmentToEnrolled, rollbackEnrollmentOnRefund, updateEnrollment,
     createSchedule, updateSchedule, deleteSchedule, loadSchedulesByCamp, loadSchedulesByDay, batchCreateSchedules, createSchedulesForCourse, applyScheduleTemplate, incrementCampRef, decrementCampRef,
     createCheckin, loadCheckinsByStudent,

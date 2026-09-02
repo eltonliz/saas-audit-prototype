@@ -12,7 +12,7 @@
             <template v-if="camp">
               <t-tag theme="primary" size="small">直播+录播混合授课</t-tag>
               <span class="camp-info">{{ camp.title }} · {{ camp.total_days }}天 · 共{{ campSchedules.length }}个排课</span>
-              <t-tag v-if="isLocked" theme="warning" size="small">已审核通过·排课锁定</t-tag>
+              <t-tag v-if="isLocked" theme="warning" size="small">已开营·排课锁定</t-tag>
             </template>
           </div>
           <div class="actions" v-if="!isLocked">
@@ -27,7 +27,7 @@
             </t-button>
           </div>
           <div class="actions" v-else>
-            <t-tag theme="default" size="small">审核通过后不可编辑，如需修改请复制营期重做</t-tag>
+            <t-tag theme="default" size="small">开营后不可编辑，如需修改请复制营期重做</t-tag>
           </div>
         </div>
       </template>
@@ -37,7 +37,7 @@
         <div v-if="campSchedules.length === 0" class="empty-state">
           <div class="empty-icon"><t-icon name="calendar" /></div>
           <div class="empty-title">{{ isLocked ? '暂无排课（已锁定）' : '还没有排课' }}</div>
-          <div class="empty-desc">{{ isLocked ? '审核通过后不可编辑，如需调整请复制营期重做' : '点击右上角「新增排课」开始安排课程内容' }}</div>
+          <div class="empty-desc">{{ isLocked ? '开营后不可编辑，如需调整请复制营期重做' : '点击右上角「新增排课」开始安排课程内容' }}</div>
         </div>
 
         <div v-else class="day-groups">
@@ -361,12 +361,12 @@ const campSchedules = computed(() =>
   campStore.loadSchedulesByCamp(campId.value).sort((a, b) => a.day_number - b.day_number || a.sort_order - b.sort_order)
 );
 
-// 排课锁定：审核通过后（published/enrolling/in_progress/ended）不可编辑
+// 排课锁定：V2·0902 报名中可排课，开营（进行中/已结束）后锁定
 const isLocked = computed(() => {
   const s = camp.value?.status;
-  return s === 'published' || s === 'enrolling' || s === 'in_progress' || s === 'ended';
+  return s === 'in_progress' || s === 'ended';
 });
-const campStatusLabel = (s: string): string => ({ draft: '草稿·可排课', pending_review: '待审核', published: '已发布', enrolling: '报名中', in_progress: '进行中', ended: '已结束', offline: '已下架', rejected: '已驳回' }[s] ?? s);
+const campStatusLabel = (s: string): string => ({ draft: '草稿', pending_review: '待审核', published: '已发布', enrolling: '报名中·可排课', in_progress: '进行中', ended: '已结束', offline: '已下架', rejected: '已驳回' }[s] ?? s);
 
 // 按天分组
 const sortedDaySchedules = computed(() => {
@@ -431,7 +431,7 @@ function cloneLastBatchRow() {
   batchRows.value.push({ ...last, unlock_time: new Date(last.unlock_time), deadline: last.deadline ? new Date(last.deadline) : null });
 }
 function openBatchDialog() {
-  if (isLocked.value) { MessagePlugin.warning('审核通过后排课已锁定'); return; }
+  if (isLocked.value) { MessagePlugin.warning('开营后排课已锁定'); return; }
   batchRows.value = [createEmptyBatchRow()];
   showBatch.value = true;
   notifyModalOpen('schedule-batch');
@@ -538,7 +538,7 @@ const addForm = ref({
   is_required: true,
 });
 function openAddDialog() {
-  if (isLocked.value) { MessagePlugin.warning('审核通过后排课已锁定，如需修改请复制营期重做'); return; }
+  if (isLocked.value) { MessagePlugin.warning('开营后排课已锁定，如需修改请复制营期重做'); return; }
   addForm.value = { day_number: 1, title: '', description: '', teach_mode: 'recorded', live_room_id: '', display_style: 'live_room', live_display_title: '', room_config: { name: '', cover_picked: false, start_at: '', end_at: '', anchor_type: 'hq', anchor_id: '', avatar_picked: false, allow_replay: 'yes', has_cart: 'yes', muted: 'no' }, course_id: '', lesson_id: null, unlock_time: new Date(), deadline: null, completion_criteria: '', quiz_enabled: false, quiz_trigger: 'half', quiz_bank_id: '', quiz_reward_cash_enabled: true, quiz_reward_amount_yuan: 1, quiz_reward_points_enabled: false, quiz_reward_points: 20, is_required: true };
   showAdd.value = true;
   notifyModalOpen('schedule-add');
@@ -600,7 +600,7 @@ function doAdd() {
   showAdd.value = false;
 }
 function del(s: CourseSchedule) {
-  if (isLocked.value) { MessagePlugin.warning('审核通过后排课已锁定'); return; }
+  if (isLocked.value) { MessagePlugin.warning('开营后排课已锁定'); return; }
   campStore.deleteSchedule(s.id);
   MessagePlugin.success('已删除');
 }
@@ -657,7 +657,7 @@ const courseCategories = computed(() => {
 });
 
 function openQuickCourseDialog() {
-  if (isLocked.value) { MessagePlugin.warning('审核通过后排课已锁定'); return; }
+  if (isLocked.value) { MessagePlugin.warning('开营后排课已锁定'); return; }
   quickCourseForm.value = {
     title: '',
     category_id: courseCategories.value[0]?.id ?? '',
