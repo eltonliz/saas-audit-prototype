@@ -779,22 +779,24 @@
           <div class="sec">营期报名总览<span class="chip c-green">报名漏斗</span></div>
           <div class="grid g6">
             <div class="card tone-blue"><div class="card-label">营期总数</div><div class="card-value" data-def="统计周期内创建的营期总数，按授课模式区分直播/录播。" data-calc="营期数量（按直播/录播区分）" data-source="营期管理数据">5<small>期</small></div><div class="card-note">直播 3 · 录播 2</div></div>
-            <div class="card tone-violet"><div class="card-label">报名总数</div><div class="card-value" data-def="全部营期的报名人数合计（含待审核）。" data-calc="各营期报名人数相加" data-source="营期报名数据">1,006</div><div class="card-note">已通过 840</div></div>
-            <div class="card tone-green"><div class="card-label">已加入营期</div><div class="card-value" data-def="报名审核通过并正式加入营期学习的人数。" data-calc="各营期加入人数相加" data-source="营期报名数据">731</div><div class="card-note">加入/通过 87.0%</div></div>
-            <div class="card tone-amber"><div class="card-label">报名→通过转化</div><div class="card-value" data-def="报名审核通过人数 ÷ 报名总人数。" data-calc="840 ÷ 1,006 × 100%" data-source="派生">83.5%</div></div>
-            <div class="card tone-cyan"><div class="card-label">累计收入</div><div class="card-value" data-def="付费营期已支付报名费的金额合计（元）。" data-calc="Σ 已支付报名订单金额" data-source="报名费收入账单">¥136,600</div><div class="card-note">待结算 12 单</div></div>
+            <div class="card tone-violet"><div class="card-label">报名总数</div><div class="card-value" data-def="全部营期的报名人数合计。报名即通过并加入营期，无审核环节。" data-calc="各营期报名人数相加" data-source="营期报名数据">1,006</div><div class="card-note">报名即加入</div></div>
+            <div class="card tone-green"><div class="card-label">完课人次</div><div class="card-value" data-def="已结束与进行中营期内完课的人次合计。" data-calc="各营期完课人数相加" data-source="营期报名数据">584</div><div class="card-note">按营期分别统计</div></div>
+            <div class="card tone-amber"><div class="card-label">排课总数</div><div class="card-value" data-def="全部营期已排课时合计。" data-calc="各营期排课数相加" data-source="营期排课数据">60</div></div>
+            <div class="card tone-cyan"><div class="card-label">累计收入</div><div class="card-value" data-def="付费营期已支付报名费的金额合计（元）。" data-calc="Σ 已支付报名订单金额" data-source="报名费收入账单">¥161,350</div><div class="card-note">按报名人数 × 价格</div></div>
             <div class="card tone-red"><div class="card-label">进行中营期</div><div class="card-value" data-def="状态为进行中的营期数。" data-calc="状态为"进行中"的营期数" data-source="营期管理数据">2<small>期</small></div><div class="card-note">已结束 2 · 报名中 1</div></div>
           </div>
 
           <div class="grid g2">
             <div class="panel" style="margin-bottom:0;">
-              <div class="panel-head"><div><div class="panel-title">报名转化漏斗</div><div class="panel-sub">报名 → 审核通过 → 加入营期（示例数据）</div></div></div>
+              <div class="panel-head"><div><div class="panel-title">营期完课率排行</div><div class="panel-sub">完课人数 ÷ 报名人数（报名即加入）</div></div></div>
               <div class="chart-wrap">
-                <div class="funnel-row"><div class="funnel-name">报名</div><div class="funnel-track"><div class="funnel-fill" style="width:100%;background:#C3D4F7;color:#1E3A8A;">1,006</div></div><div class="funnel-meta"><b>100%</b> 基数</div></div>
-                <div class="funnel-row"><div class="funnel-name">审核通过</div><div class="funnel-track"><div class="funnel-fill" style="width:84%;background:#7BA3EE;color:#fff;">840</div></div><div class="funnel-meta"><b>83.5%</b> 转化 · 流失 166</div></div>
-                <div class="funnel-row"><div class="funnel-name">加入营期</div><div class="funnel-track"><div class="funnel-fill" style="width:73%;background:#1E40AF;color:#fff;">731</div></div><div class="funnel-meta"><b>87.0%</b> 转化（按通过）· 流失 109</div></div>
+                <div class="dist-row"><div class="dist-name">销售话术</div><div class="dist-track"><div class="dist-fill" style="width:68%;background:var(--green);"></div></div><div class="dist-num">68.0%</div></div>
+                <div class="dist-row"><div class="dist-name">短视频运营</div><div class="dist-track"><div class="dist-fill" style="width:65%;background:var(--green);"></div></div><div class="dist-num">65.0%</div></div>
+                <div class="dist-row"><div class="dist-name">职场写作</div><div class="dist-track"><div class="dist-fill" style="width:63%;background:var(--secondary);"></div></div><div class="dist-num">63.1%</div></div>
+                <div class="dist-row"><div class="dist-name">时间管理</div><div class="dist-track"><div class="dist-fill" style="width:61%;background:var(--secondary);"></div></div><div class="dist-num">61.1%</div></div>
+                <div class="dist-row"><div class="dist-name">新产品知识</div><div class="dist-track"><div class="dist-fill" style="width:8%;background:var(--fg-3);"></div></div><div class="dist-num">报名中</div></div>
               </div>
-              <div class="legend"><b>口径</b>：报名=提交报名申请；通过=审核通过（approved）；加入=正式进入营期学习（joined）。转化率逐级标注，最大流失：报名→通过。</div>
+              <div class="legend"><b>口径</b>：完课率=完课人数 ÷ 报名人数（报名即加入，无审核环节）。</div>
             </div>
             <div class="panel" style="margin-bottom:0;">
               <div class="panel-head"><div><div class="panel-title">营期状态分布</div><div class="panel-sub">按营期状态统计（示例数据）</div></div></div>
@@ -809,19 +811,19 @@
 
           <div class="sec">营期明细<span class="chip c-green">含报名汇总</span></div>
           <div class="panel">
-            <div class="panel-head"><div><div class="panel-title">营期列表</div><div class="panel-sub">报名情况 = 已加入 · 已通过 · 报名（对齐营期数据看板口径）</div></div></div>
+            <div class="panel-head"><div><div class="panel-title">营期列表</div><div class="panel-sub">报名即加入：提交报名即通过并进入营期学习</div></div></div>
             <table>
-              <thead><tr><th>营期名称</th><th>营期时间</th><th>报名情况</th><th>排课数</th><th>价格</th><th>状态</th></tr></thead>
+              <thead><tr><th>营期名称</th><th>营期时间</th><th>报名人数</th><th>收入</th><th>排课数</th><th>价格</th><th>状态</th></tr></thead>
               <tbody>
-                <tr><td>短视频运营实战 8月期</td><td class="num">08-01 ~ 08-24</td><td>已加入 260 · 通过 280 · 报名 320</td><td>18</td><td>¥299</td><td><span class="tag t-gray">已结束</span></td></tr>
-                <tr><td>职场写作训练营</td><td class="num">08-05 ~ 08-30</td><td>已加入 205 · 通过 218 · 报名 260</td><td>16</td><td>免费</td><td><span class="tag t-violet">进行中</span></td></tr>
-                <tr><td>时间管理训练营</td><td class="num">08-12 ~ 09-05</td><td>已加入 138 · 通过 150 · 报名 180</td><td>14</td><td>¥199</td><td><span class="tag t-violet">进行中</span></td></tr>
-                <tr><td>新产品知识营</td><td class="num">09-02 ~ 09-20</td><td>已加入 0 · 通过 60 · 报名 96</td><td>0</td><td>免费</td><td><span class="tag t-green">报名中</span></td></tr>
-                <tr><td>销售话术集训营</td><td class="num">07-05 ~ 07-20</td><td>已加入 128 · 通过 132 · 报名 150</td><td>12</td><td>¥199</td><td><span class="tag t-gray">已结束</span></td></tr>
-                <tr class="tot"><td>汇总（5 期）</td><td>—</td><td>加入 731 · 通过 840 · 报名 1,006</td><td>60</td><td>—</td><td>进行中 2</td></tr>
+                <tr><td>短视频运营实战 8月期</td><td class="num">08-01 ~ 08-24</td><td class="num">320</td><td>18</td><td>¥299</td><td>¥95,680</td><td><span class="tag t-gray">已结束</span></td></tr>
+                <tr><td>职场写作训练营</td><td class="num">08-05 ~ 08-30</td><td class="num">260</td><td>16</td><td>免费</td><td>—</td><td><span class="tag t-violet">进行中</span></td></tr>
+                <tr><td>时间管理训练营</td><td class="num">08-12 ~ 09-05</td><td class="num">180</td><td>14</td><td>¥199</td><td>¥35,820</td><td><span class="tag t-violet">进行中</span></td></tr>
+                <tr><td>新产品知识营</td><td class="num">09-02 ~ 09-20</td><td class="num">96</td><td>0</td><td>免费</td><td>—</td><td><span class="tag t-green">报名中</span></td></tr>
+                <tr><td>销售话术集训营</td><td class="num">07-05 ~ 07-20</td><td class="num">150</td><td>12</td><td>¥199</td><td>¥29,850</td><td><span class="tag t-gray">已结束</span></td></tr>
+                <tr class="tot"><td>汇总（5 期）</td><td>—</td><td class="num">1,006</td><td>60</td><td>—</td><td>¥161,350</td><td>进行中 2</td></tr>
               </tbody>
             </table>
-            <div class="legend"><b>字段口径</b>：报名情况三值逐级包含（报名 ⊇ 通过 ⊇ 加入）；排课数=营期内已排课时；价格=报名费（免费营期不计收入）；汇总行各列为周期内合计。</div>
+            <div class="legend"><b>字段口径</b>：报名即加入（提交报名即通过并进入营期，无审核环节）；收入=该营期已支付报名费合计；汇总行各列为周期内合计。</div>
           </div>
 
           <div class="sec">学员洞察<span class="chip c-violet">报名×学习</span></div>
@@ -1713,13 +1715,13 @@ function mgrBody(){
   +'<div style="font-size:10px;color:var(--fg-3);display:flex;gap:12px;padding:0 0 6px;"><span style="flex:1">客户</span><span style="width:52px;text-align:right">场次</span><span style="width:56px;text-align:right">分钟</span><span style="width:40px;text-align:right">下单</span><span style="width:56px;text-align:right">消费</span></div>'
   +APP_MEMBERS.map(m=>'<div class="a-row clickable" onclick="openAppMember('+APP_MEMBERS.indexOf(m)+')"><div class="av">'+m.n.slice(0,1)+'</div><div class="a-main"><div class="a-name">'+m.n+' <span class="tag '+m.c+'">'+m.lvl+'</span></div><div class="a-desc">归属 '+m.staff+'</div></div><div class="a-right num" style="display:flex;gap:12px;font-size:11px;align-items:center;"><span style="width:52px;text-align:right">'+(m.sess||'—')+'</span><span style="width:56px;text-align:right">'+m.watch+'</span><span style="width:40px;text-align:right">'+(m.od||0)+'</span><span style="width:56px;text-align:right">'+m.spend+'</span></div></div>').join('')
   +'<div class="a-row" style="border:none;"><div class="a-main" style="color:var(--primary);font-weight:700;font-size:12px;">汇总（5 人示例）</div><div class="a-right num" style="display:flex;gap:12px;font-size:11.5px;font-weight:700;color:var(--primary);"><span style="width:52px;text-align:right">20</span><span style="width:56px;text-align:right">605.2</span><span style="width:40px;text-align:right">4</span><span style="width:56px;text-align:right">¥1,740</span></div></div></div>';
- if(appTabKey==='course') return   kpiRow([['营期总数','5','b'],['报名总数','1,006','v2'],['已通过','840','g']])
+ if(appTabKey==='course') return   kpiRow([['报名总数','1,006','v2'],['累计收入','¥161,350','g'],['完课人次','584','b']])
   +kpiRow([['已加入','731','g'],['报名转化','83.5%','a2'],['进行中','2','']])
   +'<div class="a-card"><div class="a-title">报名转化漏斗</div>'
   +appMiniFunnel([['报名',1006,'100%'],['审核通过',840,'83.5%'],['加入营期',731,'87%']])
   +'</div>'
   +'<div class="a-card"><div class="a-title">营期明细<span class="more">5 期</span></div>'
-  +[['短视频运营实战 8月期','直播','加入 260 · 报名 320','已结束'],['职场写作训练营','录播','加入 205 · 报名 260','进行中'],['时间管理训练营','直播','加入 138 · 报名 180','进行中'],['新产品知识营','录播','通过 60 · 报名 96','报名中'],['销售话术集训营','直播','加入 128 · 报名 150','已结束']]
+  +[['短视频运营实战 8月期','直播','报名 320','已结束'],['职场写作训练营','录播','报名 260','进行中'],['时间管理训练营','直播','报名 180','进行中'],['新产品知识营','录播','报名 96','报名中'],['销售话术集训营','直播','报名 150','已结束']]
     .map(c=>'<div class="a-row"><div class="a-main"><div class="a-name">'+c[0]+' <span class="tag '+(c[1]==='直播'?'t-red':'t-green')+'">'+c[1]+'</span></div><div class="a-desc">'+c[2]+'</div></div><div class="a-right"><span class="tag '+(c[3]==='进行中'?'t-violet':c[3]==='报名中'?'t-green':'t-gray')+'">'+c[3]+'</span></div></div>').join('')
   +'<div class="a-row" style="border:none;"><div class="a-main" style="color:var(--primary);font-weight:700;font-size:12px;">汇总（5 期）</div><div class="a-right" style="color:var(--primary);font-weight:700;font-size:12px;">加入 731 · 报名 1,006</div></div></div>';
  return '<div class="a-card"><div class="a-title">我的权限</div><div style="font-size:12px;color:var(--fg-2);line-height:2;">店长可查看：管辖门店全部直播数据、名下全部会员、单场三视角（漏斗 / 商品成交 / 客户观看分钟）。<br>数据范围按查询时点归属快照，不追溯历史。</div></div>'
@@ -2024,14 +2026,14 @@ const AC_COURSES=[
   core:[['观看人数','980'],['累计观看时长','409h'],['峰值在线','150'],['平均在线','52'],['评论人数','580'],['点赞人数','2,600'],['分享人数','600'],['互动人数','1,900'],['完播人数','620'],['完播率','63.3%'],['答题人数','520'],['正确率','75%'],['红包金额','¥180'],['新客人数','160'],['新客占比','16.3%']]}
 ];
 const AC_CAMPS=[
- {name:'短视频运营实战 8月期',no:'CAMP-20260801',enrolled:'320',approved:'280',joined:'260',watch:'260',done:'208',rate:'80.0%',rev:'¥77,740',newc:'98',
+ {name:'短视频运营实战 8月期',no:'CAMP-20260801',enrolled:'320',watch:'260',done:'208',rate:'65.0%',rev:'¥95,680',newc:'98',sched:'18',status:'已结束',
   students:[{n:'王女士',no:'8934355601',st:'watch',dur:'42.0h',rate:'92%',camp:'2 期',red:'¥10'},{n:'刘女士',no:'8934355602',st:'watch',dur:'36.0h',rate:'85%',camp:'2 期',red:'—'}]},
- {name:'职场写作训练营',no:'CAMP-20260805',enrolled:'260',approved:'218',joined:'205',watch:'205',done:'164',rate:'80.0%',rev:'免费',newc:'72',
+ {name:'职场写作训练营',no:'CAMP-20260805',enrolled:'260',watch:'205',done:'164',rate:'63.1%',rev:'免费',newc:'72',sched:'16',status:'进行中',
   students:[{n:'李先生',no:'8934355603',st:'watch',dur:'18.0h',rate:'78%',camp:'1 期',red:'¥5'}]},
- {name:'时间管理训练营',no:'CAMP-20260812',enrolled:'180',approved:'150',joined:'138',watch:'138',done:'110',rate:'79.7%',rev:'¥27,462',newc:'52',
+ {name:'时间管理训练营',no:'CAMP-20260812',enrolled:'180',watch:'138',done:'110',rate:'61.1%',rev:'¥35,820',newc:'52',sched:'14',status:'进行中',
   students:[{n:'王女士',no:'8934355601',st:'watch',dur:'12.0h',rate:'88%',camp:'2 期',red:'—'}]},
- {name:'新产品知识营',no:'CAMP-20260902',enrolled:'96',approved:'60',joined:'0',watch:'0',done:'0',rate:'—',rev:'免费',newc:'—',students:[]},
- {name:'销售话术集训营',no:'CAMP-20260705',enrolled:'150',approved:'132',joined:'128',watch:'128',done:'102',rate:'79.7%',rev:'¥25,472',newc:'46',
+ {name:'新产品知识营',no:'CAMP-20260902',enrolled:'96',watch:'0',done:'0',rate:'—',rev:'免费',newc:'—',sched:'0',status:'报名中',students:[]},
+ {name:'销售话术集训营',no:'CAMP-20260705',enrolled:'150',watch:'128',done:'102',rate:'68.0%',rev:'¥29,850',newc:'46',sched:'12',status:'已结束',
   students:[{n:'陈小姐',no:'8934355605',st:'unwatch',dur:'—',rate:'—',camp:'1 期',red:'—'}]}
 ];
 let acTabKey='data', acQuery='', acCampIdx=0;
@@ -2056,21 +2058,21 @@ function renderAc(){
   el('ac-body').innerHTML=
    '<div class="ac-kpis">'
    +'<div class="ac-kpi"><div class="ic" style="background:#3B82F6;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div class="v">1,006</div><div class="l">报名总人数</div></div>'
-   +'<div class="ac-kpi"><div class="ic" style="background:#F59E0B;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div><div class="v">¥130,674</div><div class="l">收入总额</div></div>'
-   +'<div class="ac-kpi"><div class="ic" style="background:#EF4444;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg></div><div class="v">731</div><div class="l">加入总数</div></div>'
+   +'<div class="ac-kpi"><div class="ic" style="background:#F59E0B;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div><div class="v">¥161,350</div><div class="l">收入总额</div></div>'
+   +'<div class="ac-kpi"><div class="ic" style="background:#EF4444;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg></div><div class="v">584</div><div class="l">完课人次</div></div>'
    +'</div>'
    +AC_CAMPS.map((c,i)=>'<div class="ac-camp"><div class="camp-row"><div class="camp-logo">'+c.name.slice(0,1)+'</div><div><div class="camp-name">'+c.name+'</div><div class="camp-no">编号：'+c.no.slice(-6)+'</div></div><button class="camp-btn" onclick="openCampStudents('+i+')">客户概况</button></div>'
     +'<div class="ac-grid">'
     +'<div class="g"><div class="v">'+c.enrolled+'</div><div class="l">报名人数</div></div>'
-    +'<div class="g"><div class="v">'+c.approved+'</div><div class="l">通过人数</div></div>'
-    +'<div class="g"><div class="v">'+c.joined+'</div><div class="l">加入人数</div></div>'
+    +'<div class="g"><div class="v">'+c.rev+'</div><div class="l">收入</div></div>'
     +'<div class="g"><div class="v">'+c.watch+'</div><div class="l">观看人数</div></div>'
     +'<div class="g"><div class="v">'+c.done+'</div><div class="l">完课人数</div></div>'
     +'<div class="g"><div class="v">'+c.rate+'</div><div class="l">完课率</div></div>'
-    +'<div class="g"><div class="v">'+c.rev+'</div><div class="l">收入</div></div>'
     +'<div class="g"><div class="v">'+c.newc+'</div><div class="l">新客客户数</div></div>'
+    +'<div class="g"><div class="v">'+c.sched+'</div><div class="l">排课数</div></div>'
+    +'<div class="g"><div class="v">'+c.status+'</div><div class="l">营期状态</div></div>'
     +'</div></div>').join('')+
-   '<div class="legend" style="padding:8px 2px;color:var(--fg-3);font-size:10.5px;">口径：报名人数含待审核；完课率=完课人数÷加入人数；收入=已支付报名费合计（免费营期为 0）。数据与后台「课程与营期报表」同源。</div>';
+   '<div class="legend" style="padding:8px 2px;color:var(--fg-3);font-size:10.5px;">口径：报名即通过并加入营期（无审核环节）；完课率=完课人数÷报名人数；收入=已支付报名费合计。数据与后台「课程与营期报表」同源。</div>';
   return;
  }
  el('ac-body').innerHTML='<div class="ac-empty">课程推广 · 演示占位（分享课程/推广追踪在开发版提供）</div>';
@@ -2089,18 +2091,18 @@ function openCampStudents(i){
  acCampIdx=i; const c=AC_CAMPS[i]; csQ='';
  const top=el('app-camp-students').querySelector('.ac-top');
  top.innerHTML='<button class="ac-back" onclick="closeCampStudents()" aria-label="返回"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></button>'
-  +'<div class="ac-search"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8A94A6" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input id="cs-search" placeholder="请输入直播名称、ID 查询" oninput="csFilter()"><button class="ac-searchbtn" onclick="csFilter()">搜索</button></div>';
+  +'<div class="ac-search"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8A94A6" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input id="cs-search" placeholder="请输入客户名称、编号查询" oninput="csFilter()"><button class="ac-searchbtn" onclick="csFilter()">搜索</button></div>';
  renderCsBody();
  el('app-camp-students').classList.add('open'); el('app-camp-students').style.display='flex';
 }
 let csQ='';
 function csFilter(){ csQ=(document.getElementById('cs-search')?.value||'').trim().toLowerCase(); renderCsBody(); }
 const CSTAT={
- '王女士':{orders:'13',ordAmt:'¥3,762.03',payN:'13',payAmt:'¥3,762.03',refN:'0',refAmt:'¥0',watchDur:'80:03'},
- '刘女士':{orders:'8',ordAmt:'¥1,520.00',payN:'8',payAmt:'¥1,520.00',refN:'1',refAmt:'¥76.00',watchDur:'45:20'},
- '周小姐':{orders:'0',ordAmt:'—',payN:'0',payAmt:'—',refN:'0',refAmt:'—',watchDur:'—'},
- '李先生':{orders:'5',ordAmt:'¥1,860.00',payN:'5',payAmt:'¥1,860.00',refN:'0',refAmt:'—',watchDur:'38:15'},
- '陈小姐':{orders:'0',ordAmt:'—',payN:'0',payAmt:'—',refN:'0',refAmt:'—',watchDur:'—'}
+ '王女士':{camps:'2 期',campAmt:'¥498',study:'42.0h',doneN:'1 期',rate:'92%',refund:'¥0',last:'08-25'},
+ '刘女士':{camps:'2 期',campAmt:'¥199',study:'36.0h',doneN:'1 期',rate:'85%',refund:'¥0',last:'08-24'},
+ '周小姐':{camps:'1 期',campAmt:'免费',study:'—',doneN:'0 期',rate:'—',refund:'—',last:'—'},
+ '李先生':{camps:'1 期',campAmt:'¥199',study:'18.0h',doneN:'0 期',rate:'78%',refund:'¥0',last:'08-23'},
+ '陈小姐':{camps:'1 期',campAmt:'免费',study:'—',doneN:'0 期',rate:'—',refund:'—',last:'—'}
 };
 function renderCsBody(){
  const c=AC_CAMPS[acCampIdx];
@@ -2116,13 +2118,13 @@ function renderCsBody(){
     const d=CSTAT[x.n]||{orders:'—',ordAmt:'—',payN:'—',payAmt:'—',refN:'—',refAmt:'—',watchDur:'—'};
     return '<div class="ac-custrow"><div class="cu-row"><div class="cu-av">'+x.n.slice(0,1)+'</div><div><div class="cu-name">'+x.n+'</div><div class="cu-no">编号：'+x.no+'</div></div><span class="cu-tag tag '+(x.st==='watch'?'t-green':'t-red')+'" style="margin-left:auto;">'+(x.st==='watch'?'已观看':'未观看')+'</span></div>'
      +'<div class="ac-grid" style="grid-template-columns:repeat(4,1fr);gap:8px 6px;">'
-     +'<div class="g"><div class="v">'+d.orders+'</div><div class="l">订单总数</div></div>'
-     +'<div class="g"><div class="v">'+d.ordAmt+'</div><div class="l">订单金额</div></div>'
-     +'<div class="g"><div class="v">'+d.payN+'</div><div class="l">支付总数</div></div>'
-     +'<div class="g"><div class="v">'+d.payAmt+'</div><div class="l">支付金额</div></div>'
-     +'<div class="g"><div class="v">'+d.refN+'</div><div class="l">退款总数</div></div>'
-     +'<div class="g"><div class="v">'+d.refAmt+'</div><div class="l">退款金额</div></div>'
-     +'<div class="g"><div class="v">'+d.watchDur+'</div><div class="l">观看时长</div></div>'
+     +'<div class="g"><div class="v">'+d.camps+'</div><div class="l">报名营期</div></div>'
+     +'<div class="g"><div class="v">'+d.campAmt+'</div><div class="l">报名金额</div></div>'
+     +'<div class="g"><div class="v">'+d.study+'</div><div class="l">学习时长</div></div>'
+     +'<div class="g"><div class="v">'+d.doneN+'</div><div class="l">完课营期</div></div>'
+     +'<div class="g"><div class="v">'+d.rate+'</div><div class="l">完播率</div></div>'
+     +'<div class="g"><div class="v">'+d.refund+'</div><div class="l">退款金额</div></div>'
+     +'<div class="g"><div class="v">'+d.last+'</div><div class="l">最近学习</div></div>'
      +'</div></div>';
    }).join('') :'<div class="ac-empty">未找到匹配客户</div>')
   +'<button class="ac-bigbtn" onclick="toast(\'群通知已发送给未观看客户（演示）\')">群通知观看</button>';
