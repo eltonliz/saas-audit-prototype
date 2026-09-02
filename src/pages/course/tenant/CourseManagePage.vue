@@ -86,14 +86,14 @@
                 <t-radio value="recorded"><template #label><t-icon name="play-circle" /> 录播</template></t-radio>
                 <t-radio value="live"><template #label><t-icon name="video-camera" /> 直播</template></t-radio>
               </t-radio-group>
-            </t-form-item>            <!-- V2·0902 录播展示风格（与排课同口径）：直播间/课程；直播间风格需直播标题 -->
+            </t-form-item>            <!-- V2·0902 录播展示风格（与排课同口径）：直播间/课程；直播标题始终可填 -->
             <t-form-item v-if="form.mode === 'recorded'" label="展示风格" required-mark>
               <t-radio-group v-model="(form as any).display_style">
                 <t-radio value="live_room">直播间</t-radio>
                 <t-radio value="course">课程</t-radio>
               </t-radio-group>
             </t-form-item>
-            <t-form-item v-if="form.mode === 'live' || (form as any).display_style === 'live_room'" label="直播标题">
+            <t-form-item label="直播标题">
               <t-input v-model="(form as any).live_display_title" placeholder="直播间样式展示的标题（留空则用课程名称）" style="width:100%" />
             </t-form-item>
             <!-- V2·0902 用户裁决：「是否公开」配置下线，课程统一公开（APP 独立展示），数据字段固定 public -->

@@ -33,8 +33,7 @@
       bordered
       size="small"
       max-height="360"
-      :selected-row-keys="draft.staff_ids"
-      @select-change="(_k: any, ctx: any) => onSelect(_k, ctx)"
+      v-model:selected-row-keys="draft.staff_ids"
     >
       <template #role="{ row }">{{ roleLabel(row.role) }}</template>
       <template #store="{ row }">{{ storeName(row.store_id) }}</template>
@@ -104,7 +103,6 @@ function openWith(scope: CustomerScope) {
   draft.value = { mode: scope.mode, staff_ids: [...scope.staff_ids] };
   visible.value = true;
 }
-function onSelect(keys: any) { draft.value.staff_ids = keys as string[]; }
 function doConfirm() {
   emit('confirm', { mode: draft.value.mode, staff_ids: [...draft.value.staff_ids] });
   visible.value = false;
