@@ -133,34 +133,37 @@
           <div class="form-col-full">
             <t-form-item label="授课方式" required-mark>
               <t-radio-group v-model="addForm.teach_mode">
-                <t-radio value="recorded"><template #label><t-icon name="play-circle" /> 录播（关联课程）</template></t-radio>
-                <t-radio value="live"><template #label><t-icon name="video-camera" /> 直播（选择直播间）</template></t-radio>
+                <t-radio value="recorded"><template #label><t-icon name="play-circle" /> 录播</template></t-radio>
+                <t-radio value="live"><template #label><t-icon name="video-camera" /> 直播</template></t-radio>
               </t-radio-group>
             </t-form-item>
           </div>
-          <div v-if="addForm.teach_mode === 'live'" class="form-col-full">
-            <t-form-item label="选择直播间">
-              <t-select v-model="addForm.live_room_id" filterable clearable placeholder="选择直播间（留空则按下方配置创建新直播间）" style="width:100%">
-                <template #empty>
-                  <div class="live-room-empty">暂无直播间，可直接按下方配置创建新直播间</div>
-                </template>
-                <t-option v-for="r in liveStore.rooms" :key="r.id" :label="r.name + '（' + (r.status === 'live' ? '直播中' : '空闲') + '）'" :value="r.id" />
-              </t-select>
-            </t-form-item>
-          </div>
-          <!-- V2·0902 直播间配置穿插在排课表单内（未选直播间=创建新直播间；已选=更新其配置） -->
-          <div v-if="addForm.teach_mode === 'live'" class="form-col-full live-room-config-block">
-            <LiveRoomConfigForm v-model="addForm.room_config" />
-          </div>
-          <!-- V2·0902 录播展示风格：直播间/课程 -->
+          <!-- V2·0902 录播展示风格：直播间/课程；选直播间时需直播标题 -->
           <div v-if="addForm.teach_mode === 'recorded'" class="form-col-full">
             <t-form-item label="展示风格" required-mark>
-              <t-radio-group v-model="addForm.display_style">
-                <t-radio value="live_room">直播间</t-radio>
-                <t-radio value="course">课程</t-radio>
-              </t-radio-group>
-              <span class="switch-label" style="margin-left:8px">直播间=APP 按直播间样式展示该节内容；课程=按普通课程样式展示</span>
+              <div style="width:100%">
+                <t-radio-group v-model="addForm.display_style">
+                  <t-radio value="live_room">直播间</t-radio>
+                  <t-radio value="course">课程</t-radio>
+                </t-radio-group>
+                <div v-if="addForm.display_style === 'live_room'" style="margin-top:8px">
+                  <t-form-item label="直播标题">
+                    <t-input v-model="addForm.live_display_title" placeholder="直播间样式展示的标题（留空则用排课标题）" style="width:100%" />
+                  </t-form-item>
+                </div>
+              </div>
             </t-form-item>
+          </div>
+          <!-- V2·0902 直播排课：直播间配置直接穿插，保存时创建新直播间 -->
+          <div v-if="addForm.teach_mode === 'live'" class="form-col-full live-room-config-block">
+            <LiveRoomConfigForm v-model="addForm.room_config" plan-mode />
+          </div>
+          <!-- V2·0902 解锁时间与开播时间解耦说明 -->
+          <div v-if="addForm.teach_mode === 'live'" class="form-col-full">
+            <div class="lesson-tip">
+              <t-icon name="info-circle" />
+              <span>解锁时间只控制学员可见性，可早于计划开播时间（学员可提前进入直播间等待）；开播时间不确定时可留空，开播前在直播列表补充</span>
+            </div>
           </div>
           <div class="form-col-full" v-if="addForm.teach_mode === 'recorded'">
             <t-form-item label="选择课时" required-mark>
@@ -302,7 +305,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { MessagePlugin } from 'tdesign-vue-next';
 import { useCampStore } from '../../../stores/camp-store';
@@ -476,12 +479,13 @@ const addForm = ref({
   teach_mode: 'recorded' as 'recorded' | 'live',
   live_room_id: '',
   display_style: 'live_room' as 'live_room' | 'course',
+  live_display_title: '',
   room_config: {
     name: '',
     cover_picked: false,
     start_at: '',
     end_at: '',
-    anchor_type: 'real' as 'real' | 'virtual',
+    anchor_type: 'hq' as 'hq' | 'store' | 'supplier' | 'personal',
     anchor_id: '',
     avatar_picked: false,
     allow_replay: 'yes' as 'yes' | 'no',
@@ -495,40 +499,22 @@ const addForm = ref({
   completion_criteria: '',
   is_required: true,
 });
-// V2·0902 选中已有直播间时预填配置（可改，保存时更新该直播间）
-watch(() => addForm.value.live_room_id, (rid) => {
-  const r = rid ? liveStore.loadRoom(rid) : null;
-  if (r) {
-    addForm.value.room_config.name = r.name;
-    addForm.value.room_config.anchor_id = r.anchor_id;
-    addForm.value.room_config.cover_picked = true;
-    addForm.value.room_config.avatar_picked = true;
-    if (!addForm.value.room_config.start_at) addForm.value.room_config.start_at = new Date((r.created_at || Math.floor(Date.now() / 1000)) * 1000).toISOString().slice(0, 19).replace('T', ' ');
-    if (!addForm.value.room_config.end_at) addForm.value.room_config.end_at = addForm.value.room_config.start_at;
-  }
-});
 function openAddDialog() {
   if (isLocked.value) { MessagePlugin.warning('审核通过后排课已锁定，如需修改请复制营期重做'); return; }
-  addForm.value = { day_number: 1, title: '', description: '', teach_mode: 'recorded', live_room_id: '', display_style: 'live_room', room_config: { name: '', cover_picked: false, start_at: '', end_at: '', anchor_type: 'real', anchor_id: '', avatar_picked: false, allow_replay: 'yes', has_cart: 'yes', muted: 'no' }, course_id: '', lesson_id: null, unlock_time: new Date(), deadline: null, completion_criteria: '', is_required: true };
+  addForm.value = { day_number: 1, title: '', description: '', teach_mode: 'recorded', live_room_id: '', display_style: 'live_room', live_display_title: '', room_config: { name: '', cover_picked: false, start_at: '', end_at: '', anchor_type: 'hq', anchor_id: '', avatar_picked: false, allow_replay: 'yes', has_cart: 'yes', muted: 'no' }, course_id: '', lesson_id: null, unlock_time: new Date(), deadline: null, completion_criteria: '', is_required: true };
   showAdd.value = true;
   notifyModalOpen('schedule-add');
 }
 function doAdd() {
   if (!addForm.value.title) { MessagePlugin.warning('请填写排课标题'); return; }
   if (!addForm.value.unlock_time) { MessagePlugin.warning('请选择解锁时间'); return; }
-  // V2·0902 直播排课：配置穿插在表单内——已选直播间=更新其配置；未选=按配置创建新直播间
+  // V2·0902 直播排课：不再选择已有直播间，按穿插配置创建新直播间；计划开播时间可留空后补
   if (addForm.value.teach_mode === 'live') {
     const cfg = addForm.value.room_config;
-    if (!cfg.name.trim()) { MessagePlugin.warning('请填写直播间名称（或选择已有直播间）'); return; }
-    if (!addForm.value.live_room_id) {
-      const anchor = liveStore.anchors.find(a => a.id === cfg.anchor_id);
-      const fallback = cfg.anchor_type === 'virtual' ? '虚拟主播' : '默认主播';
-      const room = liveStore.createRoom({ name: cfg.name.trim(), anchor_id: anchor?.id || 'ANCHOR-001', anchor_name: anchor?.name || fallback });
-      addForm.value.live_room_id = room.id;
-      MessagePlugin.success(`直播间「${room.name}」已创建`);
-    } else {
-      liveStore.updateRoom(addForm.value.live_room_id, { name: cfg.name.trim() });
-    }
+    if (!cfg.name.trim()) { MessagePlugin.warning('请填写直播间名称'); return; }
+    const anchor = liveStore.anchors.find(a => a.id === cfg.anchor_id);
+    const room = liveStore.createRoom({ name: cfg.name.trim(), anchor_id: anchor?.id || 'ANCHOR-001', anchor_name: anchor?.name || '默认主播' });
+    addForm.value.live_room_id = room.id;
   }
   if (addForm.value.teach_mode === 'recorded' && !addForm.value.lesson_id) { MessagePlugin.warning('必须选择课时（营期排课以课时为单位）'); return; }
   // course_id 由所选课时自动带出
@@ -559,6 +545,7 @@ function doAdd() {
     completion_criteria: addForm.value.teach_mode === 'live' ? '' : (addForm.value.completion_criteria || '完播率≥90%'),
     client_visible: true,
     display_style: addForm.value.teach_mode === 'recorded' ? addForm.value.display_style : undefined,
+    live_display_title: addForm.value.teach_mode === 'recorded' && addForm.value.display_style === 'live_room' ? addForm.value.live_display_title.trim() : '',
   } as any);
   MessagePlugin.success('排课添加成功');
   showAdd.value = false;

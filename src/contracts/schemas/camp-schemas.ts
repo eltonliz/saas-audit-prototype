@@ -247,6 +247,8 @@ export const CourseScheduleSchema = z.object({
   client_visible: z.boolean().default(true),
   /** V2·0902 录播展示风格：live_room=直播间风格，course=课程风格（仅录播排课生效） */
   display_style: z.enum(['live_room', 'course']).default('live_room'),
+  /** V2·0902 直播展示标题：展示风格=直播间时 APP 直播间样式标题（空则用排课标题） */
+  live_display_title: z.string().default(''),
 
   /** 打卡积分奖励（D7·checkin_task专用） */
   points_reward: z.number().int().min(0).default(0).optional(),

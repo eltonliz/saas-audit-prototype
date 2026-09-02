@@ -13,11 +13,14 @@
             <template v-else><t-icon name="add" class="lrc-add-icon" /></template>
           </div>
         </t-form-item>
-        <t-form-item label="开始时间" required-mark>
-          <t-date-picker v-model="form.start_at" enable-time-picker placeholder="请选择开始时间" style="width:100%" />
+        <t-form-item :label="planMode ? '计划开播' : '开始时间'" :required-mark="!planMode">
+          <div style="width:100%">
+            <t-date-picker v-model="form.start_at" enable-time-picker :placeholder="planMode ? '计划开播时间（可后补）' : '请选择开始时间'" style="width:100%" />
+            <div v-if="planMode" class="lrc-tip"><t-icon name="info-circle" /><span>计划时间可留空后补；实际开播以主播开播为准</span></div>
+          </div>
         </t-form-item>
-        <t-form-item label="结束时间" required-mark>
-          <t-date-picker v-model="form.end_at" enable-time-picker placeholder="请选择结束时间" style="width:100%" />
+        <t-form-item :label="planMode ? '计划结束' : '结束时间'" :required-mark="!planMode">
+          <t-date-picker v-model="form.end_at" enable-time-picker :placeholder="planMode ? '计划结束时间（可后补）' : '请选择结束时间'" style="width:100%" />
         </t-form-item>
       </t-form>
     </div>
@@ -27,13 +30,16 @@
       <t-form label-width="96px" label-align="right">
         <t-form-item label="主播类型" required-mark>
           <t-select v-model="form.anchor_type" placeholder="请选择主播类型">
-            <t-option label="真人主播" value="real" />
-            <t-option label="虚拟主播" value="virtual" />
+            <!-- V2·0902 主播类型枚举：总部/门店/供应商/个人 -->
+            <t-option label="总部" value="hq" />
+            <t-option label="门店" value="store" />
+            <t-option label="供应商" value="supplier" />
+            <t-option label="个人" value="personal" />
           </t-select>
         </t-form-item>
         <t-form-item label="主播名称">
           <t-select v-model="form.anchor_id" filterable clearable placeholder="从主播库选择（可留空默认主播）">
-            <t-option v-for="a in liveStore.anchors.filter(x => x.status === 'active' && (form.anchor_type ? x.type === form.anchor_type : true))" :key="a.id" :label="a.name + ' (' + a.no + ')'" :value="a.id" />
+            <t-option v-for="a in liveStore.anchors.filter(x => x.status === 'active')" :key="a.id" :label="a.name + ' (' + a.no + ')'" :value="a.id" />
           </t-select>
         </t-form-item>
         <t-form-item label="主播头像">
@@ -80,7 +86,7 @@ export interface LiveRoomConfigFormModel {
   cover_picked: boolean;
   start_at: string;
   end_at: string;
-  anchor_type: 'real' | 'virtual';
+  anchor_type: 'hq' | 'store' | 'supplier' | 'personal';
   anchor_id: string;
   avatar_picked: boolean;
   allow_replay: 'yes' | 'no';
@@ -88,6 +94,7 @@ export interface LiveRoomConfigFormModel {
   muted: 'yes' | 'no';
 }
 
+withDefaults(defineProps<{ planMode?: boolean }>(), { planMode: false });
 const form = defineModel<LiveRoomConfigFormModel>({ required: true });
 const liveStore = useLiveStore();
 
@@ -108,4 +115,8 @@ function pick(kind: 'cover' | 'avatar') {
 .lrc-upload:hover { border-color: #12B76A; }
 .lrc-add-icon { font-size: 22px; color: #98A2B3; }
 .lrc-uploaded { font-size: 26px; color: #12B76A; }
+.lrc-tip {
+  display: flex; align-items: center; gap: 4px; margin-top: 4px;
+  font-size: 12px; color: #12B76A;
+}
 </style>

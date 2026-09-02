@@ -45,7 +45,7 @@ const emptyForm = (): LiveRoomConfigFormModel => ({
   cover_picked: false,
   start_at: '',
   end_at: '',
-  anchor_type: 'real',
+  anchor_type: 'hq',
   anchor_id: '',
   avatar_picked: false,
   allow_replay: 'no',
@@ -67,11 +67,10 @@ function doCreate() {
   submitting.value = true;
   try {
     const anchor = liveStore.anchors.find(a => a.id === form.value.anchor_id);
-    const fallback = form.value.anchor_type === 'virtual' ? '虚拟主播' : '默认主播';
     const room = liveStore.createRoom({
       name: form.value.name.trim(),
       anchor_id: anchor?.id || 'ANCHOR-001',
-      anchor_name: anchor?.name || fallback,
+      anchor_name: anchor?.name || '默认主播',
     });
     MessagePlugin.success(`直播间「${room.name}」创建成功，已返回并选中`);
     emit('created', room.id, room.name);
