@@ -86,7 +86,14 @@
                 <t-radio value="recorded"><template #label><t-icon name="play-circle" /> 录播</template></t-radio>
                 <t-radio value="live"><template #label><t-icon name="video-camera" /> 直播</template></t-radio>
               </t-radio-group>
-            </t-form-item>            <t-form-item v-if="form.mode === 'live'" label="直播标题">
+            </t-form-item>            <!-- V2·0902 录播展示风格（与排课同口径）：直播间/课程；直播间风格需直播标题 -->
+            <t-form-item v-if="form.mode === 'recorded'" label="展示风格" required-mark>
+              <t-radio-group v-model="(form as any).display_style">
+                <t-radio value="live_room">直播间</t-radio>
+                <t-radio value="course">课程</t-radio>
+              </t-radio-group>
+            </t-form-item>
+            <t-form-item v-if="form.mode === 'live' || (form as any).display_style === 'live_room'" label="直播标题">
               <t-input v-model="(form as any).live_display_title" placeholder="直播间样式展示的标题（留空则用课程名称）" style="width:100%" />
             </t-form-item>
             <!-- V2·0902 用户裁决：「是否公开」配置下线，课程统一公开（APP 独立展示），数据字段固定 public -->
@@ -392,9 +399,10 @@ function defaultForm() {
     title: '', category_name: '', description: '', mode: 'recorded' as 'recorded' | 'live', visibility: 'public' as 'public' | 'camp_only',
     cover_url: '', videos: [] as any[],
     live_session_id: '' as string,
-    // V2·0902 直播课：直播间配置与展示标题（与排课表单同构）
+    // V2·0902 直播课：直播间配置与展示标题（与排课表单同构）；录播展示风格同口径
     live_room_id: '' as string,
     live_display_title: '',
+    display_style: 'live_room' as 'live_room' | 'course',
     room_config: {
       name: '', cover_picked: false, start_at: '', end_at: '',
       anchor_type: 'hq' as 'hq' | 'store' | 'supplier' | 'personal',
@@ -618,6 +626,7 @@ function openEditDrawer(row: any) {
     live_session_id: row.source_live_session_id || '',
     live_room_id: (row as any).live_room_id || '',
     live_display_title: (row as any).live_display_title || '',
+    display_style: (row as any).display_style || 'live_room',
     room_config: (() => { const r = (row as any).live_room_id ? liveStore.loadRoom((row as any).live_room_id) : null; return { name: r?.name || row.title || '', cover_picked: true, start_at: '', end_at: '', anchor_type: 'hq' as const, anchor_id: r?.anchor_id || '', avatar_picked: true, allow_replay: 'yes' as const, has_cart: 'yes' as const, muted: 'no' as const }; })(),
     videos: row.mode === 'live' ? [] : lessons.map((l: any) => ({ video_no: l.lesson_no, name: l.title, format: l.content_type === 'audio' ? 'audio/mp3' : 'video/mp4', size: l.content_type === 'audio' ? '30.00MB' : '500.00MB', duration: formatDuration(l.video_duration), category: row.category_name || '未分组', ctype: l.content_type || 'video', has_quiz: !!l.question_bank_id, files_count: 1, file_name: l.title, reward: null })),
     sale_type: 'free' as 'free' | 'paid', price: 0, original_price: '',
@@ -650,7 +659,7 @@ function doSave() {
     }
   }
   if (editing.value) {
-    store.updateCourse(editing.value.id, { title: form.value.title, category_name: form.value.category_name, description: form.value.description, mode: form.value.mode, visibility: form.value.visibility, cover_url: form.value.cover_url, is_paid: isPaid, price, commission_enabled: false, show_in_app: form.value.show_in_app, lecturer_id: '', lecturer_name: '', live_room_id: form.value.mode === 'live' ? liveRoomId : null, live_display_title: form.value.mode === 'live' ? ((form.value as any).live_display_title || '') : '' } as any);
+    store.updateCourse(editing.value.id, { title: form.value.title, category_name: form.value.category_name, description: form.value.description, mode: form.value.mode, visibility: form.value.visibility, cover_url: form.value.cover_url, is_paid: isPaid, price, commission_enabled: false, show_in_app: form.value.show_in_app, lecturer_id: '', lecturer_name: '', live_room_id: form.value.mode === 'live' ? liveRoomId : null, live_display_title: (form.value as any).live_display_title || '', display_style: form.value.mode === 'recorded' ? (form.value as any).display_style : undefined } as any);
     if (form.value.mode === 'recorded') {
       form.value.videos.forEach((v: any) => {
         const existing = store.lessons.find((l: any) => l.lesson_no === v.video_no);
@@ -664,7 +673,7 @@ function doSave() {
     }
     MessagePlugin.success('课程已更新');
   } else {
-    store.createCourse({ title: form.value.title, description: form.value.description, cover_url: form.value.cover_url, category_id: 'cat-' + Date.now(), category_name: form.value.category_name, tags: [], lecturer_id: '', lecturer_name: '', source: 'upload', mode: form.value.mode, source_live_session_id: null, visibility: form.value.visibility, price, is_paid: isPaid, commission_enabled: false, show_in_app: form.value.show_in_app, live_room_id: form.value.mode === 'live' ? liveRoomId : null, live_display_title: form.value.mode === 'live' ? ((form.value as any).live_display_title || '') : '' } as any);
+    store.createCourse({ title: form.value.title, description: form.value.description, cover_url: form.value.cover_url, category_id: 'cat-' + Date.now(), category_name: form.value.category_name, tags: [], lecturer_id: '', lecturer_name: '', source: 'upload', mode: form.value.mode, source_live_session_id: null, visibility: form.value.visibility, price, is_paid: isPaid, commission_enabled: false, show_in_app: form.value.show_in_app, live_room_id: form.value.mode === 'live' ? liveRoomId : null, live_display_title: (form.value as any).live_display_title || '', display_style: form.value.mode === 'recorded' ? (form.value as any).display_style : undefined } as any);
     MessagePlugin.success('课程已新增');
   }
   // D35 完课奖励同步营销域复刻观看奖励页（真实系统：课程表单保存→营销中心创建红包规则）；积分奖励走积分事件不建红包规则

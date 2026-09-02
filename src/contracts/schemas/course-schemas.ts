@@ -127,6 +127,8 @@ export const CourseSchema = z.object({
   live_room_id: z.string().nullable().default(null),
   /** V2·0902 直播课展示标题（空则用课程名称） */
   live_display_title: z.string().default(''),
+  /** V2·0902 录播展示风格：live_room=直播间风格，course=课程风格（与排课展示风格同口径） */
+  display_style: z.enum(['live_room', 'course']).default('live_room'),
   /** 课程可见性（public/camp_only） */
   visibility: CourseVisibilityEnum.default('public'),
 
@@ -425,6 +427,7 @@ export const CreateCourseInputSchema = CourseSchema.pick({
   mode: true,
   live_room_id: true,
   live_display_title: true,
+  display_style: true,
   visibility: true,
 }).extend({
   question_bank_id: z.string().optional(),
