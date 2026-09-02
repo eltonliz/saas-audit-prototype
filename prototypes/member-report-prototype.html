@@ -2035,9 +2035,9 @@ const AC_CAMPS=[
   students:[{n:'陈小姐',no:'8934355605',st:'unwatch',dur:'—',rate:'—',camp:'1 期',red:'—'}]}
 ];
 let acTabKey='data', acQuery='', acCampIdx=0;
-function openAppCourse(){ el('app-course').classList.add('open'); acTabKey='data'; acQuery=''; el('ac-search-input').value=''; renderAcTabs(); renderAcBody(); }
+function openAppCourse(){ el('app-course').classList.add('open'); acTabKey='data'; acQuery=''; el('ac-search-input').value=''; renderAcTabs(); renderAc(); }
 function closeAppCourse(){ el('app-course').classList.remove('open'); closeCampStudents(); }
-function acTab(t){ acTabKey=t; renderAcTabs(); renderAcBody(); el('ac-body').scrollTop=0; }
+function acTab(t){ acTabKey=t; renderAcTabs(); renderAc(); el('ac-body').scrollTop=0; }
 function renderAcTabs(){ document.querySelectorAll('.ac-tab').forEach(t=>{ const n=t.textContent.trim(); t.classList.toggle('active',(n==='课程数据'&&acTabKey==='data')||(n==='课程转化'&&acTabKey==='conv')||(n==='课程推广'&&acTabKey==='promo')); }); }
 function acFilter(){ acQuery=(el('ac-search-input').value||'').trim().toLowerCase(); if(acTabKey==='data') renderAcBody(); }
 function renderAc(){
