@@ -220,6 +220,15 @@
               <t-input-number v-model="form.completion_percent" :min="1" :max="100" theme="column" size="small" style="width:90px;margin:0 6px" />
               <span style="font-size:13px;color:#475467">%</span>
             </t-form-item>
+            <!-- V2·0902 答题触发时机（课程级默认时机，题库/奖励在排课层配置） -->
+            <t-form-item label="答题触发时机" required-mark>
+              <t-select v-model="(form as any).quiz_trigger" style="width:220px">
+                <t-option label="课时开始时" value="start" />
+                <t-option label="播放至50%时" value="half" />
+                <t-option label="播放至80%时" value="eighty" />
+                <t-option label="课时结束时" value="end" />
+              </t-select>
+            </t-form-item>
 
             <!-- 以下五项 = 课程业务新增（SaaS 线上无） -->
             <div class="saas-new-group">
@@ -418,6 +427,8 @@ function defaultForm() {
     show_intro: true, virtual_viewers: true, virtual_min: 1, virtual_max: 100,
     comment_enabled: true, comment_max_words: 50,
     show_progress: 'allow' as 'allow' | 'disallow', allow_pause: 'disallow' as 'allow' | 'disallow', completion_percent: 100,
+    // V2·0902 触发答题（课程级默认）：开关+时机+题库
+    quiz_trigger: 'half' as 'start' | 'half' | 'eighty' | 'end',
     // D35 完课奖励配置（业务新增·现金红包与积分可同选）
     completion_reward_enabled: false,
     reward_cash_enabled: true, reward_amount: 1, red_packet_rule_id: '',
@@ -634,6 +645,7 @@ function openEditDrawer(row: any) {
     commission_enabled: false,
     show_in_app: (row as any).show_in_app ?? true,
     show_intro: true, virtual_viewers: true, virtual_min: 1, virtual_max: 100, comment_enabled: true, comment_max_words: 50, show_progress: 'allow', allow_pause: 'disallow', completion_percent: 100,
+    quiz_trigger: (row as any).quiz_trigger || 'half',
     forbid_seek: false, forbid_speed: false, watermark_horse: false, watermark_text: false,
     completion_reward_enabled: false, reward_cash_enabled: true, reward_amount: 1, red_packet_rule_id: '', reward_points_enabled: false, reward_points: 20,
   };
@@ -659,7 +671,7 @@ function doSave() {
     }
   }
   if (editing.value) {
-    store.updateCourse(editing.value.id, { title: form.value.title, category_name: form.value.category_name, description: form.value.description, mode: form.value.mode, visibility: form.value.visibility, cover_url: form.value.cover_url, is_paid: isPaid, price, commission_enabled: false, show_in_app: form.value.show_in_app, lecturer_id: '', lecturer_name: '', live_room_id: form.value.mode === 'live' ? liveRoomId : null, live_display_title: (form.value as any).live_display_title || '', display_style: form.value.mode === 'recorded' ? (form.value as any).display_style : undefined } as any);
+    store.updateCourse(editing.value.id, { title: form.value.title, category_name: form.value.category_name, description: form.value.description, mode: form.value.mode, visibility: form.value.visibility, cover_url: form.value.cover_url, is_paid: isPaid, price, commission_enabled: false, show_in_app: form.value.show_in_app, lecturer_id: '', lecturer_name: '', live_room_id: form.value.mode === 'live' ? liveRoomId : null, live_display_title: (form.value as any).live_display_title || '', display_style: form.value.mode === 'recorded' ? (form.value as any).display_style : undefined, quiz_trigger: (form.value as any).quiz_trigger || 'half' } as any);
     if (form.value.mode === 'recorded') {
       form.value.videos.forEach((v: any) => {
         const existing = store.lessons.find((l: any) => l.lesson_no === v.video_no);
@@ -673,7 +685,7 @@ function doSave() {
     }
     MessagePlugin.success('课程已更新');
   } else {
-    store.createCourse({ title: form.value.title, description: form.value.description, cover_url: form.value.cover_url, category_id: 'cat-' + Date.now(), category_name: form.value.category_name, tags: [], lecturer_id: '', lecturer_name: '', source: 'upload', mode: form.value.mode, source_live_session_id: null, visibility: form.value.visibility, price, is_paid: isPaid, commission_enabled: false, show_in_app: form.value.show_in_app, live_room_id: form.value.mode === 'live' ? liveRoomId : null, live_display_title: (form.value as any).live_display_title || '', display_style: form.value.mode === 'recorded' ? (form.value as any).display_style : undefined } as any);
+    store.createCourse({ title: form.value.title, description: form.value.description, cover_url: form.value.cover_url, category_id: 'cat-' + Date.now(), category_name: form.value.category_name, tags: [], lecturer_id: '', lecturer_name: '', source: 'upload', mode: form.value.mode, source_live_session_id: null, visibility: form.value.visibility, price, is_paid: isPaid, commission_enabled: false, show_in_app: form.value.show_in_app, live_room_id: form.value.mode === 'live' ? liveRoomId : null, live_display_title: (form.value as any).live_display_title || '', display_style: form.value.mode === 'recorded' ? (form.value as any).display_style : undefined, quiz_trigger: (form.value as any).quiz_trigger || 'half' } as any);
     MessagePlugin.success('课程已新增');
   }
   // D35 完课奖励同步营销域复刻观看奖励页（真实系统：课程表单保存→营销中心创建红包规则）；积分奖励走积分事件不建红包规则

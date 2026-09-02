@@ -63,6 +63,16 @@
                     <span class="sc-title">{{ s.title }}</span>
                     <t-tag :theme="s.is_required ? 'danger' : 'default'" variant="light" size="small">{{ s.is_required ? '必学' : '可选' }}</t-tag>
                     <t-tag v-if="s.completion_criteria" theme="warning" variant="light" size="small">{{ s.completion_criteria }}</t-tag>
+                    <!-- V2·0902 答题配置与奖励配置展示 -->
+                    <t-tag v-if="(s as any).quiz_bank_id" theme="primary" variant="light" size="small">
+                      答题·{{ quizTriggerLabel((s as any).quiz_trigger) }}
+                    </t-tag>
+                    <t-tag v-if="(s as any).quiz_bank_id && (s as any).quiz_reward_cash_enabled" theme="danger" variant="light" size="small">
+                      红包¥{{ ((s as any).quiz_reward_amount || 0) / 100 }}
+                    </t-tag>
+                    <t-tag v-if="(s as any).quiz_bank_id && (s as any).quiz_reward_points_enabled" theme="success" variant="light" size="small">
+                      积分{{ (s as any).quiz_reward_points || 0 }}
+                    </t-tag>
                   </div>
                   <div v-if="s.description" class="sc-desc">{{ s.description }}</div>
                   <div v-if="s.course_id" class="sc-course">
@@ -192,11 +202,41 @@
             </t-form-item>
           </div>
           <div v-if="addForm.quiz_enabled" class="form-col-full">
-            <t-form-item label="选择题库" required-mark>
-              <t-select v-model="addForm.quiz_bank_id" filterable placeholder="选择题目（从题目库）" style="width:100%">
-                <template #empty><div class="live-room-empty">题库为空，请先在「题目库」维护题目</div></template>
-                <t-option v-for="b in courseStore.questionBanks" :key="b.id" :label="b.title" :value="b.id" />
+            <t-form-item label="触发时机" required-mark>
+              <t-select v-model="addForm.quiz_trigger" style="width:220px">
+                <t-option label="课时开始时" value="start" />
+                <t-option label="播放至50%时" value="half" />
+                <t-option label="播放至80%时" value="eighty" />
+                <t-option label="课时结束时" value="end" />
               </t-select>
+              <span class="switch-label" style="margin-left:8px">直播课按开播时长折算（开始/结束时）</span>
+            </t-form-item>
+          </div>
+          <div v-if="addForm.quiz_enabled" class="form-col-full">
+            <t-form-item label="选择题库" required-mark>
+              <div style="display:flex;gap:8px;width:100%">
+                <t-input :value="quizBankTitle" readonly placeholder="点右侧「选择」从题目库选题" style="flex:1" />
+                <t-button theme="primary" variant="outline" @click="quizPickerRef?.openWith(addForm.quiz_bank_id || '')">
+                  <template #icon><t-icon name="browse-gallery" /></template> 选择
+                </t-button>
+              </div>
+            </t-form-item>
+          </div>
+          <!-- V2·0902 答题奖励：红包+积分可同选 -->
+          <div v-if="addForm.quiz_enabled" class="form-col-full quiz-reward-block">
+            <t-form-item label="答题红包">
+              <t-switch v-model="addForm.quiz_reward_cash_enabled" />
+              <template v-if="addForm.quiz_reward_cash_enabled">
+                <t-input-number v-model="addForm.quiz_reward_amount_yuan" :min="0.1" :step="0.5" theme="column" size="small" style="width:90px;margin:0 6px" />
+                <span class="switch-label">元 / 次</span>
+              </template>
+            </t-form-item>
+            <t-form-item label="答题积分">
+              <t-switch v-model="addForm.quiz_reward_points_enabled" />
+              <template v-if="addForm.quiz_reward_points_enabled">
+                <t-input-number v-model="addForm.quiz_reward_points" :min="1" :step="5" theme="column" size="small" style="width:90px;margin:0 6px" />
+                <span class="switch-label">积分 / 次</span>
+              </template>
             </t-form-item>
           </div>
           <div class="form-col-full">
@@ -285,6 +325,9 @@
     <!-- V2·0902 设置客户范围（单条排课） -->
     <CustomerScopeDialog ref="scopeDialogRef" @confirm="onScopeConfirm" />
 
+    <!-- V2·0902 题库选择弹窗 -->
+    <QuizPickerDialog ref="quizPickerRef" @confirm="onQuizPicked" />
+
   </div>
 </template>
 
@@ -299,6 +342,7 @@ import { useCourseStore } from '../../../stores/course-store';
 import type { CourseSchedule } from '../../../contracts/schemas/camp-schemas';
 import LiveRoomConfigForm from './LiveRoomConfigForm.vue';
 import CustomerScopeDialog from './CustomerScopeDialog.vue';
+import QuizPickerDialog from './QuizPickerDialog.vue';
 
 const route = useRoute();
 const campStore = useCampStore();
@@ -485,12 +529,17 @@ const addForm = ref({
   deadline: null as Date | null,
   completion_criteria: '',
   quiz_enabled: false,
+  quiz_trigger: 'half' as 'start' | 'half' | 'eighty' | 'end',
   quiz_bank_id: '' as string,
+  quiz_reward_cash_enabled: true,
+  quiz_reward_amount_yuan: 1,
+  quiz_reward_points_enabled: false,
+  quiz_reward_points: 20,
   is_required: true,
 });
 function openAddDialog() {
   if (isLocked.value) { MessagePlugin.warning('审核通过后排课已锁定，如需修改请复制营期重做'); return; }
-  addForm.value = { day_number: 1, title: '', description: '', teach_mode: 'recorded', live_room_id: '', display_style: 'live_room', live_display_title: '', room_config: { name: '', cover_picked: false, start_at: '', end_at: '', anchor_type: 'hq', anchor_id: '', avatar_picked: false, allow_replay: 'yes', has_cart: 'yes', muted: 'no' }, course_id: '', lesson_id: null, unlock_time: new Date(), deadline: null, completion_criteria: '', quiz_enabled: false, quiz_bank_id: '', is_required: true };
+  addForm.value = { day_number: 1, title: '', description: '', teach_mode: 'recorded', live_room_id: '', display_style: 'live_room', live_display_title: '', room_config: { name: '', cover_picked: false, start_at: '', end_at: '', anchor_type: 'hq', anchor_id: '', avatar_picked: false, allow_replay: 'yes', has_cart: 'yes', muted: 'no' }, course_id: '', lesson_id: null, unlock_time: new Date(), deadline: null, completion_criteria: '', quiz_enabled: false, quiz_trigger: 'half', quiz_bank_id: '', quiz_reward_cash_enabled: true, quiz_reward_amount_yuan: 1, quiz_reward_points_enabled: false, quiz_reward_points: 20, is_required: true };
   showAdd.value = true;
   notifyModalOpen('schedule-add');
 }
@@ -508,6 +557,7 @@ function doAdd() {
   if (addForm.value.teach_mode === 'recorded' && !addForm.value.lesson_id) { MessagePlugin.warning('必须选择课时（营期排课以课时为单位）'); return; }
   // V2·0902 触发答题：开启时必须绑定题库
   if (addForm.value.quiz_enabled && !addForm.value.quiz_bank_id) { MessagePlugin.warning('请选择题库'); return; }
+  if (addForm.value.quiz_enabled && !addForm.value.quiz_reward_cash_enabled && !addForm.value.quiz_reward_points_enabled) { MessagePlugin.warning('答题奖励至少配置红包或积分其一'); return; }
   // course_id 由所选课时自动带出
   const pickedLesson = courseStore.lessons.find(l => l.id === addForm.value.lesson_id);
   const autoCourseId = pickedLesson?.course_id ?? '';
@@ -538,6 +588,11 @@ function doAdd() {
     customer_scope_mode: 'all',
     customer_scope_staff_ids: [],
     quiz_bank_id: addForm.value.quiz_enabled ? (addForm.value.quiz_bank_id || null) : null,
+    quiz_trigger: addForm.value.quiz_enabled ? addForm.value.quiz_trigger : undefined,
+    quiz_reward_cash_enabled: addForm.value.quiz_enabled ? addForm.value.quiz_reward_cash_enabled : false,
+    quiz_reward_amount: addForm.value.quiz_enabled ? Math.round(addForm.value.quiz_reward_amount_yuan * 100) : 0,
+    quiz_reward_points_enabled: addForm.value.quiz_enabled ? addForm.value.quiz_reward_points_enabled : false,
+    quiz_reward_points: addForm.value.quiz_enabled ? addForm.value.quiz_reward_points : 0,
     display_style: addForm.value.teach_mode === 'recorded' ? addForm.value.display_style : undefined,
     live_display_title: addForm.value.teach_mode === 'recorded' && addForm.value.display_style === 'live_room' ? addForm.value.live_display_title.trim() : '',
   } as any);
@@ -549,6 +604,17 @@ function del(s: CourseSchedule) {
   campStore.deleteSchedule(s.id);
   MessagePlugin.success('已删除');
 }
+
+// ===== V2·0902 触发答题：题库选择弹窗 + 奖励配置 =====
+const quizPickerRef = ref<InstanceType<typeof QuizPickerDialog> | null>(null);
+const quizBankTitle = computed(() => {
+  const b = courseStore.questionBanks.find(x => x.id === addForm.value.quiz_bank_id);
+  return b ? b.title : '';
+});
+function onQuizPicked(bankId: string) {
+  addForm.value.quiz_bank_id = bankId;
+}
+const quizTriggerLabel = (t: string) => ({ start: '开始时', half: '播放至50%', eighty: '播放至80%', end: '结束时' }[t] ?? t);
 
 // ===== V2·0902 客户范围（对齐 SaaS「设置客户范围」：新老客户限制+店长/店员多选）=====
 const scopeDialogRef = ref<InstanceType<typeof CustomerScopeDialog> | null>(null);

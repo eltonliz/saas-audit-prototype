@@ -250,6 +250,11 @@ export const CourseScheduleSchema = z.object({
   display_style: z.enum(['live_room', 'course']).default('live_room'),
   /** V2·0902 触发答题：学习该节时触发，绑定题库（答对联动答题红包） */
   quiz_bank_id: z.string().nullable().default(null),
+  /** V2·0902 答题奖励：现金红包/积分（答对发放，可同选） */
+  quiz_reward_cash_enabled: z.boolean().default(false),
+  quiz_reward_amount: z.number().int().min(0).default(100),
+  quiz_reward_points_enabled: z.boolean().default(false),
+  quiz_reward_points: z.number().int().min(0).default(20),
   /** V2·0902 直播展示标题：展示风格=直播间时 APP 直播间样式标题（空则用排课标题） */
   live_display_title: z.string().default(''),
 
