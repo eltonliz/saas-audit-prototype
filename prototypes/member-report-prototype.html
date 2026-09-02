@@ -1752,6 +1752,8 @@ function renderMe(){
   +'</div></div>';
 }
 function toggleRole(){ appRoleKey=appRoleKey==='manager'?'staff':'manager'; renderMe(); toast('已切换为'+(appRoleKey==='manager'?'店长':'店员')+'视角'); }
+switchAppRoleBtns=function(){};
+appRole=function(r){ appRoleKey=r; if(appTabKey==='me'){ renderMe(); } };
 /* 数据报表（克隆后台详细报表） */
 function appRewrite(root){
  root.querySelectorAll('[onclick]').forEach(e=>{
@@ -1790,8 +1792,8 @@ function appReportGo(k){ appReportKey=k; appShowPane('pane-'+k,null,false); }
 function appReportBack(){ if(appReportStack.length){ el('ar-body').innerHTML=appReportStack.pop(); syncArChips(); } else closeAppReport(); }
 function appMdSub(btn,key){ const root=btn.closest('.page,.pane')||document; ['list','course','live'].forEach(k=>{const x=root.querySelector('#appc-md-'+k); if(x)x.hidden=(k!==key);}); btn.parentElement.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t===btn)); }
 function syncArChips(){ const c=el('ar-chips'); if(c) c.querySelectorAll('.ar-chip').forEach(x=>x.classList.toggle('active',x.dataset.key===appReportKey)); }
-function openAppReport(){ reportOpen=true; appReportKey='tenant'; appReportStack=[]; renderAppNav(); renderTabbar(); appShowPane('pane-tenant',null,false); }
-function closeAppReport(){ reportOpen=false; renderAppNav(); renderTabbar(); renderAppBody(); }
+function openAppReport(){ reportOpen=true; appReportKey='tenant'; appReportStack=[]; el('app-report').style.display='flex'; renderAppNav(); renderTabbar(); appShowPane('pane-tenant',null,false); }
+function closeAppReport(){ reportOpen=false; el('app-report').style.display='none'; renderAppNav(); renderTabbar(); renderAppBody(); }
 /* 覆盖渲染入口 */
 renderAppHead=function(){ /* APP 模式下 p-nav 由 renderAppNav 管理 */ };
 renderAppTabs=function(){ renderTabbar(); };
