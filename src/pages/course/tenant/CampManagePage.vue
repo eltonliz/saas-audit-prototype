@@ -78,8 +78,8 @@
           <t-space :size="2">
             <t-button variant="text" size="small" theme="primary" @click="openDetail(row)">课时</t-button>
             <!-- V2·0902 状态机简化：创建即报名→报名截止自动开营→结束时间自动结营；报名中可排课/编辑 -->
-            <t-button v-if="row.status === 'enrolling'" variant="text" size="small" @click="$router.push('/tenant/course/camp-schedule?campId=' + row.id)">排课</t-button>
-            <t-button v-if="['in_progress','ended'].includes(row.status)" variant="text" size="small" @click="openStudentDrawer(row)">学员</t-button>
+            <t-button v-if="['enrolling','in_progress'].includes(row.status)" variant="text" size="small" @click="$router.push('/tenant/course/camp-schedule?campId=' + row.id)">排课</t-button>
+            <t-button v-if="['enrolling','in_progress','ended'].includes(row.status)" variant="text" size="small" @click="openStudentDrawer(row)">学员</t-button>
             <t-button variant="text" size="small" @click="openDetail(row)">详情</t-button>
             <t-button v-if="row.status === 'enrolling'" variant="text" size="small" theme="primary" @click="openEdit(row)">编辑</t-button>
             <t-button v-if="row.status === 'enrolling'" variant="text" size="small" theme="danger" @click="delCamp(row)">删除</t-button>

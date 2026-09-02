@@ -143,6 +143,8 @@ const routes: RouteRecordRaw[] = [
     children: [
       { path: '', redirect: '/tenant/course/courses' },
       { path: 'courses', name: 'CourseManage', component: () => import('../pages/course/tenant/CourseManagePage.vue'), meta: { terminal: 'pc-tenant', fn: ['FN-PC-002'] } },
+      // V2·0902 通用配置（老板需求）：营期开关/课程展示粒度
+      { path: 'general-config', name: 'GeneralConfig', component: () => import('../pages/course/tenant/GeneralConfigPage.vue'), meta: { terminal: 'pc-tenant' } },
       { path: 'course-types', name: 'CourseTypeManage', component: () => import('../pages/course/tenant/CourseTypeManagePage.vue'), meta: { terminal: 'pc-tenant', fn: ['FN-PC-002A'] } },
       { path: 'questions', name: 'QuestionBankManage', component: () => import('../pages/course/tenant/QuestionBankManagePage.vue'), meta: { terminal: 'pc-tenant', fn: ['FN-PC-004A'] } },
       { path: 'camps', name: 'CampManage', component: () => import('../pages/course/tenant/CampManagePage.vue'), meta: { terminal: 'pc-tenant', fn: ['FN-PC-005'] } },

@@ -361,12 +361,13 @@ const campSchedules = computed(() =>
   campStore.loadSchedulesByCamp(campId.value).sort((a, b) => a.day_number - b.day_number || a.sort_order - b.sort_order)
 );
 
-// 排课锁定：V2·0902 报名中可排课，开营（进行中/已结束）后锁定
+// 排课锁定：V2·0902 老板需求——开营（进行中）也可排课/修改，仅已结束锁定；进行中时「已过解锁时间的课」不可修改/删除
 const isLocked = computed(() => {
   const s = camp.value?.status;
-  return s === 'in_progress' || s === 'ended';
+  return s === 'ended';
 });
-const campStatusLabel = (s: string): string => ({ draft: '草稿', pending_review: '待审核', published: '已发布', enrolling: '报名中·可排课', in_progress: '进行中', ended: '已结束', offline: '已下架', rejected: '已驳回' }[s] ?? s);
+const isScheduleStarted = (s: any) => (s.unlock_time || 0) * 1000 <= Date.now();
+const campStatusLabel = (s: string): string => ({ draft: '草稿', pending_review: '待审核', published: '已发布', enrolling: '报名中·可排课', in_progress: '进行中·未来课可排', ended: '已结束', offline: '已下架', rejected: '已驳回' }[s] ?? s);
 
 // 按天分组
 const sortedDaySchedules = computed(() => {
@@ -600,7 +601,9 @@ function doAdd() {
   showAdd.value = false;
 }
 function del(s: CourseSchedule) {
-  if (isLocked.value) { MessagePlugin.warning('开营后排课已锁定'); return; }
+  if (isLocked.value) { MessagePlugin.warning('营期已结束，排课锁定'); return; }
+  // V2·0902 老板需求：开营可改，但已开始（过解锁时间）的课不可删
+  if (isScheduleStarted(s)) { MessagePlugin.warning('该节课已开始（已过解锁时间），不可删除'); return; }
   campStore.deleteSchedule(s.id);
   MessagePlugin.success('已删除');
 }

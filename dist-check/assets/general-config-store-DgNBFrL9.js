@@ -1,0 +1,1 @@
+import{d as t,r}from"./index-9D44I5ZF.js";const c=t("general-config",()=>{const o=r(!0),n=r("course");function s(e){o.value=e}function a(e){n.value=e}return{campEnabled:o,courseDisplayMode:n,setCampEnabled:s,setCourseDisplayMode:a}});export{c as u};

@@ -6,27 +6,44 @@
       <span v-for="cat in categories" :key="cat.id" class="cat-tag" :class="{ active: activeCat === cat.id }" @click="activeCat = cat.id">{{ cat.name }}</span>
     </div>
     <div class="course-list">
-      <div v-for="c in filteredCourses" :key="c.id" class="course-card" @click="goDetail(c)">
-        <div class="card-cover" :style="{ background: c.color }">{{ c.mode === 'live' ? '📺' : '📖' }}</div>
-        <div class="card-body">
-          <div class="card-title">{{ c.title }}</div>
-          <div class="card-meta">{{ c.category }} · {{ c.lessons }}课时 · {{ c.mode === 'live' ? '直播' : '录播' }}</div>
-          <div class="card-bottom">
-            <span class="card-price free">免费</span>
-            <span class="card-learners">{{ c.learners }}人学习</span>
+      <!-- V2·0902 通用配置：展示粒度 course=全部课程卡片 / lesson=仅课时平铺 -->
+      <template v-if="configStore.courseDisplayMode === 'course'">
+        <div v-for="c in filteredCourses" :key="c.id" class="course-card" @click="goDetail(c)">
+          <div class="card-cover" :style="{ background: c.color }">{{ c.mode === 'live' ? '📺' : '📖' }}</div>
+          <div class="card-body">
+            <div class="card-title">{{ c.title }}</div>
+            <div class="card-meta">{{ c.category }} · {{ c.lessons }}课时 · {{ c.mode === 'live' ? '直播' : '录播' }}</div>
+            <div class="card-bottom">
+              <span class="card-price free">免费</span>
+              <span class="card-learners">{{ c.learners }}人学习</span>
+            </div>
           </div>
         </div>
-      </div>
+      </template>
+      <template v-else>
+        <div v-for="l in lessonFlatList" :key="l.id" class="course-card lesson-card" @click="goLesson(l)">
+          <div class="card-cover lesson-cover">🎬</div>
+          <div class="card-body">
+            <div class="card-title">{{ l.title }}</div>
+            <div class="card-meta">所属课程：{{ l.course_title }} · 第{{ l.sort_order }}课时</div>
+          </div>
+        </div>
+        <div v-if="lessonFlatList.length === 0" class="empty">暂无课时</div>
+      </template>
     </div>
-    <div v-if="filteredCourses.length === 0" class="empty">暂无课程</div>
+    <div v-if="configStore.courseDisplayMode === 'course' && filteredCourses.length === 0" class="empty">暂无课程</div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
+import { useGeneralConfigStore } from '../../../stores/general-config-store';
+import { useCourseStore } from '../../../stores/course-store';
 
 const router = useRouter();
+const configStore = useGeneralConfigStore();
+const courseStore = useCourseStore();
 const search = ref('');
 const activeCat = ref('all');
 
@@ -56,6 +73,12 @@ const filteredCourses = computed(() => courses.value.filter(c =>
 ));
 
 function goDetail(c: any) { router.push('/app/student/course/' + c.id); }
+
+// V2·0902 仅展示课时：内容池已发布课时平铺（含所属课程标注）
+const lessonFlatList = computed(() => courseStore.lessons
+  .filter((l: any) => l.status === 'published')
+  .map((l: any) => ({ id: l.id, title: l.title, course_title: courseStore.loadCourse(l.course_id)?.title ?? l.course_id, sort_order: l.sort_order })));
+function goLesson(l: any) { router.push('/app/student/lesson/' + l.id); }
 </script>
 
 <style scoped>
@@ -76,5 +99,6 @@ function goDetail(c: any) { router.push('/app/student/course/' + c.id); }
 .card-price { font-size: 16px; font-weight: 700; color: #F04438; }
 .card-price.free { color: #12B76A; }
 .card-learners { font-size: 12px; color: #98A2B3; }
+.lesson-cover { background: #F0FDF4; }
 .empty { text-align: center; color: #98A2B3; padding: 40px; }
 </style>

@@ -2,7 +2,7 @@
   <div class="learning-record">
     <header class="app-header"><span @click="$router.back()">←</span><span>学习记录</span></header>
     <div class="tabs">
-      <span v-for="t in ['我的课程','我的营期']" :key="t" class="tab" :class="{ active: tab === t }" @click="tab = t">{{ t }}</span>
+      <span v-for="t in visibleTabs" :key="t" class="tab" :class="{ active: tab === t }" @click="tab = t">{{ t }}</span>
     </div>
     <template v-if="tab === '我的课程'">
       <div v-for="r in courseRecords" :key="r.id" class="record-card" @click="goCourse(r.course_id)">
@@ -29,9 +29,13 @@ import { useRouter } from 'vue-router';
 import EmojiIcon from './EmojiIcon.vue';
 import { useCourseStore } from '../../../stores/course-store';
 import { useCampStore } from '../../../stores/camp-store';
+import { useGeneralConfigStore } from '../../../stores/general-config-store';
 const router = useRouter();
 const courseStore = useCourseStore();
 const campStore = useCampStore();
+// V2·0902 通用配置：营期功能关闭时不展示「我的营期」Tab
+const configStore = useGeneralConfigStore();
+const visibleTabs = computed(() => (configStore.campEnabled ? ['我的课程', '我的营期'] : ['我的课程']));
 const tab = ref('我的课程');
 const courseRecords = computed(() => (courseStore as any).learningRecords?.filter((r: any) => r.student_id === 'STU-001') ?? []);
 const myEnrollments = computed(() => campStore.enrollments.filter(e => e.student_id === 'STU-001'));
