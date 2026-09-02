@@ -80,6 +80,15 @@
             <t-form-item label="课程名称" required-mark><t-input v-model="form.title" placeholder="请输入课程名称" maxlength="45" /></t-form-item>
             <t-form-item label="所属分类" required-mark><t-select v-model="form.category_name" placeholder="请选择所属分类" style="width:100%"><t-option v-for="c in categories" :key="c" :label="c" :value="c" /></t-select></t-form-item>
             <t-form-item label="课程介绍"><t-textarea v-model="form.description" :autosize="{ minRows: 3 }" placeholder="请输入课程介绍" /></t-form-item>
+            <!-- V2·0902 授课方式与排课一致：录播=视频组课；直播=表单内直接配置直播间 -->
+            <t-form-item label="授课方式" required-mark>
+              <t-radio-group v-model="form.mode">
+                <t-radio value="recorded"><template #label><t-icon name="play-circle" /> 录播</template></t-radio>
+                <t-radio value="live"><template #label><t-icon name="video-camera" /> 直播</template></t-radio>
+              </t-radio-group>
+            </t-form-item>            <t-form-item v-if="form.mode === 'live'" label="直播标题">
+              <t-input v-model="(form as any).live_display_title" placeholder="直播间样式展示的标题（留空则用课程名称）" style="width:100%" />
+            </t-form-item>
             <!-- V2·0902 用户裁决：「是否公开」配置下线，课程统一公开（APP 独立展示），数据字段固定 public -->
             <t-form-item label="课程封面">
               <div class="cover-grid">
@@ -92,8 +101,15 @@
             </t-form-item>
           </div>
 
-          <!-- 区块2：内容管理 -->
-          <div class="section-card">
+          <!-- V2·0902 直播课：直播间配置穿插（保存时创建直播间并关联课程） -->
+          <div v-if="form.mode === 'live'" class="section-card live-room-config-block">
+            <div class="section-header"><t-icon name="video-camera" class="section-icon" /><span>直播间配置</span></div>
+            <LiveRoomConfigForm v-model="form.room_config" plan-mode />
+            <div class="lrc-note"><t-icon name="info-circle" /><span>解锁时间与开播时间相互独立：计划开播可留空后补，实际开播以主播开播为准；排课时直接引用该直播间</span></div>
+          </div>
+
+          <!-- 区块2：内容管理（仅录播） -->
+          <div v-if="form.mode === 'recorded'" class="section-card">
             <div class="section-header"><t-icon name="layers" class="section-icon" /><span>内容管理</span></div>
             <div class="content-actions">
                 <t-button theme="primary" size="small" @click="openContentPicker('video')"><template #icon><t-icon name="add" /></template>选择视频</t-button>
@@ -342,6 +358,8 @@ import { ref, computed } from 'vue';
 import { MessagePlugin } from 'tdesign-vue-next';
 import { useCourseStore } from '../../../stores/course-store';
 import { useCampStore } from '../../../stores/camp-store';
+import { useLiveStore } from '../../../stores/live-store';
+import LiveRoomConfigForm from './LiveRoomConfigForm.vue';
 import ReplicaMarker from '../../../components/replica/ReplicaMarker.vue';
 import { notifyModalOpen } from '../../../utils/modal-spec-bridge';
 import { COURSE_CATEGORIES } from '../../../contracts/constants/course-constants';
@@ -349,6 +367,7 @@ import { LIVE_SESSIONS } from '../../../adapters/sim/sim-fixtures';
 
 const store = useCourseStore();
 const campStore = useCampStore();
+const liveStore = useLiveStore();
 // V2·D2-2 去掉讲师/助教角色：不再从组织档案选择，主讲人为课程内容属性（纯文本）
 const liveRooms = LIVE_SESSIONS;
 const dateRange = ref<any>([]);
@@ -373,6 +392,15 @@ function defaultForm() {
     title: '', category_name: '', description: '', mode: 'recorded' as 'recorded' | 'live', visibility: 'public' as 'public' | 'camp_only',
     cover_url: '', videos: [] as any[],
     live_session_id: '' as string,
+    // V2·0902 直播课：直播间配置与展示标题（与排课表单同构）
+    live_room_id: '' as string,
+    live_display_title: '',
+    room_config: {
+      name: '', cover_picked: false, start_at: '', end_at: '',
+      anchor_type: 'hq' as 'hq' | 'store' | 'supplier' | 'personal',
+      anchor_id: '', avatar_picked: false,
+      allow_replay: 'yes' as 'yes' | 'no', has_cart: 'yes' as 'yes' | 'no', muted: 'no' as 'yes' | 'no',
+    },
     // V2·D2-1 本期不做交易：售卖配置固定免费，仅保留 C 端展示开关
     show_in_app: true,
     validity_type: 'long' as 'long' | 'custom' | 'fixed', validity_custom_date: null as Date | null, validity_fixed_days: 365,
@@ -588,6 +616,9 @@ function openEditDrawer(row: any) {
     title: row.title, category_name: row.category_name, description: row.description, mode: row.mode || 'recorded', visibility: 'public' as 'public' | 'camp_only',
     cover_url: row.cover_url || coverPresets[0].url,
     live_session_id: row.source_live_session_id || '',
+    live_room_id: (row as any).live_room_id || '',
+    live_display_title: (row as any).live_display_title || '',
+    room_config: (() => { const r = (row as any).live_room_id ? liveStore.loadRoom((row as any).live_room_id) : null; return { name: r?.name || row.title || '', cover_picked: true, start_at: '', end_at: '', anchor_type: 'hq' as const, anchor_id: r?.anchor_id || '', avatar_picked: true, allow_replay: 'yes' as const, has_cart: 'yes' as const, muted: 'no' as const }; })(),
     videos: row.mode === 'live' ? [] : lessons.map((l: any) => ({ video_no: l.lesson_no, name: l.title, format: l.content_type === 'audio' ? 'audio/mp3' : 'video/mp4', size: l.content_type === 'audio' ? '30.00MB' : '500.00MB', duration: formatDuration(l.video_duration), category: row.category_name || '未分组', ctype: l.content_type || 'video', has_quiz: !!l.question_bank_id, files_count: 1, file_name: l.title, reward: null })),
     sale_type: 'free' as 'free' | 'paid', price: 0, original_price: '',
     validity_type: 'long', validity_custom_date: null, validity_fixed_days: 365,
@@ -605,8 +636,21 @@ function doSave() {
   // V2·D2-1 本期不做交易：全部免费，价格固定 0；D2-2 主讲人为选填文本，不做讲师档案校验
   const price = 0;
   const isPaid = false;
+  // V2·0902 直播课：保存时按穿插配置创建/更新直播间并关联课程
+  let liveRoomId: string | null = (form.value as any).live_room_id || null;
+  if (form.value.mode === 'live') {
+    const cfg = (form.value as any).room_config;
+    if (!cfg.name.trim()) { MessagePlugin.warning('请填写直播间名称'); return; }
+    const anchor = liveStore.anchors.find(a => a.id === cfg.anchor_id);
+    if (liveRoomId) {
+      liveStore.updateRoom(liveRoomId, { name: cfg.name.trim() });
+    } else {
+      const room = liveStore.createRoom({ name: cfg.name.trim(), anchor_id: anchor?.id || 'ANCHOR-001', anchor_name: anchor?.name || '默认主播' });
+      liveRoomId = room.id;
+    }
+  }
   if (editing.value) {
-    store.updateCourse(editing.value.id, { title: form.value.title, category_name: form.value.category_name, description: form.value.description, mode: form.value.mode, visibility: form.value.visibility, cover_url: form.value.cover_url, is_paid: isPaid, price, commission_enabled: false, show_in_app: form.value.show_in_app, lecturer_id: '', lecturer_name: '' } as any);
+    store.updateCourse(editing.value.id, { title: form.value.title, category_name: form.value.category_name, description: form.value.description, mode: form.value.mode, visibility: form.value.visibility, cover_url: form.value.cover_url, is_paid: isPaid, price, commission_enabled: false, show_in_app: form.value.show_in_app, lecturer_id: '', lecturer_name: '', live_room_id: form.value.mode === 'live' ? liveRoomId : null, live_display_title: form.value.mode === 'live' ? ((form.value as any).live_display_title || '') : '' } as any);
     if (form.value.mode === 'recorded') {
       form.value.videos.forEach((v: any) => {
         const existing = store.lessons.find((l: any) => l.lesson_no === v.video_no);
@@ -620,7 +664,7 @@ function doSave() {
     }
     MessagePlugin.success('课程已更新');
   } else {
-    store.createCourse({ title: form.value.title, description: form.value.description, cover_url: form.value.cover_url, category_id: 'cat-' + Date.now(), category_name: form.value.category_name, tags: [], lecturer_id: '', lecturer_name: '', source: 'upload', mode: form.value.mode, source_live_session_id: null, visibility: form.value.visibility, price, is_paid: isPaid, commission_enabled: false, show_in_app: form.value.show_in_app } as any);
+    store.createCourse({ title: form.value.title, description: form.value.description, cover_url: form.value.cover_url, category_id: 'cat-' + Date.now(), category_name: form.value.category_name, tags: [], lecturer_id: '', lecturer_name: '', source: 'upload', mode: form.value.mode, source_live_session_id: null, visibility: form.value.visibility, price, is_paid: isPaid, commission_enabled: false, show_in_app: form.value.show_in_app, live_room_id: form.value.mode === 'live' ? liveRoomId : null, live_display_title: form.value.mode === 'live' ? ((form.value as any).live_display_title || '') : '' } as any);
     MessagePlugin.success('课程已新增');
   }
   // D35 完课奖励同步营销域复刻观看奖励页（真实系统：课程表单保存→营销中心创建红包规则）；积分奖励走积分事件不建红包规则
@@ -803,6 +847,9 @@ function showQuestionDialog(row: any) { currentCourse.value = row; questionDialo
   transition: box-shadow 200ms ease;
 }
 
+/* V2·0902 直播课配置穿插 */
+.live-room-config-block { border: 1px dashed #12B76A; border-radius: 10px; }
+.lrc-note { display: flex; align-items: center; gap: 4px; margin-top: 8px; font-size: 12px; color: #12B76A; }
 /* ── 相对 SaaS 线上新增项的红框标注（课堂域业务改动） ── */
 .saas-new-box {
   position: relative;

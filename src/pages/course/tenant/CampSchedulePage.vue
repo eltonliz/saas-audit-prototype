@@ -25,10 +25,6 @@
             <t-button theme="primary" variant="text" @click="openQuickCourseDialog">
               <template #icon><t-icon name="add" /></template> 快捷新建课程
             </t-button>
-            <!-- V2·0902 学员端可见性批量配置 -->
-            <t-button theme="default" variant="outline" :disabled="campSchedules.length === 0" @click="openBatchVisible">
-              <template #icon><t-icon name="eye" /></template> 批量设置可见性
-            </t-button>
           </div>
           <div class="actions" v-else>
             <t-tag theme="default" size="small">审核通过后不可编辑，如需修改请复制营期重做</t-tag>
@@ -78,22 +74,20 @@
                   </div>
                 </div>
                 <div class="sc-side">
-                  <!-- V2·0902 学员端可见性：点击切换 -->
+                  <!-- V2·0902 客户范围：对齐 SaaS「设置客户范围」口径（新老客户限制+店长/店员多选） -->
                   <t-tag
                     v-if="!isLocked"
-                    :theme="s.client_visible === false ? 'default' : 'success'"
+                    :theme="(s as any).customer_scope_staff_ids?.length ? 'success' : 'default'"
                     variant="light"
                     size="small"
                     class="sc-vis"
                     style="cursor: pointer"
-                    @click="toggleVisible(s)"
+                    @click="openScope(s)"
                   >
-                    <t-icon :name="s.client_visible === false ? 'eye-closed' : 'eye'" style="margin-right: 2px" />
-                    {{ s.client_visible === false ? '对学员隐藏' : '对学员可见' }}
+                    <t-icon name="user-group" style="margin-right: 2px" />
+                    {{ scopeLabel(s) }}
                   </t-tag>
-                  <t-tag v-else :theme="s.client_visible === false ? 'default' : 'success'" variant="light" size="small">
-                    {{ s.client_visible === false ? '对学员隐藏' : '对学员可见' }}
-                  </t-tag>
+                  <t-tag v-else theme="default" variant="light" size="small">{{ scopeLabel(s) }}</t-tag>
                   <t-popconfirm v-if="!isLocked" content="确认删除此排课？" theme="danger" @confirm="del(s)">
                     <t-button variant="text" theme="danger" size="small" class="sc-del"><t-icon name="delete" /></t-button>
                   </t-popconfirm>
@@ -273,33 +267,8 @@
       </t-form>
     </t-dialog>
 
-    <!-- V2·0902 批量设置可见性 -->
-    <t-dialog v-model:visible="showBatchVisible" header="批量设置可见性" width="520px" :on-confirm="doBatchVisible" :confirm-btn="{ content: '确定', theme: 'primary' }" :cancel-btn="{ content: '取消' }">
-      <t-form label-width="100px" label-align="right">
-        <t-form-item label="设为" required-mark>
-          <t-radio-group v-model="batchVisibleForm.target">
-            <t-radio :value="true">对学员可见</t-radio>
-            <t-radio :value="false">对学员隐藏</t-radio>
-          </t-radio-group>
-        </t-form-item>
-        <t-form-item label="生效范围" required-mark>
-          <div style="width:100%">
-            <t-radio-group v-model="batchVisibleForm.scope">
-              <t-radio value="all">全部排课</t-radio>
-              <t-radio value="days">按天选择</t-radio>
-            </t-radio-group>
-            <div v-if="batchVisibleForm.scope === 'days'" class="batch-days">
-              <t-checkbox-group v-model="batchVisibleForm.days">
-                <t-checkbox v-for="[day] in sortedDaySchedules" :key="day" :value="day">Day{{ day }}</t-checkbox>
-              </t-checkbox-group>
-            </div>
-          </div>
-        </t-form-item>
-        <t-form-item label="">
-          <span class="form-tip-inline">隐藏后 APP 排课列表不展示该节，但解锁时间与学习进度统计照常</span>
-        </t-form-item>
-      </t-form>
-    </t-dialog>
+    <!-- V2·0902 设置客户范围（单条排课） -->
+    <CustomerScopeDialog ref="scopeDialogRef" @confirm="onScopeConfirm" />
 
   </div>
 </template>
@@ -314,6 +283,7 @@ import { notifyModalOpen } from '../../../utils/modal-spec-bridge';
 import { useCourseStore } from '../../../stores/course-store';
 import type { CourseSchedule } from '../../../contracts/schemas/camp-schemas';
 import LiveRoomConfigForm from './LiveRoomConfigForm.vue';
+import CustomerScopeDialog from './CustomerScopeDialog.vue';
 
 const route = useRoute();
 const campStore = useCampStore();
@@ -447,6 +417,8 @@ function doBatch() {
         is_required: row.is_required,
         completion_criteria: row.completion_criteria || '完播率≥90%',
         client_visible: true,
+        customer_scope_mode: 'all',
+        customer_scope_staff_ids: [],
         display_style: 'live_room',
       } as any;
     });
@@ -544,6 +516,8 @@ function doAdd() {
     is_required: addForm.value.is_required,
     completion_criteria: addForm.value.teach_mode === 'live' ? '' : (addForm.value.completion_criteria || '完播率≥90%'),
     client_visible: true,
+    customer_scope_mode: 'all',
+    customer_scope_staff_ids: [],
     display_style: addForm.value.teach_mode === 'recorded' ? addForm.value.display_style : undefined,
     live_display_title: addForm.value.teach_mode === 'recorded' && addForm.value.display_style === 'live_room' ? addForm.value.live_display_title.trim() : '',
   } as any);
@@ -556,29 +530,27 @@ function del(s: CourseSchedule) {
   MessagePlugin.success('已删除');
 }
 
-// ===== V2·0902 学员端可见性（单条切换 + 批量设置）=====
-function toggleVisible(s: any) {
-  s.client_visible = s.client_visible === false;
-  MessagePlugin.success(s.client_visible === false ? '已设为对学员隐藏' : '已设为对学员可见');
+// ===== V2·0902 客户范围（对齐 SaaS「设置客户范围」：新老客户限制+店长/店员多选）=====
+const scopeDialogRef = ref<InstanceType<typeof CustomerScopeDialog> | null>(null);
+let scopeTarget: any = null;
+function scopeLabel(s: any): string {
+  const ids: string[] = (s as any).customer_scope_staff_ids || [];
+  const mode = (s as any).customer_scope_mode || 'all';
+  if (ids.length === 0) return mode === 'new_only' ? '仅新客户' : '全部客户';
+  return `${mode === 'new_only' ? '仅新客户·' : ''}${ids.length}名店员可见`;
 }
-const showBatchVisible = ref(false);
-const batchVisibleForm = ref<{ target: boolean; scope: 'all' | 'days'; days: number[] }>({ target: true, scope: 'all', days: [] });
-function openBatchVisible() {
-  if (isLocked.value) { MessagePlugin.warning('审核通过后排课已锁定'); return; }
-  if (campSchedules.value.length === 0) { MessagePlugin.warning('暂无排课可设置'); return; }
-  batchVisibleForm.value = { target: true, scope: 'all', days: [] };
-  showBatchVisible.value = true;
+function openScope(s: any) {
+  scopeTarget = s;
+  scopeDialogRef.value?.openWith({
+    mode: (s as any).customer_scope_mode || 'all',
+    staff_ids: [...((s as any).customer_scope_staff_ids || [])],
+  });
 }
-function doBatchVisible() {
-  const { target, scope, days } = batchVisibleForm.value;
-  let list = campSchedules.value;
-  if (scope === 'days') {
-    if (days.length === 0) { MessagePlugin.warning('请至少选择一天'); return; }
-    list = list.filter(s => days.includes(s.day_number));
-  }
-  for (const s of list) (s as any).client_visible = target;
-  MessagePlugin.success(`已将 ${list.length} 条排课设为${target ? '对学员可见' : '对学员隐藏'}`);
-  showBatchVisible.value = false;
+function onScopeConfirm(scope: { mode: 'all' | 'new_only'; staff_ids: string[] }) {
+  if (!scopeTarget) return;
+  scopeTarget.customer_scope_mode = scope.mode;
+  scopeTarget.customer_scope_staff_ids = scope.staff_ids;
+  MessagePlugin.success('客户范围已更新');
 }
 
 // ===== 快捷新建课程（V2·0829：主讲人为内容属性文本，无讲师档案）=====

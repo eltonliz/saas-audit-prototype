@@ -123,6 +123,10 @@ export const CourseSchema = z.object({
   source_live_session_id: z.string().nullable().optional(),
   /** 授课方式（recorded/live·与营期模式对齐） */
   mode: CourseModeEnum.default('recorded'),
+  /** V2·0902 直播课关联直播间（创建课程表单内直接配置生成） */
+  live_room_id: z.string().nullable().default(null),
+  /** V2·0902 直播课展示标题（空则用课程名称） */
+  live_display_title: z.string().default(''),
   /** 课程可见性（public/camp_only） */
   visibility: CourseVisibilityEnum.default('public'),
 
@@ -419,6 +423,8 @@ export const CreateCourseInputSchema = CourseSchema.pick({
   source: true,
   source_live_session_id: true,
   mode: true,
+  live_room_id: true,
+  live_display_title: true,
   visibility: true,
 }).extend({
   question_bank_id: z.string().optional(),

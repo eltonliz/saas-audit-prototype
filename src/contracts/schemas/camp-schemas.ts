@@ -243,8 +243,9 @@ export const CourseScheduleSchema = z.object({
   is_required: z.boolean().default(true),
   completion_criteria: z.string(),
 
-  /** V2·0902 学员端可见性：false=隐藏（APP 排课列表不下发该节） */
-  client_visible: z.boolean().default(true),
+  /** V2·0902 客户可见范围（对齐 SaaS 口径）：mode=all/new_only；staff_ids=可见的店长/店员（空=全部店长店员名下客户可见） */
+  customer_scope_mode: z.enum(['all', 'new_only']).default('all'),
+  customer_scope_staff_ids: z.array(z.string()).default([]),
   /** V2·0902 录播展示风格：live_room=直播间风格，course=课程风格（仅录播排课生效） */
   display_style: z.enum(['live_room', 'course']).default('live_room'),
   /** V2·0902 直播展示标题：展示风格=直播间时 APP 直播间样式标题（空则用排课标题） */
