@@ -24,10 +24,6 @@
           <t-select v-model="modeFilter" placeholder="授课方式" clearable style="width:110px"><t-option label="录播" value="recorded" /><t-option label="直播" value="live" /></t-select>
         </div>
         <div class="filter-item">
-          <span class="filter-label">是否公开</span>
-          <t-select v-model="visibilityFilter" placeholder="是否公开" clearable style="width:110px"><t-option label="公开" value="public" /><t-option label="仅营期内" value="camp_only" /></t-select>
-        </div>
-        <div class="filter-item">
           <span class="filter-label">课程范围</span>
           <t-select v-model="inCampFilter" placeholder="是否属于营期" clearable style="width:120px"><t-option label="独立课程" value="standalone" /><t-option label="营期课程" value="in_camp" /></t-select>
         </div>
@@ -88,13 +84,7 @@
               <!-- V2·0901 用户裁决：课程固定为录播组课；直播在「直播列表」独立创建（直播间三联），直播回放可转课程 -->
               <div class="saas-new-badge">V2·0901：课程=录播组课；直播请在「直播列表」创建，直播回放可转课程</div>
             </div>
-            <t-form-item label="是否公开">
-              <t-radio-group v-model="form.visibility">
-                <t-radio value="public">公开</t-radio>
-                <t-radio value="camp_only">仅营期内</t-radio>
-              </t-radio-group>
-              <div class="form-tip">公开=APP独立展示；仅营期内=APP不独立展示，仅营期内可学</div>
-            </t-form-item>
+            <!-- V2·0902 用户裁决：「是否公开」配置下线，课程统一公开（APP 独立展示），数据字段固定 public -->
             <t-form-item label="课程封面">
               <div class="cover-grid">
                 <div v-for="cover in coverPresets" :key="cover.url" class="cover-item" :class="{ active: form.cover_url === cover.url }" @click="form.cover_url = cover.url">
@@ -366,7 +356,7 @@ const campStore = useCampStore();
 // V2·D2-2 去掉讲师/助教角色：不再从组织档案选择，主讲人为课程内容属性（纯文本）
 const liveRooms = LIVE_SESSIONS;
 const dateRange = ref<any>([]);
-const search = ref(''); const searchNo = ref(''); const catFilter = ref(''); const modeFilter = ref(''); const visibilityFilter = ref(''); const inCampFilter = ref('');
+const search = ref(''); const searchNo = ref(''); const catFilter = ref(''); const modeFilter = ref(''); const inCampFilter = ref('');
 const batchMode = ref(false); const selected = ref<any[]>([]);
 const page = ref(1); const pageSize = ref(10);
 const drawerVisible = ref(false); const videoDialogVisible = ref(false); const questionDialogVisible = ref(false);
@@ -446,7 +436,6 @@ const filtered = computed(() => {
   if (searchNo.value) list = list.filter(c => c.course_no.includes(searchNo.value));
   if (catFilter.value) list = list.filter(c => c.category_name === catFilter.value);
   if (modeFilter.value) list = list.filter(c => c.mode === modeFilter.value);
-  if (visibilityFilter.value) list = list.filter(c => c.visibility === visibilityFilter.value);
   if (inCampFilter.value === 'in_camp') list = list.filter(c => (c.camp_ref_count ?? 0) > 0);
   if (inCampFilter.value === 'standalone') list = list.filter(c => (c.camp_ref_count ?? 0) === 0);
   if (dateRange.value && dateRange.value.length === 2) {
@@ -461,7 +450,7 @@ const relatedQuestions = computed(() => currentCourse.value ? store.questions.fi
 function formatDuration(seconds: number) { const m = Math.floor(seconds / 60); const s = seconds % 60; return `${m}分钟${s}秒`; }
 function onSelChange(_keys: any[], ctx: any) { selected.value = ctx?.selectedRowData ?? []; }
 function doFilter() { page.value = 1; }
-function reset() { dateRange.value = []; search.value = ''; searchNo.value = ''; catFilter.value = ''; modeFilter.value = ''; visibilityFilter.value = ''; inCampFilter.value = ''; page.value = 1; }
+function reset() { dateRange.value = []; search.value = ''; searchNo.value = ''; catFilter.value = ''; modeFilter.value = ''; inCampFilter.value = ''; page.value = 1; }
 function openCreate() { editing.value = null; form.value = defaultForm(); drawerVisible.value = true; notifyModalOpen('course-create'); }
 function addVideo() { openContentPicker('video'); }
 function addAudio() { openContentPicker('audio'); }
@@ -600,7 +589,7 @@ function openEditDrawer(row: any) {
   notifyModalOpen('course-edit');
   const lessons = store.loadLessonsByCourse(row.id);
   form.value = {
-    title: row.title, category_name: row.category_name, description: row.description, mode: row.mode || 'recorded', visibility: row.visibility || 'public',
+    title: row.title, category_name: row.category_name, description: row.description, mode: row.mode || 'recorded', visibility: 'public' as 'public' | 'camp_only',
     cover_url: row.cover_url || coverPresets[0].url,
     live_session_id: row.source_live_session_id || '',
     videos: row.mode === 'live' ? [] : lessons.map((l: any) => ({ video_no: l.lesson_no, name: l.title, format: l.content_type === 'audio' ? 'audio/mp3' : 'video/mp4', size: l.content_type === 'audio' ? '30.00MB' : '500.00MB', duration: formatDuration(l.video_duration), category: row.category_name || '未分组', ctype: l.content_type || 'video', has_quiz: !!l.question_bank_id, files_count: 1, file_name: l.title, reward: null })),

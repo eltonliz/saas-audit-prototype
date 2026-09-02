@@ -46,10 +46,23 @@
     <t-dialog v-model:visible="showQuickCreate" header="快速创建直播" width="500px" :confirm-btn="{ content: '创建', theme: 'primary' }" :cancel-btn="{ content: '取消' }" :on-confirm="doCreate">
       <t-form :data="form" label-width="100px">
         <t-form-item label="直播名称" required-mark><t-input v-model="form.name" placeholder="请输入直播名称" /></t-form-item>
+        <t-form-item label="选择直播间">
+          <div style="display:flex;gap:8px;width:100%">
+            <t-select v-model="form.roomId" filterable clearable placeholder="选择直播间（可留空）" style="flex:1">
+              <template #empty><div style="padding:14px 0;text-align:center;font-size:12px;color:#98A2B3">暂无直播间，请点右侧「新建直播间」创建</div></template>
+              <t-option v-for="r in liveStore.rooms" :key="r.id" :label="r.name + '（' + (r.status === 'live' ? '直播中' : '空闲') + '）'" :value="r.id" />
+            </t-select>
+            <!-- V2·0902 无直播间时就近创建：创建后自动返回本表单并选中 -->
+            <t-button theme="primary" variant="outline" @click="showCreateRoom = true"><template #icon><t-icon name="add" /></template> 新建直播间</t-button>
+          </div>
+        </t-form-item>
         <t-form-item label="选择主播"><t-select v-model="form.anchorId" style="width:100%"><t-option v-for="l in liveStore.anchors" :key="l.id" :label="l.name + ' (' + l.no + ')'" :value="l.id" /></t-select></t-form-item>
         <t-form-item label="开始时间"><t-date-picker enable-time-picker placeholder="选择开始时间" style="width:100%" /></t-form-item>
       </t-form>
     </t-dialog>
+
+    <!-- V2·0902 创建直播间（就近创建·创建后返回快速创建表单并自动选中） -->
+    <CreateLiveRoomDialog v-model:visible="showCreateRoom" from="快速创建直播" @created="onRoomCreated" />
 
     <!-- 配置弹窗 -->
     <t-dialog v-model:visible="configVisible" header="直播间配置" width="500px" :confirm-btn="{ content: '保存', theme: 'primary' }" :cancel-btn="{ content: '取消' }" :on-confirm="doConfig">
@@ -67,12 +80,16 @@
 import { ref, computed } from 'vue';
 import { MessagePlugin } from 'tdesign-vue-next';
 import { useLiveStore } from '../../../stores/live-store';
+import CreateLiveRoomDialog from './CreateLiveRoomDialog.vue';
 
 // V2·0829：主播为直播域独立角色（本地主播库），不再关联课程讲师档案
 const liveStore = useLiveStore();
 const search = ref(''); const showQuickCreate = ref(false); const configVisible = ref(false);
 const configForm = ref<any>({ roomName: '', hasCart: false, muted: false, allowReplay: true }); const configTarget = ref<any>(null);
-const form = ref<any>({ name: '', anchorId: '', });
+// V2·0902 新建直播间就近入口
+const showCreateRoom = ref(false);
+function onRoomCreated(roomId: string) { form.value.roomId = roomId; }
+const form = ref<any>({ name: '', anchorId: '', roomId: '' });
 const columns = [
   { colKey: 'lecturer_name', title: '主播信息', width: 120 },
   { colKey: 'session_no', title: '场次编号', width: 120 },
@@ -122,12 +139,13 @@ function doCreate() {
     anchor_name: lecturer?.name || '未指定',
     camp_id: null, camp_title: null, course_id: null, lesson_id: null, schedule_id: null,
     source: 'standalone',
+    room_id: form.value.roomId || null,
     planned_start_at: Math.floor(Date.now() / 1000) + 3600,
     planned_end_at: Math.floor(Date.now() / 1000) + 7200,
   });
   MessagePlugin.success('直播已创建');
   showQuickCreate.value = false;
-  form.value = { name: '', anchorId: '' };
+  form.value = { name: '', anchorId: '', roomId: '' };
 }
 function showConfig(row: any) { configForm.value = { roomName: row.title, hasCart: row.hasCart, muted: row.muted, allowReplay: row.allowReplay }; configTarget.value = row; configVisible.value = true; }
 function doConfig() {

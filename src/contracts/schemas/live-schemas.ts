@@ -120,6 +120,8 @@ export const CreateLiveSessionInputSchema = z.object({
   lesson_id: z.string().nullable(),
   schedule_id: z.string().nullable(),
   source: LiveSessionSourceEnum,
+  // V2·0902 快速创建直播可选定直播间（配合创建直播间就近入口）
+  room_id: z.string().nullable().default(null),
   planned_start_at: z.number().int(),
   planned_end_at: z.number().int(),
 });

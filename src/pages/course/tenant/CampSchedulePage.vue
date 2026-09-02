@@ -118,9 +118,22 @@
           </div>
           <div v-if="addForm.teach_mode === 'live'" class="form-col-full">
             <t-form-item label="选择直播间" required-mark>
-              <t-select v-model="addForm.live_room_id" filterable placeholder="选择直播间">
-                <t-option v-for="r in liveStore.rooms" :key="r.id" :label="r.name + '（' + (r.status === 'live' ? '直播中' : '空闲') + '）'" :value="r.id" />
-              </t-select>
+              <div style="display:flex;gap:8px;width:100%">
+                <t-select v-model="addForm.live_room_id" filterable placeholder="选择直播间" style="flex:1">
+                  <template #empty>
+                    <div class="live-room-empty">暂无直播间，请点右侧「新建直播间」创建</div>
+                  </template>
+                  <t-option v-for="r in liveStore.rooms" :key="r.id" :label="r.name + '（' + (r.status === 'live' ? '直播中' : '空闲') + '）'" :value="r.id" />
+                </t-select>
+                <!-- V2·0902 无直播间时就近创建：创建后自动返回本表单并选中 -->
+                <t-button theme="primary" variant="outline" @click="showCreateRoom = true">
+                  <template #icon><t-icon name="add" /></template> 新建直播间
+                </t-button>
+              </div>
+              <div v-if="liveStore.rooms.length === 0" class="lesson-tip">
+                <t-icon name="info-circle" />
+                <span>当前还没有直播间，创建完成后会自动返回本表单并选中</span>
+              </div>
             </t-form-item>
           </div>
           <div class="form-col-full" v-if="addForm.teach_mode === 'recorded'">
@@ -231,6 +244,9 @@
       </t-form>
     </t-dialog>
 
+    <!-- V2·0902 创建直播间（就近创建·创建后返回排课表单并自动选中） -->
+    <CreateLiveRoomDialog v-model:visible="showCreateRoom" from="营期排课" @created="onRoomCreated" />
+
   </div>
 </template>
 
@@ -243,6 +259,7 @@ import { useLiveStore } from '../../../stores/live-store';
 import { notifyModalOpen } from '../../../utils/modal-spec-bridge';
 import { useCourseStore } from '../../../stores/course-store';
 import type { CourseSchedule } from '../../../contracts/schemas/camp-schemas';
+import CreateLiveRoomDialog from './CreateLiveRoomDialog.vue';
 
 const route = useRoute();
 const campStore = useCampStore();
@@ -458,6 +475,12 @@ function del(s: CourseSchedule) {
   if (isLocked.value) { MessagePlugin.warning('审核通过后排课已锁定'); return; }
   campStore.deleteSchedule(s.id);
   MessagePlugin.success('已删除');
+}
+
+// ===== 新建直播间（V2·0902：无直播间时就近创建，创建后返回并自动选中）=====
+const showCreateRoom = ref(false);
+function onRoomCreated(roomId: string) {
+  addForm.value.live_room_id = roomId;
 }
 
 // ===== 快捷新建课程（V2·0829：主讲人为内容属性文本，无讲师档案）=====
@@ -696,5 +719,7 @@ async function doOneClickFromAdd() {
 .batch-table-header .required::before {
   content: '*'; color: #F04438; margin-right: 4px;
 }
+/* V2·0902 直播间下拉空态 */
+.live-room-empty { padding: 16px 0; text-align: center; font-size: 12px; color: #98A2B3; }
 .batch-actions { display: flex; gap: 12px; margin-top: 16px; }
 </style>
