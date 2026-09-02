@@ -216,6 +216,40 @@
   .app-report .grid{grid-template-columns:repeat(2,1fr)!important;}
   .app-report .page-head h1{font-size:17px;}
   .app-report .g2,.app-report .g2e{grid-template-columns:1fr!important;}
+  /* APP 报表移动适配 */
+  .app-report .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .app-report .tbl-wrap table{min-width:620px;}
+  .app-report .card-value{font-size:18px;}
+  .app-report .card{padding:11px 12px;}
+  .app-report .panel-head{padding:12px 12px 8px;}
+  .app-report .panel-body,.app-report .chart-wrap{padding-left:12px;padding-right:12px;}
+  .app-report .legend{padding:8px 12px 10px;}
+  .app-report .page-head{margin-bottom:10px;}
+  .app-report .page-head h1{font-size:16px;}
+  .app-report .sec{font-size:12px;margin:14px 0 8px;}
+  .app-report .funnel-row{grid-template-columns:56px 1fr;}
+  .app-report .funnel-name{font-size:11px;}
+  .app-report .funnel-meta{grid-column:1/-1;font-size:10px;padding-left:2px;margin-top:-2px;}
+  .app-report .entity{padding:11px 12px;gap:10px;}
+  .app-report .entity .t{font-size:14px;}
+  .app-report .entity .back{position:static;margin-left:auto;}
+  .app-report .grid{gap:9px;margin-bottom:12px;}
+  .app-report .a-title{font-size:12.5px;}
+  /* 外层：手机浏览器访问适配 */
+  @media (max-width:820px){
+    .sidebar{display:none;}
+    .app{display:block;}
+    .app-stage{padding:6px 8px 24px;}
+    .phone{width:100%;max-width:375px;height:720px;margin:0 auto;}
+    .app-notes{max-width:375px;margin:0 auto 14px;}
+    .topbar{padding:0 12px;}
+    .topbar-right .pill{display:none;}
+    .content{padding:0 10px 30px;}
+  }
+  @media (max-width:400px){
+    .phone{padding:8px;border-radius:36px;}
+    .phone-screen{border-radius:30px;}
+  }
 
   /* ===== v5.2 APP 端（移动端报表 · 店长/店员双角色） ===== */
   .app-stage{display:flex;gap:30px;align-items:flex-start;justify-content:center;flex-wrap:wrap;padding:8px 0 30px;}
@@ -1773,6 +1807,12 @@ function appRewrite(root){
   e.setAttribute('onclick',o);
  });
  root.querySelectorAll('[id]').forEach(x=>{ x.id='appc-'+x.id; });
+ /* 表格横滚包装（移动端左右滑查看，不挤压布局） */
+ root.querySelectorAll('table').forEach(t=>{
+  if(t.parentElement && t.parentElement.classList.contains('tbl-wrap')) return;
+  const w=document.createElement('div'); w.className='tbl-wrap';
+  t.parentNode.insertBefore(w,t); w.appendChild(t);
+ });
 }
 function appShowPane(paneId,subId,push){
  if(push) appReportStack.push(el('ar-body').innerHTML);
