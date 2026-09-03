@@ -49,7 +49,7 @@
     </div>
 
     <!-- 题目详情（选项/答案/解析） -->
-    <t-dialog v-model:visible="detailVisible" :header="detailRow ? `题目详情 · ${detailRow.question_no}`" width="560px" :footer="false">
+    <t-dialog v-model:visible="detailVisible" :header="detailRow ? `题目详情 · ${detailRow.question_no}` : '题目详情'" width="560px" :footer="false">
       <template v-if="detailRow">
         <div class="qd-stem">{{ detailRow.content }}</div>
         <div class="qd-opt" v-for="o in detailRow.options || []" :key="o.key">
