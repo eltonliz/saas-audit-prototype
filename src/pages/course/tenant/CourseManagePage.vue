@@ -77,9 +77,10 @@
           <!-- 区块1：基本信息 -->
           <div class="section-card">
             <div class="section-header"><t-icon name="user" class="section-icon" /><span>基本信息</span></div>
-            <t-form-item label="课程名称" required-mark><t-input v-model="form.title" placeholder="请输入课程名称" maxlength="45" /></t-form-item>
-            <t-form-item label="所属分类" required-mark><t-select v-model="form.category_name" placeholder="请选择所属分类" style="width:100%"><t-option v-for="c in categories" :key="c" :label="c" :value="c" /></t-select></t-form-item>
-            <t-form-item label="课程介绍"><t-textarea v-model="form.description" :autosize="{ minRows: 3 }" placeholder="请输入课程介绍" /></t-form-item>
+            <!-- V2·0902 用户裁决：直播模式不填课程名称/分类/介绍（课程名取直播间名称），仅录播显示 -->
+            <t-form-item v-if="form.mode === 'recorded'" label="课程名称" required-mark><t-input v-model="form.title" placeholder="请输入课程名称" maxlength="45" /></t-form-item>
+            <t-form-item v-if="form.mode === 'recorded'" label="所属分类" required-mark><t-select v-model="form.category_name" placeholder="请选择所属分类" style="width:100%"><t-option v-for="c in categories" :key="c" :label="c" :value="c" /></t-select></t-form-item>
+            <t-form-item v-if="form.mode === 'recorded'" label="课程介绍"><t-textarea v-model="form.description" :autosize="{ minRows: 3 }" placeholder="请输入课程介绍" /></t-form-item>
             <!-- V2·0902 授课方式与排课一致：录播=视频组课；直播=表单内直接配置直播间 -->
             <t-form-item label="授课方式" required-mark>
               <t-radio-group v-model="form.mode">
@@ -93,7 +94,8 @@
                 <t-radio value="course">课程</t-radio>
               </t-radio-group>
             </t-form-item>
-            <t-form-item label="直播标题">
+            <!-- V2·0902 用户裁决：直播模式无直播标题；录播选「直播间」风格时显示 -->
+            <t-form-item v-if="form.mode === 'recorded' && (form as any).display_style === 'live_room'" label="直播标题">
               <t-input v-model="(form as any).live_display_title" placeholder="直播间样式展示的标题（留空则用课程名称）" style="width:100%" />
             </t-form-item>
             <!-- V2·0902 老板需求：录播课是否被营期引用开关（关=排课选课时不出现该课程课时） -->
@@ -154,9 +156,7 @@
               <span class="form-tip" style="margin-left:8px">学员完成全部课时后自动发放（D35）</span>
             </t-form-item>
             <template v-if="form.completion_reward_enabled">
-              <t-form-item label="红包名称">
-                <t-input v-model="(form as any).reward_name" :placeholder="`完课红包·${form.title || '课程名'}`" style="width:260px" />
-              </t-form-item>
+              <!-- V2·0902 用户裁决：红包名称输入移除（展示端固定用默认文案「完课红包·课程名」） -->
               <t-form-item label="现金红包">
                 <t-switch v-model="form.reward_cash_enabled" />
                 <template v-if="form.reward_cash_enabled">
@@ -650,8 +650,11 @@ function openEditDrawer(row: any) {
   drawerVisible.value = true;
 }
 function doSave() {
-  if (!form.value.title) { MessagePlugin.warning('请填写课程名称'); return; }
-  if (!form.value.category_name) { MessagePlugin.warning('请选择所属分类'); return; }
+  // V2·0902 用户裁决：直播模式不填课程名称/分类（课程名取直播间名称），仅录播校验
+  if (form.value.mode === 'recorded') {
+    if (!form.value.title) { MessagePlugin.warning('请填写课程名称'); return; }
+    if (!form.value.category_name) { MessagePlugin.warning('请选择所属分类'); return; }
+  }
   // V2·D2-1 本期不做交易：全部免费，价格固定 0；D2-2 主讲人为选填文本，不做讲师档案校验
   const price = 0;
   const isPaid = false;
@@ -669,7 +672,7 @@ function doSave() {
     }
   }
   if (editing.value) {
-    store.updateCourse(editing.value.id, { title: form.value.title, category_name: form.value.category_name, description: form.value.description, mode: form.value.mode, visibility: form.value.visibility, cover_url: form.value.cover_url, is_paid: isPaid, price, commission_enabled: false, show_in_app: form.value.show_in_app, lecturer_id: '', lecturer_name: '', live_room_id: form.value.mode === 'live' ? liveRoomId : null, live_display_title: (form.value as any).live_display_title || '', display_style: form.value.mode === 'recorded' ? (form.value as any).display_style : undefined, quiz_reward_cash_enabled: form.value.mode === 'recorded' ? (form.value as any).quiz_reward_cash_enabled : false, quiz_reward: form.value.mode === 'recorded' ? (form.value as any).quiz_reward : null, answer_reward_points_enabled: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points_enabled : false, answer_reward_points: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points : 0, quiz_enabled: form.value.mode === 'recorded' ? (form.value as any).quiz_enabled : false, quiz_bank_id: form.value.mode === 'recorded' ? ((form.value as any).quiz_bank_id || null) : null, quiz_question_ids: form.value.mode === 'recorded' ? (((form.value as any).quiz_question_ids || []) as string[]) : [], answer_reward_name: form.value.mode === 'recorded' ? ((form.value as any).answer_reward_name || '') : '', reward_name: (form.value as any).reward_name || '', camp_ref_enabled: (form.value as any).camp_ref_enabled } as any);
+    store.updateCourse(editing.value.id, { title: form.value.mode === 'live' ? ((((form.value as any).room_config as any)?.name || '').trim() || '直播课程') : form.value.title, category_name: form.value.category_name || '未分类', description: form.value.mode === 'live' ? '' : form.value.description, mode: form.value.mode, visibility: form.value.visibility, cover_url: form.value.cover_url, is_paid: isPaid, price, commission_enabled: false, show_in_app: form.value.show_in_app, lecturer_id: '', lecturer_name: '', live_room_id: form.value.mode === 'live' ? liveRoomId : null, live_display_title: form.value.mode === 'recorded' && (form.value as any).display_style === 'live_room' ? ((form.value as any).live_display_title || '') : '', display_style: form.value.mode === 'recorded' ? (form.value as any).display_style : undefined, quiz_reward_cash_enabled: form.value.mode === 'recorded' ? (form.value as any).quiz_reward_cash_enabled : false, quiz_reward: form.value.mode === 'recorded' ? (form.value as any).quiz_reward : null, answer_reward_points_enabled: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points_enabled : false, answer_reward_points: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points : 0, quiz_enabled: form.value.mode === 'recorded' ? (form.value as any).quiz_enabled : false, quiz_bank_id: form.value.mode === 'recorded' ? ((form.value as any).quiz_bank_id || null) : null, quiz_question_ids: form.value.mode === 'recorded' ? (((form.value as any).quiz_question_ids || []) as string[]) : [], answer_reward_name: form.value.mode === 'recorded' ? ((form.value as any).answer_reward_name || '') : '', reward_name: (form.value as any).reward_name || '', camp_ref_enabled: (form.value as any).camp_ref_enabled } as any);
     if (form.value.mode === 'recorded') {
       form.value.videos.forEach((v: any) => {
         const existing = store.lessons.find((l: any) => l.lesson_no === v.video_no);
@@ -681,7 +684,7 @@ function doSave() {
     }
     MessagePlugin.success('课程已更新');
   } else {
-    store.createCourse({ title: form.value.title, description: form.value.description, cover_url: form.value.cover_url, category_id: 'cat-' + Date.now(), category_name: form.value.category_name, tags: [], lecturer_id: '', lecturer_name: '', source: 'upload', mode: form.value.mode, source_live_session_id: null, visibility: form.value.visibility, price, is_paid: isPaid, commission_enabled: false, show_in_app: form.value.show_in_app, live_room_id: form.value.mode === 'live' ? liveRoomId : null, live_display_title: (form.value as any).live_display_title || '', display_style: form.value.mode === 'recorded' ? (form.value as any).display_style : undefined, quiz_reward_cash_enabled: form.value.mode === 'recorded' ? (form.value as any).quiz_reward_cash_enabled : false, quiz_reward: form.value.mode === 'recorded' ? (form.value as any).quiz_reward : null, answer_reward_points_enabled: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points_enabled : false, answer_reward_points: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points : 0, quiz_enabled: form.value.mode === 'recorded' ? (form.value as any).quiz_enabled : false, quiz_bank_id: form.value.mode === 'recorded' ? ((form.value as any).quiz_bank_id || null) : null, quiz_question_ids: form.value.mode === 'recorded' ? (((form.value as any).quiz_question_ids || []) as string[]) : [], answer_reward_name: form.value.mode === 'recorded' ? ((form.value as any).answer_reward_name || '') : '', reward_name: (form.value as any).reward_name || '', camp_ref_enabled: (form.value as any).camp_ref_enabled } as any);
+    store.createCourse({ title: form.value.mode === 'live' ? ((((form.value as any).room_config as any)?.name || '').trim() || '直播课程') : form.value.title, description: form.value.mode === 'live' ? '' : form.value.description, cover_url: form.value.cover_url, category_id: 'cat-' + Date.now(), category_name: form.value.category_name || '未分类', tags: [], lecturer_id: '', lecturer_name: '', source: 'upload', mode: form.value.mode, source_live_session_id: null, visibility: form.value.visibility, price, is_paid: isPaid, commission_enabled: false, show_in_app: form.value.show_in_app, live_room_id: form.value.mode === 'live' ? liveRoomId : null, live_display_title: form.value.mode === 'recorded' && (form.value as any).display_style === 'live_room' ? ((form.value as any).live_display_title || '') : '', display_style: form.value.mode === 'recorded' ? (form.value as any).display_style : undefined, quiz_reward_cash_enabled: form.value.mode === 'recorded' ? (form.value as any).quiz_reward_cash_enabled : false, quiz_reward: form.value.mode === 'recorded' ? (form.value as any).quiz_reward : null, answer_reward_points_enabled: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points_enabled : false, answer_reward_points: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points : 0, quiz_enabled: form.value.mode === 'recorded' ? (form.value as any).quiz_enabled : false, quiz_bank_id: form.value.mode === 'recorded' ? ((form.value as any).quiz_bank_id || null) : null, quiz_question_ids: form.value.mode === 'recorded' ? (((form.value as any).quiz_question_ids || []) as string[]) : [], answer_reward_name: form.value.mode === 'recorded' ? ((form.value as any).answer_reward_name || '') : '', reward_name: (form.value as any).reward_name || '', camp_ref_enabled: (form.value as any).camp_ref_enabled } as any);
     MessagePlugin.success('课程已新增');
   }
   // D35 完课奖励同步营销域复刻观看奖励页（真实系统：课程表单保存→营销中心创建红包规则）；积分奖励走积分事件不建红包规则
