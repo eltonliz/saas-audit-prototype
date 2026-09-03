@@ -71,13 +71,13 @@
         </template>
         <template #op="{ row }">
           <t-space :size="2">
-            <t-button variant="text" size="small" theme="primary" @click="openDetail(row)">课时</t-button>
-            <!-- V2·0902 状态机简化：创建即报名→报名截止自动开营→结束时间自动结营；报名中可排课/编辑 -->
-            <t-button v-if="['enrolling','in_progress'].includes(row.status)" variant="text" size="small" @click="$router.push('/tenant/course/camp-schedule?campId=' + row.id)">排课</t-button>
-            <t-button v-if="['enrolling','in_progress','ended'].includes(row.status)" variant="text" size="small" @click="openStudentDrawer(row)">学员</t-button>
+            <!-- V2·0902 用户裁决（0903）：「课时」与「详情」重复仅保留详情；按钮按状态机分配——草稿/已驳回可编辑删除提审，报名中不可删除 -->
             <t-button variant="text" size="small" @click="openDetail(row)">详情</t-button>
-            <t-button v-if="row.status === 'enrolling'" variant="text" size="small" theme="primary" @click="openEdit(row)">编辑</t-button>
-            <t-button v-if="row.status === 'enrolling'" variant="text" size="small" theme="danger" @click="delCamp(row)">删除</t-button>
+            <t-button v-if="['published','enrolling','in_progress'].includes(row.status)" variant="text" size="small" @click="$router.push('/tenant/course/camp-schedule?campId=' + row.id)">排课</t-button>
+            <t-button v-if="['published','enrolling','in_progress','ended'].includes(row.status)" variant="text" size="small" @click="openStudentDrawer(row)">学员</t-button>
+            <t-button v-if="['draft','rejected','enrolling'].includes(row.status)" variant="text" size="small" theme="primary" @click="openEdit(row)">编辑</t-button>
+            <t-button v-if="['draft','rejected'].includes(row.status)" variant="text" size="small" theme="primary" @click="submitReview(row)">提审</t-button>
+            <t-button v-if="row.status === 'draft'" variant="text" size="small" theme="danger" @click="delCamp(row)">删除</t-button>
           </t-space>
         </template>
       </t-table>
@@ -301,7 +301,13 @@ function doSave() {
   showCreate.value = false; editingCamp.value = null;
 }
 function delCamp(row: any) {
-  DialogPlugin.confirm({ header: '删除营期', body: '确认删除营期？报名中的营期可删除。', theme: 'warning', onConfirm: () => { store.deleteCamp(row.id); MessagePlugin.success('已删除'); } });
+  DialogPlugin.confirm({ header: '删除营期', body: '确认删除该营期？仅草稿状态可删除。', theme: 'warning', onConfirm: () => { store.deleteCamp(row.id); MessagePlugin.success('已删除'); } });
+}
+// V2·0902 用户裁决（0903）：草稿/已驳回可提审；已驳回按状态机先回草稿再提审
+function submitReview(row: any) {
+  if (row.status === 'rejected' && !store.transitionCampStatus(row.id, 'draft')) { MessagePlugin.warning('当前状态不可提审'); return; }
+  if (!store.submitCampForReview(row.id)) { MessagePlugin.warning('当前状态不可提审'); return; }
+  MessagePlugin.success('已提交审核');
 }
 
 function openEdit(row: any) {
