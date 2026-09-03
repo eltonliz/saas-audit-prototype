@@ -142,8 +142,6 @@ export const CourseSchema = z.object({
   }).nullable().default(null),
   answer_reward_points_enabled: z.boolean().default(false),
   answer_reward_points: z.number().int().min(0).default(20),
-  /** V2·0902 老板需求：课时修改同步开关——开=引用同步（修改即更新所有已排营期）；关=快照独立（已排营期保留原版，real 阶段实现） */
-  lesson_sync_camps: z.boolean().default(true),
   /** 课程可见性（public/camp_only） */
   visibility: CourseVisibilityEnum.default('public'),
 
@@ -449,7 +447,6 @@ export const CreateCourseInputSchema = CourseSchema.pick({
   quiz_reward: true,
   answer_reward_points_enabled: true,
   answer_reward_points: true,
-  lesson_sync_camps: true,
   visibility: true,
 }).extend({
   question_bank_id: z.string().optional(),

@@ -164,6 +164,9 @@ export const CampSchema = z.object({
   customer_scope_mode: z.enum(['all', 'new_only']).default('all'),
   customer_scope_staff_ids: z.array(z.string()).default([]),
 
+  /** V2·0902 老板需求：修改后同步其他营期开关（排课页头部，默认开） */
+  lesson_sync_camps: z.boolean().default(true),
+
   /** 状态机（D15·8状态） */
   status: CampStatusEnum.default('draft'),
   review_remark: z.string().optional(),

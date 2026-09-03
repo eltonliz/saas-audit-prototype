@@ -25,6 +25,11 @@
             <t-button theme="primary" variant="text" @click="openQuickCourseDialog">
               <template #icon><t-icon name="add" /></template> 快捷新建课程
             </t-button>
+            <!-- V2·0902 老板需求：修改后同步其他营期开关（营期级） -->
+            <span class="sync-switch" @click.stop>
+              <t-switch v-model="campSyncEnabled" size="small" @change="onSyncChange" />
+              <span class="sync-label">修改后同步其他营期</span>
+            </span>
           </div>
           <div class="actions" v-else>
             <t-tag theme="default" size="small">开营后不可编辑，如需修改请复制营期重做</t-tag>
@@ -356,6 +361,15 @@ const isLocked = computed(() => {
   return s === 'ended';
 });
 const isScheduleStarted = (s: any) => (s.unlock_time || 0) * 1000 <= Date.now();
+// V2·0902 老板需求：修改后同步其他营期开关（营期级，默认开）
+const campSyncEnabled = computed({
+  get: () => (camp.value as any)?.lesson_sync_camps ?? true,
+  set: (v: boolean) => { if (camp.value) { (camp.value as any).lesson_sync_camps = v; } },
+});
+function onSyncChange(v: boolean) {
+  if (camp.value) { campStore.updateCamp(camp.value.id, { lesson_sync_camps: v } as any); }
+  MessagePlugin.success(v ? '已开启：该营期引用的课时被修改时，同步更新其他营期' : '已关闭：该营期保留课时原版，不随修改同步');
+}
 const campStatusLabel = (s: string): string => ({ draft: '草稿', pending_review: '待审核', published: '已发布', enrolling: '报名中·可排课', in_progress: '进行中·未来课可排', ended: '已结束', offline: '已下架', rejected: '已驳回' }[s] ?? s);
 
 // 按天分组
@@ -894,6 +908,9 @@ async function doOneClickFromAdd() {
 /* 直播间配置穿插块 */
 .live-room-config-block { border-top: 1px dashed #EAECF0; margin-top: 4px; padding-top: 8px; }
 .batch-days { margin-top: 8px; padding: 8px 12px; background: #F9FAFB; border-radius: 6px; }
+/* V2·0902 修改后同步其他营期开关 */
+.sync-switch { display: inline-flex; align-items: center; gap: 6px; margin-left: 8px; }
+.sync-label { font-size: 13px; color: #667085; white-space: nowrap; }
 .batch-actions { display: flex; gap: 12px; margin-top: 16px; }
 </style>
 

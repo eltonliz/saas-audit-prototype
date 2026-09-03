@@ -31,12 +31,7 @@
             <template #prefix-icon><t-icon name="search" /></template>
           </t-input>
         </div>
-        <div class="filter-item">
-          <t-select v-model="modeFilter" placeholder="授课方式" clearable style="width:120px">
-            <t-option label="直播" value="live" />
-            <t-option label="录播" value="recorded" />
-          </t-select>
-        </div>
+        <!-- V2·0902 营期不设授课模式（直播/录播在排课处逐条配置），筛选移除 -->
         <div class="filter-item">
           <t-select v-model="statusFilter" placeholder="状态" clearable style="width:120px">
             <t-option v-for="s in ['enrolling','in_progress','ended']" :key="s" :label="statusLabel(s)" :value="s" />
@@ -203,7 +198,7 @@ import CustomerScopeDialog from './CustomerScopeDialog.vue';
 const store = useCampStore();
 const courseStore = useCourseStore();
 // V2·0829 用户裁决：讲师/助教角色下线；归属关系统一走 SaaS 门店成员（店长/店员），课程业务不带归属
-const search = ref(''); const modeFilter = ref(''); const statusFilter = ref(''); const showCreate = ref(false);
+const search = ref(''); const statusFilter = ref(''); const showCreate = ref(false);
 const editingCamp = ref<any>(null);
 // 营期最大90天约束（行业约束）；兼容字符串/Date（t-date-range-picker 默认输出字符串）
 function daysBetween(start: any, end: any): number { return Math.floor((new Date(end).getTime() - new Date(start).getTime()) / 86400000) + 1; }
@@ -232,10 +227,10 @@ const metrics = computed(() => {
 });
 
 const filtered = computed(() =>
-  store.camps.filter(c => (!search.value || c.title.includes(search.value)) && (!modeFilter.value || c.mode === modeFilter.value) && (!statusFilter.value || c.status === statusFilter.value))
+  store.camps.filter(c => (!search.value || c.title.includes(search.value)) && (!statusFilter.value || c.status === statusFilter.value))
 );
 
-function resetFilter() { search.value = ''; modeFilter.value = ''; statusFilter.value = ''; MessagePlugin.success('已重置筛选条件'); }
+function resetFilter() { search.value = ''; statusFilter.value = ''; MessagePlugin.success('已重置筛选条件'); }
 
 // 表格列定义
 const columns = [
