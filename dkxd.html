@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>代客下单原型（业务逻辑与数据流转旁注版）V1.2.0 — STR-SAAS-005</title>
+<style>
+:root{
+  --g1:#10B981; --g1-deep:#0BA876; --g2:#3DDBB4; --gw:#EAF9F1;
+  --price:#FF3141; --bg:#F5F6F7; --card:#fff; --line:#F0F0F0;
+  --t1:#333; --t2:#999; --t3:#C0C4CC;
+  --add:#FA8C16; --chg:#1890FF; --blue-bg:#E8F3FF; --warn-bg:#FFF7E8; --warn-line:#FFE1B3;
+  --grad:linear-gradient(180deg,#E3F7EC 0%,#F2FBF6 60%,#F5F6F7 100%);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased}
+body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;background:#E9ECF0;color:var(--t1);padding:24px}
+.doc-head{max-width:1620px;margin:0 auto 20px;background:#fff;border-radius:14px;padding:20px 24px}
+.doc-head h1{font-size:20px;margin-bottom:6px}
+.doc-head .sub{font-size:12.5px;color:var(--t2);line-height:1.9}
+.flow{background:#F0FAF5;border:1px solid #CFF0E0;border-radius:10px;padding:10px 14px;font-size:12.5px;line-height:2;margin-top:10px;color:#444}
+.flow b{color:var(--g1-deep)}
+.legend{display:flex;gap:14px;margin-top:10px;font-size:12px;flex-wrap:wrap}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend i{width:14px;height:14px;border-radius:4px;display:inline-block}
+.lg-cur{background:var(--bg);border:1px solid var(--line)}
+.lg-add{border:1.5px dashed var(--add)}
+.legend .a{color:var(--add);font-weight:600}
+.board{max-width:1620px;margin:0 auto}
+.sec-title{font-size:14px;font-weight:700;color:#444;margin:26px 4px 12px;padding-left:10px;border-left:4px solid var(--g1)}
+.rowwrap{display:flex;flex-wrap:wrap;gap:26px;align-items:flex-start}
+.col{display:flex;flex-direction:column;gap:6px}
+.phone{width:375px;background:var(--bg);border-radius:26px;border:1px solid #D8DCE1;box-shadow:0 12px 30px rgba(30,40,60,.12);overflow:hidden;position:relative;height:812px;display:flex;flex-direction:column}
+.statusbar{height:34px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;font-size:13px;font-weight:600;color:#222;position:relative;z-index:3}
+.grad-head{background:var(--grad)}
+.nvbar{height:44px;display:flex;align-items:center;padding:0 12px;font-size:16.5px;font-weight:600;position:relative;z-index:3}
+.nvbar .bk{width:26px;height:26px;display:flex;align-items:center;justify-content:center}
+.nvbar .bk svg{width:20px;height:20px}
+.nvbar .t{flex:1;text-align:center;margin-right:26px}
+.nvbar .r{position:absolute;right:14px;color:var(--t1)}
+.p-body{flex:1;overflow-y:auto;padding:12px 12px 96px;scrollbar-width:none}
+.p-body::-webkit-scrollbar{display:none}
+.card{background:var(--card);border-radius:14px;padding:14px;margin-bottom:10px}
+.row{display:flex;align-items:center}
+.gap{flex:1}
+.mut{color:var(--t2)}.small{font-size:12px}.big{font-size:17px}
+.price{color:var(--price);font-weight:700}
+.p-foot{position:absolute;bottom:0;left:0;right:0;background:#fff;padding:10px 14px;display:flex;align-items:center;gap:12px;border-top:1px solid var(--line);z-index:4}
+.btn{border:none;border-radius:22px;font-size:14px;padding:11px 0;text-align:center;cursor:pointer}
+.btn-g1{background:var(--g1);color:#fff}
+.btn-g2{background:var(--g2);color:#fff}
+.btn-ghost{background:#fff;color:var(--g1-deep);border:1px solid var(--g1)}
+.btn-gray{background:#F5F6F7;color:#666;border:1px solid #E8EAEC}
+.btn-red-ghost{background:#fff;color:#F5222D;border:1px solid #F5222D}
+.btn-disabled{background:#CDD3D9;color:#fff}
+.btn-sm{padding:8px 0;font-size:12.5px;border-radius:18px}
+/* 标注 */
+.tag{font-size:9.5px;font-weight:700;color:#fff;border-radius:4px;padding:1px 5px;vertical-align:2px;margin-left:5px}
+.tag-add{background:var(--add)}
+.hl-add{outline:1.8px dashed var(--add);outline-offset:2px;border-radius:10px}
+.note{font-size:11px;color:var(--add);background:var(--warn-bg);border:1px solid var(--warn-line);border-radius:8px;padding:6px 9px;margin:0 12px 8px;line-height:1.6}
+.note-static{font-size:11px;color:var(--t2);background:#F7F8FA;border-radius:8px;padding:6px 9px;margin:0 12px 8px;line-height:1.6}
+.note b{color:#C56A00}
+/* 我的页 */
+.me-top{padding:6px 16px 0}
+.invite{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#444;background:rgba(255,255,255,.7);border-radius:14px;padding:4px 10px}
+.me-head{display:flex;align-items:center;gap:12px;padding:12px 16px 6px}
+.ava{border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;flex:none}
+.me-name{font-size:18px;font-weight:700}
+.role-pill{font-size:11px;color:#666;background:rgba(255,255,255,.8);border-radius:12px;padding:2px 8px;margin-top:5px;display:inline-block}
+.assets{display:flex;background:#fff;border-radius:14px;margin:10px 16px;padding:12px 0}
+.assets .a{flex:1;text-align:center;font-size:12px;color:#666}
+.assets .a b{display:block;font-size:18px;color:#222;margin-bottom:2px;font-weight:600}
+.vip-bar{margin:0 16px 10px;background:linear-gradient(90deg,#2E2E38,#3C3C4A);border-radius:12px 12px 0 0;color:#E8E8F0;display:flex;align-items:center;padding:10px 14px;font-size:12.5px}
+.vip-bar .crown{color:#F5C542;margin-right:6px;font-size:14px}
+.order-card{background:#fff;border-radius:0 0 14px 14px;margin:0 16px 10px;padding:12px 8px 8px}
+.order-card .oc-h{display:flex;justify-content:space-between;padding:0 8px 10px;font-size:14px;font-weight:600}
+.oc-icons{display:flex}
+.oc-icons .o{flex:1;text-align:center;font-size:11px;color:#666;position:relative}
+.oc-icons .o svg{width:24px;height:24px;color:#555;margin-bottom:4px}
+.sec-t{font-size:13px;font-weight:600;padding:0 4px 10px}
+.grid-menu{background:#fff;border-radius:14px;padding:14px 6px 6px;margin:0 16px 10px}
+.gm{display:flex;flex-wrap:wrap}
+.gm .g{width:25%;text-align:center;font-size:11.5px;color:#555;padding:10px 0 12px;position:relative;cursor:pointer}
+.gm .g svg{width:25px;height:25px;color:var(--g1);display:block;margin:0 auto 6px}
+.gm .g .newdot{position:absolute;top:6px;left:58%;background:#FF3141;color:#fff;font-size:8.5px;border-radius:8px 8px 8px 0;padding:1px 4px}
+.gm .g .relabel{position:absolute;top:6px;right:14%;background:var(--add);color:#fff;font-size:8.5px;border-radius:8px;padding:1px 4px}
+.like-sec{font-size:14px;font-weight:600;padding:6px 18px 10px}
+.like-grid{display:flex;flex-wrap:wrap;gap:10px;padding:0 16px 16px}
+.like-card{width:calc(50% - 5px);background:#fff;border-radius:12px;overflow:hidden}
+.like-card .lc-img{height:120px;position:relative;display:flex;align-items:center;justify-content:center;font-size:30px}
+.like-card .lc-t{font-size:12.5px;padding:8px 10px 2px;font-weight:500;line-height:1.4}
+.like-card .lc-s{font-size:10.5px;color:var(--t2);padding:0 10px}
+.like-card .lc-b{display:flex;align-items:center;padding:6px 10px 10px}
+.like-card .lc-p{color:var(--price);font-weight:700;font-size:14px}
+.lc-buy{margin-left:auto;background:var(--g1);color:#fff;font-size:11px;border-radius:12px;padding:4px 10px}
+/* 工作台 */
+.shop-card{background:#fff;border-radius:14px;margin:0 16px 10px;padding:12px;display:flex;gap:10px;align-items:flex-start}
+.shop-logo{width:46px;height:46px;border-radius:10px;background:linear-gradient(135deg,#F26D6D,#E54848);flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;font-weight:700}
+.shop-n{font-size:14.5px;font-weight:600}
+.shop-l{font-size:11.5px;color:var(--t2);margin-top:4px;display:flex;align-items:center;gap:4px}
+.switch-pill{position:absolute;right:12px;top:12px;background:var(--g1);color:#fff;font-size:11px;border-radius:12px;padding:3px 10px}
+.data-card{background:#fff;border-radius:14px;margin:0 16px 10px;padding:12px 12px 14px}
+.dc-tabs{display:flex;gap:8px;font-size:11.5px;color:#888;margin-bottom:12px}
+.dc-tabs .on{background:#EAF9F1;color:var(--g1-deep);border-radius:12px;padding:3px 10px;font-weight:600}
+.dc-row{display:flex;text-align:center;margin-bottom:12px}
+.dc-row .d{flex:1}
+.dc-row .d b{display:block;font-size:16px;font-weight:700;color:#222}
+.dc-row .d i{font-style:normal;font-size:10.5px;color:var(--t2)}
+.dc-row2 .d b{font-size:15px}
+.sec-label{font-size:13.5px;font-weight:600;padding:2px 4px 10px}
+.wk-grid{background:#fff;border-radius:14px;margin:0 16px;padding:10px 4px;display:flex;flex-wrap:wrap}
+/* 客户管理 */
+.cm-hero{display:flex;align-items:flex-start;justify-content:space-between;padding:4px 20px 14px}
+.cm-num{font-size:40px;font-weight:700;color:#222;line-height:1}
+.cm-lab{font-size:12px;color:#666;margin-top:4px}
+.bl-pill{background:#fff;border:1px solid #E8EAEC;color:#555;font-size:12px;border-radius:16px;padding:6px 14px}
+.stat-card{background:#fff;border-radius:14px;margin:0 16px 12px;display:flex;padding:14px 0}
+.stat-card .s{flex:1;text-align:center;font-size:11.5px;color:#666}
+.stat-card .s b{display:block;font-size:20px;color:#222;font-weight:700;margin-bottom:3px}
+.cust-card{background:#fff;border-radius:14px;margin:0 16px 12px;padding:14px}
+.ch{display:flex;align-items:center;gap:10px}
+.ch .n{font-size:15px;font-weight:600}
+.ch .cid{font-size:11.5px;color:var(--t2);margin-top:3px}
+.ch .cid b{color:#666;font-weight:500}
+.copy{color:#8FB8FF;font-size:11px;margin-left:4px}
+.cust-row{display:flex;font-size:12.5px;margin-top:9px}
+.cust-row i{font-style:normal;width:64px;color:var(--t2);flex:none}
+.btnrow{display:flex;gap:8px;margin-top:12px}
+.btnrow .br-btn{flex:1;font-size:12.5px;border-radius:18px;padding:9px 0;text-align:center}
+/* 确认订单 */
+.addr-card{background:#fff;border-radius:14px;margin-bottom:10px;padding:14px}
+.addr-empty{text-align:left}
+.addr-empty .ae-t{font-size:14.5px;font-weight:600;display:flex;align-items:center;gap:6px}
+.addr-empty .ae-b{display:flex;align-items:center;margin-top:12px}
+.addr-empty .ae-hint{color:#8FB8FF;font-size:12.5px}
+.addr-add-btn{margin-left:auto;background:var(--g1);color:#fff;font-size:12px;border-radius:15px;padding:7px 14px}
+.addr-a1{font-size:14.5px;font-weight:600;line-height:1.5}
+.addr-a2{font-size:12.5px;color:var(--t2);margin-top:5px}
+.goods{display:flex;gap:10px;margin-bottom:10px}
+.goods:last-child{margin-bottom:0}
+.goods .gimg{width:66px;height:66px;border-radius:8px;flex:none;display:flex;align-items:center;justify-content:center;font-size:22px}
+.goods .ginfo{flex:1;min-width:0}
+.goods .gn{font-size:13px;font-weight:500;line-height:1.4}
+.goods .gs{font-size:11.5px;color:var(--t2);margin-top:3px}
+.goods .gp{font-size:12.5px;margin-top:4px}
+.goods .gp .pj{font-size:10.5px;color:var(--t2);font-weight:400}
+.kv{display:flex;justify-content:space-between;font-size:13px;padding:9px 0;border-bottom:1px solid var(--line)}
+.kv:last-child{border-bottom:none}
+.kv .red{color:var(--price)}
+.msg-row{display:flex;justify-content:space-between;font-size:13px;padding:11px 0 2px;border-top:1px solid var(--line);margin-top:4px}
+.pay-bar .amt{font-size:13px;color:#666}
+.pay-bar .amt b{color:var(--price);font-size:18px;font-weight:700}
+.proxy-bar{background:var(--warn-bg);border:1px solid var(--warn-line);border-radius:10px;padding:8px 12px;font-size:12px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.proxy-bar .sw{margin-left:auto;color:var(--add);font-weight:600}
+/* 弹层 */
+.mask{position:absolute;inset:0;background:rgba(0,0,0,.45);z-index:5}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:14px 14px 0 0;z-index:6;padding:16px 16px 14px}
+.sheet .close{position:absolute;right:14px;top:14px;color:var(--t3);font-size:16px}
+.chip{border:1px solid #E4E7ED;border-radius:6px;padding:6px 16px;font-size:13px;margin:0 8px 8px 0;background:#fff}
+.chip.on{border-color:var(--g1);color:var(--g1-deep);background:var(--gw)}
+.stepper{display:flex;align-items:center;border:1px solid #E4E7ED;border-radius:6px;overflow:hidden}
+.stepper b{width:30px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:400;color:#666;background:#FAFAFA}
+.stepper i{width:34px;height:28px;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:13px;border-left:1px solid #E4E7ED;border-right:1px solid #E4E7ED}
+.sku-img{width:74px;height:74px;border-radius:8px;background:#FCE7E7;display:flex;align-items:center;justify-content:center;font-size:26px;flex:none}
+.search{background:#F5F6F7;border-radius:8px;padding:9px 12px;font-size:13px;color:var(--t3);display:flex;gap:6px;align-items:center}
+.search input{border:none;outline:none;background:transparent;flex:1;font-size:13px;color:var(--t1)}
+.radio{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--t3);flex:none}
+.radio.on{border-color:var(--g1);background:radial-gradient(circle,var(--g1) 42%,#fff 46%)}
+.pay-opt{display:flex;align-items:center;gap:12px;background:#fff;border-radius:12px;padding:15px 14px;margin-bottom:10px;border:1.5px solid transparent}
+.pay-opt.on{border-color:var(--g1);background:var(--gw)}
+.pay-ico{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff;flex:none}
+.pi-wx{background:#2AAE67}.pi-other{background:#FA8C16}
+.locked-tag{font-size:10px;color:#1890FF;background:var(--blue-bg);border-radius:4px;padding:1px 6px;margin-left:6px}
+.orange-tag{font-size:10px;color:var(--add);background:var(--warn-bg);border-radius:4px;padding:1px 6px;margin-left:6px}
+.notice{background:#F7F8FA;border-radius:8px;padding:9px 10px;font-size:11.5px;color:var(--t2);line-height:1.6;margin-top:10px}
+.notice b{color:var(--g1-deep);font-weight:600}
+/* 列表/订单 */
+.order-li{background:#fff;border-radius:14px;padding:12px 14px;margin-bottom:10px}
+.ol-top{display:flex;justify-content:space-between;font-size:11.5px;color:var(--t2);margin-bottom:8px}
+.countdown{color:var(--add);font-weight:600}
+.empty{padding:40px 0;text-align:center;color:var(--t3);font-size:13px}
+.empty b{display:block;font-size:32px;font-weight:400;margin-bottom:8px}
+/* 用例卡 */
+.uc{width:375px;background:#fff;border-radius:12px;border-left:4px solid var(--g1);padding:12px 14px;font-size:12px;line-height:1.85;color:#555}
+.uc b{color:var(--t1)}
+.uc .br{color:var(--g1-deep);font-weight:600}
+.uc .prd{color:#7A5CD0;font-weight:600;font-size:11px}
+.uc-wide{width:660px}
+/* PC */
+.pc{width:660px;background:#fff;border-radius:14px;border:1px solid #D8DCE1;box-shadow:0 12px 30px rgba(30,40,60,.10);overflow:hidden}
+.pc-head{padding:14px 18px;border-bottom:1px solid var(--line);font-weight:600;font-size:15px;display:flex;align-items:center;gap:8px}
+.blk{border:1px solid #EBEEF3;border-radius:10px;margin:10px 18px;overflow:hidden}
+.blk-h{background:#FAFBFC;padding:9px 14px;font-size:13px;font-weight:600;border-bottom:1px solid #EBEEF3}
+.blk-b{padding:11px 14px;font-size:12.5px;color:#555;line-height:2}
+.blk-b .kv2{display:flex}
+.blk-b .kv2 i{font-style:normal;width:110px;color:#8C8C8C;flex:none}
+.pill{font-size:10.5px;border-radius:4px;padding:1px 6px;background:var(--gw);color:var(--g1-deep)}
+.pill-r{background:#FFECE8;color:#F5222D}
+.pill-b{background:var(--blue-bg);color:#1890FF}
+/* ===== 后台 1:1 复刻（对照真实页 待发货订单样例）===== */
+.pcx{width:1020px;background:#fff;border-radius:10px;border:1px solid #E4E7ED;box-shadow:0 12px 30px rgba(30,40,60,.10);overflow:hidden}
+.pcx-crumb{padding:12px 20px;border-bottom:1px solid #F0F0F0;display:flex;align-items:center;gap:8px;font-size:13px;color:#666}
+.pcx-crumb .tabs{margin-left:18px;display:flex;gap:2px}
+.pcx-crumb .ptab{padding:7px 18px;font-size:13px;color:#666;background:#F5F6F7;border-radius:8px 8px 0 0;border:1px solid #EBEEF3;border-bottom:none}
+.pcx-crumb .ptab.on{background:#fff;color:var(--g1-deep);font-weight:600;position:relative;top:1px}
+.pcx-status{display:flex;gap:24px;padding:20px 22px 8px}
+.pcx-status .st-l{width:250px;flex:none}
+.pcx-status .st-big{font-size:20px;font-weight:700;color:#222}
+.pcx-status .st-sub{font-size:12.5px;color:var(--t2);margin:6px 0 12px}
+.btn-ship{display:inline-block;background:#0FC6A0;color:#fff;font-size:13px;border-radius:6px;padding:8px 22px}
+.pcx-status .st-note{font-size:12.5px;color:#666;margin-top:14px}
+.pcx-status .st-note b{color:#0FC6A0;font-weight:500}
+.tlh{flex:1;display:flex;align-items:flex-start;padding-top:4px}
+.tlh .step{display:flex;flex-direction:column;align-items:center;min-width:86px}
+.tlh .dot{width:26px;height:26px;border-radius:50%;background:#E8EAEC;color:#999;font-size:13px;display:flex;align-items:center;justify-content:center;font-weight:600}
+.tlh .dot.done{background:#0FC6A0;color:#fff}
+.tlh .sn{font-size:12.5px;color:#333;margin-top:6px;font-weight:600}
+.tlh .sn.gray{color:#999;font-weight:400}
+.tlh .sd{font-size:10.5px;color:var(--t2);margin-top:3px;text-align:center;line-height:1.5}
+.tlh .ln{flex:1;height:2px;background:#E8EAEC;margin-top:12px;min-width:22px}
+.gray-strip{margin:6px 22px 18px;background:#F7F8FA;border-radius:8px;padding:16px 18px;display:grid;grid-template-columns:1.2fr .9fr .9fr .8fr 1.1fr .9fr;gap:18px}
+.gray-strip .gc h5{font-size:13px;font-weight:700;color:#222;margin-bottom:10px}
+.gray-strip .gc p{font-size:12px;color:#555;line-height:2;margin:0}
+.gray-strip .gc p b{color:#222;font-weight:500}
+.sku-tb{width:calc(100% - 44px);margin:0 22px;border-collapse:collapse;font-size:12.5px}
+.sku-tb th{background:#FAFBFC;color:#333;font-weight:600;padding:12px 10px;text-align:left;border-bottom:1px solid #EBEEF3}
+.sku-tb td{padding:14px 10px;border-bottom:1px solid #F5F6F7;color:#555;vertical-align:middle}
+.sum-box{width:300px;margin:10px 22px 20px auto;font-size:12.5px;color:#555}
+.sum-box .srow{display:flex;justify-content:flex-end;gap:26px;padding:5px 0}
+.sum-box .srow i{font-style:normal;width:150px;text-align:left;color:#666}
+.sum-box .srow.final b{color:#222;font-size:14px}
+/* 售后 1:1 */
+.afs-filter{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #EBEEF3;border-radius:6px;margin:0 22px 12px;padding:12px 14px;font-size:12.5px;color:#666}
+.afs-filter .sel{border:1px solid #E0E3E8;border-radius:4px;padding:6px 10px;color:#333}
+.afs-filter .ipt{border:1px solid #E0E3E8;border-radius:4px;padding:6px 10px;color:var(--t3)}
+.afs-filter .exp{color:#666}
+.btn-q{margin-left:auto;background:#0FC6A0;color:#fff;font-size:12.5px;border-radius:5px;padding:7px 18px}
+.afs-tabbar{display:flex;align-items:center;gap:4px;background:#fff;border:1px solid #EBEEF3;border-radius:6px;margin:0 22px 10px;padding:4px 10px;font-size:13px}
+.afs-tabbar .at{padding:9px 14px;color:#666;cursor:pointer}
+.afs-tabbar .at.on{color:#0FC6A0;font-weight:600;border-bottom:2px solid #0FC6A0}
+.afs-tabbar .sort{margin-left:auto;color:#666;font-size:12px}
+.afs-batch{display:flex;gap:10px;margin:0 22px 10px;font-size:12.5px;color:var(--g1-deep)}
+.afs-batch .bb{background:var(--gw);border-radius:4px;padding:6px 12px}
+.afs-cols{display:grid;grid-template-columns:repeat(3,1fr);margin:8px 22px;border:1px solid #EBEEF3;border-radius:4px}
+.afs-cols.c4{grid-template-columns:repeat(4,1fr)}
+.afs-cols .ac{padding:14px 16px;border-right:1px solid #EBEEF3}
+.afs-cols .ac:last-child{border-right:none}
+.afs-cols h5{font-size:13px;font-weight:700;color:#222;margin-bottom:10px}
+.afs-cols p{font-size:12px;color:#555;line-height:2;margin:0}
+.afs-cols p b{color:#222;font-weight:500}
+.afs-log{margin:10px 22px 22px;border:1px solid #EBEEF3;border-radius:4px}
+.afs-log .lh{padding:11px 16px;font-size:13px;font-weight:700;color:#222;border-bottom:1px solid #EBEEF3;background:#FAFBFC}
+.afs-log .li{padding:13px 16px;border-bottom:1px solid #F0F0F0;font-size:12px;color:#555;line-height:1.9;position:relative;padding-left:30px}
+.afs-log .li:last-child{border-bottom:none}
+.afs-log .li::before{content:"";position:absolute;left:14px;top:18px;width:8px;height:8px;border-radius:50%;background:#0FC6A0}
+.afs-log .li .lt{font-weight:600;color:#222;font-size:12.5px}
+.afs-log .li .tm{position:absolute;right:16px;top:14px;color:var(--t2);font-size:11px}
+.tl{position:relative;padding-left:16px}
+.tl::before{content:"";position:absolute;left:4px;top:4px;bottom:6px;width:2px;background:#EDEFF1}
+.tl-dot{position:absolute;left:0;top:7px;width:10px;height:10px;border-radius:50%;background:#CDD3D9}
+.tl-dot.done{background:var(--g1)}
+.tl-item{position:relative;padding-bottom:12px}
+
+.scr{display:flex;gap:16px;align-items:flex-start;margin-bottom:26px}
+.phcol{width:375px;flex:none}
+.anno{width:380px;flex:none;background:#fff;border-radius:14px;border:1px solid #E4E7ED;padding:16px;font-size:12px;line-height:1.95;color:#444}
+.anno .ttl{font-size:13.5px;font-weight:700;color:#222}
+.anno .ttl small{font-weight:400;color:var(--t2);font-size:11px;margin-left:6px}
+.anno .ah{font-size:12.5px;font-weight:700;color:var(--g1-deep);margin:12px 0 6px;padding-left:8px;border-left:3px solid var(--g1)}
+.anno .ah:first-of-type{margin-top:10px}
+.anno ol{margin-left:17px}
+.anno ol li{margin-bottom:7px}
+.anno ol li b{color:#222}
+.anno .br{color:var(--g1-deep);font-weight:700}
+.anno .prd{color:#7A5CD0;font-weight:600;font-size:11px}
+.anno .api{color:#B4690E;font-weight:600;font-size:11px}
+.anno .flow2{background:#F0FAF5;border:1px solid #CFF0E0;border-radius:8px;padding:9px 11px;font-size:11.5px;line-height:2;color:#345;margin-top:4px}
+.anno .flow2 b{color:var(--g1-deep)}
+
+
+.scr.pcscr{flex-wrap:wrap}
+.scr.pcscr>.sec-title{width:100%;flex:none}
+.pcx{flex:none}
+.anno{flex:none}
+</style>
+</head>
+<body>
+
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+<symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M16 16l4.5 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+<symbol id="i-pay" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M3 10h18" stroke="currentColor" stroke-width="1.7"/><path d="M7 15h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+<symbol id="i-deliver" viewBox="0 0 24 24"><path d="M4 8l8-4 8 4v8l-8 4-8-4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M4 8l8 4 8-4M12 12v8" fill="none" stroke="currentColor" stroke-width="1.7"/></symbol>
+<symbol id="i-receive" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M8.5 12.5l2.5 2.5 5-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-star" viewBox="0 0 24 24"><path d="M12 4l2.4 4.9 5.4.8-3.9 3.8.9 5.4-4.8-2.5-4.8 2.5.9-5.4L4.2 9.7l5.4-.8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+<symbol id="i-after" viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M18 3v4h-4M6 21v-4h4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-work" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M9 20h6M12 17v3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M8 9l2.5 2.5L8 14M13 14h3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-publish" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 8v8M8 12h8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+<symbol id="i-foot" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.3-6.5-10a6.5 6.5 0 0 1 13 0c0 4.7-6.5 10-6.5 10z" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="10.5" r="2.4" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+<symbol id="i-live" viewBox="0 0 24 24"><rect x="3.5" y="6" width="13" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M16.5 10.5l4-2.5v8l-4-2.5z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
+<symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.7-7.5-10A4.3 4.3 0 0 1 12 7.6 4.3 4.3 0 0 1 19.5 10c0 5.3-7.5 10-7.5 10z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
+<symbol id="i-addr" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.3-6.5-10a6.5 6.5 0 0 1 13 0c0 4.7-6.5 10-6.5 10z" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="10.5" r="2.4" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+<symbol id="i-scan" viewBox="0 0 24 24"><path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M4 12h16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+<symbol id="i-coupon" viewBox="0 0 24 24"><path d="M4 8a2 2 0 0 0 2-2h12a2 2 0 0 0 2 2v3a2.5 2.5 0 0 0 0 5v3a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" transform="rotate(0 12 12)"/><path d="M13.5 7v10" stroke="currentColor" stroke-width="1.6" stroke-dasharray="2 2.4"/></symbol>
+<symbol id="i-mgr" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.6" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M5 20a7 7 0 0 1 14 0" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+<symbol id="i-order" viewBox="0 0 24 24"><rect x="5" y="3.5" width="14" height="17" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M9 8h6M9 12h6M9 16h3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+<symbol id="i-wrench" viewBox="0 0 24 24"><path d="M14.5 6.5a4 4 0 0 0-5.3 5.1L4 16.8V20h3.2l5.2-5.2a4 4 0 0 0 5.1-5.3L14.6 12l-2.5-2.5z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 8.5v7M8.5 12h7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 2.8v5.4c0 4.6-3 8-7 9.8-4-1.8-7-5.2-7-9.8V5.8z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M9 11.8l2.2 2.2 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-box" viewBox="0 0 24 24"><path d="M4 8l8-4 8 4v8l-8 4-8-4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M4 8l8 4 8-4M12 12v8" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+<symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20h16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M7 20v-6M12 20V8M17 20v-9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+<symbol id="i-coin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 7.5v9M9.5 10c0-1.2 1.1-2 2.5-2s2.5.8 2.5 2-1 1.7-2.5 2-2.5.8-2.5 2 1.1 2 2.5 2 2.5-.8 2.5-2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+<symbol id="i-horn" viewBox="0 0 24 24"><path d="M4 10v4a1 1 0 0 0 1 1h3l7 4V5L8 9H5a1 1 0 0 0-1 1z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M18 9a5 5 0 0 1 0 6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+<symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h12M8 12h12M8 18h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="4.5" cy="6" r="1.2" fill="currentColor"/><circle cx="4.5" cy="12" r="1.2" fill="currentColor"/><circle cx="4.5" cy="18" r="1.2" fill="currentColor"/></symbol>
+<symbol id="i-book" viewBox="0 0 24 24"><path d="M5 4.5h11a2 2 0 0 1 2 2V20H7a2 2 0 0 1-2-2z" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M5 17.5a2 2 0 0 1 2-2h11M9 8.5h5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+<symbol id="i-tv" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M10 8.5l4 2.5-4 2.5z" fill="currentColor"/><path d="M8 20h8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+</svg>
+
+<div class="doc-head">
+  <h1>代客下单原型（业务逻辑与数据流转旁注版）V1.2.0</h1>
+  <div class="sub">需求流 代客下单需求流 · 脑暴文档 V1.3.0 配套原型 · 2026-09-03<br>本版变更：①去除全部演示数据，页面按正式环境风格填充示例数据；②每屏旁挂两块注解——<b>业务逻辑</b>（编号规则，引 BR/需求文档 章节）与<b>数据流转</b>（<span style="color:#后台售后列表690E;font-weight:600">接口</span> / 状态与写库链路）；③三端骨架 1:1（APP 16 屏 + 后台订单详情/售后列表/售后详情）<br>走查依据：SaaS 现有 APP 下单页 4 屏 + 后台订单详情 + 售后列表/售后详情+ 微赞代客下单 5 屏 + 百货商城原型 v1.3.9.0</div>
+  <div class="legend"><span>页面数据为正式环境风格示例</span>
+    <span><i class="lg-cur"></i>现有页面 1:1 复刻（无改动）</span>
+    <span><i class="lg-add"></i><b class="a">橙框/橙标 = 代客下单新增</b></span>
+    <span style="color:#7A5CD0">紫字 = 引用 需求文档 v7.0.0 章节号</span>
+  </div>
+</div>
+
+<div class="board">
+
+<!-- ======================= 正向主链 ======================= -->
+<div class="sec-title">第一段 · 正向主链：我的 → 工作台 → 客户管理 → 代客下单 → 商品选择 → 确认订单 → 支付</div>
+<div class="rowwrap">
+
+<!-- 屏1 · 我的页面 -->
+<div class="scr">
+  <div class="phcol">
+  <div class="sec-title" style="margin-top:0">我的页面屏 · 我的页面（1:1 复刻，无改动）</div>
+  <div class="phone">
+    <div class="grad-head" style="padding-bottom:2px">
+      <div class="statusbar"><span>9:41</span><span>▮▮▮ ⌾ ▰ 77</span></div>
+      <div class="row me-top" style="justify-content:space-between">
+        <span class="invite">❖ 邀请码</span>
+        <span style="display:flex;gap:10px;color:#555"><svg width="18" height="18"><use href="#i-plus"/></svg><svg width="18" height="18"><use href="#i-scan"/></svg></span>
+      </div>
+      <div class="me-head">
+        <div class="ava" style="width:52px;height:52px;background:linear-gradient(135deg,#5B8DEF,#7BA8F5);font-size:20px">阿</div>
+        <div><div class="me-name">阿远要快快乐乐</div><span class="role-pill">店长 | 切换角色 ›</span></div>
+      </div>
+      <div class="assets">
+        <div class="a"><b>80</b>优惠券</div><div class="a"><b>897</b>积分</div>
+        <div class="a"><b>¥57.8</b>零钱<span style="color:#F5A623;font-size:9px"> 新客</span></div>
+      </div>
+    </div>
+    <div style="background:var(--bg);flex:1;padding-bottom:10px">
+      <div class="vip-bar"><span class="crown">♛</span>会员专享<div class="gap"></div>查看会员信息 ›</div>
+      <div class="order-card">
+        <div class="oc-h">我的订单<span class="small mut" style="font-weight:400">全部订单 ›</span></div>
+        <div class="oc-icons">
+          <div class="o"><svg><use href="#i-pay"/></svg>待付款</div>
+          <div class="o"><svg><use href="#i-deliver"/></svg>待发货</div>
+          <div class="o"><svg><use href="#i-receive"/></svg>待收货</div>
+          <div class="o"><svg><use href="#i-star"/></svg>待评价</div>
+          <div class="o"><svg><use href="#i-after"/></svg>售后/退款</div>
+        </div>
+      </div>
+      <div class="grid-menu">
+        <div class="sec-t">常用功能</div>
+        <div class="gm">
+          <div class="g"><svg><use href="#i-work"/></svg>工作台<span class="newdot">新</span></div>
+          <div class="g"><svg><use href="#i-publish"/></svg>我的发布</div>
+          <div class="g"><svg><use href="#i-foot"/></svg>我的足迹</div>
+          <div class="g"><svg><use href="#i-tv"/></svg>直播预约</div>
+          <div class="g"><svg><use href="#i-live"/></svg>我的主播</div>
+          <div class="g"><svg><use href="#i-star"/></svg>我的收藏</div>
+          <div class="g"><svg><use href="#i-addr"/></svg>收货地址</div>
+        </div>
+      </div>
+      <div class="like-sec">猜你喜欢</div>
+      <div class="like-grid">
+        <div class="like-card"><div class="lc-img" style="background:#FDF3E7">🥛</div><div class="lc-t">认养一头牛 4.0g 蛋白高钙牛奶 全脂纯牛奶</div><div class="lc-s">已售 1</div><div class="lc-b"><span class="lc-p">¥218.5 起</span><span class="lc-buy">购买</span></div></div>
+        <div class="like-card"><div class="lc-img" style="background:#EAF4FD">🧴</div><div class="lc-t">洗漾焕颜香水一样全身义香香水嫩肤</div><div class="lc-s">已售 1</div><div class="lc-b"><span class="lc-p">¥69.9 起</span><span class="lc-buy">购买</span></div></div>
+      </div>
+    </div>
+  </div>
+  </div>
+  <aside class="anno"><div class="ttl">屏1 · 我的页面<small>1:1 复刻 · 本期不改</small></div>
+<div class="ah">业务逻辑</div>
+<ol>
+<li>这一页所有身份共用。系统根据登录身份决定显示什么：<b>只有店长和店员能看到「工作台」入口</b>，普通会员完全看不到，从源头上避免会员误入代客下单流程。</li>
+<li>点「切换角色」时，如果正在给客户代下单，系统会立即退出代客状态并回到这一页——防止切换身份后还挂着上一个客户的订单。</li>
+<li>「我的订单」显示的是客户自己的订单；店员代下的单也会出现在这里，因为订单的买家就是这个客户。</li>
+</ol>
+<div class="ah">数据流转</div>
+<div class="flow2">登录后系统识别身份（店长/店员/会员）→ 决定「常用功能」显示哪些入口<br>本页只读不写；点「工作台」进入工作台页</div></aside>
+</div>
+
+<!-- 屏2 · 工作台 -->
+<div class="scr">
+  <div class="phcol">
+  <div class="sec-title" style="margin-top:0">工作台屏 · 工作台（1:1 复刻，无改动）</div>
+  <div class="phone">
+    <div class="statusbar"><span>9:41</span><span>▮▮▮ ⌾ ▰ 77</span></div>
+    <div class="nvbar"><span class="bk"><svg><use href="#i-back"/></svg></span><span class="t">工作台</span></div>
+    <div style="background:var(--bg);flex:1;padding-bottom:10px">
+      <div class="card" style="margin:2px 16px 10px;display:flex;align-items:center;gap:12px">
+        <div class="ava" style="width:46px;height:46px;background:linear-gradient(135deg,#5B8DEF,#7BA8F5);font-size:18px">阿</div>
+        <div><div style="font-size:16px;font-weight:700">阿远要快快乐乐</div><span class="role-pill">店长 | 切换角色 ›</span></div>
+      </div>
+      <div class="shop-card" style="position:relative">
+        <div class="shop-logo">百</div>
+        <div style="flex:1">
+          <div class="shop-n">百货商城商城商城商城</div>
+          <div class="shop-l">✆ 15554174768</div>
+          <div class="shop-l">◉ 西华439号之一(星玺广场对面)</div>
+        </div>
+        <span class="switch-pill">切换</span>
+      </div>
+      <div class="data-card">
+        <div class="sec-label">经营数据</div>
+        <div class="dc-tabs"><span class="on">昨日</span><span>近7天</span><span>近30天</span><span>近90天</span><span>更多</span></div>
+        <div class="dc-row">
+          <div class="d"><b>¥37624.03</b><i>订单金额</i></div>
+          <div class="d"><b>¥3762.03</b><i>交易金额</i></div>
+          <div class="d"><b>¥372.03</b><i>退款金额</i></div>
+          <div class="d"><b>¥32.03</b><i>客单价</i></div>
+        </div>
+        <div class="dc-row dc-row2">
+          <div class="d"><b>636</b><i>订单总数</i></div>
+          <div class="d"><b>925</b><i>签收总数</i></div>
+          <div class="d"><b>925</b><i>退款总数</i></div>
+          <div class="d"><b>14393</b><i>客户总数</i></div>
+        </div>
+      </div>
+      <div class="wk-grid">
+        <div class="sec-t" style="width:100%;padding:4px 10px 8px">门店管理</div>
+        <div class="gm" style="width:100%">
+          <div class="g"><svg><use href="#i-scan"/></svg>自提核销</div>
+          <div class="g"><svg><use href="#i-coupon"/></svg>核销优惠券</div>
+          <div class="g"><svg><use href="#i-order"/></svg>订单管理</div>
+          <div class="g hl-add"><svg><use href="#i-mgr"/></svg>客户管理</div>
+          <div class="g"><svg><use href="#i-wrench"/></svg>售后管理</div>
+          <div class="g"><svg><use href="#i-tv"/></svg>直播管理</div>
+          <div class="g"><svg><use href="#i-plus"/></svg>添加渠道</div>
+          <div class="g"><svg><use href="#i-shield"/></svg>审核门店</div>
+          <div class="g"><svg><use href="#i-box"/></svg>门店商品</div>
+          <div class="g"><svg><use href="#i-chart"/></svg>门店报表</div>
+          <div class="g"><svg><use href="#i-coin"/></svg>虚拟账户</div>
+          <div class="g"><svg><use href="#i-horn"/></svg>营销管理</div>
+          <div class="g"><svg><use href="#i-list"/></svg>核销记录</div>
+          <div class="g"><svg><use href="#i-book"/></svg>课程管理</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  <aside class="anno"><div class="ttl">屏2 · 工作台<small>1:1 复刻 · 本期不改</small></div>
+<div class="ah">业务逻辑</div>
+<ol>
+<li>本期不改这个页面。它承担代客链路的四个入口：<b>客户管理</b>（发起代客下单）、<b>订单管理</b>（跟进自己代下的待付款订单）、<b>自提核销</b>（客户到店提货）、<b>售后管理</b>（处理售后）。</li>
+<li>「切换角色」规则与我的页面一致：切身份先退出代客状态。</li>
+</ol>
+<div class="ah">数据流转</div>
+<div class="flow2">经营数据来自门店经营统计（按昨日/近7天/近30天/近90天切换）<br>点「客户管理」→ 系统按身份返回客户名单：店员只看到名下客户，店长看到全店客户</div></aside>
+</div>
+
+<!-- 屏3 · 客户管理 -->
+<div class="scr">
+  <div class="phcol">
+  <div class="sec-title" style="margin-top:0">客户管理屏 · 客户管理（1:1 复刻 + 新增「代客下单」按钮）</div>
+  <div class="phone">
+    <div class="grad-head" style="padding-bottom:14px">
+      <div class="statusbar"><span>9:41</span><span>▮▮▮ ⌾ ▰ 77</span></div>
+      <div class="nvbar"><span class="bk"><svg><use href="#i-back"/></svg></span><span class="t">客户管理</span><span class="r"><svg width="18" height="18"><use href="#i-search"/></svg></span></div>
+      <div class="cm-hero">
+        <div><div class="cm-num">4</div><div class="cm-lab">全部客户</div></div>
+        <span class="bl-pill">黑名单</span>
+      </div>
+      <div class="stat-card" style="margin:0 16px">
+        <div class="s"><b>0</b>新增客户</div><div class="s"><b>0</b>首单客户</div>
+        <div class="s"><b>0</b>复购用户</div><div class="s"><b>4</b>无交易客户</div>
+      </div>
+    </div>
+    <div style="flex:1;background:var(--bg);padding-top:12px">
+      <div class="cust-card">
+        <div class="ch">
+          <div class="ava" style="width:42px;height:42px;background:#F3D9C4;color:#8A5A2B;font-size:16px">店</div>
+          <div><div class="n">门店3店员1</div><div class="cid"><b>客户编号</b> 260821000000039<span class="copy">复制</span></div></div>
+        </div>
+        <div class="cust-row"><i>所属员工</i><span>门店3店员</span></div>
+        <div class="cust-row"><i>绑定时间</i><span>2026-08-27 21:42:37</span></div>
+        <div class="cust-row"><i>归属门店</i><span>门店3</span></div>
+        <div class="btnrow">
+          <span class="br-btn btn-gray">设为店员</span>
+          <span class="br-btn btn-gray">设为黑名单</span>
+          <span class="br-btn btn-g1" style="flex:1.1">发放卡券</span>
+          <span class="br-btn btn-g1 hl-add" style="position:relative;white-space:nowrap">代客下单<span class="newdot" style="left:auto;right:-4px;top:-5px">新增</span></span>
+        </div>
+      </div>
+      <div class="cust-card">
+        <div class="ch">
+          <div class="ava" style="width:42px;height:42px;background:#F3D9C4;color:#8A5A2B;font-size:16px">橙</div>
+          <div><div class="n">橙橙</div><div class="cid"><b>客户编号</b> 260716000000005<span class="copy">复制</span></div></div>
+        </div>
+        <div class="cust-row"><i>所属员工</i><span>门店3店员1</span></div>
+        <div class="cust-row"><i>绑定时间</i><span>2026-08-21 20:07:38</span></div>
+        <div class="cust-row"><i>归属门店</i><span>门店3</span></div>
+        <div class="btnrow">
+          <span class="br-btn btn-gray">设为店员</span>
+          <span class="br-btn btn-gray">设为黑名单</span>
+          <span class="br-btn btn-g1" style="flex:1.1">发放卡券</span>
+          <span class="br-btn btn-g1">代客下单</span>
+        </div>
+      </div>
+      <div class="note">「代客下单」= <b>唯一新增按钮</b>（发放卡券旁），其余 1:1 复刻。点击后以该客户身份进入 屏4 · 商品选择页。</div>
+    </div>
+  </div>
+  </div>
+  <aside class="anno"><div class="ttl">屏3 · 客户管理<small>1:1 复刻 + 新增「代客下单」按钮</small></div>
+<div class="ah">业务逻辑</div>
+<ol>
+<li><b>看到谁</b>：店员只看到自己名下的客户，店长看到全店客户。搜索支持昵称、客户编号、手机号后四位。</li>
+<li><b>谁能点「代客下单」</b>：店员只在自己名下客户的卡片上看到这个按钮；店长在所有客户卡片上都有（店长帮别的店员的客户下单是允许的，系统记录实际操作人，但业绩仍归客户原本的归属店员）。</li>
+<li>点击「代客下单」= 锁定这个客户，进入商品选择页。系统生成一条<b>30分钟有效的代客记录</b>——超时、手动退出或完成下单后自动失效，防止店员忘了退出、给下一位客户下单时挂错人。</li>
+</ol>
+<div class="ah">数据流转</div>
+<div class="flow2">打开页面 → 查询客户列表（按身份返回范围）<br>点「代客下单」→ 创建代客记录（操作店员+客户+有效期），拿到一个会话凭证<br>之后选商品、查地址、下单都必须带这个凭证；凭证失效就全部拦截，回本页重新发起</div></aside>
+</div>
+
+<!-- 屏4 · 商品选择页 -->
+<div class="scr">
+  <div class="phcol">
+  <div class="sec-title" style="margin-top:0">商品选择屏 · 代客下单 · 商品选择页（新增页）</div>
+  <div class="phone">
+    <div class="statusbar"><span>9:41</span><span>▮▮▮ ⌾ ▰ 77</span></div>
+    <div class="nvbar"><span class="bk"><svg><use href="#i-back"/></svg></span><span class="t">代客下单</span></div>
+    <div class="proxy-bar hl-add" style="margin:6px 12px 0">ⓘ 正在为 <b>橙橙</b>（编号：260716000000005）客户下单<span class="sw">退出</span></div>
+    <div style="padding:10px 12px 0"><div class="search">🔍 <input placeholder="请输入商品名称"></div></div>
+    <div style="display:flex;flex:1;min-height:0;padding:10px 12px;gap:10px">
+      <div style="width:86px;background:#fff;border-radius:10px;padding:6px 0;font-size:12px;color:#666;flex:none;height:fit-content">
+        <div style="padding:9px 12px;color:var(--g1-deep);font-weight:600;border-left:3px solid var(--g1);background:var(--gw)">全部</div>
+        <div style="padding:9px 12px">食品饮料</div><div style="padding:9px 12px">个护美妆</div><div style="padding:9px 12px">数码家电</div><div style="padding:9px 12px">日用百货</div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:10px;overflow-y:auto">
+        <div class="card" style="margin:0"><div class="goods"><div class="gimg" style="background:#FDF3E7">🥛</div>
+          <div class="ginfo"><div class="gn">认养一头牛 4.0g 蛋白高钙牛奶 全脂纯牛奶 400g 400g</div><div class="gs">已售 3.3万</div>
+            <div class="row" style="margin-top:7px"><span class="price" style="font-size:15px">¥218.50 <span class="pj" style="color:var(--t2)">起</span></span><div class="gap"></div>
+            <button class="btn btn-g2 btn-sm" style="width:72px">下单</button></div></div></div></div>
+        <div class="card" style="margin:0"><div class="goods"><div class="gimg" style="background:#EAF4FD">🧴</div>
+          <div class="ginfo"><div class="gn">沐浴露持久留香 72 小时香水祛痘嫩肤 绿豆饼; 12斤嫩肤 绿豆饼; 12 斤</div><div class="gs">已售 892</div>
+            <div class="row" style="margin-top:7px"><span class="price" style="font-size:15px">¥218.50 <span class="pj" style="color:var(--t2)">券后价</span></span><div class="gap"></div>
+            <button class="btn btn-g2 btn-sm" style="width:72px">下单</button></div></div></div></div>
+      </div>
+    </div>
+    <div class="note-static" style="margin-bottom:12px">锁定上下文：提示条全程常驻；退出/30 分钟无操作自动解除；返回键回到客户管理页。</div>
+  </div>
+  </div>
+  <aside class="anno"><div class="ttl">屏4 · 商品选择页<small>新增页</small></div>
+<div class="ah">业务逻辑</div>
+<ol>
+<li>顶部提示条始终显示"正在为谁下单"，<b>固定在页面顶部、不随滚动消失</b>——这是防串单的主要防线。随时可点「退出」。</li>
+<li>商品列表做了准入过滤：<b>直播专享价、积分兑换、预售、已下架的商品不会出现</b>，避免代客下单绕过这些专属规则。</li>
+<li>点商品「下单」→ 弹出规格选择；选品过程不产生任何订单。</li>
+</ol>
+<div class="ah">数据流转</div>
+<div class="flow2">打开页面 → 按会话查询可代购的商品（服务端完成准入过滤）<br>店员持续操作时，会话有效期自动顺延<br>会话过期 → 所有请求被拒绝 → 自动回到客户管理页</div></aside>
+</div>
+
+<!-- 屏5 · 规格弹层 -->
+<div class="scr">
+  <div class="phcol">
+  <div class="sec-title" style="margin-top:0">规格弹层屏 · 规格弹层（现有组件，代客上下文）</div>
+  <div class="phone">
+    <div class="p-body" style="padding-top:12px"><div class="hero" style="height:170px;background:linear-gradient(135deg,#F8A9A9,#F26D6D);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:40px">🥛</div></div>
+    <div class="mask"></div>
+    <div class="sheet">
+      <div class="close">✕</div>
+      <div class="row" style="gap:12px;margin-bottom:8px"><div class="sku-img" style="background:#FDF3E7">🥛</div>
+        <div><div class="price" style="font-size:18px">¥199.00</div><div class="small mut" style="margin-top:3px">库存: 574</div></div></div>
+      <div class="row" style="margin:8px 0 4px"><span style="font-size:13.5px;font-weight:600">数量</span><div class="gap"></div>
+        <div class="stepper"><b>−</b><i>1</i><b>＋</b></div></div>
+      <div style="font-size:13.5px;font-weight:600;margin:10px 0 8px">规格</div>
+      <span class="chip on">全脂 400g</span><span class="chip">脱脂 250ml</span><span class="chip">礼盒装</span>
+      <button class="btn btn-g1" style="width:100%;margin-top:12px">确定</button>
+    </div>
+  </div>
+  </div>
+  <aside class="anno"><div class="ttl">屏5 · 规格弹层<small>复用现有组件 · 零改动</small></div>
+<div class="ah">业务逻辑</div>
+<ol>
+<li>复用现有规格选择组件，店员代客和会员自己买看到的一模一样。</li>
+<li>购买数量上限 = 库存、<b>这个客户的限购数量</b>、系统上限三者取最小——注意限购按客户算，不按店员算。</li>
+<li>库存不足时「确定」置灰，提示库存不足。</li>
+<li>点「确定」只是在手机上暂存所选规格和数量，<b>还没有生成订单</b>；提交订单时系统会再校验一次，防止页面停留期间价格或库存变了。</li>
+</ol>
+<div class="ah">数据流转</div>
+<div class="flow2">打开弹层 → 实时查询该商品的规格、价格、库存、客户限购<br>「确定」→ 暂存所选内容 → 进入确认订单页</div></aside>
+</div>
+
+<!-- 确认订单屏 有地址 -->
+<div class="scr">
+  <div class="phcol">
+  <div class="sec-title" style="margin-top:0">屏6 · 确认订单 · 快递（1:1 复刻截图 + 代客标识）</div>
+  <div class="phone">
+    <div class="statusbar"><span>9:41</span><span>▮▮▮ ⌾ ▰ 77</span></div>
+    <div class="nvbar"><span class="bk"><svg><use href="#i-back"/></svg></span><span class="t">确认订单</span></div>
+    <div class="proxy-bar hl-add" style="margin:0 12px 8px">ⓘ 正在为 <b>橙橙</b>（编号：260716000000005）客户下单<span class="sw">切换客户 · 退出</span></div>
+    <div class="p-body" style="padding-top:0">
+      <div class="addr-card hl-add">
+        <div class="addr-a1">广东省广州市天河区东英科技园9号楼5楼 ›</div>
+        <div class="addr-a2">橙橙 138****0002<span class="locked-tag">会员名下地址</span></div>
+      </div>
+      <div class="card">
+        <div class="row" style="font-size:13.5px;font-weight:600;margin-bottom:12px">百货商城商城商城商城 <span class="mut">›</span></div>
+        <div class="goods"><div class="gimg" style="background:#FDF3E7">🥛</div>
+          <div class="ginfo"><div class="gn">认养一头牛 4.0g 蛋白高钙牛奶 全脂纯牛奶</div><div class="gs">全脂 400g</div>
+            <div class="row" style="margin-top:5px"><span class="gp price">¥218.50</span><div class="gap"></div><span class="small mut">x1</span></div></div></div>
+        <div class="msg-row"><span>买家留言</span><span class="mut">请输入 ›</span></div>
+      </div>
+      <div class="card">
+        <div class="kv"><span>商品总金额</span><span>¥0</span></div>
+        <div class="kv"><span>运费</span><span>¥0</span></div>
+        <div class="kv"><span>订单总金额</span><span>¥218.50</span></div>
+        <div class="kv"><span>选择满减券</span><span class="mut">暂无 ›</span></div>
+        <div class="kv"><span>选择折扣券</span><span class="mut">暂无 ›</span></div>
+        <div class="kv"><span>选择现金红包</span><span class="mut">暂无 ›</span></div>
+      </div>
+    </div>
+    <div class="p-foot pay-bar"><span class="amt">应付金额: <b>¥218.50</b></span><div class="gap"></div>
+      <button class="btn btn-g2" style="width:150px">立即付款</button></div>
+  </div>
+  </div>
+  <aside class="anno"><div class="ttl">屏6 · 确认订单 · 快递<small>1:1 骨架 + 顶部代客标识条</small></div>
+<div class="ah">业务逻辑</div>
+<ol>
+<li><b>地址按客户来</b>：默认带出客户名下的默认地址，地址列表只有这个客户自己的地址；店员新增的地址也保存到客户名下。客户没有地址时进入无地址空态。</li>
+<li><b>优惠按客户来</b>：客户有什么券、有多少积分，就按他的资格算，与店员无关。优惠抵扣不能超过订单金额，超了按订单金额封顶。</li>
+<li><b>0元单</b>：优惠全额抵扣后实付为0时，不需要付款，系统直接完成支付，也不能选"他人支付"。</li>
+<li><b>防串单确认</b>：点「立即付款」先弹确认框，显示客户头像、编号后四位和金额；如果30分钟内刚给别的客户下过单，还会提示"上一单客户是谁"，防止记混。</li>
+<li>选「门店自提」时：自提点默认带出客户归属的门店，店员可以改，但不强制锁定。</li>
+</ol>
+<div class="ah">数据流转</div>
+<div class="flow2">打开页面 → 读取客户收货地址（需携带代客会话凭证）<br>优惠试算 → 服务端按客户资格实时计算，逐项返回优惠金额并单独记录（退款时按原样退回）<br>确认后提交订单 → 生成一张待付款订单+预占库存；同一店员短时间内重复点击只会生成一张</div></aside>
+</div>
+
+<!-- 确认订单无地址态 暂无地址 -->
+<div class="scr">
+  <div class="phcol">
+  <div class="sec-title" style="margin-top:0">屏6b · 确认订单 · 暂无收货地址（1:1 复刻截图）</div>
+  <div class="phone">
+    <div class="statusbar"><span>9:41</span><span>▮▮▮ ⌾ ▰ 77</span></div>
+    <div class="nvbar"><span class="bk"><svg><use href="#i-back"/></svg></span><span class="t">确认订单</span></div>
+    <div class="proxy-bar hl-add" style="margin:0 12px 8px">ⓘ 正在为 <b>橙橙</b>（编号：260716000000005）客户下单<span class="sw">切换客户 · 退出</span></div>
+    <div class="p-body" style="padding-top:0">
+      <div class="addr-card addr-empty hl-add">
+        <div class="ae-t"><span style="color:var(--g1)">＋</span> 请填写收货地址</div>
+        <div class="ae-b"><span class="ae-hint">该会员暂无收货地址，新增将保存至其名下</span><span class="addr-add-btn">立即添加</span></div>
+      </div>
+      <div class="card">
+        <div class="row" style="font-size:13.5px;font-weight:600;margin-bottom:12px">百货商城商城商城商城 <span class="mut">›</span></div>
+        <div class="goods"><div class="gimg" style="background:#FDF3E7">🥛</div>
+          <div class="ginfo"><div class="gn">认养一头牛 4.0g 蛋白高钙牛奶 全脂纯牛奶 400g</div><div class="gs">全脂 400g</div>
+            <div class="row" style="margin-top:5px"><span class="gp price">¥218.50</span><div class="gap"></div><span class="small mut">x1</span></div></div></div>
+        <div class="msg-row"><span>买家留言</span><span class="mut">请输入 ›</span></div>
+      </div>
+      <div class="card">
+        <div class="kv"><span>商品总金额</span><span>¥0</span></div>
+        <div class="kv"><span>运费</span><span>¥0</span></div>
+        <div class="kv"><span>订单总金额</span><span>¥218.50</span></div>
+        <div class="kv"><span>选择满减券</span><span class="mut">暂无 ›</span></div>
+        <div class="kv"><span>选择折扣券</span><span class="mut">暂无 ›</span></div>
+        <div class="kv"><span>选择现金红包</span><span class="mut">暂无 ›</span></div>
+      </div>
+    </div>
+    <div class="p-foot pay-bar"><span class="amt">应付金额: <b>¥218.50</b></span><div class="gap"></div>
+      <button class="btn btn-disabled" style="width:150px">立即付款</button></div>
+  </div>
+  </div>
+  <aside class="anno"><div class="ttl">屏6b · 确认订单 · 暂无收货地址<small>1:1 复刻空态</small></div>
+<div class="ah">业务逻辑</div>
+<ol>
+<li>客户名下一个地址都没有时显示本空态，提示语明确告诉店员：新增的地址会保存到<b>客户</b>名下。</li>
+<li>填完保存后自动回到确认订单页并选中；没选地址前「立即付款」置灰。</li>
+</ol>
+<div class="ah">数据流转</div>
+<div class="flow2">保存地址 → 以客户为归属人写入地址簿（系统校验代客会话，防止店员往别的客户名下写地址）</div></aside>
+</div>
+
+<!-- 屏7 · 支付方式 -->
+<div class="scr">
+  <div class="phcol">
+  <div class="sec-title" style="margin-top:0">支付方式屏 · 支付方式（新增步骤 · 仅代客单显示）</div>
+  <div class="phone">
+    <div class="statusbar"><span>9:41</span><span>▮▮▮ ⌾ ▰ 77</span></div>
+    <div class="nvbar"><span class="bk"><svg><use href="#i-back"/></svg></span><span class="t">支付方式<span class="tag tag-add" style="vertical-align:3px">新增</span></span></div>
+    <div class="p-body" style="padding-top:16px">
+      <div style="text-align:center;margin:8px 0 18px">
+        <div style="font-size:16px;font-weight:600">订单创建完成，请选择支付方式</div>
+        <div class="small mut" style="margin-top:6px">正在为 橙橙（编号：260716000000005）下单 · 应付 ¥218.50</div>
+      </div>
+      <div class="pay-opt on"><div class="pay-ico pi-wx">微</div>
+        <div style="flex:1"><div style="font-size:14.5px;font-weight:600">本人支付</div><div class="small mut" style="margin-top:3px">使用当前登录微信支付</div></div><div class="radio on"></div></div>
+      <div class="pay-opt"><div class="pay-ico pi-other">友</div>
+        <div style="flex:1"><div style="font-size:14.5px;font-weight:600">他人支付</div><div class="small mut" style="margin-top:3px">发送支付卡片或出示二维码，由客户完成支付</div></div><div class="radio"></div></div>
+      <div class="note">仅 下单方式=店员代客 订单进入本页（待确认问题6 收窄落地）；会员自助下单保持「立即付款直达收银台」。支付方式枚举（微信/支付宝/银行卡）沿用现有 <span class="prd">交易域支付方式规则</span>。</div>
+    </div>
+    <div class="p-foot pay-bar"><span class="amt">应付金额: <b>¥218.50</b></span><div class="gap"></div>
+      <button class="btn btn-g2" style="width:150px">立即付款</button></div>
+  </div>
+  </div>
+  <aside class="anno"><div class="ttl">屏7 · 支付方式<small>新增步骤 · 只在代客单出现</small></div>
+<div class="ah">业务逻辑</div>
+<ol>
+<li><b>只有店员代客下单的订单才有这一页</b>；会员自己下单仍然直接进收银台，不多任何步骤。</li>
+<li>「本人支付」= 店员用自己的微信先付钱（垫付）。付完后页面提醒店员向客户收款，并记入"我垫付的订单"台账。</li>
+<li>「他人支付」= 生成支付卡片或二维码发给客户，由客户自己付。</li>
+</ol>
+<div class="ah">数据流转</div>
+<div class="flow2">本人支付 → 创建预支付单 → 拉起收银台 → 支付成功后订单进入待发货/待自提，同时记入垫付台账<br>他人支付 → 生成支付分享凭证（有效期与订单待付款时间一致）→ 进入他人支付页</div></aside>
+</div>
+
+<!-- 他人支付屏 他人支付 -->
+<div class="scr">
+  <div class="phcol">
+  <div class="sec-title" style="margin-top:0">他人支付屏 · 他人支付：卡片 + 现场二维码 → 客户代付页</div>
+  <div class="phone">
+    <div class="chat-wrap" style="background:#EDEDED;height:100%;padding:14px;overflow-y:auto">
+      <div style="font-size:11px;color:#9A9A9A;text-align:center;margin:4px 0 12px">形态一：微信卡片（发给客户）</div>
+      <div class="bubble-me" style="display:flex;justify-content:flex-end"><div class="chat-card" style="width:230px;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,.08)">
+        <div style="height:110px;background:#FDF3E7;display:flex;align-items:center;justify-content:center;font-size:36px">🥛</div>
+        <div style="font-size:13px;padding:8px 10px 2px;font-weight:500">认养一头牛 高钙牛奶</div>
+        <div style="font-size:12px;color:var(--t2);padding:0 10px 8px;font-weight:600">待支付<span class="tag tag-add">不展示金额</span></div>
+        <div style="border-top:1px solid var(--line);font-size:10.5px;color:var(--t2);text-align:center;padding:6px">「百货商城」订单待付款，帮我付一下</div>
+      </div></div>
+      <div style="font-size:11px;color:#9A9A9A;text-align:center;margin:14px 0 10px">形态二：现场二维码（店员出示）<span class="tag tag-add">新增</span></div>
+      <div class="row" style="gap:12px;background:#fff;border-radius:12px;padding:12px">
+        <div style="width:84px;height:84px;background:conic-gradient(#333 25%,#fff 0 50%,#333 0 75%,#fff 0);border-radius:8px;flex:none"></div>
+        <div style="font-size:12px;color:#555;line-height:1.7">客户微信扫码直达代付页<br><span class="mut">免加好友 · 支付凭证 时效=待付款 30 分钟窗口 · 可吊销重发</span></div>
+      </div>
+      <div style="background:#fff;border-radius:12px;padding:14px;margin-top:14px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:10px">客户打开后（微信内 · 免登录）</div>
+        <div class="row" style="gap:10px"><div class="sku-img" style="width:56px;height:56px;font-size:20px;background:#FDF3E7">🥛</div>
+          <div><div style="font-size:13.5px;font-weight:500">认养一头牛 高钙牛奶</div><div class="small mut" style="margin-top:2px">全脂 400g · x1</div></div>
+          <div class="gap"></div><span class="price" style="font-size:16px">¥218.50</span></div>
+        <div class="kv" style="margin-top:10px"><span>应付款（以服务端实时校验为准）</span><span class="price"><b>¥218.50</b></span></div>
+        <button class="btn btn-g1" style="width:100%;margin-top:10px">去支付 → 收银台</button>
+      </div>
+    </div>
+  </div>
+  </div>
+  <aside class="anno"><div class="ttl">屏8 · 他人支付<small>微信卡片 + 现场二维码</small></div>
+<div class="ah">业务逻辑</div>
+<ol>
+<li>卡片上只有商品名、首图和"待支付"字样，<b>不显示金额</b>——金额在支付页以系统实时数据为准，防止改价后卡片金额对不上。</li>
+<li>两种形态：微信卡片（发给客户）和现场二维码（店员出示、客户扫码），用同一个支付凭证，客户不用加好友。</li>
+<li>客户打开支付页时系统实时校验：<b>订单还在待付款、金额没变才允许支付</b>；订单已取消/已支付/已改价，显示失效页。</li>
+<li>客户支付失败（如余额不足）会实时通知店员；连续失败两次，提示店员改用垫付或重新生成二维码。</li>
+<li>支付成功后，这单的所有支付凭证立即作废，从机制上杜绝重复支付。</li>
+</ol>
+<div class="ah">数据流转</div>
+<div class="flow2">客户打开支付页 → 校验支付凭证（匿名访问，有频次限制）→ 显示订单摘要与应付款<br>点「去支付」→ 此时才创建预支付单 → 收银台<br>支付成功 → 订单完成支付；若这单的其它支付方式已成功或订单已关闭，这笔钱自动原路退回并记为差错流水<br>支付失败 → 实时通知操作店员</div></aside>
+</div>
+
+<!-- 屏9 · 支付成功 -->
+<div class="scr">
+  <div class="phcol">
+  <div class="sec-title" style="margin-top:0">支付成功屏 · 支付成功（店员核对锚点 + 垫付提示）</div>
+  <div class="phone">
+    <div class="p-body" style="padding-top:24px;text-align:center">
+      <div style="width:64px;height:64px;margin:16px auto 14px;border-radius:50%;background:var(--g1);color:#fff;font-size:30px;display:flex;align-items:center;justify-content:center">✓</div>
+      <div style="font-size:17px;font-weight:600">支付成功</div>
+      <div class="small mut" style="margin-top:6px">实付 ¥218.50 · 微信支付</div>
+      <div class="card hl-add" style="text-align:left;margin-top:20px">
+        <div style="font-size:13px;color:var(--t2)">已为客户生成订单</div>
+        <div style="font-size:16px;font-weight:700;margin:4px 0 2px">橙橙（编号：260716000000005）</div>
+        <div class="small mut">订单号 ORD260902000030 · 认养一头牛 高钙牛奶 x1</div>
+      </div>
+      <div class="card hl-add" style="text-align:left;border:1px solid var(--warn-line);background:var(--warn-bg)">
+        <div style="font-size:13px;font-weight:600;color:var(--add)">本单由你垫付 ¥218.50，请向客户收款</div>
+        <div class="small" style="color:#8C6239;margin-top:4px">收款说明可一键复制 · 台账见「我垫付的订单」</div>
+        <button class="btn btn-ghost" style="width:100%;margin-top:10px;padding:8px 0;font-size:12.5px">复制收款说明</button>
+      </div>
+      <button class="btn btn-g1" style="width:100%;margin-top:6px">完成</button>
+      <div class="note" style="margin:12px 12px 0">订单进入「待发货/待自提」（<span class="prd">订单域状态流转规则</span>）；自提单生成提货码（YXKSA+6 位）。</div>
+    </div>
+  </div>
+  </div>
+  <aside class="anno"><div class="ttl">屏9 · 支付成功<small>店员核对锚点 + 垫付提示</small></div>
+<div class="ah">业务逻辑</div>
+<ol>
+<li>页面固定显示"已为哪位客户生成了订单"和订单号——这是多客户排队时，店员核对"这单到底是给谁下的"的最后防线。</li>
+<li>如果是店员垫付的，显示"本单由你垫付，请向客户收款"，可一键复制收款说明（金额/订单号/客户昵称），并记入垫付台账；之后退款时台账会同步更新并提醒店员。</li>
+<li>订单进入待发货或待自提；自提订单生成提货码（YXKSA+6位数字）。</li>
+</ol>
+<div class="ah">数据流转</div>
+<div class="flow2">支付成功的事务内一次完成：更新支付单 → 推进订单状态 → 扣减库存 →（自提）生成提货码 → 作废这单所有支付凭证<br>垫付单写入垫付台账；0元单不走收银台，系统直接完成支付</div></aside></div><!-- 正向主链 end -->
+
+<!-- ======================= 店员端跟进 ======================= -->
+<div class="sec-title">第二段 · 店员端跟进与核销（工作台入口）</div>
+<div class="rowwrap">
+
+<!-- 店员待付款屏 -->
+<div class="scr">
+  <div class="phcol">
+  <div class="sec-title" style="margin-top:0">店员待付款屏 · 店员端 · 订单管理-待付款（30 分钟倒计时）</div>
+  <div class="phone">
+    <div class="statusbar"><span>9:41</span><span>▮▮▮ ⌾ ▰ 77</span></div>
+    <div class="nvbar"><span class="bk"><svg><use href="#i-back"/></svg></span><span class="t">订单管理</span></div>
+    <div class="p-body" style="padding-top:12px">
+      <div class="dc-tabs" style="padding:0 2px 10px"><span class="on">待付款 (1)</span><span>待发货</span><span>待自提</span><span>售后中</span><span>已关闭</span></div>
+      <div class="order-li hl-add">
+        <div class="ol-top"><span>订单号 ORD260902000030</span><span class="countdown">剩余 18:26</span></div>
+        <div class="row" style="gap:10px"><div class="sku-img" style="width:48px;height:48px;font-size:18px;background:#FDF3E7">🥛</div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:500">认养一头牛 高钙牛奶 x1 x1</div>
+          <div class="small mut" style="margin-top:2px">为 <b style="color:var(--t1)">橙橙</b> 代下单</div></div>
+          <span class="price" style="font-size:15px">¥218.50</span></div>
+        <div class="btnrow">
+          <span class="br-btn btn-red-ghost">取消订单</span>
+          <span class="br-btn btn-gray">催付</span>
+          <span class="br-btn btn-g1">代付 / 二维码</span>
+        </div>
+      </div>
+      <div class="notice">待付款超时 = <b>30 分钟自动关单</b>（<span class="prd">订单域超时关单规则</span>，硬编码 订单域待办006）；关单前 2 小时推送无意义——<b>关单前 10 分钟推送店员提醒</b>（新增建议）；已关闭代客单支持一键重下；列表<b>仅显示本人代下的订单</b>，店长与同店店员互不可见。</div>
+    </div>
+  </div>
+  </div>
+  <aside class="anno"><div class="ttl">屏10 · 订单管理 · 待付款<small>现有页增量改造（非新页）</small></div>
+<div class="ah">业务逻辑</div>
+<ol>
+<li>列表只显示<b>当前登录人自己代下的</b>待付款订单：店长看不到店员代下的单，店员之间也互相看不到——谁下的单谁跟进到底。离职或账号停用时不移交：系统提醒客户自己付款，到期没付自动关单，需要兜底时由后台人工取消。</li>
+<li>订单有30分钟支付倒计时，到期自动关闭并释放库存；关单前10分钟系统提醒店员去跟进。</li>
+<li>「取消」立即生效：同时作废发给客户的支付凭证、通知客户。</li>
+<li>「一键重下」：已关闭的订单按原来的商品数量重新走一遍下单流程，价格按当下重新计算，页面会说明与原单的差额原因。</li>
+</ol>
+<div class="ah">数据流转</div>
+<div class="flow2">打开列表 → 按「操作人=当前登录人」查询待付款订单（服务端过滤，别人代下的单查不到；含关单时间，手机本地倒计时）<br>取消订单 → 只有待付款状态才能取消（防止与支付同时发生）→ 释放库存 → 作废凭证 → 通知买家<br>关单由系统定时任务自动执行</div></aside>
+</div>
+
+<!-- 自提核销屏 -->
+<div class="scr">
+  <div class="phcol">
+  <div class="sec-title" style="margin-top:0">自提核销屏 · 店员端 · 自提核销（对齐订单域提货流程）</div>
+  <div class="phone">
+    <div class="statusbar"><span>9:41</span><span>▮▮▮ ⌾ ▰ 77</span></div>
+    <div class="nvbar"><span class="bk"><svg><use href="#i-back"/></svg></span><span class="t">自提核销</span></div>
+    <div class="p-body" style="padding-top:12px">
+      <div class="card hl-add" style="text-align:center;padding:20px">
+        <div style="width:56px;height:56px;margin:0 auto 10px;border-radius:14px;background:var(--gw);display:flex;align-items:center;justify-content:center"><svg width="28" height="28" style="color:var(--g1)"><use href="#i-scan"/></svg></div>
+        <div style="font-size:14px;font-weight:600">扫描客户提货码核销</div>
+        <div class="small mut" style="margin-top:4px">提货码 YXKSA + 6 位随机数（订单域 订单域功能004）</div>
+      </div>
+      <div class="order-li hl-add">
+        <div class="ol-top"><span>订单号 ORD260902000031</span><span class="pill-b" style="font-size:10.5px;border-radius:4px;padding:1px 6px">代客下单</span></div>
+        <div class="row" style="gap:10px"><div class="sku-img" style="width:48px;height:48px;font-size:18px;background:#FDF3E7">🥛</div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:500">认养一头牛 高钙牛奶 x1</div>
+          <div class="small mut" style="margin-top:2px">买家：橙橙 · 提货码 <b style="color:var(--t1)">YXKSA483216</b></div></div></div>
+        <div class="btnrow"><span class="br-btn btn-gray">查看提货单</span><span class="br-btn btn-g1">扫码核销 / 部分提货</span></div>
+      </div>
+      <div class="notice">核销流程对齐 需求文档：扫<b>客户</b>提货码 → 反查整组提货单 → 勾选商品录应提/实提 → 支持部分提货 → 全部提货订单已完成；记录提货人/下单人/点货人（<span class="prd">订单域提货核销规则</span>）。<b>代客扩展</b>：客户报不出提货码时，店员经本列表核对身份后代客户端直接核销。</div>
+    </div>
+  </div>
+  </div>
+  <aside class="anno"><div class="ttl">屏11 · 自提核销<small>现有能力 + 代客扩展</small></div>
+<div class="ah">业务逻辑</div>
+<ol>
+<li>标准流程：扫客户手机上的提货码 → 系统反查出整组提货单 → 逐个商品确认实提数量 → 支持部分提货 → 全部提完订单即完成。提货记录会记下三个角色：提货人、下单人、点货人（扫码的店员）。</li>
+<li>代客场景补充：客户可能根本说不出提货码（东西是店员代拍的），所以提货码同时显示在店员端；店员在列表里核对客户身份后可以直接核销。</li>
+<li>授权按"订单所属门店"：本店任一店长/店员都能核销，不限当初下单的人，交接班不影响。</li>
+<li>防错设计：提货码查询有次数限制（防止有人试码套单）；两名店员同时核销同一单会被系统拦下。</li>
+</ol>
+<div class="ah">数据流转</div>
+<div class="flow2">提货码反查提货单（限次）→ 提交核销（商品明细+实提数量，防并发+防重复）<br>全部提货 → 订单完成 → 进入交易结算流程</div></aside></div><!-- 店员端 end -->
+
+<!-- ======================= 逆向流 ======================= -->
+<div class="sec-title">第三段 · 逆向流（对齐订单域/售后域/营销域/分销域/财务域对账字段）</div>
+<div class="rowwrap">
+
+<!-- 买家订单屏 -->
+<div class="scr">
+  <div class="phcol">
+  <div class="sec-title" style="margin-top:0">买家订单屏 · 买家视角 · 我的订单（代客单可见 + 售后入口）</div>
+  <div class="phone">
+    <div class="statusbar"><span>9:41</span><span>▮▮▮ ⌾ ▰ 77</span></div>
+    <div class="nvbar"><span class="bk"><svg><use href="#i-back"/></svg></span><span class="t">我的订单</span></div>
+    <div class="p-body" style="padding-top:12px">
+      <div class="dc-tabs" style="padding:0 2px 10px"><span class="on">全部</span><span>待付款</span><span>待发货</span><span>待收货</span><span>售后</span></div>
+      <div class="order-li hl-add">
+        <div class="ol-top"><span>百货商城 ›</span><span style="color:var(--add)">待收货</span></div>
+        <div class="row" style="gap:10px"><div class="sku-img" style="width:48px;height:48px;font-size:18px;background:#FDF3E7">🥛</div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:500">认养一头牛 高钙牛奶 x1 x1</div>
+          <div class="small" style="margin-top:2px"><span class="orange-tag">店员代下单</span></div></div>
+          <span class="price" style="font-size:14px">¥218.50</span></div>
+        <div class="btnrow"><span class="br-btn btn-gray">查看物流</span><span class="br-btn btn-ghost" style="border-color:#E8EAEC;color:#666">确认收货</span><span class="br-btn btn-g1">申请售后</span></div>
+      </div>
+      <div class="order-li">
+        <div class="ol-top"><span>百货商城 ›</span><span>已完成</span></div>
+        <div class="row" style="gap:10px"><div class="sku-img" style="width:48px;height:48px;font-size:18px;background:#EAF4FD">🧴</div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:500">沐浴露持久留香 72 小时香水祛痘 x2</div>
+          <div class="small mut" style="margin-top:2px">确认收货 3 天前</div></div>
+          <span class="price" style="font-size:14px">¥218.50</span></div>
+        <div class="btnrow"><span class="br-btn btn-gray">再次购买</span><span class="br-btn btn-g1">申请售后</span></div>
+      </div>
+      <div class="note-static" style="margin:0 0 12px">待付款代客单：买家可见（带「店员代下单」标识）且可自行支付（计 买家本人付款）。</div>
+    </div>
+  </div>
+  </div>
+  <aside class="anno"><div class="ttl">逆向屏1 · 买家我的订单<small>代客单对客户透明</small></div>
+<div class="ah">业务逻辑</div>
+<ol>
+<li>代客下单的订单在客户自己的订单列表里也能看到，带"店员代下单"标识——钱货关系对客户透明，避免"我明明买了东西却查不到订单"的疑虑。</li>
+<li>待付款的代客单，客户可以自己付款（此时记为"买家本人付款"）。</li>
+<li>售后入口按状态出现：付过款就能申请"仅退款"；签收后才能申请"退货退款"；确认收货后的一段售后期内都可申请。</li>
+<li>申请售后后订单被"挂起"：商家不能发货、不能签收，直到售后处理完。</li>
+</ol>
+<div class="ah">数据流转</div>
+<div class="flow2">打开列表 → 查询客户自己的订单（带代下单标识）<br>买家自付 → 走现有收银台流程（付款方式记为买家本人付款）<br>提交售后 → 创建售后单 → 订单挂起</div></aside>
+</div>
+
+<!-- 售后申请屏 -->
+<div class="scr">
+  <div class="phcol">
+  <div class="sec-title" style="margin-top:0">售后申请屏 · 售后申请（仅退款 / 退货退款，对齐售后域）</div>
+  <div class="phone">
+    <div class="statusbar"><span>9:41</span><span>▮▮▮ ⌾ ▰ 77</span></div>
+    <div class="nvbar"><span class="bk"><svg><use href="#i-back"/></svg></span><span class="t">申请售后</span></div>
+    <div class="p-body" style="padding-top:12px">
+      <div class="card">
+        <div class="goods"><div class="gimg" style="width:54px;height:54px;font-size:18px;background:#FDF3E7">🥛</div>
+          <div class="ginfo"><div class="gn">认养一头牛 高钙牛奶</div><div class="gs">全脂 400g x1 x1</div>
+          <div class="gp price" style="font-size:13px">¥218.50</div></div></div>
+      </div>
+      <div class="card">
+        <div style="font-size:13.5px;font-weight:600;margin-bottom:10px">售后类型<span class="tag tag-add">代客单同流程</span></div>
+        <div class="pay-opt on" style="margin-bottom:8px"><div style="flex:1"><div style="font-size:14px;font-weight:600">仅退款</div><div class="small mut" style="margin-top:2px">未收到货/商品未发出，申请全额退款</div></div><div class="radio on"></div></div>
+        <div class="pay-opt"><div style="flex:1"><div style="font-size:14px;font-weight:600">退货退款</div><div class="small mut" style="margin-top:2px">已收货，退货并退款（需寄回商品）</div></div><div class="radio"></div></div>
+      </div>
+      <div class="card">
+        <div class="kv"><span>退款原因</span><span class="mut">请选择 ›</span></div>
+        <div class="kv"><span>退款金额</span><span class="price">¥218.50</span></div>
+        <div class="kv"><span>联系电话</span><span class="mut">请填写</span></div>
+      </div>
+      <button class="btn btn-g1" style="width:100%;margin-top:4px">提交申请</button>
+      <div class="note" style="margin:10px 12px 0">售后类型当前实现=仅退款/退货退款（换货/补发/部分退货为 二期待建，<span class="prd">售后域实体001/§3</span>）；客服代客操作时主语仍=买家橙橙。</div>
+    </div>
+  </div>
+  </div>
+  <aside class="anno"><div class="ttl">逆向屏2 · 售后申请<small>仅退款 / 退货退款</small></div>
+<div class="ah">业务逻辑</div>
+<ol>
+<li>目前支持两种售后：<b>仅退款</b>（东西还没发，直接退钱，付过款就能申请）和<b>退货退款</b>（收到货了，退货再退钱，签收后才能申请）。换货、补发等类型二期再做。</li>
+<li>申请人是客户本人——即使是店员代下的单，退不退也由客户决定，店员只能协助操作，不能替客户发起。</li>
+<li>提交后商家有30分钟处理时限：不处理系统自动同意；同意后自动原路退款（一分钟内到账），人工处理不超过24小时。</li>
+</ol>
+<div class="ah">数据流转</div>
+<div class="flow2">提交 → 创建售后单 + 生成对应的退款单（记录来源=售后）→ 订单挂起 → 商家端出现待处理任务</div></aside>
+</div>
+
+<!-- 售后详情屏 -->
+<div class="scr">
+  <div class="phcol">
+  <div class="sec-title" style="margin-top:0">售后详情屏 · 售后详情 · 退款去向（原路退回三分支）</div>
+  <div class="phone">
+    <div class="statusbar"><span>9:41</span><span>▮▮▮ ⌾ ▰ 77</span></div>
+    <div class="nvbar"><span class="bk"><svg><use href="#i-back"/></svg></span><span class="t">售后详情</span></div>
+    <div class="p-body" style="padding-top:12px">
+      <div class="card">
+        <div class="row" style="justify-content:space-between"><span style="font-size:14px;font-weight:600">退款中</span><span class="small mut">编号 AFS2609020001</span></div>
+        <div class="tl" style="margin-top:12px">
+          <div class="tl-item"><span class="tl-dot done"></span><span style="font-size:12.5px"><b>买家提交申请</b> · 09-02 10:30</span></div>
+          <div class="tl-item"><span class="tl-dot done"></span><span style="font-size:12.5px"><b>商家确认</b> · 超时未处理 30 分钟自动同意</span></div>
+          <div class="tl-item"><span class="tl-dot"></span><span style="font-size:12.5px"><b>系统退款</b> · 自动退款 &lt;1 分钟，人工 &lt;24 小时</span></div>
+        </div>
+      </div>
+      <div class="card hl-add">
+        <div style="font-size:13.5px;font-weight:600;margin-bottom:8px">退款去向（原路退回，不可改收款方）</div>
+        <div class="kv"><span>退款方式</span><span>原路退回至实际支付方</span></div>
+        <div class="kv"><span>本单付款方</span><span class="small">他人支付 · 微信（非买家付款）<span class="orange-tag">付款人与买家非同一人</span></span></div>
+        <div class="kv"><span>预计到账</span><span class="mut">1-3 个工作日（渠道原路）</span></div>
+      </div>
+      <div class="card">
+        <div style="font-size:13.5px;font-weight:600;margin-bottom:8px">优惠与权益返还</div>
+        <div class="kv"><span>现金红包</span><span>-¥9.00 按原路退回</span></div>
+        <div class="kv"><span>满减券</span><span class="mut">按订单优惠独立记录退回</span></div>
+        <div class="kv"><span>积分抵现</span><span class="mut">按退款比例退还</span></div>
+      </div>
+      <div class="notice">佣金冲减：退款完成 → 财务域佣金回滚——未结算（退款中暂停）/已结算（扣减 <span class="prd">财务域功能009、财务域实体010</span>）；<b>代客单佣金归属=客户业绩归属人</b>（按分销域客户归属规则：永久锁客，不因代客下单改变）。</div>
+    </div>
+  </div>
+  </div>
+  <aside class="anno"><div class="ttl">逆向屏3 · 售后详情 · 退款去向<small>原路退回 · 谁付的退给谁</small></div>
+<div class="ah">业务逻辑</div>
+<ol>
+<li><b>退款一律原路退回，且不能改收款方</b>——谁付的钱退给谁，分三种情况：客户自己付的退给客户；店员垫付的退给店员（同时强提醒店员"钱已退回你账户，请与客户结清"）；陌生微信用户代付的退给那个微信。</li>
+<li>页面把"退给谁"写清楚，避免客服随口承诺"钱退给买家"造成差错。</li>
+<li>优惠券、红包按订单里记录的优惠明细退回；退回的券隔一天才能再用（防止"用券→退款→再用券"反复薅）；积分按退款比例退还。</li>
+<li>退款完成后通知财务侧冲减佣金：还没结算的暂停发放，已结算的从余额扣回。<b>佣金始终归客户归属的店员/门店，与谁操作下单无关</b>。</li>
+</ol>
+<div class="ah">数据流转</div>
+<div class="flow2">同意退款 → 调用支付网关原路退回 → 退款成功 → 售后完成（全额退款则订单关闭，部分退款订单继续履约）<br>同步触发：佣金冲减、券/积分返还、垫付台账更新、店员提醒</div></aside></div><!-- 逆向 end -->
+
+<!-- ======================= 后台 ======================= -->
+<div class="sec-title">第四段 · SaaS 后台 · 订单详情 + 售后管理（1:1 复刻真实页面；走查依据：订单 ORD260902000030 待发货单、售后 R20260902000030）</div>
+<div class="rowwrap">
+
+<div class="scr pcscr">
+  <div class="sec-title" style="width:100%;margin:0 0 12px;margin-top:0">后台 · 订单详情页（1:1 复刻 + 灰带新增「代下单信息」列）</div>
+  <div class="pcx">
+    <div class="pcx-crumb">
+      交易 › 订单管理
+      <div class="tabs"><span class="ptab">工作台</span><span class="ptab">项目列表</span><span class="ptab on">订单管理</span></div>
+    </div>
+    <div class="pcx-status">
+      <div class="st-l">
+        <div class="st-big">待发货</div>
+        <div class="st-sub">买家已付款，待商家发货</div>
+        <span class="btn-ship">发货</span>
+        <div class="st-note">商家备注: <b>备注</b></div>
+      </div>
+      <div class="tlh">
+        <div class="step"><div class="dot done">1</div><div class="sn">买家下单</div><div class="sd">2026-09-02 10:21:08</div></div>
+        <div class="ln"></div>
+        <div class="step"><div class="dot done">2</div><div class="sn">买家付款</div><div class="sd">2026-09-02 10:23:46</div></div>
+        <div class="ln"></div>
+        <div class="step"><div class="dot">3</div><div class="sn gray">商家发货</div></div>
+        <div class="ln"></div>
+        <div class="step"><div class="dot">4</div><div class="sn gray">买家签收</div></div>
+        <div class="ln"></div>
+        <div class="step"><div class="dot">5</div><div class="sn gray">交易完成</div></div>
+      </div>
+    </div>
+    <div style="margin:8px 22px;background:#FFFCCF;border:1px solid #F7EFA8;border-radius:4px;padding:9px 12px;font-size:12px;color:#8C6239">买家备注:</div>
+    <div class="gray-strip">
+      <div class="gc">
+        <h5>收货人信息</h5>
+        <p>收货人：橙橙</p>
+        <p>联系电话：13800020002</p>
+        <p>收货地址：广东省广州市天河区东英科技园9号楼5楼</p>
+      </div>
+      <div class="gc">
+        <h5>配送信息</h5>
+        <p>配送方式：快递发货</p>
+      </div>
+      <div class="gc">
+        <h5>付款信息</h5>
+        <p>应付金额：￥218.50</p>
+        <p>实付金额：￥218.50</p>
+      </div>
+      <div class="gc">
+        <h5>买家信息</h5>
+        <p>买家：橙橙</p>
+      </div>
+      <div class="gc hl-add" style="border-radius:8px;background:#fff;outline-offset:-2px;padding:2px 8px;margin:-4px 0">
+        <h5>代下单信息<span class="tag tag-add">新增列</span></h5>
+        <p>下单方式：<b>店员代客下单</b></p>
+        <p>代下单用户：门店3店员（CY26081900031）</p>
+        <p>代付人：橙橙（客户编号 260716000000005）</p>
+        <p style="color:#999;font-size:11px">非系统用户代付时此行不显示</p>
+      </div>
+      <div class="gc">
+        <h5>营销信息</h5>
+        <p>满减优惠总金额： -</p>
+        <p>折扣优惠总金额： -</p>
+        <p>红包优惠总金额： -</p>
+      </div>
+    </div>
+    <table class="sku-tb">
+      <tr><th style="width:34%">商品信息</th><th>单价(元)</th><th>数量</th><th>单位</th><th>优惠后金额(元)</th><th>售后状态</th><th>发货状态</th></tr>
+      <tr>
+        <td><div class="row" style="gap:10px"><div class="sku-img" style="width:44px;height:44px;font-size:18px;background:#FDF3E7">🥛</div>
+          <div><div style="font-size:13px;font-weight:500;color:#333">认养一头牛 高钙牛奶</div>
+          <div style="font-size:11.5px;color:var(--t2);margin-top:3px">全脂 400g<br>商品编码：NYYT0400 商品SKU：NYYT0400</div></div></div></td>
+        <td>￥218.50</td><td>1</td><td>件</td><td>￥218.50</td><td><span style="color:#666">未退款</span></td><td>未发货</td>
+      </tr>
+    </table>
+    <div class="sum-box">
+      <div class="srow"><i>商品总价：</i><span>￥218.50</span></div>
+      <div class="srow"><i>优惠总价：</i><span>￥0</span></div>
+      <div class="srow"><i>积分抵扣：（消耗0积分）</i><span>-</span></div>
+      <div class="srow final"><i><b>订单应收总价：</b></i><span><b>￥218.50</b></span></div>
+    </div>
+  </div>
+  <aside class="anno anno-wide"><div class="ttl">后台屏 · 订单详情<small>1:1 骨架 · 唯一新增=灰带一列</small></div>
+<div class="ah">业务逻辑</div>
+<ol>
+<li>页面结构与现有后台完全一致，唯一的新增是灰色信息区里的「代下单信息」列：<b>这笔单是谁下的（下单方式）、哪个店员操作的、钱实际是谁付的</b>。</li>
+<li>「代付人」只显示付款人的公开信息；如果付款的就是买家本人，这一行不显示（付款信息里已经能看出）。陌生微信用户代付时不显示身份，但支付流水里留有加密的付款人标识，退款和对账都查得到。</li>
+<li>操作按钮跟着订单状态走：待发货显示「发货」；已关闭的订单只剩查看和备注。</li>
+<li>店员信息是下单当时固化下来的——之后店员换门店、离职，历史订单的显示不受影响。</li>
+</ol>
+<div class="ah">数据流转</div>
+<div class="flow2">打开详情 → 后台读取订单（含下单方式、操作店员等代客字段快照）<br>列表页增量：可按下单方式、付款方式筛选；代客单带「代」角标；导出文件包含支付流水号和退款去向，供财务对账</div></aside>
+</div>
+
+<div class="scr pcscr">
+  <div class="sec-title" style="width:100%;margin:0 0 12px;margin-top:0">后台 · 售后管理列表（1:1 复刻，走查依据：真实后台「售后管理」页）</div>
+  <div class="pcx">
+    <div class="pcx-crumb">
+      交易 › 售后管理
+      <div class="tabs"><span class="ptab">工作台</span><span class="ptab">项目列表</span><span class="ptab on">售后管理</span></div>
+    </div>
+    <div class="afs-filter">
+      <span class="sel">订单编号 ▾</span><span class="ipt">请输入订单编号</span><span class="exp">展开</span>
+      <span class="btn-q">查询</span>
+    </div>
+    <div class="afs-tabbar">
+      <span class="at on">全部</span><span class="at">待商家处理</span><span class="at">待商家收货</span><span class="at">待买家处理</span><span class="at">退款异常</span><span class="at">退款中</span><span class="at">退款成功</span>
+      <span class="sort">⇅ 按照申请时间降序</span>
+    </div>
+    <div class="afs-batch"><span class="bb">批量全选/取消</span></div>
+    <div style="overflow-x:auto;margin:0 22px"><table class="sku-tb" style="min-width:880px">
+      <tr><th style="width:26%">商品信息</th><th>售后编号</th><th>售后方式</th><th>发货状态</th><th>订单金额</th><th>数量</th><th>退款金额(元)</th><th>退还积分</th><th>申请时间</th><th>超时时间</th><th>售后原因</th><th>售后状态</th><th>操作</th></tr>
+      <tr>
+        <td><div style="font-size:11.5px;color:#0FC6A0;margin-bottom:4px">订单号：ORD260902000030<span class="tag tag-add">代</span></div>
+          <div class="row" style="gap:8px"><div class="sku-img" style="width:36px;height:36px;font-size:14px;background:#FDF3E7">🥛</div><span style="font-size:12.5px;color:#333">认养一头牛 高钙牛奶<br><span class="mut" style="font-size:11px">400g</span><br><span class="mut" style="font-size:11px">400g</span></span></div></td>
+        <td style="font-size:11.5px">R20260902000030</td>
+        <td>仅退款</td><td>暂无</td><td>¥218.50</td><td>1</td><td style="color:#0FC6A0">¥0.00</td><td>1</td>
+        <td style="font-size:11.5px">2026-09-02 14:02:18</td><td>2026-09-02 14:32:18</td><td>不想要了</td>
+        <td><span style="color:#FA8C16">待商家处理</span></td>
+        <td style="color:#0FC6A0;font-size:12px">备注<br>详情</td>
+      </tr>
+      <tr>
+        <td><div style="font-size:11.5px;color:#0FC6A0;margin-bottom:4px">订单号：ORD260818000054</div>
+          <div class="row" style="gap:8px"><div class="sku-img" style="width:36px;height:36px;font-size:14px;background:#EAF4FD">🍇</div><span style="font-size:12.5px;color:#333">葡萄<br><span class="mut" style="font-size:11px">500g</span><br><span class="mut" style="font-size:11px">全脂 400g</span></span></div></td>
+        <td style="font-size:11.5px">R20260902000030</td>
+        <td>仅退款</td><td>暂无</td><td>¥0.01</td><td>1</td><td style="color:#0FC6A0">¥0.00</td><td>0</td>
+        <td style="font-size:11.5px">2026-08-18 15:02:18</td><td>-</td><td>快递长时间未送达</td>
+        <td><span style="color:#FA8C16">待退款</span></td>
+        <td style="color:#0FC6A0;font-size:12px">备注<br>详情</td>
+      </tr>
+      <tr>
+        <td><div style="font-size:11.5px;color:#0FC6A0;margin-bottom:4px">订单号：ORD260715000176</div>
+          <div class="row" style="gap:8px"><div class="sku-img" style="width:36px;height:36px;font-size:14px;background:#FBEAEA">榴</div><span style="font-size:12.5px;color:#333">榴莲<br><span class="mut" style="font-size:11px">500g/金枕</span><br><span class="mut" style="font-size:11px">全脂 400g/金枕</span></span></div></td>
+        <td style="font-size:11.5px">售后申请屏0260723000488</td>
+        <td>仅退款</td><td>暂无</td><td>¥0.02</td><td>1</td><td style="color:#0FC6A0">¥0.02</td><td>0</td>
+        <td style="font-size:11.5px">2026-07-23 16:41:01</td><td>-</td><td>其他</td>
+        <td><span style="color:#666">售后完成</span></td>
+        <td style="color:#0FC6A0;font-size:12px">备注<br>详情</td>
+      </tr>
+    </table></div>
+  </div>
+  <aside class="anno anno-wide"><div class="ttl">后台屏 · 售后管理列表<small>1:1 骨架 · 七个页签+14列</small></div>
+<div class="ah">业务逻辑</div>
+<ol>
+<li>顶部七个页签对应售后的各个阶段，默认按申请时间倒序排列。</li>
+<li>代客增量只有两处：筛选区可以按"下单方式"筛出代客单；代客单的商品信息带「代」角标，一眼区分。</li>
+<li>导出的售后明细包含退款去向和支付流水号——财务对账时能逐笔分清"钱退给了谁"。</li>
+</ol>
+<div class="ah">数据流转</div>
+<div class="flow2">查询 → 按筛选条件返回售后单列表<br>导出 → 按财务对账字段输出（支付流水号+退款去向），与渠道账单逐笔核对</div></aside>
+</div>
+
+<div class="scr pcscr">
+  <div class="sec-title" style="width:100%;margin:0 0 12px;margin-top:0">后台 · 售后详情（1:1 复刻，走查依据：真实售后单）</div>
+  <div class="pcx">
+    <div class="pcx-crumb">‹ 返回&nbsp;&nbsp;<b style="color:#333">售后详情</b></div>
+    <div style="padding:14px 22px 0;font-size:12.5px;color:#555">订单编号：<b style="color:#0FC6A0">ORD260902000030</b> <span class="copy" style="color:#8FB8FF;font-size:11px">编号复制</span>&nbsp;&nbsp;&nbsp;维权编号：<b style="color:#0FC6A0">R20260902000030</b> <span class="copy" style="color:#8FB8FF;font-size:11px">编号复制</span></div>
+    <div class="pcx-status">
+      <div class="st-l">
+        <div class="st-big">待商家处理</div>
+        <div class="st-sub">买家已提交维权申请，请及时处理</div>
+        <span class="btn-ship" style="background:#fff;color:#F5222D;border:1px solid #F5222D;margin-right:8px">拒绝申请</span>
+        <span class="btn-ship">同意退款</span>
+        <div class="st-note">备 注</div>
+      </div>
+      <div class="tlh">
+        <div class="step"><div class="dot done">✓</div><div class="sn">买家维权</div><div class="sd">2026-09-02<br>14:02:18</div></div>
+        <div class="ln"></div>
+        <div class="step"><div class="dot done">2</div><div class="sn">待商家处理</div><div class="sd">剩余 <b style="color:#FA8C16">18:26</b></div></div>
+        <div class="ln"></div>
+        <div class="step"><div class="dot">3</div><div class="sn gray">待商家退款</div></div>
+        <div class="ln"></div>
+        <div class="step"><div class="dot">4</div><div class="sn gray">售后完成</div></div>
+      </div>
+    </div>
+    <div style="margin:8px 22px;background:#FFFCCF;border:1px solid #F7EFA8;border-radius:4px;padding:9px 12px;font-size:12px;color:#8C6239">买家备注：-</div>
+    <div class="afs-cols c4">
+      <div class="ac">
+        <h5>售后申请信息</h5>
+        <p>售后类型：<b>仅退款</b></p>
+        <p>退款金额：<b>￥218.50</b></p>
+        <p>退还积分：0</p>
+        <p>退款原因：不想要了</p>
+        <p>退款说明：-</p>
+      </div>
+      <div class="ac">
+        <h5>订单信息</h5>
+        <p>应付金额：￥218.50</p>
+        <p>实付金额：￥218.50</p>
+        <p>配送方式：快递</p>
+        <p>物流状态：未发货</p>
+      </div>
+      <div class="ac hl-add" style="border-radius:0;background:#FFFDF7">
+        <h5>代下单信息<span class="tag tag-add">新增列</span></h5>
+        <p>下单方式：<b>店员代客下单</b></p>
+        <p>代下单用户：门店3店员（CY26081900031）</p>
+        <p>代付人：橙橙（客户编号 260716000000005）</p>
+        <p>退款原路：退回实际支付方</p>
+      </div>
+      <div class="ac">
+        <h5>客户信息</h5>
+        <p>申请人：橙橙</p>
+        <p>收货人：橙橙</p>
+        <p>联系电话：13800020002</p>
+        <p>收货地址：广东省广州市天河区东英科技园9号楼5楼</p>
+      </div>
+    </div>
+    <table class="sku-tb">
+      <tr><th style="width:34%">商品信息</th><th>单价(元)</th><th>数量</th><th>实付款</th><th>退货数量</th><th>退货金额</th></tr>
+      <tr>
+        <td><div style="font-size:13px;font-weight:500;color:#333">认养一头牛 高钙牛奶</div><div style="font-size:11.5px;color:var(--t2);margin-top:3px">规格：全脂 400g</div></td>
+        <td>218.50</td><td>1</td><td>218.50</td><td>0</td><td>218.50</td>
+      </tr>
+    </table>
+    <div class="afs-log">
+      <div class="lh">维权记录</div>
+      <div class="li"><div class="lt">买家发起退款申请 <span class="tag tag-add">代客单：主语=买家橙橙</span></div>
+        售后类型：仅退款<br>申请退款金额：￥218.50<br>退款原因：不想要了<br>退款说明：-
+        <span class="tm">2026-09-02 14:02:18</span></div>
+      <div class="li"><div class="lt">商家已同意售后申请</div><span class="mut" style="font-size:11px">超时未处理 30 分钟系统自动同意（售后域超时自动处理规则）</span>
+        <span class="tm">2026-09-02 14:32:18</span></div>
+      <div class="li" style="color:#999"><div class="lt" style="color:#999">待商家退款 → 原路退回实际支付方（他人支付·非买家付款）</div><span class="mut" style="font-size:11px">系统自动退款 &lt;1 分钟，人工 &lt;24 小时；退款完成→佣金按「谁的客户归谁」的归属规则冲减</span></div>
+    </div>
+  </div>
+  <aside class="anno anno-wide"><div class="ttl">后台屏 · 售后详情<small>1:1 骨架 · 四步时间线+维权记录</small></div>
+<div class="ah">业务逻辑</div>
+<ol>
+<li>顶部是订单编号和维权编号；状态卡随阶段变化：<b>待商家处理时显示「拒绝申请/同意退款」</b>（30分钟不处理自动同意）；<b>同意后显示「原路退款」</b>。</li>
+<li>信息区在原有三列（售后申请信息/订单信息/客户信息）后，新增一列「代下单信息」，其中"退款原路"明确写清钱退给谁——避免客服随口承诺"退给买家"造成差错。</li>
+<li>底部维权记录是完整日志：谁在什么时间做了什么，全程可追溯。</li>
+</ol>
+<div class="ah">数据流转</div>
+<div class="flow2">同意 → 售后推进（超时由系统定时任务自动同意）<br>原路退款 → 支付网关 → 退款成功 → 售后完成（全额退款订单关闭，部分退款订单继续履约）→ 同步佣金冲减与券/积分返还</div></aside>
+
+</div><!-- board end -->
+</body>
+</html>
