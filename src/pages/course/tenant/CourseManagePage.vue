@@ -187,14 +187,14 @@
               <t-switch v-model="(form as any).quiz_enabled" />
               <span class="form-tip" style="margin-left:8px">开启后本课程所有课时播放将按触发时机弹出答题（全局配置）</span>
             </t-form-item>
-            <!-- V2·0902 用户裁决：开启答题后需选择题库，选完可查看题库详情 -->
+            <!-- V2·0902 用户裁决：开启答题后按线上「选择题库」选题（多选题目），选完可查看题库详情 -->
             <t-form-item label="答题题库" v-if="(form as any).quiz_enabled">
-              <template v-if="(form as any).quiz_bank_id">
-                <span style="margin-left:8px;font-size:13px;color:#475467">{{ quizBankName((form as any).quiz_bank_id) }}</span>
-                <t-button variant="text" size="small" theme="primary" style="margin-left:8px" @click="quizPickerRef?.openWith((form as any).quiz_bank_id)">更换题库</t-button>
-                <t-button variant="text" size="small" theme="primary" style="margin-left:4px" @click="openQuizBankDetail((form as any).quiz_bank_id)">查看题库详情</t-button>
+              <template v-if="((form as any).quiz_question_ids || []).length">
+                <span style="margin-left:8px;font-size:13px;color:#475467">已选 {{ (form as any).quiz_question_ids.length }} 道题目</span>
+                <t-button variant="text" size="small" theme="primary" style="margin-left:8px" @click="quizPickerRef?.openWith((form as any).quiz_question_ids)">更换题目</t-button>
+                <t-button variant="text" size="small" theme="primary" style="margin-left:4px" @click="openQuizBankDetail()">查看题库详情</t-button>
               </template>
-              <t-button v-else variant="text" size="small" theme="primary" style="margin-left:8px" @click="quizPickerRef?.openWith('')">选择题库</t-button>
+              <t-button v-else variant="text" size="small" theme="primary" style="margin-left:8px" @click="quizPickerRef?.openWith([])">选择题库</t-button>
             </t-form-item>
             <!-- 以下六项 = SaaS 线上 1:1（2026-08-27 实测） -->
             <t-form-item label="是否显示课程介绍"><t-switch v-model="form.show_intro" /></t-form-item>
@@ -439,6 +439,7 @@ function defaultForm() {
     // V2·0902 老板需求：是否答题全局开关 + 两类奖励命名
     quiz_enabled: false,
     quiz_bank_id: null as string | null,
+    quiz_question_ids: [] as string[],
     answer_reward_name: '',
     reward_name: '',
     // V2·0902 老板需求：录播课是否被营期引用
@@ -559,20 +560,19 @@ function removeVideo(row: any) { form.value.videos = form.value.videos.filter((v
 
 // ─── 是否答题已改课程级全局开关（课程设置区块），课时行配置与相关弹窗已移除 ───
 
-// ===== V2·0902 用户裁决：课程设置·答题题库选择 + 查看题库详情 =====
+// ===== V2·0902 用户裁决：课程设置·选择题库（线上口径：题目库选题挂课程）+ 查看题库详情 =====
 const quizPickerRef = ref<InstanceType<typeof QuizPickerDialog> | null>(null);
-function onQuizBankPicked(bankId: string) {
-  (form.value as any).quiz_bank_id = bankId;
+function onQuizBankPicked(questionIds: string[]) {
+  (form.value as any).quiz_question_ids = questionIds;
 }
-const quizBankName = (id: string) => store.questionBanks.find(b => b.id === id)?.title ?? id;
 const quizTypeLabel = (t: string) => ({ single: '单选', multiple: '多选', judge: '判断', fill: '填空' }[t] ?? t);
 const quizBankDetailVisible = ref(false);
 const quizBankDetailTitle = ref('题库详情');
 const quizBankQuestions = ref<any[]>([]);
-function openQuizBankDetail(bankId: string) {
-  const bank = store.questionBanks.find(b => b.id === bankId);
-  quizBankDetailTitle.value = `题库详情${bank ? ' · ' + bank.title : ''}`;
-  quizBankQuestions.value = store.questions.filter(q => q.bank_id === bankId);
+function openQuizBankDetail() {
+  const ids: string[] = (form.value as any).quiz_question_ids || [];
+  quizBankDetailTitle.value = `题库详情 · 已选 ${ids.length} 道题目`;
+  quizBankQuestions.value = store.questions.filter(q => ids.includes(q.id));
   quizBankDetailVisible.value = true;
 }
 
@@ -640,6 +640,7 @@ function openEditDrawer(row: any) {
     answer_reward_points: (row as any).answer_reward_points ?? 20,
     quiz_enabled: (row as any).quiz_enabled ?? false,
     quiz_bank_id: (row as any).quiz_bank_id ?? null,
+    quiz_question_ids: (row as any).quiz_question_ids ?? [],
     answer_reward_name: (row as any).answer_reward_name || '',
     reward_name: (row as any).reward_name || '',
     camp_ref_enabled: (row as any).camp_ref_enabled ?? true,
@@ -668,7 +669,7 @@ function doSave() {
     }
   }
   if (editing.value) {
-    store.updateCourse(editing.value.id, { title: form.value.title, category_name: form.value.category_name, description: form.value.description, mode: form.value.mode, visibility: form.value.visibility, cover_url: form.value.cover_url, is_paid: isPaid, price, commission_enabled: false, show_in_app: form.value.show_in_app, lecturer_id: '', lecturer_name: '', live_room_id: form.value.mode === 'live' ? liveRoomId : null, live_display_title: (form.value as any).live_display_title || '', display_style: form.value.mode === 'recorded' ? (form.value as any).display_style : undefined, quiz_reward_cash_enabled: form.value.mode === 'recorded' ? (form.value as any).quiz_reward_cash_enabled : false, quiz_reward: form.value.mode === 'recorded' ? (form.value as any).quiz_reward : null, answer_reward_points_enabled: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points_enabled : false, answer_reward_points: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points : 0, quiz_enabled: form.value.mode === 'recorded' ? (form.value as any).quiz_enabled : false, quiz_bank_id: form.value.mode === 'recorded' ? ((form.value as any).quiz_bank_id || null) : null, answer_reward_name: form.value.mode === 'recorded' ? ((form.value as any).answer_reward_name || '') : '', reward_name: (form.value as any).reward_name || '', camp_ref_enabled: (form.value as any).camp_ref_enabled } as any);
+    store.updateCourse(editing.value.id, { title: form.value.title, category_name: form.value.category_name, description: form.value.description, mode: form.value.mode, visibility: form.value.visibility, cover_url: form.value.cover_url, is_paid: isPaid, price, commission_enabled: false, show_in_app: form.value.show_in_app, lecturer_id: '', lecturer_name: '', live_room_id: form.value.mode === 'live' ? liveRoomId : null, live_display_title: (form.value as any).live_display_title || '', display_style: form.value.mode === 'recorded' ? (form.value as any).display_style : undefined, quiz_reward_cash_enabled: form.value.mode === 'recorded' ? (form.value as any).quiz_reward_cash_enabled : false, quiz_reward: form.value.mode === 'recorded' ? (form.value as any).quiz_reward : null, answer_reward_points_enabled: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points_enabled : false, answer_reward_points: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points : 0, quiz_enabled: form.value.mode === 'recorded' ? (form.value as any).quiz_enabled : false, quiz_bank_id: form.value.mode === 'recorded' ? ((form.value as any).quiz_bank_id || null) : null, quiz_question_ids: form.value.mode === 'recorded' ? (((form.value as any).quiz_question_ids || []) as string[]) : [], answer_reward_name: form.value.mode === 'recorded' ? ((form.value as any).answer_reward_name || '') : '', reward_name: (form.value as any).reward_name || '', camp_ref_enabled: (form.value as any).camp_ref_enabled } as any);
     if (form.value.mode === 'recorded') {
       form.value.videos.forEach((v: any) => {
         const existing = store.lessons.find((l: any) => l.lesson_no === v.video_no);
@@ -680,7 +681,7 @@ function doSave() {
     }
     MessagePlugin.success('课程已更新');
   } else {
-    store.createCourse({ title: form.value.title, description: form.value.description, cover_url: form.value.cover_url, category_id: 'cat-' + Date.now(), category_name: form.value.category_name, tags: [], lecturer_id: '', lecturer_name: '', source: 'upload', mode: form.value.mode, source_live_session_id: null, visibility: form.value.visibility, price, is_paid: isPaid, commission_enabled: false, show_in_app: form.value.show_in_app, live_room_id: form.value.mode === 'live' ? liveRoomId : null, live_display_title: (form.value as any).live_display_title || '', display_style: form.value.mode === 'recorded' ? (form.value as any).display_style : undefined, quiz_reward_cash_enabled: form.value.mode === 'recorded' ? (form.value as any).quiz_reward_cash_enabled : false, quiz_reward: form.value.mode === 'recorded' ? (form.value as any).quiz_reward : null, answer_reward_points_enabled: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points_enabled : false, answer_reward_points: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points : 0, quiz_enabled: form.value.mode === 'recorded' ? (form.value as any).quiz_enabled : false, quiz_bank_id: form.value.mode === 'recorded' ? ((form.value as any).quiz_bank_id || null) : null, answer_reward_name: form.value.mode === 'recorded' ? ((form.value as any).answer_reward_name || '') : '', reward_name: (form.value as any).reward_name || '', camp_ref_enabled: (form.value as any).camp_ref_enabled } as any);
+    store.createCourse({ title: form.value.title, description: form.value.description, cover_url: form.value.cover_url, category_id: 'cat-' + Date.now(), category_name: form.value.category_name, tags: [], lecturer_id: '', lecturer_name: '', source: 'upload', mode: form.value.mode, source_live_session_id: null, visibility: form.value.visibility, price, is_paid: isPaid, commission_enabled: false, show_in_app: form.value.show_in_app, live_room_id: form.value.mode === 'live' ? liveRoomId : null, live_display_title: (form.value as any).live_display_title || '', display_style: form.value.mode === 'recorded' ? (form.value as any).display_style : undefined, quiz_reward_cash_enabled: form.value.mode === 'recorded' ? (form.value as any).quiz_reward_cash_enabled : false, quiz_reward: form.value.mode === 'recorded' ? (form.value as any).quiz_reward : null, answer_reward_points_enabled: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points_enabled : false, answer_reward_points: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points : 0, quiz_enabled: form.value.mode === 'recorded' ? (form.value as any).quiz_enabled : false, quiz_bank_id: form.value.mode === 'recorded' ? ((form.value as any).quiz_bank_id || null) : null, quiz_question_ids: form.value.mode === 'recorded' ? (((form.value as any).quiz_question_ids || []) as string[]) : [], answer_reward_name: form.value.mode === 'recorded' ? ((form.value as any).answer_reward_name || '') : '', reward_name: (form.value as any).reward_name || '', camp_ref_enabled: (form.value as any).camp_ref_enabled } as any);
     MessagePlugin.success('课程已新增');
   }
   // D35 完课奖励同步营销域复刻观看奖励页（真实系统：课程表单保存→营销中心创建红包规则）；积分奖励走积分事件不建红包规则
