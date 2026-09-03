@@ -75,9 +75,6 @@
                     <t-tag v-if="(s as any).quiz_bank_id && (s as any).quiz_reward_points_enabled" theme="success" variant="light" size="small">
                       答题积分{{ (s as any).quiz_reward_points || 0 }}
                     </t-tag>
-                    <t-tag v-if="(s as any).red_packet_enabled && (s as any).red_packet" theme="warning" variant="light" size="small">
-                      红包奖励 ¥{{ (s as any).red_packet.amount }}/{{ (s as any).red_packet.count }}个
-                    </t-tag>
                   </div>
                   <div v-if="s.description" class="sc-desc">{{ s.description }}</div>
                   <div v-if="s.course_id" class="sc-course">
@@ -212,19 +209,7 @@
               <t-date-picker v-model="addForm.deadline" enable-time-picker placeholder="选择预计结束时间（可选）" style="width: 100%" />
             </t-form-item>
           </div>
-          <!-- V2·0902 红包奖励（排课级·仅录播）：现金红包选择器 -->
-          <div v-if="addForm.teach_mode === 'recorded'" class="form-col-full">
-            <t-form-item label="红包奖励">
-              <t-switch v-model="addForm.red_packet_enabled" />
-              <template v-if="addForm.red_packet_enabled">
-                <div v-if="addForm.red_packet" class="reward-cell" style="margin-left:8px" @click="redPacketPickerRef?.openWith(addForm.red_packet.no)">
-                  <span class="reward-name">{{ addForm.red_packet.no }}</span>
-                  <span class="reward-meta">¥{{ addForm.red_packet.amount }} / {{ addForm.red_packet.count }}个 · {{ addForm.red_packet.type }}</span>
-                </div>
-                <t-button v-else variant="text" size="small" theme="primary" style="margin-left:8px" @click="redPacketPickerRef?.openWith('')">选择红包</t-button>
-              </template>
-            </t-form-item>
-          </div>
+          <!-- V2·0902 用户裁决：红包奖励移除（排课层不再配置） -->
           <!-- V2·0902 老板需求：播放控制（拖动进度条/暂停）排课级可配，选课时后跟随课程默认；仅录播——直播间无播放控制 -->
           <div v-if="addForm.teach_mode === 'recorded'" class="form-col-full">
             <t-form-item label="允许拖动进度条">
@@ -234,7 +219,7 @@
               </t-radio-group>
             </t-form-item>
           </div>
-          <div class="form-col-full">
+          <div v-if="addForm.teach_mode === 'recorded'" class="form-col-full">
             <t-form-item label="允许暂停">
               <t-radio-group v-model="addForm.allow_pause">
                 <t-radio value="allow">允许</t-radio>
@@ -331,9 +316,6 @@
     <!-- V2·0902 题库选择弹窗 -->
 
 
-    <!-- V2·0902 现金红包选择弹窗 -->
-    <RedPacketPickerDialog ref="redPacketPickerRef" @confirm="onRedPacketPicked" />
-
     <!-- V2·0902 快速创建直播间（配置全部在弹窗内，创建后自动选中） -->
     <CreateLiveRoomDialog v-model:visible="showCreateRoom" from="营期排课" @created="onRoomCreated" />
 
@@ -351,8 +333,6 @@ import { useCourseStore } from '../../../stores/course-store';
 import type { CourseSchedule } from '../../../contracts/schemas/camp-schemas';
 import CreateLiveRoomDialog from './CreateLiveRoomDialog.vue';
 import CustomerScopeDialog from './CustomerScopeDialog.vue';
-
-import RedPacketPickerDialog from './RedPacketPickerDialog.vue';
 
 const route = useRoute();
 const campStore = useCampStore();
@@ -498,8 +478,6 @@ function doBatch() {
         client_visible: true,
         customer_scope_mode: 'all',
         customer_scope_staff_ids: [],
-        red_packet_enabled: false,
-        red_packet: null,
         allow_seek: 'allow',
         allow_pause: 'disallow',
         display_style: 'live_room',
@@ -542,8 +520,6 @@ const addForm = ref({
   completion_criteria: '',
   allow_seek: 'allow' as 'allow' | 'disallow',
   allow_pause: 'disallow' as 'allow' | 'disallow',
-  red_packet_enabled: false,
-  red_packet: null as { no: string; amount: number; count: number; type: string } | null,
   is_required: true,
 });
 // V2·0902 选课时后播放控制跟随课程设置（可调整）
@@ -568,7 +544,7 @@ const quizFollowTip = computed(() => {
 });
 function openAddDialog() {
   if (isLocked.value) { MessagePlugin.warning('营期已结束，排课锁定'); return; }
-  addForm.value = { day_number: 1, title: '', description: '', teach_mode: 'recorded', live_room_id: '', display_style: 'live_room', live_display_title: '', course_id: '', lesson_id: null, unlock_time: new Date(), deadline: null, completion_criteria: '', allow_seek: 'allow', allow_pause: 'disallow', red_packet_enabled: false, red_packet: null, is_required: true };
+  addForm.value = { day_number: 1, title: '', description: '', teach_mode: 'recorded', live_room_id: '', display_style: 'live_room', live_display_title: '', course_id: '', lesson_id: null, unlock_time: new Date(), deadline: null, completion_criteria: '', allow_seek: 'allow', allow_pause: 'disallow', is_required: true };
   showAdd.value = true;
   notifyModalOpen('schedule-add');
 }
@@ -616,8 +592,6 @@ function doAdd() {
     quiz_reward_points: (courseStore.loadCourse(autoCourseId) as any)?.answer_reward_points ?? 0,
     allow_seek: addForm.value.allow_seek,
     allow_pause: addForm.value.allow_pause,
-    red_packet_enabled: addForm.value.teach_mode === 'recorded' ? addForm.value.red_packet_enabled : false,
-    red_packet: addForm.value.teach_mode === 'recorded' && addForm.value.red_packet_enabled ? addForm.value.red_packet : null,
     display_style: addForm.value.teach_mode === 'recorded' ? addForm.value.display_style : undefined,
     live_display_title: addForm.value.teach_mode === 'recorded' && addForm.value.display_style === 'live_room' ? addForm.value.live_display_title.trim() : '',
   } as any);
@@ -638,11 +612,7 @@ function onRoomCreated(roomId: string) {
   addForm.value.live_room_id = roomId;
 }
 
-// ===== V2·0902 红包选择弹窗 =====
-const redPacketPickerRef = ref<InstanceType<typeof RedPacketPickerDialog> | null>(null);
-function onRedPacketPicked(p: { no: string; amount: number; count: number; type: string }) {
-  addForm.value.red_packet = p;
-}
+// ===== V2·0902 红包选择弹窗已移除（排课层不再配置红包奖励）=====
 const quizTriggerLabel = (t: string) => ({ start: '开始时', half: '播放至50%', eighty: '播放至80%', end: '结束时' }[t] ?? t);
 
 // ===== V2·0902 客户范围（对齐 SaaS「设置客户范围」：新老客户限制+店长/店员多选）=====
