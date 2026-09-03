@@ -634,7 +634,7 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
 <div class="ah">业务逻辑</div>
 <ol>
 <li><b>地址按客户来</b>：默认带出客户名下的默认地址，地址列表只有这个客户自己的地址；店员新增的地址也保存到客户名下。客户没有地址时进入无地址空态。</li>
-<li><b>优惠按客户来</b>：客户有什么券、有多少积分，就按他的资格算，与店员无关。优惠抵扣不能超过订单金额，超了按订单金额封顶。</li>
+<li><b>优惠按客户来</b>：用的就是<b>客户账户里的券和积分</b>——客户有什么券、有多少积分，就按他的资格算，店员的券和积分完全不参与。优惠抵扣不能超过订单金额，超了按订单金额封顶。</li>
 <li><b>0元单</b>：优惠全额抵扣后实付为0时，不需要付款，系统直接完成支付，也不能选"他人支付"。</li>
 <li><b>防串单确认</b>：点「立即付款」先弹确认框，显示客户头像、编号后四位和金额；如果30分钟内刚给别的客户下过单，还会提示"上一单客户是谁"，防止记混。</li>
 <li>选「门店自提」时：自提点默认带出客户归属的门店，店员可以改，但不强制锁定。</li>
@@ -790,7 +790,8 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
 <ol>
 <li>页面固定显示"已为哪位客户生成了订单"和订单号——这是多客户排队时，店员核对"这单到底是给谁下的"的最后防线。</li>
 <li>如果是店员垫付的，显示"本单由你垫付，请向客户收款"，可一键复制收款说明（金额/订单号/客户昵称），并记入垫付台账；之后退款时台账会同步更新并提醒店员。</li>
-<li>订单进入待发货或待自提；自提订单生成提货码（YXKSA+6位数字）。</li>
+<li>订单进入待发货或待自提；自提订单生成提货码（YXKSA+6位数字），由客户出示、店员扫码核销。</li>
+<li><b>付完款店员端就结束了</b>：这张单不会再出现在店员的任何订单列表里——查单去后台订单详情；客户在自己「我的订单」可见。</li>
 </ol>
 <div class="ah">数据流转</div>
 <div class="flow2">支付成功的事务内一次完成：更新支付单 → 推进订单状态 → 扣减库存 →（自提）生成提货码 → 作废这单所有支付凭证<br>垫付单写入垫付台账；0元单不走收银台，系统直接完成支付</div></aside></div><!-- 正向主链 end -->
@@ -807,7 +808,7 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
     <div class="statusbar"><span>9:41</span><span>▮▮▮ ⌾ ▰ 77</span></div>
     <div class="nvbar"><span class="bk"><svg><use href="#i-back"/></svg></span><span class="t">订单管理</span></div>
     <div class="p-body" style="padding-top:12px">
-      <div class="dc-tabs" style="padding:0 2px 10px"><span class="on">待付款 (1)</span><span>待发货</span><span>待自提</span><span>售后中</span><span>已关闭</span></div>
+      <div class="dc-tabs" style="padding:0 2px 10px"><span class="on">待付款 (1)</span><span>已关闭</span></div>
       <div class="order-li hl-add">
         <div class="ol-top"><span>订单号 ORD260902000030</span><span class="countdown">剩余 18:26</span></div>
         <div class="row" style="gap:10px"><div class="sku-img" style="width:48px;height:48px;font-size:18px;background:#FDF3E7">🥛</div>
@@ -820,7 +821,7 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
           <span class="br-btn btn-g1">代付 / 二维码</span>
         </div>
       </div>
-      <div class="notice">待付款超时 = <b>30 分钟自动关单</b>（<span class="prd">订单域超时关单规则</span>，硬编码 订单域待办006）；关单前 2 小时推送无意义——<b>关单前 10 分钟推送店员提醒</b>（新增建议）；已关闭代客单支持一键重下；列表<b>仅显示本人代下的订单</b>，店长与同店店员互不可见。</div>
+      <div class="notice">待付款超时 = <b>30 分钟自动关单</b>（<span class="prd">订单域超时关单规则</span>，硬编码 订单域待办006）；关单前 2 小时推送无意义——<b>关单前 10 分钟推送店员提醒</b>（新增建议）；已关闭代客单支持一键重下；列表<b>仅显示本人代下的订单</b>，店长与同店店员互不可见；<b>已支付的代客单不在店员端显示</b>——付完款店员端即结束，查单去后台订单详情。</div>
     </div>
   </div>
   </div>
@@ -828,6 +829,7 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
 <div class="ah">业务逻辑</div>
 <ol>
 <li>列表只显示<b>当前登录人自己代下的</b>待付款订单：店长看不到店员代下的单，店员之间也互相看不到——谁下的单谁跟进到底。离职或账号停用时不移交：系统提醒客户自己付款，到期没付自动关单，需要兜底时由后台人工取消。</li>
+<li><b>付完款就结束</b>：已支付的代客单从店员端所有列表消失（这里只有未付款和已关闭的代客单），店长/店员要查单去后台订单详情；客户在自己「我的订单」能看到这张单。</li>
 <li>订单有30分钟支付倒计时，到期自动关闭并释放库存；关单前10分钟系统提醒店员去跟进。</li>
 <li>「取消」立即生效：同时作废发给客户的支付凭证、通知客户。</li>
 <li>「一键重下」：已关闭的订单按原来的商品数量重新走一遍下单流程，价格按当下重新计算，页面会说明与原单的差额原因。</li>
