@@ -1,1 +1,0 @@
-const e="saas-signin-days";function s(){return new Date().toISOString().slice(0,10)}function a(){try{return JSON.parse(localStorage.getItem(e)||"[]").includes(s())}catch{return!1}}function n(){if(a())return!1;const t=JSON.parse(localStorage.getItem(e)||"[]");return t.push(s()),localStorage.setItem(e,JSON.stringify(t)),!0}export{a as i,n as s,s as t};
