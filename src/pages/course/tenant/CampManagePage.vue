@@ -71,12 +71,12 @@
         </template>
         <template #op="{ row }">
           <t-space :size="2">
-            <!-- V2·0902 用户裁决（0903）：「课时」与「详情」重复仅保留详情；按钮按状态机分配——草稿/已驳回可编辑删除提审，报名中不可删除 -->
+            <!-- V2·0902 用户裁决（0903 终版）：系统无审核流——草稿「发布」即自己审自己（直接开启报名）；创建即报名中 -->
             <t-button variant="text" size="small" @click="openDetail(row)">详情</t-button>
             <t-button v-if="['published','enrolling','in_progress'].includes(row.status)" variant="text" size="small" @click="$router.push('/tenant/course/camp-schedule?campId=' + row.id)">排课</t-button>
             <t-button v-if="['published','enrolling','in_progress','ended'].includes(row.status)" variant="text" size="small" @click="openStudentDrawer(row)">学员</t-button>
-            <t-button v-if="['draft','rejected','enrolling'].includes(row.status)" variant="text" size="small" theme="primary" @click="openEdit(row)">编辑</t-button>
-            <t-button v-if="['draft','rejected'].includes(row.status)" variant="text" size="small" theme="primary" @click="submitReview(row)">提审</t-button>
+            <t-button v-if="['draft','enrolling'].includes(row.status)" variant="text" size="small" theme="primary" @click="openEdit(row)">编辑</t-button>
+            <t-button v-if="row.status === 'draft'" variant="text" size="small" theme="primary" @click="publishCamp(row)">发布</t-button>
             <t-button v-if="row.status === 'draft'" variant="text" size="small" theme="danger" @click="delCamp(row)">删除</t-button>
           </t-space>
         </template>
@@ -138,9 +138,7 @@
     <CampStudentDrawerPage v-model="studentDrawerVisible" :camp-id="activeCampId" />
 
     <!-- 驳回营期 Dialog -->
-    <t-dialog v-model:visible="rejectCampVisible" header="驳回营期" width="480px" :on-confirm="doRejectCamp" :confirm-btn="{ content: '确认', theme: 'warning' }" :cancel-btn="{ content: '取消' }">
-      <t-input v-model="rejectCampReason" placeholder="驳回原因（必填）" />
-    </t-dialog>
+    <!-- V2·0902 用户裁决（0903 终版）：系统无审核流（审核弹窗已删除）；草稿「发布」即开启报名 -->
 
     <!-- V2·0829 用户裁决：邀请码/口令体系整体下线，邀请码管理 Drawer/生成弹窗/二维码预览已删除 -->
 
@@ -295,7 +293,12 @@ function doSave() {
     store.updateCamp(editingCamp.value.id, data);
     MessagePlugin.success('营期已更新');
   } else {
-    store.createCamp(data);
+    // V2·0902 用户裁决（0903）：创建异常兜底提示（原来异常被吞导致「创建点不动」）
+    try {
+      store.createCamp(data);
+    } catch (e: any) {
+      MessagePlugin.error(e?.message || '创建失败'); return;
+    }
     MessagePlugin.success('营期已创建，报名已自动开启（报名截止后自动开营）');
   }
   showCreate.value = false; editingCamp.value = null;
@@ -303,11 +306,12 @@ function doSave() {
 function delCamp(row: any) {
   DialogPlugin.confirm({ header: '删除营期', body: '确认删除该营期？仅草稿状态可删除。', theme: 'warning', onConfirm: () => { store.deleteCamp(row.id); MessagePlugin.success('已删除'); } });
 }
-// V2·0902 用户裁决（0903）：草稿/已驳回可提审；已驳回按状态机先回草稿再提审
-function submitReview(row: any) {
-  if (row.status === 'rejected' && !store.transitionCampStatus(row.id, 'draft')) { MessagePlugin.warning('当前状态不可提审'); return; }
-  if (!store.submitCampForReview(row.id)) { MessagePlugin.warning('当前状态不可提审'); return; }
-  MessagePlugin.success('已提交审核');
+// V2·0902 用户裁决（0903 终版）：系统无审核流——草稿「发布」= 自己审自己，直接开启报名（draft→enrolling）
+function publishCamp(row: any) {
+  DialogPlugin.confirm({ header: '发布营期', body: '确认发布该营期？发布后立即开启报名。', theme: 'warning', onConfirm: () => {
+    if (!store.openEnrollment(row.id)) { MessagePlugin.warning('当前状态不可发布'); return; }
+    MessagePlugin.success('已发布，报名已开启');
+  } });
 }
 
 function openEdit(row: any) {

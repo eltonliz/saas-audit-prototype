@@ -121,7 +121,7 @@ export const SEED_CAMPS: Camp[] = [
     enrolled_count: 0, approved_count: 0, joined_count: 0,
     course_count: 6, schedule_count: 7,
     daily_red_packet_mode: 'by_camp',
-    status: 'pending_review',
+    status: 'draft',
     created_at: dayAgo(1), updated_at: dayAgo(1),
   },
   {

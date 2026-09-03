@@ -65,7 +65,7 @@ export const CAMP_STATES = CampStatusEnum.options;
 export type CampState = z.infer<typeof CampStatusEnum>;
 
 export const CAMP_TRANSITIONS: Record<CampState, CampState[]> = {
-  'draft':           ['pending_review', 'offline'],
+  'draft':           ['enrolling', 'pending_review', 'offline'],
   'pending_review':  ['published', 'rejected'],
   'published':       ['enrolling', 'offline'],
   'enrolling':       ['in_progress', 'offline'],

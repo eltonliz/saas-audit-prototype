@@ -37,8 +37,7 @@ export const useCampStore = defineStore('camp', () => {
   // 营期 CRUD
   function createCamp(input: CreateCampInput): Camp {
     if (input.total_days > 90) throw new Error('营期最长90天（行业约束）');
-    const same = camps.value.filter(c => c.series_id === input.series_id);
-    if (!validateCampCalendarNoOverlap(input.start_date, input.end_date, same)) throw new Error('同专题营期时间交叉（BR-CAMP-CAL-04）');
+    // V2·0902 用户裁决（0903）：去掉同专题时间交叉校验——营期默认同系列，交叉属正常业务场景，不应阻断创建
     // V2·0902 用户裁决：营期创建即自动开启报名（跳过草稿/审核），报名截止自动开营，结束时间自动结营
     const camp = { ...input, id: genId('CAMP'), camp_no: genId('CAMP'), status: 'enrolling', enrolled_count: 0, approved_count: 0, joined_count: 0, course_count: 0, schedule_count: 0, created_at: now(), updated_at: now() } as Camp;
     camps.value.push(camp);
