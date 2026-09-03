@@ -509,7 +509,7 @@
             <div class="card tone-violet"><div class="card-label">门店总会员</div><div class="card-value" data-def="全部门店名下的顾客总数，按顾客所属门店统计。" data-calc="状态正常的顾客数量" data-source="客户档案 · 所属门店">12,560</div></div>
             <div class="card tone-green"><div class="card-label">门店贡献GMV</div><div class="card-value" data-def="全部门店会员已支付订单金额合计。" data-calc="已支付订单金额合计" data-source="订单表 × 客户所属门店">¥1.85M</div></div>
             <div class="card tone-amber"><div class="card-label">门店复购率</div><div class="card-value" data-def="90 天内有 ≥2 次已支付订单的会员占同期有消费会员的比例。" data-calc="90 天内下单 ≥2 次的会员数 ÷ 有消费会员数" data-source="会员状态汇总 · 复购标记">38%</div></div>
-            <div class="card tone-cyan"><div class="card-label">活跃率</div><div class="card-value" data-def="活跃会员占会员总数的比例（每日凌晨预计算的前一日状态）。" data-calc="活跃会员数 ÷ 会员总数" data-source="会员状态汇总 · 活跃标记">85%</div></div>
+            <div class="card tone-cyan"><div class="card-label">活跃率</div><div class="card-value" data-def="活跃会员占会员总数的比例。活跃=90 天内有消费或有登录任一行为，与沉睡互斥（每日凌晨预计算的前一日状态）。" data-calc="活跃会员数 ÷ 会员总数" data-source="会员状态汇总 · 活跃标记">85%</div></div>
           </div>
           <div class="panel">
             <div class="panel-head"><div><div class="panel-title">门店会员对比</div><div class="panel-sub">点击门店名进入门店详情（示例数据）</div></div></div>
@@ -1053,7 +1053,7 @@
             <tr><td>归属快照</td><td class="num">店员/店长归属按查询时点的归属关系快照统计，不追溯历史归属；换绑后历史数据不迁移</td></tr>
             <tr><td>查询窗口</td><td class="num">起止日期跨度 ≤ 30 天；<b>按月查</b>不可跨月（自然月结束后出数）；<b>按 30 天窗口查</b>可跨月</td></tr>
             <tr><td>成交口径</td><td class="num">订单类指标仅统计<b>已支付</b>；"下单"含未支付，仅在漏斗中区分标注</td></tr>
-            <tr><td>状态预计算</td><td class="num">沉睡 / 活跃 / 复购标记每日 02:30 预计算，为前一日状态</td></tr>
+            <tr><td>状态预计算</td><td class="num"><b>活跃</b>=90 天内有消费或有登录任一行为；<b>沉睡</b>=90 天无消费且无登录；<b>复购</b>=90 天内下单 ≥2 次。三项每日 02:30 预计算，为前一日（T-1）状态，活跃与沉睡互斥</td></tr>
             <tr><td>环比/同比</td><td class="num">暂不支持（计算需同周期差值再除以上周期，量大，列为后续评估项）</td></tr>
           </tbody>
         </table>
