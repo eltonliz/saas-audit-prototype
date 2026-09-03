@@ -1,1 +1,0 @@
-import{d as i,r as n}from"./index-Cdguq4G1.js";const l=i("general-config",()=>{const o=n(!0),s=n("course"),t=n(!0);function a(e){o.value=e}function r(e){s.value=e}function u(e){t.value=e}return{campEnabled:o,courseDisplayMode:s,campEndedVisible:t,setCampEnabled:a,setCourseDisplayMode:r,setCampEndedVisible:u}});export{l as u};
