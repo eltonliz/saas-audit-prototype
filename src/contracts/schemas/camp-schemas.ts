@@ -262,6 +262,9 @@ export const CourseScheduleSchema = z.object({
     count: z.number().int(),
     type: z.string(),
   }).nullable().default(null),
+  /** V2·0902 老板需求：播放控制（排课级可配） */
+  allow_seek: z.enum(['allow', 'disallow']).default('allow'),
+  allow_pause: z.enum(['allow', 'disallow']).default('disallow'),
   /** V2·0902 答题奖励：现金红包/积分（答对发放，可同选） */
   quiz_reward_cash_enabled: z.boolean().default(false),
   quiz_reward_amount: z.number().int().min(0).default(100),

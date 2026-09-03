@@ -194,50 +194,6 @@
               <t-date-picker v-model="addForm.unlock_time" enable-time-picker placeholder="选择解锁时间" style="width: 100%" />
             </t-form-item>
           </div>
-          <!-- V2·0902 触发答题：仅录播课可配（直播无答题/奖励） -->
-          <div v-if="addForm.teach_mode === 'recorded'" class="form-col-full">
-            <t-form-item label="触发答题">
-              <t-switch v-model="addForm.quiz_enabled" />
-              <span class="switch-label">{{ addForm.quiz_enabled ? '答题后计完播并联动答题红包' : '不触发' }}</span>
-            </t-form-item>
-          </div>
-          <div v-if="addForm.teach_mode === 'recorded' && addForm.quiz_enabled" class="form-col-full">
-            <t-form-item label="触发时机" required-mark>
-              <t-select v-model="addForm.quiz_trigger" style="width:220px">
-                <t-option label="课时开始时" value="start" />
-                <t-option label="播放至50%时" value="half" />
-                <t-option label="播放至80%时" value="eighty" />
-                <t-option label="课时结束时" value="end" />
-              </t-select>
-            </t-form-item>
-          </div>
-          <div v-if="addForm.teach_mode === 'recorded' && addForm.quiz_enabled" class="form-col-full">
-            <t-form-item label="选择题库" required-mark>
-              <div style="display:flex;gap:8px;width:100%">
-                <t-input :value="quizBankTitle" readonly placeholder="点右侧「选择」从题目库选题" style="flex:1" />
-                <t-button theme="primary" variant="outline" @click="quizPickerRef?.openWith(addForm.quiz_bank_id || '')">
-                  <template #icon><t-icon name="browse-gallery" /></template> 选择
-                </t-button>
-              </div>
-            </t-form-item>
-          </div>
-          <!-- V2·0902 答题奖励：仅积分（红包统一走「红包奖励」现金红包选择器，避免重复） -->
-          <div v-if="addForm.teach_mode === 'recorded' && addForm.quiz_enabled" class="form-col-full quiz-reward-block">
-            <t-form-item label="答题积分">
-              <t-switch v-model="addForm.quiz_reward_points_enabled" />
-              <template v-if="addForm.quiz_reward_points_enabled">
-                <t-input-number v-model="addForm.quiz_reward_points" :min="1" :step="5" theme="column" size="small" style="width:90px;margin:0 6px" />
-                <span class="switch-label">积分 / 次</span>
-              </template>
-            </t-form-item>
-          </div>
-          <div class="form-col-full">
-            <t-form-item label="完成判定">
-              <t-select v-model="addForm.completion_criteria" clearable placeholder="请选择完成判定标准" style="width:100%">
-                <t-option v-for="opt in completionCriteriaOptions" :key="opt" :label="opt" :value="opt" />
-              </t-select>
-            </t-form-item>
-          </div>
           <!-- V2·0902 红包奖励（排课级·仅录播）：现金红包选择器 -->
           <div v-if="addForm.teach_mode === 'recorded'" class="form-col-full">
             <t-form-item label="红包奖励">
@@ -250,6 +206,30 @@
                 <t-button v-else variant="text" size="small" theme="primary" style="margin-left:8px" @click="redPacketPickerRef?.openWith('')">选择红包</t-button>
               </template>
             </t-form-item>
+          </div>
+          <!-- V2·0902 老板需求：播放控制（拖动进度条/暂停）排课级可配，选课时后跟随课程默认 -->
+          <div class="form-col-full">
+            <t-form-item label="允许拖动进度条">
+              <t-radio-group v-model="addForm.allow_seek">
+                <t-radio value="allow">允许</t-radio>
+                <t-radio value="disallow">不允许</t-radio>
+              </t-radio-group>
+            </t-form-item>
+          </div>
+          <div class="form-col-full">
+            <t-form-item label="允许暂停">
+              <t-radio-group v-model="addForm.allow_pause">
+                <t-radio value="allow">允许</t-radio>
+                <t-radio value="disallow">不允许</t-radio>
+              </t-radio-group>
+            </t-form-item>
+          </div>
+          <!-- 答题与奖励跟随课时配置（只读提示） -->
+          <div v-if="addForm.teach_mode === 'recorded'" class="form-col-full">
+            <div class="lesson-tip">
+              <t-icon name="info-circle" />
+              <span>触发答题与奖励跟随课时配置（在「课程库→课程设置」维护），排课不再重复配置{{ quizFollowTip }}</span>
+            </div>
           </div>
         </div>
       </t-form>
@@ -331,7 +311,7 @@
     <CustomerScopeDialog ref="scopeDialogRef" @confirm="onScopeConfirm" />
 
     <!-- V2·0902 题库选择弹窗 -->
-    <QuizPickerDialog ref="quizPickerRef" @confirm="onQuizPicked" />
+
 
     <!-- V2·0902 现金红包选择弹窗 -->
     <RedPacketPickerDialog ref="redPacketPickerRef" @confirm="onRedPacketPicked" />
@@ -350,7 +330,7 @@ import { useCourseStore } from '../../../stores/course-store';
 import type { CourseSchedule } from '../../../contracts/schemas/camp-schemas';
 import LiveRoomConfigForm from './LiveRoomConfigForm.vue';
 import CustomerScopeDialog from './CustomerScopeDialog.vue';
-import QuizPickerDialog from './QuizPickerDialog.vue';
+
 import RedPacketPickerDialog from './RedPacketPickerDialog.vue';
 
 const route = useRoute();
@@ -490,6 +470,8 @@ function doBatch() {
         customer_scope_staff_ids: [],
         red_packet_enabled: false,
         red_packet: null,
+        allow_seek: 'allow',
+        allow_pause: 'disallow',
         display_style: 'live_room',
       } as any;
     });
@@ -540,19 +522,35 @@ const addForm = ref({
   unlock_time: new Date(),
   deadline: null as Date | null,
   completion_criteria: '',
-  quiz_enabled: false,
-  quiz_trigger: 'half' as 'start' | 'half' | 'eighty' | 'end',
-  quiz_bank_id: '' as string,
+  allow_seek: 'allow' as 'allow' | 'disallow',
+  allow_pause: 'disallow' as 'allow' | 'disallow',
   red_packet_enabled: false,
   red_packet: null as { no: string; amount: number; count: number; type: string } | null,
-  quiz_reward_cash_enabled: false,
-  quiz_reward_points_enabled: false,
-  quiz_reward_points: 20,
   is_required: true,
 });
+// V2·0902 选课时后播放控制跟随课程设置（可调整）
+watch(() => addForm.value.lesson_id, (lid) => {
+  const lesson = lid ? courseStore.lessons.find(l => l.id === lid) : null;
+  const course = lesson ? courseStore.loadCourse(lesson.course_id) : null;
+  if (course) {
+    addForm.value.allow_pause = (course as any).allow_pause || 'disallow';
+  }
+});
+// 答题与奖励跟随课时配置（只读提示摘要）
+const quizFollowTip = computed(() => {
+  if (addForm.value.teach_mode !== 'recorded') return '';
+  const lesson = addForm.value.lesson_id ? courseStore.lessons.find(l => l.id === addForm.value.lesson_id) : null;
+  const course = lesson ? courseStore.loadCourse(lesson.course_id) : null;
+  if (!course) return '';
+  const bank = course.question_bank_id ? courseStore.questionBanks.find(b => b.id === course.question_bank_id) : null;
+  if (!bank) return '';
+  const triggerLabel = ({ start: '课时开始时', half: '播放至50%', eighty: '播放至80%', end: '课时结束时' } as any)[course.quiz_trigger] || '播放至50%';
+  const pts = (course as any).answer_reward_points_enabled ? ` · 答题积分${course.answer_reward_points}分/次` : '';
+  return `（当前课时：${triggerLabel}触发 · ${bank.title}${pts}）`;
+});
 function openAddDialog() {
-  if (isLocked.value) { MessagePlugin.warning('开营后排课已锁定，如需修改请复制营期重做'); return; }
-  addForm.value = { day_number: 1, title: '', description: '', teach_mode: 'recorded', live_room_id: '', display_style: 'live_room', live_display_title: '', room_config: { name: '', cover_picked: false, start_at: '', end_at: '', anchor_type: 'hq', anchor_id: '', avatar_picked: false, allow_replay: 'yes', has_cart: 'yes', muted: 'no' }, course_id: '', lesson_id: null, unlock_time: new Date(), deadline: null, completion_criteria: '', quiz_enabled: false, quiz_trigger: 'half', quiz_bank_id: '', red_packet_enabled: false, red_packet: null, quiz_reward_points_enabled: false, quiz_reward_points: 20, is_required: true };
+  if (isLocked.value) { MessagePlugin.warning('营期已结束，排课锁定'); return; }
+  addForm.value = { day_number: 1, title: '', description: '', teach_mode: 'recorded', live_room_id: '', display_style: 'live_room', live_display_title: '', room_config: { name: '', cover_picked: false, start_at: '', end_at: '', anchor_type: 'hq', anchor_id: '', avatar_picked: false, allow_replay: 'yes', has_cart: 'yes', muted: 'no' }, course_id: '', lesson_id: null, unlock_time: new Date(), deadline: null, completion_criteria: '', allow_seek: 'allow', allow_pause: 'disallow', red_packet_enabled: false, red_packet: null, is_required: true };
   showAdd.value = true;
   notifyModalOpen('schedule-add');
 }
@@ -568,9 +566,6 @@ function doAdd() {
     addForm.value.live_room_id = room.id;
   }
   if (addForm.value.teach_mode === 'recorded' && !addForm.value.lesson_id) { MessagePlugin.warning('必须选择课时（营期排课以课时为单位）'); return; }
-  // V2·0902 触发答题：开启时必须绑定题库
-  if (addForm.value.quiz_enabled && !addForm.value.quiz_bank_id) { MessagePlugin.warning('请选择题库'); return; }
-  if (addForm.value.quiz_enabled && !addForm.value.quiz_reward_points_enabled) { MessagePlugin.warning('答题积分未开启，学员答题将无奖励'); }
   // course_id 由所选课时自动带出
   const pickedLesson = courseStore.lessons.find(l => l.id === addForm.value.lesson_id);
   const autoCourseId = pickedLesson?.course_id ?? '';
@@ -600,12 +595,15 @@ function doAdd() {
     client_visible: true,
     customer_scope_mode: 'all',
     customer_scope_staff_ids: [],
-    quiz_bank_id: addForm.value.teach_mode === 'recorded' && addForm.value.quiz_enabled ? (addForm.value.quiz_bank_id || null) : null,
-    quiz_trigger: addForm.value.teach_mode === 'recorded' && addForm.value.quiz_enabled ? addForm.value.quiz_trigger : undefined,
+    // V2·0902 老板需求：答题配置跟随课时所在课程（题库/触发时机/积分），排课不再重复配置
+    quiz_bank_id: (courseStore.loadCourse(autoCourseId) as any)?.question_bank_id ?? null,
+    quiz_trigger: (courseStore.loadCourse(autoCourseId) as any)?.quiz_trigger || 'half',
     quiz_reward_cash_enabled: false,
     quiz_reward_amount: 0,
-    quiz_reward_points_enabled: addForm.value.quiz_enabled ? addForm.value.quiz_reward_points_enabled : false,
-    quiz_reward_points: addForm.value.quiz_enabled ? addForm.value.quiz_reward_points : 0,
+    quiz_reward_points_enabled: (courseStore.loadCourse(autoCourseId) as any)?.answer_reward_points_enabled ?? false,
+    quiz_reward_points: (courseStore.loadCourse(autoCourseId) as any)?.answer_reward_points ?? 0,
+    allow_seek: addForm.value.allow_seek,
+    allow_pause: addForm.value.allow_pause,
     red_packet_enabled: addForm.value.teach_mode === 'recorded' ? addForm.value.red_packet_enabled : false,
     red_packet: addForm.value.teach_mode === 'recorded' && addForm.value.red_packet_enabled ? addForm.value.red_packet : null,
     display_style: addForm.value.teach_mode === 'recorded' ? addForm.value.display_style : undefined,
@@ -622,15 +620,7 @@ function del(s: CourseSchedule) {
   MessagePlugin.success('已删除');
 }
 
-// ===== V2·0902 触发答题：题库选择弹窗 + 奖励配置 =====
-const quizPickerRef = ref<InstanceType<typeof QuizPickerDialog> | null>(null);
-const quizBankTitle = computed(() => {
-  const b = courseStore.questionBanks.find(x => x.id === addForm.value.quiz_bank_id);
-  return b ? b.title : '';
-});
-function onQuizPicked(bankId: string) {
-  addForm.value.quiz_bank_id = bankId;
-}
+// ===== V2·0902 红包选择弹窗 =====
 const redPacketPickerRef = ref<InstanceType<typeof RedPacketPickerDialog> | null>(null);
 function onRedPacketPicked(p: { no: string; amount: number; count: number; type: string }) {
   addForm.value.red_packet = p;
