@@ -96,6 +96,11 @@
             <t-form-item label="直播标题">
               <t-input v-model="(form as any).live_display_title" placeholder="直播间样式展示的标题（留空则用课程名称）" style="width:100%" />
             </t-form-item>
+            <!-- V2·0902 老板需求：录播课是否被营期引用开关（关=排课选课时不出现该课程课时） -->
+            <t-form-item v-if="form.mode === 'recorded'" label="是否被营期引用">
+              <t-switch v-model="(form as any).camp_ref_enabled" />
+              <span class="form-tip" style="margin-left:8px">开启：营期排课可引用本课程课时；关闭：本课程不对营期开放（已引用的排课不受影响）</span>
+            </t-form-item>
             <!-- V2·0902 用户裁决：「是否公开」配置下线，课程统一公开（APP 独立展示），数据字段固定 public -->
             <t-form-item label="课程封面">
               <div class="cover-grid">
@@ -436,6 +441,8 @@ function defaultForm() {
     quiz_reward: null as { no: string; amount: number; count: number; type: string } | null,
     answer_reward_points_enabled: false,
     answer_reward_points: 20,
+    // V2·0902 老板需求：录播课是否被营期引用
+    camp_ref_enabled: true,
     // D35 完课奖励配置（业务新增·现金红包与积分可同选）
     completion_reward_enabled: false,
     reward_cash_enabled: true, reward_amount: 1, red_packet_rule_id: '',
@@ -655,6 +662,7 @@ function openEditDrawer(row: any) {
     quiz_reward: (row as any).quiz_reward ?? null,
     answer_reward_points_enabled: (row as any).answer_reward_points_enabled ?? false,
     answer_reward_points: (row as any).answer_reward_points ?? 20,
+    camp_ref_enabled: (row as any).camp_ref_enabled ?? true,
     forbid_seek: false, forbid_speed: false, watermark_horse: false, watermark_text: false,
     completion_reward_enabled: false, reward_cash_enabled: true, reward_amount: 1, red_packet_rule_id: '', reward_points_enabled: false, reward_points: 20,
   };
@@ -680,7 +688,7 @@ function doSave() {
     }
   }
   if (editing.value) {
-    store.updateCourse(editing.value.id, { title: form.value.title, category_name: form.value.category_name, description: form.value.description, mode: form.value.mode, visibility: form.value.visibility, cover_url: form.value.cover_url, is_paid: isPaid, price, commission_enabled: false, show_in_app: form.value.show_in_app, lecturer_id: '', lecturer_name: '', live_room_id: form.value.mode === 'live' ? liveRoomId : null, live_display_title: (form.value as any).live_display_title || '', display_style: form.value.mode === 'recorded' ? (form.value as any).display_style : undefined, quiz_reward_cash_enabled: form.value.mode === 'recorded' ? (form.value as any).quiz_reward_cash_enabled : false, quiz_reward: form.value.mode === 'recorded' ? (form.value as any).quiz_reward : null, answer_reward_points_enabled: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points_enabled : false, answer_reward_points: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points : 0 } as any);
+    store.updateCourse(editing.value.id, { title: form.value.title, category_name: form.value.category_name, description: form.value.description, mode: form.value.mode, visibility: form.value.visibility, cover_url: form.value.cover_url, is_paid: isPaid, price, commission_enabled: false, show_in_app: form.value.show_in_app, lecturer_id: '', lecturer_name: '', live_room_id: form.value.mode === 'live' ? liveRoomId : null, live_display_title: (form.value as any).live_display_title || '', display_style: form.value.mode === 'recorded' ? (form.value as any).display_style : undefined, quiz_reward_cash_enabled: form.value.mode === 'recorded' ? (form.value as any).quiz_reward_cash_enabled : false, quiz_reward: form.value.mode === 'recorded' ? (form.value as any).quiz_reward : null, answer_reward_points_enabled: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points_enabled : false, answer_reward_points: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points : 0, camp_ref_enabled: (form.value as any).camp_ref_enabled } as any);
     if (form.value.mode === 'recorded') {
       form.value.videos.forEach((v: any) => {
         const existing = store.lessons.find((l: any) => l.lesson_no === v.video_no);
@@ -692,7 +700,7 @@ function doSave() {
     }
     MessagePlugin.success('课程已更新');
   } else {
-    store.createCourse({ title: form.value.title, description: form.value.description, cover_url: form.value.cover_url, category_id: 'cat-' + Date.now(), category_name: form.value.category_name, tags: [], lecturer_id: '', lecturer_name: '', source: 'upload', mode: form.value.mode, source_live_session_id: null, visibility: form.value.visibility, price, is_paid: isPaid, commission_enabled: false, show_in_app: form.value.show_in_app, live_room_id: form.value.mode === 'live' ? liveRoomId : null, live_display_title: (form.value as any).live_display_title || '', display_style: form.value.mode === 'recorded' ? (form.value as any).display_style : undefined, quiz_reward_cash_enabled: form.value.mode === 'recorded' ? (form.value as any).quiz_reward_cash_enabled : false, quiz_reward: form.value.mode === 'recorded' ? (form.value as any).quiz_reward : null, answer_reward_points_enabled: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points_enabled : false, answer_reward_points: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points : 0 } as any);
+    store.createCourse({ title: form.value.title, description: form.value.description, cover_url: form.value.cover_url, category_id: 'cat-' + Date.now(), category_name: form.value.category_name, tags: [], lecturer_id: '', lecturer_name: '', source: 'upload', mode: form.value.mode, source_live_session_id: null, visibility: form.value.visibility, price, is_paid: isPaid, commission_enabled: false, show_in_app: form.value.show_in_app, live_room_id: form.value.mode === 'live' ? liveRoomId : null, live_display_title: (form.value as any).live_display_title || '', display_style: form.value.mode === 'recorded' ? (form.value as any).display_style : undefined, quiz_reward_cash_enabled: form.value.mode === 'recorded' ? (form.value as any).quiz_reward_cash_enabled : false, quiz_reward: form.value.mode === 'recorded' ? (form.value as any).quiz_reward : null, answer_reward_points_enabled: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points_enabled : false, answer_reward_points: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points : 0, camp_ref_enabled: (form.value as any).camp_ref_enabled } as any);
     MessagePlugin.success('课程已新增');
   }
   // D35 完课奖励同步营销域复刻观看奖励页（真实系统：课程表单保存→营销中心创建红包规则）；积分奖励走积分事件不建红包规则

@@ -117,7 +117,7 @@
             <el-icon><Aim /></el-icon>
             <span>课程结合</span>
           </template>
-          <el-menu-item index="/tenant/replica/marketing/watch-reward">观看奖励（复刻+课程红包）</el-menu-item>
+          <el-menu-item index="/tenant/replica/marketing/watch-reward">红包记录（复刻营销·红包记录）</el-menu-item>
           <el-menu-item index="/tenant/replica/marketing/points-task">积分任务（复刻+课程任务）</el-menu-item>
           <el-menu-item index="/tenant/replica/marketing/points-records">积分记录（复刻+课程事件）</el-menu-item>
         </el-sub-menu>

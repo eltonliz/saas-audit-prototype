@@ -163,16 +163,23 @@
               </div>
             </t-form-item>
           </div>
-          <!-- V2·0902 直播排课：直播间配置直接穿插，保存时创建新直播间 -->
-          <div v-if="addForm.teach_mode === 'live'" class="form-col-full live-room-config-block">
-            <LiveRoomConfigForm v-model="addForm.room_config" plan-mode />
-          </div>
-          <!-- V2·0902 解锁时间与开播时间解耦说明 -->
+          <!-- V2·0902 老板需求：直播排课只引用直播间（下拉选择）；无直播间时快速创建（全部配置在弹窗内） -->
           <div v-if="addForm.teach_mode === 'live'" class="form-col-full">
-            <div class="lesson-tip">
-              <t-icon name="info-circle" />
-              <span>解锁时间只控制学员可见性，可早于计划开播时间（学员可提前进入直播间等待）；开播时间不确定时可留空，开播前在直播列表补充</span>
-            </div>
+            <t-form-item label="选择直播间" required-mark>
+              <div style="display:flex;gap:8px;width:100%">
+                <t-select v-model="addForm.live_room_id" filterable placeholder="选择直播间" style="flex:1">
+                  <template #empty><div class="live-room-empty">暂无直播间，点右侧「快速创建直播间」</div></template>
+                  <t-option v-for="r in liveStore.rooms" :key="r.id" :label="r.name + '（' + (r.status === 'live' ? '直播中' : '空闲') + '）'" :value="r.id" />
+                </t-select>
+                <t-button theme="primary" variant="outline" @click="showCreateRoom = true">
+                  <template #icon><t-icon name="add" /></template> 快速创建直播间
+                </t-button>
+              </div>
+              <div class="lesson-tip">
+                <t-icon name="info-circle" />
+                <span>解锁时间只控制学员可见性，可早于直播间计划开播时间（学员可提前进入等待）；直播间的配置在「直播列表」维护</span>
+              </div>
+            </t-form-item>
           </div>
           <div class="form-col-full" v-if="addForm.teach_mode === 'recorded'">
             <t-form-item label="选择课时" required-mark>
@@ -321,6 +328,9 @@
     <!-- V2·0902 现金红包选择弹窗 -->
     <RedPacketPickerDialog ref="redPacketPickerRef" @confirm="onRedPacketPicked" />
 
+    <!-- V2·0902 快速创建直播间（配置全部在弹窗内，创建后自动选中） -->
+    <CreateLiveRoomDialog v-model:visible="showCreateRoom" from="营期排课" @created="onRoomCreated" />
+
   </div>
 </template>
 
@@ -333,7 +343,7 @@ import { useLiveStore } from '../../../stores/live-store';
 import { notifyModalOpen } from '../../../utils/modal-spec-bridge';
 import { useCourseStore } from '../../../stores/course-store';
 import type { CourseSchedule } from '../../../contracts/schemas/camp-schemas';
-import LiveRoomConfigForm from './LiveRoomConfigForm.vue';
+import CreateLiveRoomDialog from './CreateLiveRoomDialog.vue';
 import CustomerScopeDialog from './CustomerScopeDialog.vue';
 
 import RedPacketPickerDialog from './RedPacketPickerDialog.vue';
@@ -519,18 +529,6 @@ const addForm = ref({
   live_room_id: '',
   display_style: 'live_room' as 'live_room' | 'course',
   live_display_title: '',
-  room_config: {
-    name: '',
-    cover_picked: false,
-    start_at: '',
-    end_at: '',
-    anchor_type: 'hq' as 'hq' | 'store' | 'supplier' | 'personal',
-    anchor_id: '',
-    avatar_picked: false,
-    allow_replay: 'yes' as 'yes' | 'no',
-    has_cart: 'yes' as 'yes' | 'no',
-    muted: 'no' as 'yes' | 'no',
-  },
   course_id: '',
   lesson_id: null as string | null,
   unlock_time: new Date(),
@@ -564,21 +562,15 @@ const quizFollowTip = computed(() => {
 });
 function openAddDialog() {
   if (isLocked.value) { MessagePlugin.warning('营期已结束，排课锁定'); return; }
-  addForm.value = { day_number: 1, title: '', description: '', teach_mode: 'recorded', live_room_id: '', display_style: 'live_room', live_display_title: '', room_config: { name: '', cover_picked: false, start_at: '', end_at: '', anchor_type: 'hq', anchor_id: '', avatar_picked: false, allow_replay: 'yes', has_cart: 'yes', muted: 'no' }, course_id: '', lesson_id: null, unlock_time: new Date(), deadline: null, completion_criteria: '', allow_seek: 'allow', allow_pause: 'disallow', red_packet_enabled: false, red_packet: null, is_required: true };
+  addForm.value = { day_number: 1, title: '', description: '', teach_mode: 'recorded', live_room_id: '', display_style: 'live_room', live_display_title: '', course_id: '', lesson_id: null, unlock_time: new Date(), deadline: null, completion_criteria: '', allow_seek: 'allow', allow_pause: 'disallow', red_packet_enabled: false, red_packet: null, is_required: true };
   showAdd.value = true;
   notifyModalOpen('schedule-add');
 }
 function doAdd() {
   if (!addForm.value.title) { MessagePlugin.warning('请填写排课标题'); return; }
   if (!addForm.value.unlock_time) { MessagePlugin.warning('请选择解锁时间'); return; }
-  // V2·0902 直播排课：不再选择已有直播间，按穿插配置创建新直播间；计划开播时间可留空后补
-  if (addForm.value.teach_mode === 'live') {
-    const cfg = addForm.value.room_config;
-    if (!cfg.name.trim()) { MessagePlugin.warning('请填写直播间名称'); return; }
-    const anchor = liveStore.anchors.find(a => a.id === cfg.anchor_id);
-    const room = liveStore.createRoom({ name: cfg.name.trim(), anchor_id: anchor?.id || 'ANCHOR-001', anchor_name: anchor?.name || '默认主播' });
-    addForm.value.live_room_id = room.id;
-  }
+  // V2·0902 老板需求：直播排课只引用直播间（在「快速创建直播间」弹窗或直播列表维护）
+  if (addForm.value.teach_mode === 'live' && !addForm.value.live_room_id) { MessagePlugin.warning('请选择直播间（无直播间可点「快速创建直播间」）'); return; }
   if (addForm.value.teach_mode === 'recorded' && !addForm.value.lesson_id) { MessagePlugin.warning('必须选择课时（营期排课以课时为单位）'); return; }
   // course_id 由所选课时自动带出
   const pickedLesson = courseStore.lessons.find(l => l.id === addForm.value.lesson_id);
@@ -632,6 +624,12 @@ function del(s: CourseSchedule) {
   if (isScheduleStarted(s)) { MessagePlugin.warning('该节课已开始（已过解锁时间），不可删除'); return; }
   campStore.deleteSchedule(s.id);
   MessagePlugin.success('已删除');
+}
+
+// ===== V2·0902 快速创建直播间（弹窗内全量配置，创建后自动选中）=====
+const showCreateRoom = ref(false);
+function onRoomCreated(roomId: string) {
+  addForm.value.live_room_id = roomId;
 }
 
 // ===== V2·0902 红包选择弹窗 =====
@@ -729,6 +727,8 @@ const scheduledLessonIds = computed(() => new Set(campSchedules.value.map(s => s
 // 排课直选课时：全部课程的已发布课时平铺（label 含所属课程名），已排的过滤
 const allSelectableLessons = computed(() => courseStore.lessons
   .filter(l => l.status === 'published' && !scheduledLessonIds.value.has(l.id))
+  // V2·0902 老板需求：课程关闭「是否被营期引用」后，其课时不出现在排课选择中
+  .filter(l => { const c: any = courseStore.loadCourse(l.course_id); return !c || c.camp_ref_enabled !== false; })
   .map(l => ({ ...l, course_title: courseStore.loadCourse(l.course_id)?.title ?? '' })));
 const addLessonOptions = computed(() => allSelectableLessons.value.map(l => ({
   label: `【${l.course_title}】第${l.sort_order}课时：${l.title}`,

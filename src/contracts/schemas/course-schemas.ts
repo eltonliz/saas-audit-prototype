@@ -142,6 +142,8 @@ export const CourseSchema = z.object({
   }).nullable().default(null),
   answer_reward_points_enabled: z.boolean().default(false),
   answer_reward_points: z.number().int().min(0).default(20),
+  /** V2·0902 老板需求：录播课是否被营期引用（关=排课选课时不出现该课程课时） */
+  camp_ref_enabled: z.boolean().default(true),
   /** 课程可见性（public/camp_only） */
   visibility: CourseVisibilityEnum.default('public'),
 
@@ -447,6 +449,7 @@ export const CreateCourseInputSchema = CourseSchema.pick({
   quiz_reward: true,
   answer_reward_points_enabled: true,
   answer_reward_points: true,
+  camp_ref_enabled: true,
   visibility: true,
 }).extend({
   question_bank_id: z.string().optional(),
