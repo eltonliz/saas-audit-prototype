@@ -13,14 +13,12 @@
             <template v-else><t-icon name="add" class="lrc-add-icon" /></template>
           </div>
         </t-form-item>
-        <t-form-item :label="planMode ? '计划开播' : '开始时间'" :required-mark="!planMode">
-          <div style="width:100%">
-            <t-date-picker v-model="form.start_at" enable-time-picker :placeholder="planMode ? '计划开播时间（可后补）' : '请选择开始时间'" style="width:100%" />
-            <div v-if="planMode" class="lrc-tip"><t-icon name="info-circle" /><span>计划时间可留空后补；实际开播以主播开播为准</span></div>
-          </div>
+        <!-- V2·0902 用户裁决（0903）：计划开播/计划结束为必填，去掉可后补提示 -->
+        <t-form-item :label="planMode ? '计划开播' : '开始时间'" required-mark>
+          <t-date-picker v-model="form.start_at" enable-time-picker :placeholder="planMode ? '请选择计划开播时间' : '请选择开始时间'" style="width:100%" />
         </t-form-item>
-        <t-form-item :label="planMode ? '计划结束' : '结束时间'" :required-mark="!planMode">
-          <t-date-picker v-model="form.end_at" enable-time-picker :placeholder="planMode ? '计划结束时间（可后补）' : '请选择结束时间'" style="width:100%" />
+        <t-form-item :label="planMode ? '计划结束' : '结束时间'" required-mark>
+          <t-date-picker v-model="form.end_at" enable-time-picker :placeholder="planMode ? '请选择计划结束时间' : '请选择结束时间'" style="width:100%" />
         </t-form-item>
       </t-form>
     </div>

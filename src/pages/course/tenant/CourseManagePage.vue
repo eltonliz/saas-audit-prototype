@@ -662,6 +662,8 @@ function doSave() {
   if (form.value.mode === 'live') {
     const cfg = (form.value as any).room_config;
     if (!cfg.name.trim()) { MessagePlugin.warning('请填写直播间名称'); return; }
+    if (!cfg.start_at) { MessagePlugin.warning('请选择计划开播时间'); return; }
+    if (!cfg.end_at) { MessagePlugin.warning('请选择计划结束时间'); return; }
     const anchor = liveStore.anchors.find(a => a.id === cfg.anchor_id);
     if (liveRoomId) {
       liveStore.updateRoom(liveRoomId, { name: cfg.name.trim() });
