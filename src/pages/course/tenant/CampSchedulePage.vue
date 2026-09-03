@@ -320,7 +320,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { MessagePlugin } from 'tdesign-vue-next';
 import { useCampStore } from '../../../stores/camp-store';
@@ -896,3 +896,5 @@ async function doOneClickFromAdd() {
 .batch-days { margin-top: 8px; padding: 8px 12px; background: #F9FAFB; border-radius: 6px; }
 .batch-actions { display: flex; gap: 12px; margin-top: 16px; }
 </style>
+
+/* v2-0902-20 watch fix */

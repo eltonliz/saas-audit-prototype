@@ -1,0 +1,330 @@
+vite v5.4.21 building for sim...
+transforming...
+node_modules/@vueuse/core/dist/index.js (3362:0): A comment
+
+"/* #__PURE__ */"
+
+in "node_modules/@vueuse/core/dist/index.js" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.
+node_modules/@vueuse/core/dist/index.js (5780:22): A comment
+
+"/* #__PURE__ */"
+
+in "node_modules/@vueuse/core/dist/index.js" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.
+[plugin:vite:esbuild] [plugin vite:esbuild] src/data/replica-requirements.ts: Duplicate key "/tenant/replica/marketing/watch-reward" in object literal
+780|      },
+781|    },
+782|    '/tenant/replica/marketing/watch-reward': {
+   |    ^
+783|      title: '课程结合 · 观看奖励',
+784|      markers: [
+
+[plugin:vite:esbuild] [plugin vite:esbuild] src/data/replica-requirements.ts: Duplicate key "/tenant/replica/marketing/points-task" in object literal
+787|    },
+788|    // V2·0901：红包记录/场次管理（复刻）入口下线
+789|    '/tenant/replica/marketing/points-task': {
+   |    ^
+790|      title: '课程结合 · 积分任务设置',
+791|      markers: [
+
+[plugin:vite:esbuild] [plugin vite:esbuild] src/data/replica-requirements.ts: Duplicate key "/tenant/replica/marketing/points-records" in object literal
+793|      ],
+794|    },
+795|    '/tenant/replica/marketing/points-records': {
+   |    ^
+796|      title: '课程结合 · 积分记录',
+797|      markers: [
+
+[plugin:vite:esbuild] [plugin vite:esbuild] src/data/replica-requirements.ts: Duplicate key "/tenant/course/videos" in object literal
+803|  
+804|  
+805|    '/tenant/course/videos': {
+   |    ^
+806|      title: '视频课程',
+807|      sourcePath: '/classroom/videoCourse',
+
+[plugin:vite:esbuild] [plugin vite:esbuild] src/data/replica-requirements.ts: Duplicate key "/tenant/course/audios" in object literal
+833|      },
+834|    },
+835|    '/tenant/course/audios': {
+   |    ^
+836|      title: '音频课程',
+837|      sourcePath: '/classroom/audioCourse',
+
+✓ 6584 modules transformed.
+rendering chunks...
+computing gzip size...
+dist-preview/index.html                                                            0.47 kB │ gzip:   0.35 kB
+dist-preview/assets/LiveAnchorCertPage-C4LVhKDN.css                                0.09 kB │ gzip:   0.10 kB
+dist-preview/assets/ViolationsPanel-Be15b8q3.css                                   0.14 kB │ gzip:   0.14 kB
+dist-preview/assets/CustomerScopeDialog-lHwn1NqF.css                               0.14 kB │ gzip:   0.13 kB
+dist-preview/assets/PageUseCaseHelp-D2GBFOEA.css                                   0.31 kB │ gzip:   0.22 kB
+dist-preview/assets/StudentInsightPage-LgU1gK_V.css                                0.32 kB │ gzip:   0.18 kB
+dist-preview/assets/ReplicaFieldBox-BPaDOpBu.css                                   0.38 kB │ gzip:   0.25 kB
+dist-preview/assets/MallPage-CW3RYUd8.css                                          0.40 kB │ gzip:   0.24 kB
+dist-preview/assets/EntertainmentPage-CFMSz3po.css                                 0.44 kB │ gzip:   0.24 kB
+dist-preview/assets/MessagePage-Dc9TDCEs.css                                       0.44 kB │ gzip:   0.24 kB
+dist-preview/assets/GeneralConfigPage-CcsDxKl3.css                                 0.57 kB │ gzip:   0.27 kB
+dist-preview/assets/LiveRoomConfigForm-Cq5UK52N.css                                0.69 kB │ gzip:   0.35 kB
+dist-preview/assets/LearningDataPage-B3u2JSkU.css                                  0.82 kB │ gzip:   0.36 kB
+dist-preview/assets/TenantDashboardEntry-Bmy1kRUb.css                              0.85 kB │ gzip:   0.39 kB
+dist-preview/assets/AuditSwitchPage-jFjDiLFA.css                                   0.88 kB │ gzip:   0.36 kB
+dist-preview/assets/ReplicaMarker-D_ui3dA2.css                                     0.89 kB │ gzip:   0.41 kB
+dist-preview/assets/TerminalSwitcher-ChwVx6wb.css                                  0.93 kB │ gzip:   0.39 kB
+dist-preview/assets/NotifyListPage-DDUD8tst.css                                    0.98 kB │ gzip:   0.39 kB
+dist-preview/assets/LiveListAppPage-dwr1uUNl.css                                   1.01 kB │ gzip:   0.41 kB
+dist-preview/assets/JoinGroupPage-BP99Ow_l.css                                     1.03 kB │ gzip:   0.43 kB
+dist-preview/assets/TrafficRecharge-BfsYVlzG.css                                   1.03 kB │ gzip:   0.39 kB
+dist-preview/assets/TerminalPortal-haBrIEnX.css                                    1.04 kB │ gzip:   0.50 kB
+dist-preview/assets/ImGridView-BW8A1RWU.css                                        1.06 kB │ gzip:   0.46 kB
+dist-preview/assets/CourseTriScreenView-2-xnZds7.css                               1.06 kB │ gzip:   0.47 kB
+dist-preview/assets/PayResultPage-BATvmHaU.css                                     1.07 kB │ gzip:   0.45 kB
+dist-preview/assets/CourseTypeManagePage-BbcuuqGl.css                              1.14 kB │ gzip:   0.54 kB
+dist-preview/assets/LiveAnchorManagePage-BZzft4Dg.css                              1.16 kB │ gzip:   0.54 kB
+dist-preview/assets/ltf-tokens-CUnn59kw.css                                        1.20 kB │ gzip:   0.46 kB
+dist-preview/assets/LivePlanManagePage-mthEMY36.css                                1.22 kB │ gzip:   0.55 kB
+dist-preview/assets/FriendRequests-BkeJCq9f.css                                    1.28 kB │ gzip:   0.49 kB
+dist-preview/assets/PointsCenterPage-hAZYvXEx.css                                  1.33 kB │ gzip:   0.43 kB
+dist-preview/assets/MyCoursesPage-Dr9MvRRM.css                                     1.35 kB │ gzip:   0.49 kB
+dist-preview/assets/GlobalSearch-CZfkZGfF.css                                      1.40 kB │ gzip:   0.51 kB
+dist-preview/assets/WatchRewardPage-CUtKlIw9.css                                   1.42 kB │ gzip:   0.54 kB
+dist-preview/assets/LiveSessionManagePage-DiOpMGs7.css                             1.42 kB │ gzip:   0.61 kB
+dist-preview/assets/PointsTaskPage-9ZqAJUch.css                                    1.47 kB │ gzip:   0.55 kB
+dist-preview/assets/QuestionBankManagePage-DEG0P5vg.css                            1.47 kB │ gzip:   0.65 kB
+dist-preview/assets/LearnCoursePage-Cccu9SeM.css                                   1.49 kB │ gzip:   0.48 kB
+dist-preview/assets/StudentShell-5Zyfo37e.css                                      1.54 kB │ gzip:   0.60 kB
+dist-preview/assets/PointsRecordsPage-BxlXise3.css                                 1.59 kB │ gzip:   0.58 kB
+dist-preview/assets/KnowledgeHomePage-Dc01ywjK.css                                 1.62 kB │ gzip:   0.61 kB
+dist-preview/assets/MassSendRecordsPage-DsUY0asY.css                               1.69 kB │ gzip:   0.57 kB
+dist-preview/assets/StoreListPage-DhR_xddt.css                                     1.74 kB │ gzip:   0.58 kB
+dist-preview/assets/LiveListPage-BBI4L4r0.css                                      1.89 kB │ gzip:   0.73 kB
+dist-preview/assets/AppDashboardPage-B35MsyV5.css                                  1.94 kB │ gzip:   0.69 kB
+dist-preview/assets/FriendProfile-C8S5MlA3.css                                     1.95 kB │ gzip:   0.64 kB
+dist-preview/assets/LiveRecordingPage-Bb3DDxyz.css                                 2.03 kB │ gzip:   0.77 kB
+dist-preview/assets/ImLiveRoom-DyewTFg2.css                                        2.19 kB │ gzip:   0.79 kB
+dist-preview/assets/AddFriend-C7wjKmmG.css                                         2.23 kB │ gzip:   0.68 kB
+dist-preview/assets/CoursePromotePage-CD1EW3my.css                                 2.28 kB │ gzip:   0.70 kB
+dist-preview/assets/MyGroups-7sODsc6P.css                                          2.30 kB │ gzip:   0.70 kB
+dist-preview/assets/OperatorLayout-m8Y0YB5P.css                                    2.30 kB │ gzip:   0.70 kB
+dist-preview/assets/FriendSettings-DtN9TT_E.css                                    2.35 kB │ gzip:   0.76 kB
+dist-preview/assets/WorkbenchPage-Cc__S4Gy.css                                     2.41 kB │ gzip:   0.68 kB
+dist-preview/assets/LearningRecordPage-BH9d8l5i.css                                2.54 kB │ gzip:   0.71 kB
+dist-preview/assets/AppImShell-D3wojSyV.css                                        2.55 kB │ gzip:   0.82 kB
+dist-preview/assets/ViolationDetailPanel-BUu7fgc7.css                              2.93 kB │ gzip:   0.93 kB
+dist-preview/assets/AccountClosePage-BzrMuYHr.css                                  3.01 kB │ gzip:   0.83 kB
+dist-preview/assets/useCaseCardData-GsCHRKsZ.css                                   3.01 kB │ gzip:   0.84 kB
+dist-preview/assets/ContactsPage-BPO47_Mn.css                                      3.06 kB │ gzip:   0.83 kB
+dist-preview/assets/ConsultEntryPage-BTX9DojO.css                                  3.11 kB │ gzip:   0.96 kB
+dist-preview/assets/LectureCenterPage-CM9zXxX3.css                                 3.13 kB │ gzip:   0.91 kB
+dist-preview/assets/MessageCenter-Bghb5obY.css                                     3.21 kB │ gzip:   0.91 kB
+dist-preview/assets/StoreMemberPage-C7DH9xOn.css                                   3.30 kB │ gzip:   0.95 kB
+dist-preview/assets/StoreHomePage-BRPxWbcT.css                                     3.32 kB │ gzip:   0.98 kB
+dist-preview/assets/StoreMgmtPage-CfIpfMDG.css                                     3.38 kB │ gzip:   0.96 kB
+dist-preview/assets/ProfilePage-DRtxETbs.css                                       3.92 kB │ gzip:   0.99 kB
+dist-preview/assets/CampLivePage-MB1_M9MA.css                                      3.96 kB │ gzip:   1.15 kB
+dist-preview/assets/AftersaleApplyPage-B44eiXXS.css                                4.12 kB │ gzip:   1.13 kB
+dist-preview/assets/LiveTrafficHome-BRxen-Ur.css                                   4.59 kB │ gzip:   1.02 kB
+dist-preview/assets/ReportDialog-BCbmdIaX.css                                      4.63 kB │ gzip:   1.28 kB
+dist-preview/assets/LiveRoomPage-C-Im2hLB.css                                      4.71 kB │ gzip:   1.31 kB
+dist-preview/assets/AudienceLiveRoom-BoQsMxbK.css                                  4.91 kB │ gzip:   1.43 kB
+dist-preview/assets/LivePromoPage-DyFLum3m.css                                     5.09 kB │ gzip:   1.26 kB
+dist-preview/assets/LiveControlAuditPanel-BUDD8TEQ.css                             5.12 kB │ gzip:   1.37 kB
+dist-preview/assets/HomePage-CbRzggex.css                                          5.15 kB │ gzip:   1.28 kB
+dist-preview/assets/GroupSettings-Dv6Ln6sw.css                                     5.38 kB │ gzip:   1.40 kB
+dist-preview/assets/LessonLearnPage-BU0X6ZCD.css                                   6.36 kB │ gzip:   1.63 kB
+dist-preview/assets/CourseDetailPage-DxiQYFd0.css                                  6.66 kB │ gzip:   1.46 kB
+dist-preview/assets/CampSchedulePage-Ca49ieKJ.css                                  6.83 kB │ gzip:   1.61 kB
+dist-preview/assets/DisposalBar-Rp7g2zEJ.css                                       6.93 kB │ gzip:   1.47 kB
+dist-preview/assets/CampDashboardPage-B4VlvCAN.css                                 7.60 kB │ gzip:   1.77 kB
+dist-preview/assets/CourseManagePage-CbYOlkwC.css                                  7.62 kB │ gzip:   1.77 kB
+dist-preview/assets/CampDetailPage-SOxDeI9V.css                                    7.89 kB │ gzip:   1.72 kB
+dist-preview/assets/TenantLayout-LYcizqQT.css                                      8.31 kB │ gzip:   2.00 kB
+dist-preview/assets/CampManagePage-gOXhnto0.css                                    8.35 kB │ gzip:   1.93 kB
+dist-preview/assets/ReplayDetailAudit-DX-b4YqI.css                                 9.46 kB │ gzip:   2.00 kB
+dist-preview/assets/CampLearnPage-tVcQGc6S.css                                    11.72 kB │ gzip:   2.12 kB
+dist-preview/assets/ProtoViewerPage-DerTqPYT.css                                  14.14 kB │ gzip:   2.79 kB
+dist-preview/assets/ChatPage-DH6WBFT1.css                                         14.60 kB │ gzip:   3.01 kB
+dist-preview/assets/index-DY34-wYT.css                                           809.47 kB │ gzip:  99.62 kB
+dist-preview/assets/course-constants-BsEfrO5D.js                                   0.06 kB │ gzip:   0.11 kB
+dist-preview/assets/_plugin-vue_export-helper-DlAUqK2U.js                          0.09 kB │ gzip:   0.10 kB
+dist-preview/assets/channel-CKbJDy9u.js                                            0.12 kB │ gzip:   0.13 kB
+dist-preview/assets/static-mode-w1ge-jQu.js                                        0.12 kB │ gzip:   0.13 kB
+dist-preview/assets/init-Gi6I4Gst.js                                               0.15 kB │ gzip:   0.13 kB
+dist-preview/assets/chunk-2Q5K7J3B-CeH14NHL.js                                     0.20 kB │ gzip:   0.16 kB
+dist-preview/assets/chunk-XXDRQBXY-GqyFcIjb.js                                     0.23 kB │ gzip:   0.21 kB
+dist-preview/assets/chunk-JWPE2WC7-L2LWlUPz.js                                     0.30 kB │ gzip:   0.20 kB
+dist-preview/assets/general-config-store-CAm6h0hW.js                               0.33 kB │ gzip:   0.22 kB
+dist-preview/assets/signin-N-G7TkTo.js                                             0.35 kB │ gzip:   0.23 kB
+dist-preview/assets/chunk-5VM5RSS4-5mM8NMgX.js                                     0.37 kB │ gzip:   0.27 kB
+dist-preview/assets/MallPage-9_6noAAh.js                                           0.43 kB │ gzip:   0.34 kB
+dist-preview/assets/im-live-store-CtZOvzM5.js                                      0.48 kB │ gzip:   0.30 kB
+dist-preview/assets/modal-spec-bridge-C7AePGXW.js                                  0.49 kB │ gzip:   0.31 kB
+dist-preview/assets/chunk-POPQ4Y6H-CTUM4XN6.js                                     0.54 kB │ gzip:   0.37 kB
+dist-preview/assets/im-visibility-engine-C4H5Fedr.js                               0.55 kB │ gzip:   0.30 kB
+dist-preview/assets/MessagePage-BrnuMdok.js                                        0.57 kB │ gzip:   0.43 kB
+dist-preview/assets/EntertainmentPage-CmhMQa01.js                                  0.57 kB │ gzip:   0.43 kB
+dist-preview/assets/TerminalPortal-COL0MVrN.js                                     0.65 kB │ gzip:   0.47 kB
+dist-preview/assets/ReplicaFieldBox-DnmUlgmN.js                                    0.86 kB │ gzip:   0.63 kB
+dist-preview/assets/PayResultPage-BSHjXOE0.js                                      1.00 kB │ gzip:   0.68 kB
+dist-preview/assets/PageUseCaseHelp-DZMMNbSV.js                                    1.06 kB │ gzip:   0.71 kB
+dist-preview/assets/ReplicaMarker-Ca3oXb30.js                                      1.13 kB │ gzip:   0.73 kB
+dist-preview/assets/ordinal-Cboi1Yqb.js                                            1.19 kB │ gzip:   0.57 kB
+dist-preview/assets/CourseTriScreenView-c6J-oJWy.js                                1.20 kB │ gzip:   0.82 kB
+dist-preview/assets/ImGridView-Cwlf6fqX.js                                         1.28 kB │ gzip:   0.91 kB
+dist-preview/assets/LiveListAppPage-BFMBLJYr.js                                    1.32 kB │ gzip:   0.88 kB
+dist-preview/assets/member-store-BD26wIjI.js                                       1.34 kB │ gzip:   0.62 kB
+dist-preview/assets/im-mass-send-store-D9WUSYNo.js                                 1.35 kB │ gzip:   0.73 kB
+dist-preview/assets/audit-level-config-41MskOb6.js                                 1.35 kB │ gzip:   0.63 kB
+dist-preview/assets/EmojiIcon.vue_vue_type_script_setup_true_lang-3_CTbu5w.js      1.37 kB │ gzip:   0.84 kB
+dist-preview/assets/TerminalSwitcher-RBqDbG_x.js                                   1.39 kB │ gzip:   0.74 kB
+dist-preview/assets/store-store-CL3r9aPV.js                                        1.47 kB │ gzip:   0.63 kB
+dist-preview/assets/audit-store-BdyB2uD9.js                                        1.60 kB │ gzip:   0.78 kB
+dist-preview/assets/FriendRequests-D5y-iQl_.js                                     1.70 kB │ gzip:   0.97 kB
+dist-preview/assets/ViolationsPanel-B3hxH-R6.js                                    1.72 kB │ gzip:   0.88 kB
+dist-preview/assets/PointsCenterPage-CIN2roqM.js                                   1.73 kB │ gzip:   1.10 kB
+dist-preview/assets/StoreListPage-Crl3hPZo.js                                      1.83 kB │ gzip:   1.04 kB
+dist-preview/assets/chunk-F27PBJKO-vquOVxG-.js                                     1.86 kB │ gzip:   0.82 kB
+dist-preview/assets/stateDiagram-v2-MP3YSRHH-rGhBD6GE.js                           1.86 kB │ gzip:   0.93 kB
+dist-preview/assets/classDiagram-ZZMXUADV-Eyu3k3xB.js                              1.90 kB │ gzip:   0.95 kB
+dist-preview/assets/classDiagram-v2-VYDZK3BY-Eyu3k3xB.js                           1.90 kB │ gzip:   0.95 kB
+dist-preview/assets/im-aftersale-service-Ceq6dzg5.js                               1.91 kB │ gzip:   1.15 kB
+dist-preview/assets/MyCoursesPage-CPzr2ebW.js                                      1.96 kB │ gzip:   1.19 kB
+dist-preview/assets/swimlanesDiagram-VR7AAH4N-Dk0sQV-i.js                          1.98 kB │ gzip:   1.00 kB
+dist-preview/assets/infoDiagram-27XIBGKW-H3I9WVdz.js                               2.02 kB │ gzip:   1.05 kB
+dist-preview/assets/TrafficRecharge-BmNAXhm6.js                                    2.03 kB │ gzip:   1.34 kB
+dist-preview/assets/marketing-replica-store-BCj1K3E4.js                            2.08 kB │ gzip:   0.96 kB
+dist-preview/assets/im-group-store-DR0dAabn.js                                     2.11 kB │ gzip:   1.09 kB
+dist-preview/assets/StudentShell-C-hC0sBV.js                                       2.15 kB │ gzip:   1.15 kB
+dist-preview/assets/LearnCoursePage-BzKwkLM9.js                                    2.15 kB │ gzip:   1.20 kB
+dist-preview/assets/JoinGroupPage-DFh0hJwv.js                                      2.18 kB │ gzip:   1.28 kB
+dist-preview/assets/PointsTaskPage-dxpztOxq.js                                     2.24 kB │ gzip:   1.22 kB
+dist-preview/assets/MassSendRecordsPage-Cob8P09o.js                                2.35 kB │ gzip:   1.23 kB
+dist-preview/assets/AccountClosePage-vNvS5f-D.js                                   2.41 kB │ gzip:   1.67 kB
+dist-preview/assets/sizeCapture-INFHLROL-CNzZye3Q.js                               2.43 kB │ gzip:   1.21 kB
+dist-preview/assets/GeneralConfigPage-DHqc0sLy.js                                  2.46 kB │ gzip:   1.49 kB
+dist-preview/assets/NotifyListPage-BexRLW8I.js                                     2.46 kB │ gzip:   1.38 kB
+dist-preview/assets/FriendProfile-CHIKbXIY.js                                      2.52 kB │ gzip:   1.44 kB
+dist-preview/assets/LearningRecordPage-CEScpTHF.js                                 2.72 kB │ gzip:   1.47 kB
+dist-preview/assets/im-sync-C1g4-AaV.js                                            2.90 kB │ gzip:   1.06 kB
+dist-preview/assets/AddFriend-B5Y6azjT.js                                          2.94 kB │ gzip:   1.61 kB
+dist-preview/assets/StoreHomePage-D38_CTBM.js                                      2.97 kB │ gzip:   1.60 kB
+dist-preview/assets/railroadDiagram-O6MQD6OU-ChIt85Gn.js                           3.04 kB │ gzip:   1.40 kB
+dist-preview/assets/im-conversation-store-Ch6mVZom.js                              3.04 kB │ gzip:   1.51 kB
+dist-preview/assets/ConsultEntryPage-DTCLvM4y.js                                   3.04 kB │ gzip:   1.80 kB
+dist-preview/assets/WatchRewardPage-Di5nQfU6.js                                    3.13 kB │ gzip:   1.54 kB
+dist-preview/assets/LiveRoomPage-DBcUpCMm.js                                       3.20 kB │ gzip:   1.67 kB
+dist-preview/assets/AudienceLiveRoom-BPHmPrhi.js                                   3.24 kB │ gzip:   1.67 kB
+dist-preview/assets/abnfDiagram-VCTEODGH-CuS9VDB0.js                               3.24 kB │ gzip:   1.54 kB
+dist-preview/assets/CourseDetailPage-BPQq0F3N.js                                   3.26 kB │ gzip:   1.66 kB
+dist-preview/assets/PointsRecordsPage-8CsM9fQZ.js                                  3.31 kB │ gzip:   1.67 kB
+dist-preview/assets/pegDiagram-XKGWAZYB-gBmtKNcJ.js                                3.39 kB │ gzip:   1.57 kB
+dist-preview/assets/ViolationDetailPanel-D6mhrNe_.js                               3.41 kB │ gzip:   1.61 kB
+dist-preview/assets/arc-VJ-wq34g.js                                                3.43 kB │ gzip:   1.47 kB
+dist-preview/assets/ebnfDiagram-PWID7BFC-CVmOWAAF.js                               3.44 kB │ gzip:   1.53 kB
+dist-preview/assets/ImLiveRoom-yP7xvWwL.js                                         3.49 kB │ gzip:   1.89 kB
+dist-preview/assets/MyGroups-2EIZsiXy.js                                           3.54 kB │ gzip:   1.80 kB
+dist-preview/assets/WorkbenchPage-Bqut6zAk.js                                      3.59 kB │ gzip:   1.69 kB
+dist-preview/assets/AppImShell-DvEUMtWa.js                                         3.68 kB │ gzip:   1.79 kB
+dist-preview/assets/ContactsPage-D5ux5Jxi.js                                       3.68 kB │ gzip:   1.70 kB
+dist-preview/assets/KnowledgeHomePage-VMCQsQ0s.js                                  3.70 kB │ gzip:   1.92 kB
+dist-preview/assets/CoursePromotePage-DoXGYN5d.js                                  3.75 kB │ gzip:   1.98 kB
+dist-preview/assets/im-group-orchestrator-BYfdix8_.js                              3.82 kB │ gzip:   1.62 kB
+dist-preview/assets/im-sim-adapter-C5XZR9xX.js                                     3.85 kB │ gzip:   1.65 kB
+dist-preview/assets/CampLivePage-BAQuK5ZX.js                                       4.01 kB │ gzip:   2.38 kB
+dist-preview/assets/GlobalSearch-B0kHgc42.js                                       4.13 kB │ gzip:   2.03 kB
+dist-preview/assets/im-friend-store-BmYBnw3a.js                                    4.31 kB │ gzip:   1.64 kB
+dist-preview/assets/CampLearnPage-un_s_5DS.js                                      4.34 kB │ gzip:   2.32 kB
+dist-preview/assets/CustomerScopeDialog-BmzE4TQ2.js                                4.38 kB │ gzip:   2.00 kB
+dist-preview/assets/AppDashboardPage-0vdpt9Q-.js                                   4.59 kB │ gzip:   2.08 kB
+dist-preview/assets/AuditSwitchPage-C6miUyDo.js                                    4.65 kB │ gzip:   2.22 kB
+dist-preview/assets/defaultLocale-DX6XiGOO.js                                      4.69 kB │ gzip:   2.18 kB
+dist-preview/assets/LiveRoomConfigForm-BFc-fO07.js                                 4.70 kB │ gzip:   1.77 kB
+dist-preview/assets/FriendSettings-DUD9DdKv.js                                     4.72 kB │ gzip:   2.23 kB
+dist-preview/assets/customer-replica-store-CCqV-PaR.js                             4.85 kB │ gzip:   1.67 kB
+dist-preview/assets/LectureCenterPage-DUlPfOkL.js                                  4.93 kB │ gzip:   2.22 kB
+dist-preview/assets/LiveAnchorManagePage-BA-GpnE7.js                               5.05 kB │ gzip:   2.32 kB
+dist-preview/assets/CourseTypeManagePage-BRJfVAGc.js                               5.62 kB │ gzip:   2.58 kB
+dist-preview/assets/linear-Ccz5Ppkj.js                                             5.66 kB │ gzip:   2.31 kB
+dist-preview/assets/diagram-Z3DM3KII-hWroJ8x6.js                                   5.68 kB │ gzip:   2.53 kB
+dist-preview/assets/AftersaleApplyPage-CpB9Qfuz.js                                 5.89 kB │ gzip:   2.73 kB
+dist-preview/assets/ProfilePage-t08S9I0w.js                                        5.98 kB │ gzip:   2.33 kB
+dist-preview/assets/StudentInsightPage-COkJb_FF.js                                 6.43 kB │ gzip:   2.42 kB
+dist-preview/assets/LiveSessionManagePage-BLnUcbLr.js                              6.50 kB │ gzip:   2.63 kB
+dist-preview/assets/im-aftersale-store-STYkIUbW.js                                 6.56 kB │ gzip:   2.62 kB
+dist-preview/assets/LiveRecordingPage-Dr3eTVF5.js                                  6.68 kB │ gzip:   2.82 kB
+dist-preview/assets/TenantDashboardEntry-v0kB-Bwk.js                               6.68 kB │ gzip:   2.68 kB
+dist-preview/assets/ReportDialog-CQsQFh4u.js                                       6.68 kB │ gzip:   2.83 kB
+dist-preview/assets/HomePage-TQDC77bW.js                                           7.08 kB │ gzip:   3.11 kB
+dist-preview/assets/DisposalBar-ThFOEcmr.js                                        7.20 kB │ gzip:   3.14 kB
+dist-preview/assets/LiveAnchorCertPage-Cubbwwq8.js                                 7.34 kB │ gzip:   2.72 kB
+dist-preview/assets/LivePlanManagePage-F_noLAf1.js                                 7.52 kB │ gzip:   3.03 kB
+dist-preview/assets/LearningDataPage-ueYqKKmW.js                                   7.60 kB │ gzip:   2.56 kB
+dist-preview/assets/OperatorLayout-BAcQdutZ.js                                     7.61 kB │ gzip:   5.05 kB
+dist-preview/assets/wallet-store-K0BNdzLb.js                                       7.62 kB │ gzip:   2.22 kB
+dist-preview/assets/diagram-UQ7AKVKN-37xe1VkT.js                                   7.66 kB │ gzip:   3.35 kB
+dist-preview/assets/pieDiagram-E7YTZNPT-CQR3Llyu.js                                7.78 kB │ gzip:   3.32 kB
+dist-preview/assets/LivePromoPage-Dzf-9LXn.js                                      7.86 kB │ gzip:   3.69 kB
+dist-preview/assets/MessageCenter-EpXP39PQ.js                                      8.09 kB │ gzip:   3.56 kB
+dist-preview/assets/sim-fixtures-PIG54G15.js                                       8.19 kB │ gzip:   2.27 kB
+dist-preview/assets/CampDetailPage-BINM0zU_.js                                     8.61 kB │ gzip:   3.48 kB
+dist-preview/assets/LiveListPage-Dwa03xHR.js                                       9.20 kB │ gzip:   3.72 kB
+dist-preview/assets/diagram-S7CK7UJ4-Dw34l-Q5.js                                   9.73 kB │ gzip:   4.39 kB
+dist-preview/assets/LessonLearnPage-CkQQeqYV.js                                    9.74 kB │ gzip:   4.16 kB
+dist-preview/assets/QuestionBankManagePage-CSM-Fkie.js                             9.89 kB │ gzip:   3.92 kB
+dist-preview/assets/StoreMgmtPage-wB74BNLa.js                                     10.29 kB │ gzip:   4.35 kB
+dist-preview/assets/cynefinDiagram-5FMLGOSQ-DYwGyChq.js                           11.51 kB │ gzip:   4.30 kB
+dist-preview/assets/LiveControlAuditPanel-CY12De35.js                             11.70 kB │ gzip:   5.79 kB
+dist-preview/assets/stateDiagram-D77RDMKH-BCCcCbou.js                             11.80 kB │ gzip:   4.29 kB
+dist-preview/assets/diagram-VSXAHHWV-JdqZjEqe.js                                  12.25 kB │ gzip:   4.84 kB
+dist-preview/assets/dagre-GXQ25YYZ-Dj9UuPId.js                                    12.57 kB │ gzip:   4.86 kB
+dist-preview/assets/StoreMemberPage-DUJJmbHP.js                                   12.89 kB │ gzip:   4.83 kB
+dist-preview/assets/GroupSettings-CaQsg9VU.js                                     13.76 kB │ gzip:   5.55 kB
+dist-preview/assets/chunk-SVP7TREG-NCqoE4b2.js                                    15.75 kB │ gzip:   4.43 kB
+dist-preview/assets/LiveTrafficHome-uqOEE0Al.js                                   16.63 kB │ gzip:   6.18 kB
+dist-preview/assets/diagram-VX7I27RA-DZvcLjxL.js                                  17.50 kB │ gzip:   6.41 kB
+dist-preview/assets/camp-store-Cozz3PvQ.js                                        18.00 kB │ gzip:   6.29 kB
+dist-preview/assets/ltf-tokens-Bx9kdiRo.js                                        18.87 kB │ gzip:   6.48 kB
+dist-preview/assets/ishikawaDiagram-5VMMS53U-Dx76W4VM.js                          18.99 kB │ gzip:   7.36 kB
+dist-preview/assets/CampManagePage-TKGc_cU0.js                                    19.00 kB │ gzip:   6.93 kB
+dist-preview/assets/ReplayDetailAudit-BNbDZHJn.js                                 19.24 kB │ gzip:   6.98 kB
+dist-preview/assets/CampDashboardPage-SP0FWK4V.js                                 21.86 kB │ gzip:   7.44 kB
+dist-preview/assets/kanban-definition-UXKFOSKX-CH-VthOo.js                        22.13 kB │ gzip:   7.98 kB
+dist-preview/assets/ChatPage-dCuWfwBv.js                                          24.33 kB │ gzip:   8.98 kB
+dist-preview/assets/mindmap-definition-YA3MSWOX-CM5j5Zi-.js                       24.79 kB │ gzip:   8.58 kB
+dist-preview/assets/sankeyDiagram-P5KCCOFB-BhoRUMN5.js                            24.82 kB │ gzip:   9.27 kB
+dist-preview/assets/journeyDiagram-3NMN7TZE-Cdttphi4.js                           25.02 kB │ gzip:   9.05 kB
+dist-preview/assets/layout-Bn8OlAF6.js                                            27.45 kB │ gzip:   9.76 kB
+dist-preview/assets/wardleyDiagram-VM6X3IG4-TD3H1R0D.js                           27.53 kB │ gzip:   7.62 kB
+dist-preview/assets/CampSchedulePage-B91cMqyO.js                                  27.74 kB │ gzip:   9.46 kB
+dist-preview/assets/gitGraphDiagram-WWUBYQGX-DBFp1a0Y.js                          31.37 kB │ gzip:   9.55 kB
+dist-preview/assets/erDiagram-RLTQ6QDP-7LFwA4XR.js                                32.35 kB │ gzip:  11.32 kB
+dist-preview/assets/requirementDiagram-BXWQKSXE-3CgqwWLO.js                       32.63 kB │ gzip:  10.51 kB
+dist-preview/assets/timeline-definition-24CTP7MA-CAq4ifnd.js                      32.79 kB │ gzip:  11.14 kB
+dist-preview/assets/quadrantDiagram-AXDQQJYC-D31Gz33W.js                          35.92 kB │ gzip:  10.82 kB
+dist-preview/assets/chunk-IMKFNOWR-CXeUhiYB.js                                    38.56 kB │ gzip:  12.66 kB
+dist-preview/assets/TenantLayout-B0ukt0jn.js                                      40.44 kB │ gzip:  21.16 kB
+dist-preview/assets/CourseManagePage-DDyBRQWp.js                                  41.26 kB │ gzip:  12.72 kB
+dist-preview/assets/vennDiagram-4TSXK5OY-B6j-2HcV.js                              43.80 kB │ gzip:  16.49 kB
+dist-preview/assets/blockDiagram-I7D4REHJ-C-gf74CS.js                             44.58 kB │ gzip:  14.60 kB
+dist-preview/assets/xychartDiagram-S5SC5T6Z-10fQZCvH.js                           45.94 kB │ gzip:  13.29 kB
+dist-preview/assets/chunk-TICWLB2K-BSoRUEk6.js                                    49.30 kB │ gzip:  15.79 kB
+dist-preview/assets/flowDiagram-HODETNUW-BanU638t.js                              62.63 kB │ gzip:  20.07 kB
+dist-preview/assets/live-store-G9-UTpsW.js                                        63.43 kB │ gzip:  14.98 kB
+dist-preview/assets/ganttDiagram-EL5Y4UJY-C3t8jTJP.js                             66.18 kB │ gzip:  22.19 kB
+dist-preview/assets/c4Diagram-7LVT6UL2-CoLEQCQZ.js                                66.98 kB │ gzip:  19.52 kB
+dist-preview/assets/useCaseCardData-y8Q-qp6l.js                                   69.28 kB │ gzip:  43.63 kB
+dist-preview/assets/cose-bilkent-JH36ORCC-CrKSnJYw.js                             82.98 kB │ gzip:  23.17 kB
+dist-preview/assets/course-store-CLjAntOy.js                                      93.28 kB │ gzip:  19.03 kB
+dist-preview/assets/swimlanes-42K2YHIH-qUTEGLII.js                               118.55 kB │ gzip:  43.51 kB
+dist-preview/assets/sequenceDiagram-WJ2MYXX4-B5qQu9Mm.js                         118.85 kB │ gzip:  32.00 kB
+dist-preview/assets/architectureDiagram-5GKGNRK7-DgJJEeBd.js                     153.24 kB │ gzip:  43.88 kB
+dist-preview/assets/katex-C5jXJg4s.js                                            258.49 kB │ gzip:  77.57 kB
+dist-preview/assets/cytoscape.esm-BB-IEtsb.js                                    443.80 kB │ gzip: 142.39 kB
+dist-preview/assets/cynefin-OW5HDTMX-B8qmD0vw.js                                 690.83 kB │ gzip: 155.11 kB
+dist-preview/assets/ProtoViewerPage-DwkjjveC.js                                  798.79 kB │ gzip: 219.90 kB
+dist-preview/assets/index-BEyr_ISf.js                                          2,395.91 kB │ gzip: 682.09 kB
+
+(!) Some chunks are larger than 2000 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 12.54s
