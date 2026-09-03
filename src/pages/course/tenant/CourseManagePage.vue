@@ -156,18 +156,13 @@
               <span class="form-tip" style="margin-left:8px">学员完成全部课时后自动发放（D35）</span>
             </t-form-item>
             <template v-if="form.completion_reward_enabled">
-              <!-- V2·0902 用户裁决：红包名称输入移除（展示端固定用默认文案「完课红包·课程名」） -->
-              <t-form-item label="现金红包">
-                <t-switch v-model="form.reward_cash_enabled" />
-                <template v-if="form.reward_cash_enabled">
-                  <t-input-number v-model="form.reward_amount" :min="0.01" :step="0.5" style="width:120px;margin-left:12px" /><span class="form-tip" style="margin-left:8px">元</span>
-                </template>
-              </t-form-item>
-              <t-form-item v-if="form.reward_cash_enabled" label="红包规则">
-                <t-select v-model="form.red_packet_rule_id" placeholder="选择红包规则（营销中心）" clearable style="width:240px">
-                  <t-option label="XJHB260806000009 · ¥1等分" value="XJHB260806000009" />
-                  <t-option label="XJHB260805000005 · ¥500拼手气" value="XJHB260805000005" />
-                </t-select>
+              <!-- V2·0902 用户裁决（0903）：无「现金红包」开关；「红包规则」行即选择红包（弹窗选题，选中显示红包信息） -->
+              <t-form-item label="红包规则">
+                <div v-if="(form as any).completion_red_packet" class="reward-cell" @click="openRewardPicker('completion')">
+                  <span class="reward-name">{{ (form as any).completion_red_packet.no }}</span>
+                  <span class="reward-meta">¥{{ (form as any).completion_red_packet.amount }} / {{ (form as any).completion_red_packet.count }}个 · {{ (form as any).completion_red_packet.type }}</span>
+                </div>
+                <t-button v-else variant="text" size="small" theme="primary" @click="openRewardPicker('completion')">选择红包</t-button>
               </t-form-item>
               <t-form-item label="积分">
                 <t-switch v-model="form.reward_points_enabled" />
@@ -175,7 +170,6 @@
                   <t-input-number v-model="form.reward_points" :min="1" :step="10" style="width:120px;margin-left:12px" /><span class="form-tip" style="margin-left:8px">分</span>
                 </template>
               </t-form-item>
-              <t-form-item v-if="!form.reward_cash_enabled && !form.reward_points_enabled"><span class="form-tip">现金红包与积分至少开启一项，否则完课无奖励</span></t-form-item>
             </template>
           </div>
 
@@ -225,16 +219,14 @@
               <span style="font-size:13px;color:#475467">%</span>
             </t-form-item>
             <!-- V2·0902 老板需求：答题红包与积分（与完课奖励分开命名） -->
+            <!-- V2·0902 用户裁决（0903）：答题红包去掉红包名称输入，只留开关+选择红包 -->
             <t-form-item label="答题红包" v-if="(form as any).quiz_enabled">
               <t-switch v-model="(form as any).quiz_reward_cash_enabled" />
-              <template v-if="(form as any).quiz_reward_cash_enabled">
-                <t-input v-model="(form as any).answer_reward_name" placeholder="答题红包名称（如：答题红包·高效学习方法论）" style="width:260px;margin-left:8px" />
-                <div v-if="(form as any).quiz_reward" class="reward-cell" style="margin-left:8px" @click="openRewardPicker()">
-                  <span class="reward-name">{{ (form as any).quiz_reward.no }}</span>
-                  <span class="reward-meta">¥{{ (form as any).quiz_reward.amount }} / {{ (form as any).quiz_reward.count }}个 · {{ (form as any).quiz_reward.type }}</span>
-                </div>
-                <t-button v-else variant="text" size="small" theme="primary" style="margin-left:8px" @click="openRewardPicker()">选择红包</t-button>
-              </template>
+              <div v-if="(form as any).quiz_reward_cash_enabled && (form as any).quiz_reward" class="reward-cell" style="margin-left:8px" @click="openRewardPicker('quiz')">
+                <span class="reward-name">{{ (form as any).quiz_reward.no }}</span>
+                <span class="reward-meta">¥{{ (form as any).quiz_reward.amount }} / {{ (form as any).quiz_reward.count }}个 · {{ (form as any).quiz_reward.type }}</span>
+              </div>
+              <t-button v-if="(form as any).quiz_reward_cash_enabled && !(form as any).quiz_reward" variant="text" size="small" theme="primary" style="margin-left:8px" @click="openRewardPicker('quiz')">选择红包</t-button>
             </t-form-item>
             <t-form-item label="答题积分" v-if="(form as any).quiz_enabled">
               <t-switch v-model="(form as any).answer_reward_points_enabled" />
@@ -447,6 +439,7 @@ function defaultForm() {
     // D35 完课奖励配置（业务新增·现金红包与积分可同选）
     completion_reward_enabled: false,
     reward_cash_enabled: true, reward_amount: 1, red_packet_rule_id: '',
+    completion_red_packet: null as { no: string; amount: number; count: number; type: string } | null,
     reward_points_enabled: false, reward_points: 20,
     // 课程设置（课程业务新增·内容保护）
     forbid_seek: false, forbid_speed: false, watermark_horse: false, watermark_text: false,
@@ -604,15 +597,20 @@ const rewardColumns = [
   { colKey: 'created', title: '创建时间', width: 150 },
 ];
 function onRewardSelect(_keys: (string | number)[], ctx: any) { rewardSelectedKeys.value = _keys; }
-// V2·0902 奖励配置上移课程级：红包按原单视频奖励交互（现金红包选择器）
-function openRewardPicker() {
-  rewardSelectedKeys.value = (form.value as any).quiz_reward ? [(form.value as any).quiz_reward.no] : [];
+// V2·0902 用户裁决（0903）：红包选择器支持答题红包/完课红包规则两个目标
+let rewardPickerTarget: 'quiz' | 'completion' = 'quiz';
+function openRewardPicker(target: 'quiz' | 'completion' = 'quiz') {
+  rewardPickerTarget = target;
+  const cur = target === 'quiz' ? (form.value as any).quiz_reward : (form.value as any).completion_red_packet;
+  rewardSelectedKeys.value = cur ? [cur.no] : [];
   rewardPickerVisible.value = true;
 }
 function confirmRewardPicker() {
   const hit = rewardList.value.find(r => rewardSelectedKeys.value.includes(r.no));
   if (!hit) { MessagePlugin.warning('请选择一个现金红包'); return; }
-  (form.value as any).quiz_reward = { no: hit.no, amount: hit.amount, count: hit.count, type: hit.type };
+  const picked = { no: hit.no, amount: hit.amount, count: hit.count, type: hit.type };
+  if (rewardPickerTarget === 'quiz') { (form.value as any).quiz_reward = picked; }
+  else { (form.value as any).completion_red_packet = picked; }
   MessagePlugin.success(`已关联现金红包 ${hit.no}`);
   rewardPickerVisible.value = false;
 }
@@ -646,6 +644,7 @@ function openEditDrawer(row: any) {
     camp_ref_enabled: (row as any).camp_ref_enabled ?? true,
     forbid_seek: false, forbid_speed: false, watermark_horse: false, watermark_text: false,
     completion_reward_enabled: false, reward_cash_enabled: true, reward_amount: 1, red_packet_rule_id: '', reward_points_enabled: false, reward_points: 20,
+    completion_red_packet: (row as any).completion_red_packet ?? null,
   };
   drawerVisible.value = true;
 }
@@ -672,7 +671,7 @@ function doSave() {
     }
   }
   if (editing.value) {
-    store.updateCourse(editing.value.id, { title: form.value.mode === 'live' ? ((((form.value as any).room_config as any)?.name || '').trim() || '直播课程') : form.value.title, category_name: form.value.category_name || '未分类', description: form.value.mode === 'live' ? '' : form.value.description, mode: form.value.mode, visibility: form.value.visibility, cover_url: form.value.cover_url, is_paid: isPaid, price, commission_enabled: false, show_in_app: form.value.show_in_app, lecturer_id: '', lecturer_name: '', live_room_id: form.value.mode === 'live' ? liveRoomId : null, live_display_title: form.value.mode === 'recorded' && (form.value as any).display_style === 'live_room' ? ((form.value as any).live_display_title || '') : '', display_style: form.value.mode === 'recorded' ? (form.value as any).display_style : undefined, quiz_reward_cash_enabled: form.value.mode === 'recorded' ? (form.value as any).quiz_reward_cash_enabled : false, quiz_reward: form.value.mode === 'recorded' ? (form.value as any).quiz_reward : null, answer_reward_points_enabled: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points_enabled : false, answer_reward_points: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points : 0, quiz_enabled: form.value.mode === 'recorded' ? (form.value as any).quiz_enabled : false, quiz_bank_id: form.value.mode === 'recorded' ? ((form.value as any).quiz_bank_id || null) : null, quiz_question_ids: form.value.mode === 'recorded' ? (((form.value as any).quiz_question_ids || []) as string[]) : [], answer_reward_name: form.value.mode === 'recorded' ? ((form.value as any).answer_reward_name || '') : '', reward_name: (form.value as any).reward_name || '', camp_ref_enabled: (form.value as any).camp_ref_enabled } as any);
+    store.updateCourse(editing.value.id, { title: form.value.mode === 'live' ? ((((form.value as any).room_config as any)?.name || '').trim() || '直播课程') : form.value.title, category_name: form.value.category_name || '未分类', description: form.value.mode === 'live' ? '' : form.value.description, mode: form.value.mode, visibility: form.value.visibility, cover_url: form.value.cover_url, is_paid: isPaid, price, commission_enabled: false, show_in_app: form.value.show_in_app, lecturer_id: '', lecturer_name: '', live_room_id: form.value.mode === 'live' ? liveRoomId : null, live_display_title: form.value.mode === 'recorded' && (form.value as any).display_style === 'live_room' ? ((form.value as any).live_display_title || '') : '', display_style: form.value.mode === 'recorded' ? (form.value as any).display_style : undefined, quiz_reward_cash_enabled: form.value.mode === 'recorded' ? (form.value as any).quiz_reward_cash_enabled : false, quiz_reward: form.value.mode === 'recorded' ? (form.value as any).quiz_reward : null, answer_reward_points_enabled: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points_enabled : false, answer_reward_points: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points : 0, quiz_enabled: form.value.mode === 'recorded' ? (form.value as any).quiz_enabled : false, quiz_bank_id: form.value.mode === 'recorded' ? ((form.value as any).quiz_bank_id || null) : null, quiz_question_ids: form.value.mode === 'recorded' ? (((form.value as any).quiz_question_ids || []) as string[]) : [], answer_reward_name: form.value.mode === 'recorded' ? ((form.value as any).answer_reward_name || '') : '', reward_name: (form.value as any).reward_name || '', completion_red_packet: form.value.mode === 'recorded' ? ((form.value as any).completion_red_packet || null) : null, red_packet_rule_id: ((form.value as any).completion_red_packet as any)?.no || (form.value as any).red_packet_rule_id || '', camp_ref_enabled: (form.value as any).camp_ref_enabled } as any);
     if (form.value.mode === 'recorded') {
       form.value.videos.forEach((v: any) => {
         const existing = store.lessons.find((l: any) => l.lesson_no === v.video_no);
@@ -684,17 +683,19 @@ function doSave() {
     }
     MessagePlugin.success('课程已更新');
   } else {
-    store.createCourse({ title: form.value.mode === 'live' ? ((((form.value as any).room_config as any)?.name || '').trim() || '直播课程') : form.value.title, description: form.value.mode === 'live' ? '' : form.value.description, cover_url: form.value.cover_url, category_id: 'cat-' + Date.now(), category_name: form.value.category_name || '未分类', tags: [], lecturer_id: '', lecturer_name: '', source: 'upload', mode: form.value.mode, source_live_session_id: null, visibility: form.value.visibility, price, is_paid: isPaid, commission_enabled: false, show_in_app: form.value.show_in_app, live_room_id: form.value.mode === 'live' ? liveRoomId : null, live_display_title: form.value.mode === 'recorded' && (form.value as any).display_style === 'live_room' ? ((form.value as any).live_display_title || '') : '', display_style: form.value.mode === 'recorded' ? (form.value as any).display_style : undefined, quiz_reward_cash_enabled: form.value.mode === 'recorded' ? (form.value as any).quiz_reward_cash_enabled : false, quiz_reward: form.value.mode === 'recorded' ? (form.value as any).quiz_reward : null, answer_reward_points_enabled: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points_enabled : false, answer_reward_points: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points : 0, quiz_enabled: form.value.mode === 'recorded' ? (form.value as any).quiz_enabled : false, quiz_bank_id: form.value.mode === 'recorded' ? ((form.value as any).quiz_bank_id || null) : null, quiz_question_ids: form.value.mode === 'recorded' ? (((form.value as any).quiz_question_ids || []) as string[]) : [], answer_reward_name: form.value.mode === 'recorded' ? ((form.value as any).answer_reward_name || '') : '', reward_name: (form.value as any).reward_name || '', camp_ref_enabled: (form.value as any).camp_ref_enabled } as any);
+    store.createCourse({ title: form.value.mode === 'live' ? ((((form.value as any).room_config as any)?.name || '').trim() || '直播课程') : form.value.title, description: form.value.mode === 'live' ? '' : form.value.description, cover_url: form.value.cover_url, category_id: 'cat-' + Date.now(), category_name: form.value.category_name || '未分类', tags: [], lecturer_id: '', lecturer_name: '', source: 'upload', mode: form.value.mode, source_live_session_id: null, visibility: form.value.visibility, price, is_paid: isPaid, commission_enabled: false, show_in_app: form.value.show_in_app, live_room_id: form.value.mode === 'live' ? liveRoomId : null, live_display_title: form.value.mode === 'recorded' && (form.value as any).display_style === 'live_room' ? ((form.value as any).live_display_title || '') : '', display_style: form.value.mode === 'recorded' ? (form.value as any).display_style : undefined, quiz_reward_cash_enabled: form.value.mode === 'recorded' ? (form.value as any).quiz_reward_cash_enabled : false, quiz_reward: form.value.mode === 'recorded' ? (form.value as any).quiz_reward : null, answer_reward_points_enabled: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points_enabled : false, answer_reward_points: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points : 0, quiz_enabled: form.value.mode === 'recorded' ? (form.value as any).quiz_enabled : false, quiz_bank_id: form.value.mode === 'recorded' ? ((form.value as any).quiz_bank_id || null) : null, quiz_question_ids: form.value.mode === 'recorded' ? (((form.value as any).quiz_question_ids || []) as string[]) : [], answer_reward_name: form.value.mode === 'recorded' ? ((form.value as any).answer_reward_name || '') : '', reward_name: (form.value as any).reward_name || '', completion_red_packet: form.value.mode === 'recorded' ? ((form.value as any).completion_red_packet || null) : null, red_packet_rule_id: ((form.value as any).completion_red_packet as any)?.no || (form.value as any).red_packet_rule_id || '', camp_ref_enabled: (form.value as any).camp_ref_enabled } as any);
     MessagePlugin.success('课程已新增');
   }
   // D35 完课奖励同步营销域复刻观看奖励页（真实系统：课程表单保存→营销中心创建红包规则）；积分奖励走积分事件不建红包规则
-  if (form.value.completion_reward_enabled && form.value.reward_cash_enabled) {
+  // V2·0902 用户裁决（0903）：红包金额随所选红包带出，不再单独配金额
+  if (form.value.completion_reward_enabled && (form.value as any).completion_red_packet) {
     import('../../../stores/saas-replica/marketing-replica-store').then(({ useMarketingReplicaStore }) => {
       const mk = useMarketingReplicaStore();
-      const name = (form.value as any).reward_name?.trim() || `完课红包·${form.value.title}`;
+      const rp = (form.value as any).completion_red_packet;
+      const name = `完课红包·${form.value.title}`;
       const existed = mk.rules.find(r => r.rule_name === name);
-      if (existed) { existed.amount_yuan = form.value.reward_amount; return; }
-      mk.rules.unshift({ id: 'WR-' + Date.now(), rule_no: 'HB' + Date.now().toString().slice(-9), rule_name: name, reward_type: '完课红包', bind_scene: '营期', scene_name: form.value.title, amount_yuan: form.value.reward_amount, total_count: 500, issued_count: 0, received_count: 0, status: 'enabled', created_at: Math.floor(Date.now() / 1000) });
+      if (existed) { existed.amount_yuan = rp.amount; return; }
+      mk.rules.unshift({ id: 'WR-' + Date.now(), rule_no: 'HB' + Date.now().toString().slice(-9), rule_name: name, reward_type: '完课红包', bind_scene: '营期', scene_name: form.value.title, amount_yuan: rp.amount, total_count: rp.count, issued_count: 0, received_count: 0, status: 'enabled', created_at: Math.floor(Date.now() / 1000) });
     });
   }
   drawerVisible.value = false; editing.value = null; form.value = defaultForm();
