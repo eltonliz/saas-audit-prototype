@@ -99,7 +99,7 @@
             <!-- V2·0902 老板需求：录播课是否被营期引用开关（关=排课选课时不出现该课程课时） -->
             <t-form-item v-if="form.mode === 'recorded'" label="是否被营期引用">
               <t-switch v-model="(form as any).camp_ref_enabled" />
-              <span class="form-tip" style="margin-left:8px">开启：营期排课可引用本课程课时；关闭：本课程不对营期开放（已引用的排课不受影响）</span>
+              <span class="form-tip" style="margin-left:8px">开启：录播风格可被营期引用（排课可选本课程课时，直播间外壳风格展示）；关闭：本录播不对营期开放（已引用的排课不受影响）</span>
             </t-form-item>
             <!-- V2·0902 用户裁决：「是否公开」配置下线，课程统一公开（APP 独立展示），数据字段固定 public -->
             <t-form-item label="课程封面">
@@ -145,8 +145,8 @@
               </t-table>
           </div>
 
-          <!-- 区块3：展示设置（V2·0901 用户裁决：仅保留 C端展示，有效期删除） -->
-          <div class="section-card saas-new-box" data-saas-no="3">
+          <!-- 区块3：展示设置（V2·0901 用户裁决：仅保留 C端展示，有效期删除；V2·0902 仅录播——直播间无视频播放设置） -->
+          <div v-if="form.mode === 'recorded'" class="section-card saas-new-box" data-saas-no="3">
             <div class="section-header"><t-icon name="cart" class="section-icon" /><span>展示设置</span><ReplicaMarker :no="3" label="编号③ 展示开关" /></div>
             <!-- V2·0901 用户裁决：有效期删除，仅保留 C端展示 -->
             <t-form-item label="C端展示">
@@ -157,8 +157,8 @@
 
           <!-- V2·0829 用户裁决：主讲人字段去除；分成设置区块已移除（本期不做交易） -->
 
-          <!-- D35 红包奖励配置【红框=课程业务新增】V2·0829：仅保留完课奖励（答题奖励在内容管理课时行已有添加奖励入口）；奖励类型现金红包+积分可同选 -->
-          <div class="section-card saas-new-box">
+          <!-- D35 红包奖励配置【红框=课程业务新增】V2·0829：仅保留完课奖励（答题奖励在内容管理课时行已有添加奖励入口）；奖励类型现金红包+积分可同选；V2·0902 仅录播——直播间无完课奖励 -->
+          <div v-if="form.mode === 'recorded'" class="section-card saas-new-box">
             <div class="section-header"><t-icon name="gift" class="section-icon" /><span>完课奖励配置</span><ReplicaMarker :no="7" label="编号⑦ 新增·D35完课奖励" /></div>
             <t-form-item label="完课奖励">
               <t-switch v-model="form.completion_reward_enabled" />
@@ -187,8 +187,8 @@
             </template>
           </div>
 
-          <!-- 区块6：课程设置 -->
-          <div class="section-card">
+          <!-- 区块6：课程设置（V2·0902 仅录播——直播间无视频播放类设置；红包/积分奖励含在内） -->
+          <div v-if="form.mode === 'recorded'" class="section-card">
             <div class="section-header"><t-icon name="setting" class="section-icon" /><span>课程设置</span><ReplicaMarker :no="5" label="编号⑤ 1:1线上六项" /></div>
             <!-- 以下六项 = SaaS 线上 1:1（2026-08-27 实测） -->
             <t-form-item label="是否显示课程介绍"><t-switch v-model="form.show_intro" /></t-form-item>

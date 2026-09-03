@@ -219,8 +219,8 @@
               </template>
             </t-form-item>
           </div>
-          <!-- V2·0902 老板需求：播放控制（拖动进度条/暂停）排课级可配，选课时后跟随课程默认 -->
-          <div class="form-col-full">
+          <!-- V2·0902 老板需求：播放控制（拖动进度条/暂停）排课级可配，选课时后跟随课程默认；仅录播——直播间无播放控制 -->
+          <div v-if="addForm.teach_mode === 'recorded'" class="form-col-full">
             <t-form-item label="允许拖动进度条">
               <t-radio-group v-model="addForm.allow_seek">
                 <t-radio value="allow">允许</t-radio>
