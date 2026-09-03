@@ -38,7 +38,7 @@ const visible = defineModel<boolean>('visible', { default: false });
 const courseStore = useCourseStore();
 
 const columns = [
-  { colKey: 'row-select', width: 46 },
+  { colKey: 'row-select', type: 'single', width: 50 },
   { colKey: 'title', title: '题库名称', minWidth: 160 },
   { colKey: 'course', title: '关联课程', minWidth: 140 },
   { colKey: 'question_count', title: '题目数', width: 80 },
