@@ -85,7 +85,7 @@
                     <span>关联课程：{{ getCourseName(s.course_id) }}</span>
                   </div>
                   <div class="sc-times">
-                    <span class="sc-time"><t-icon name="unlock" />解锁 {{ formatTime(s.unlock_time) }}</span>
+                    <span class="sc-time"><t-icon name="time" />开始 {{ formatTime(s.unlock_time) }}<template v-if="s.deadline"> · 结束 {{ formatTime(s.deadline) }}</template></span>
                   </div>
                 </div>
                 <div class="sc-side">
@@ -201,9 +201,15 @@
               </div>
             </t-form-item>
           </div>
+          <!-- V2·0902 用户裁决：解锁时间改为预计开始/预计结束 -->
           <div class="form-col">
-            <t-form-item label="解锁时间" required-mark>
-              <t-date-picker v-model="addForm.unlock_time" enable-time-picker placeholder="选择解锁时间" style="width: 100%" />
+            <t-form-item label="预计开始" required-mark>
+              <t-date-picker v-model="addForm.unlock_time" enable-time-picker placeholder="选择预计开始时间" style="width: 100%" />
+            </t-form-item>
+          </div>
+          <div class="form-col">
+            <t-form-item label="预计结束">
+              <t-date-picker v-model="addForm.deadline" enable-time-picker placeholder="选择预计结束时间（可选）" style="width: 100%" />
             </t-form-item>
           </div>
           <!-- V2·0902 红包奖励（排课级·仅录播）：现金红包选择器 -->
@@ -262,7 +268,7 @@
         <span class="required">Day</span>
         <span class="required">标题</span>
         <span class="required">课时</span>
-        <span class="required">解锁时间</span>
+        <span class="required">预计开始</span>
         <span>必学</span>
         <span>操作</span>
       </div>
@@ -456,7 +462,7 @@ function doBatch() {
   for (let i = 0; i < batchRows.value.length; i++) {
     if (!batchRows.value[i].title) { MessagePlugin.warning(`第 ${i + 1} 行标题为空`); return; }
     if (!batchRows.value[i].lesson_id) { MessagePlugin.warning(`第 ${i + 1} 行未选择课时`); return; }
-    if (!batchRows.value[i].unlock_time) { MessagePlugin.warning(`第 ${i + 1} 行未选择解锁时间`); return; }
+    if (!batchRows.value[i].unlock_time) { MessagePlugin.warning(`第 ${i + 1} 行未选择预计开始时间`); return; }
   }
   // V2·0901 课时唯一性：与营期已排 + 批次内重复校验
   const usedIds = new Set(batchUsedLessonIds.value);
@@ -568,7 +574,7 @@ function openAddDialog() {
 }
 function doAdd() {
   if (!addForm.value.title) { MessagePlugin.warning('请填写排课标题'); return; }
-  if (!addForm.value.unlock_time) { MessagePlugin.warning('请选择解锁时间'); return; }
+  if (!addForm.value.unlock_time) { MessagePlugin.warning('请选择预计开始时间'); return; }
   // V2·0902 老板需求：直播排课只引用直播间（在「快速创建直播间」弹窗或直播列表维护）
   if (addForm.value.teach_mode === 'live' && !addForm.value.live_room_id) { MessagePlugin.warning('请选择直播间（无直播间可点「快速创建直播间」）'); return; }
   if (addForm.value.teach_mode === 'recorded' && !addForm.value.lesson_id) { MessagePlugin.warning('必须选择课时（营期排课以课时为单位）'); return; }

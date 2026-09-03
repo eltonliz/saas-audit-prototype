@@ -129,17 +129,6 @@
               </div>
               <t-table :data="form.videos" row-key="video_no" :columns="videoColumns" bordered size="small" style="margin-top:12px">
                 <template #ctype="{ row }"><t-tag :theme="row.ctype === 'audio' ? 'primary' : 'success'" variant="light" size="small">{{ row.ctype === 'audio' ? '音频' : '视频' }}</t-tag></template>
-                <template #quiz_header><el-switch v-model="quizAllOn" size="small" @change="toggleQuizAll" /> 是否答题</template>
-                <template #quiz="{ row }">
-                  <div class="quiz-cell">
-                    <t-switch v-model="row.has_quiz" size="small" />
-                    <template v-if="row.has_quiz">
-                      <t-button variant="text" size="small" theme="primary" @click="viewQuizDetail(row)">查看详情</t-button>
-                      <t-button variant="text" size="small" theme="primary" @click="openQuizPicker(row)">更换题目</t-button>
-                      <t-button variant="text" size="small" theme="danger" @click="unlinkQuiz(row)">取消关联</t-button>
-                    </template>
-                  </div>
-                </template>
                 <template #file="{ row }"><t-button variant="text" size="small" theme="primary" @click="MessagePlugin.info(`共 ${row.files_count ?? 1} 个文件：${row.file_name ?? row.name}`)">查看{{ row.files_count ?? 1 }}文件</t-button></template>
                 <template #vop="{ row }"><t-button variant="text" size="small" theme="danger" @click="removeVideo(row)">移除</t-button></template>
               </t-table>
@@ -165,6 +154,9 @@
               <span class="form-tip" style="margin-left:8px">学员完成全部课时后自动发放（D35）</span>
             </t-form-item>
             <template v-if="form.completion_reward_enabled">
+              <t-form-item label="红包名称">
+                <t-input v-model="(form as any).reward_name" :placeholder="`完课红包·${form.title || '课程名'}`" style="width:260px" />
+              </t-form-item>
               <t-form-item label="现金红包">
                 <t-switch v-model="form.reward_cash_enabled" />
                 <template v-if="form.reward_cash_enabled">
@@ -190,6 +182,11 @@
           <!-- 区块6：课程设置（V2·0902 仅录播——直播间无视频播放类设置；红包/积分奖励含在内） -->
           <div v-if="form.mode === 'recorded'" class="section-card">
             <div class="section-header"><t-icon name="setting" class="section-icon" /><span>课程设置</span><ReplicaMarker :no="5" label="编号⑤ 1:1线上六项" /></div>
+            <!-- V2·0902 老板需求：是否答题改为课程级全局配置（不再逐视频设置） -->
+            <t-form-item label="是否答题">
+              <t-switch v-model="(form as any).quiz_enabled" />
+              <span class="form-tip" style="margin-left:8px">开启后本课程所有课时播放将按触发时机弹出答题（全局配置）</span>
+            </t-form-item>
             <!-- 以下六项 = SaaS 线上 1:1（2026-08-27 实测） -->
             <t-form-item label="是否显示课程介绍"><t-switch v-model="form.show_intro" /></t-form-item>
             <t-form-item label="虚拟观看人数">
@@ -218,10 +215,11 @@
               <t-input-number v-model="form.completion_percent" :min="1" :max="100" theme="column" size="small" style="width:90px;margin:0 6px" />
               <span style="font-size:13px;color:#475467">%</span>
             </t-form-item>
-            <!-- V2·0902 奖励配置（课程级·红包按原单视频奖励交互选择，积分直接配置） -->
-            <t-form-item label="红包奖励">
+            <!-- V2·0902 老板需求：答题红包与积分（与完课奖励分开命名） -->
+            <t-form-item label="答题红包" v-if="(form as any).quiz_enabled">
               <t-switch v-model="(form as any).quiz_reward_cash_enabled" />
               <template v-if="(form as any).quiz_reward_cash_enabled">
+                <t-input v-model="(form as any).answer_reward_name" placeholder="答题红包名称（如：答题红包·高效学习方法论）" style="width:260px;margin-left:8px" />
                 <div v-if="(form as any).quiz_reward" class="reward-cell" style="margin-left:8px" @click="openRewardPicker()">
                   <span class="reward-name">{{ (form as any).quiz_reward.no }}</span>
                   <span class="reward-meta">¥{{ (form as any).quiz_reward.amount }} / {{ (form as any).quiz_reward.count }}个 · {{ (form as any).quiz_reward.type }}</span>
@@ -229,7 +227,7 @@
                 <t-button v-else variant="text" size="small" theme="primary" style="margin-left:8px" @click="openRewardPicker()">选择红包</t-button>
               </template>
             </t-form-item>
-            <t-form-item label="积分奖励">
+            <t-form-item label="答题积分" v-if="(form as any).quiz_enabled">
               <t-switch v-model="(form as any).answer_reward_points_enabled" />
               <template v-if="(form as any).answer_reward_points_enabled">
                 <t-input-number v-model="(form as any).answer_reward_points" :min="1" :step="5" theme="column" size="small" style="width:90px;margin:0 6px" />
@@ -327,35 +325,7 @@
       </template>
     </t-dialog>
 
-    <!-- 更换题目弹窗（从题目库选题） -->
-    <t-dialog v-model:visible="quizPickerVisible" header="更换题目（从题目库选择）" width="720px">
-      <t-table :data="quizBankRows" row-key="no" :columns="quizPickerColumns" bordered size="small" v-model:selected-row-keys="quizSelectedKeys" @select-change="(_k: any, ctx: any) => (quizSelectedRows = ctx?.selectedRowData ?? [])">
-        <template #qtype="{ row }">{{ row.type }}</template>
-      </t-table>
-      <div class="pool-selected-tip"><t-icon name="info-circle" /> 选择后原关联题目将被替换；确认后该视频时间轴将按新题目触发答题卡</div>
-      <template #footer>
-        <t-button @click="quizPickerVisible = false">取消</t-button>
-        <t-button theme="primary" @click="confirmQuizPicker">确认更换</t-button>
-      </template>
-    </t-dialog>
-
-    <!-- 题目详情弹窗 -->
-    <t-dialog v-model:visible="quizDetailVisible" header="题目详情" width="560px">
-      <template v-if="quizDetailRow">
-        <t-form label-width="90px" :data="quizDetailRow">
-          <t-form-item label="题目编号">{{ quizDetailRow.video_no }}</t-form-item>
-          <t-form-item label="关联题目">{{ quizDetailRow.quiz_title || 'S01E03 综合测评题' }}</t-form-item>
-          <t-form-item label="题型">单选题（4选1）</t-form-item>
-          <t-form-item label="题目内容">课程完播后练习：本节课程的核心要点以下哪项描述正确？</t-form-item>
-          <t-form-item label="选项">
-            <div style="width:100%;line-height:1.9;font-size:13px;color:#475467">A. 分段学习不复习<br/>B. 学完即测+错题回顾（正确答案）<br/>C. 只看视频不做题<br/>D. 考前突击一夜</div>
-          </t-form-item>
-          <t-form-item label="触发方式">完播触发 · 阈值 ≥ 90%</t-form-item>
-          <t-form-item label="历史正确率">86%</t-form-item>
-        </t-form>
-      </template>
-      <template #footer><t-button theme="primary" @click="quizDetailVisible = false">关闭</t-button></template>
-    </t-dialog>
+    <!-- V2·0902 老板需求：答题改课程级全局配置，课时行「是否答题/更换题目/查看详情」与相关弹窗已移除 -->
 
     <!-- V2·0829 用户裁决：课时管理/题库管理抽屉入口已随操作列按钮删除（相关操作统一在编辑模块内完成） -->
 
@@ -441,6 +411,10 @@ function defaultForm() {
     quiz_reward: null as { no: string; amount: number; count: number; type: string } | null,
     answer_reward_points_enabled: false,
     answer_reward_points: 20,
+    // V2·0902 老板需求：是否答题全局开关 + 两类奖励命名
+    quiz_enabled: false,
+    answer_reward_name: '',
+    reward_name: '',
     // V2·0902 老板需求：录播课是否被营期引用
     camp_ref_enabled: true,
     // D35 完课奖励配置（业务新增·现金红包与积分可同选）
@@ -475,7 +449,6 @@ const videoColumns = [
   { colKey: 'file', title: '视频文件', width: 100 },
   { colKey: 'duration', title: '视频时长', width: 95 },
   { colKey: 'category', title: '所属分类', width: 90 },
-  { colKey: 'quiz', title: '是否答题', width: 200 },
   { colKey: 'vop', title: '操作', width: 70, fixed: 'right' },
 ];
 
@@ -558,46 +531,7 @@ function confirmContentPicker() {
 }
 function removeVideo(row: any) { form.value.videos = form.value.videos.filter((v: any) => v !== row); }
 
-// ─── 是否答题：表头全局开关 + 行内三操作（查看详情/更换题目/取消关联） ───
-const quizAllOn = ref(false);
-function toggleQuizAll(v: any) {
-  form.value.videos.forEach((v2: any) => (v2.has_quiz = !!v));
-}
-function viewQuizDetail(row: any) { quizDetailRow.value = row; quizDetailVisible.value = true; }
-function unlinkQuiz(row: any) {
-  row.has_quiz = false;
-  MessagePlugin.success('已取消该视频的题目关联');
-}
-
-// ─── 更换题目弹窗（题目库数据） ───
-const quizPickerVisible = ref(false);
-const quizPickerRow = ref<any>(null);
-const quizSelectedKeys = ref<(string | number)[]>([]);
-const quizSelectedRows = ref<any[]>([]);
-const quizBankRows = ref([
-  { no: 'QN00000033', title: '课程完播综合测评（单选）', type: '单选题', answer: 'B' },
-  { no: 'QN00000031', title: '本节课程核心要点（多选）', type: '多选题', answer: 'A,B' },
-  { no: 'QN00000027', title: '学习效果自评（单选）', type: '单选题', answer: 'A' },
-]);
-const quizPickerColumns = [
-  { colKey: 'row-select', type: 'multiple', width: 50 },
-  { colKey: 'no', title: '题目编码', width: 120 },
-  { colKey: 'title', title: '题目名称', minWidth: 200 },
-  { colKey: 'qtype', title: '题目类型', width: 90 },
-  { colKey: 'answer', title: '答案', width: 80 },
-];
-function openQuizPicker(row: any) {
-  quizPickerRow.value = row;
-  quizSelectedKeys.value = [];
-  quizSelectedRows.value = [];
-  quizPickerVisible.value = true;
-}
-function confirmQuizPicker() {
-  if (quizSelectedRows.value.length === 0) { MessagePlugin.warning('请至少选择一道题目'); return; }
-  if (quizPickerRow.value) quizPickerRow.value.quiz_title = quizSelectedRows.value[0].title;
-  MessagePlugin.success(`已更换关联题目（${quizSelectedRows.value.length} 题）`);
-  quizPickerVisible.value = false;
-}
+// ─── 是否答题已改课程级全局开关（课程设置区块），课时行配置与相关弹窗已移除 ───
 
 // ─── 查看详情弹窗 ───
 const quizDetailVisible = ref(false);
@@ -662,6 +596,9 @@ function openEditDrawer(row: any) {
     quiz_reward: (row as any).quiz_reward ?? null,
     answer_reward_points_enabled: (row as any).answer_reward_points_enabled ?? false,
     answer_reward_points: (row as any).answer_reward_points ?? 20,
+    quiz_enabled: (row as any).quiz_enabled ?? false,
+    answer_reward_name: (row as any).answer_reward_name || '',
+    reward_name: (row as any).reward_name || '',
     camp_ref_enabled: (row as any).camp_ref_enabled ?? true,
     forbid_seek: false, forbid_speed: false, watermark_horse: false, watermark_text: false,
     completion_reward_enabled: false, reward_cash_enabled: true, reward_amount: 1, red_packet_rule_id: '', reward_points_enabled: false, reward_points: 20,
@@ -688,7 +625,7 @@ function doSave() {
     }
   }
   if (editing.value) {
-    store.updateCourse(editing.value.id, { title: form.value.title, category_name: form.value.category_name, description: form.value.description, mode: form.value.mode, visibility: form.value.visibility, cover_url: form.value.cover_url, is_paid: isPaid, price, commission_enabled: false, show_in_app: form.value.show_in_app, lecturer_id: '', lecturer_name: '', live_room_id: form.value.mode === 'live' ? liveRoomId : null, live_display_title: (form.value as any).live_display_title || '', display_style: form.value.mode === 'recorded' ? (form.value as any).display_style : undefined, quiz_reward_cash_enabled: form.value.mode === 'recorded' ? (form.value as any).quiz_reward_cash_enabled : false, quiz_reward: form.value.mode === 'recorded' ? (form.value as any).quiz_reward : null, answer_reward_points_enabled: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points_enabled : false, answer_reward_points: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points : 0, camp_ref_enabled: (form.value as any).camp_ref_enabled } as any);
+    store.updateCourse(editing.value.id, { title: form.value.title, category_name: form.value.category_name, description: form.value.description, mode: form.value.mode, visibility: form.value.visibility, cover_url: form.value.cover_url, is_paid: isPaid, price, commission_enabled: false, show_in_app: form.value.show_in_app, lecturer_id: '', lecturer_name: '', live_room_id: form.value.mode === 'live' ? liveRoomId : null, live_display_title: (form.value as any).live_display_title || '', display_style: form.value.mode === 'recorded' ? (form.value as any).display_style : undefined, quiz_reward_cash_enabled: form.value.mode === 'recorded' ? (form.value as any).quiz_reward_cash_enabled : false, quiz_reward: form.value.mode === 'recorded' ? (form.value as any).quiz_reward : null, answer_reward_points_enabled: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points_enabled : false, answer_reward_points: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points : 0, quiz_enabled: form.value.mode === 'recorded' ? (form.value as any).quiz_enabled : false, answer_reward_name: form.value.mode === 'recorded' ? ((form.value as any).answer_reward_name || '') : '', reward_name: (form.value as any).reward_name || '', camp_ref_enabled: (form.value as any).camp_ref_enabled } as any);
     if (form.value.mode === 'recorded') {
       form.value.videos.forEach((v: any) => {
         const existing = store.lessons.find((l: any) => l.lesson_no === v.video_no);
@@ -700,14 +637,14 @@ function doSave() {
     }
     MessagePlugin.success('课程已更新');
   } else {
-    store.createCourse({ title: form.value.title, description: form.value.description, cover_url: form.value.cover_url, category_id: 'cat-' + Date.now(), category_name: form.value.category_name, tags: [], lecturer_id: '', lecturer_name: '', source: 'upload', mode: form.value.mode, source_live_session_id: null, visibility: form.value.visibility, price, is_paid: isPaid, commission_enabled: false, show_in_app: form.value.show_in_app, live_room_id: form.value.mode === 'live' ? liveRoomId : null, live_display_title: (form.value as any).live_display_title || '', display_style: form.value.mode === 'recorded' ? (form.value as any).display_style : undefined, quiz_reward_cash_enabled: form.value.mode === 'recorded' ? (form.value as any).quiz_reward_cash_enabled : false, quiz_reward: form.value.mode === 'recorded' ? (form.value as any).quiz_reward : null, answer_reward_points_enabled: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points_enabled : false, answer_reward_points: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points : 0, camp_ref_enabled: (form.value as any).camp_ref_enabled } as any);
+    store.createCourse({ title: form.value.title, description: form.value.description, cover_url: form.value.cover_url, category_id: 'cat-' + Date.now(), category_name: form.value.category_name, tags: [], lecturer_id: '', lecturer_name: '', source: 'upload', mode: form.value.mode, source_live_session_id: null, visibility: form.value.visibility, price, is_paid: isPaid, commission_enabled: false, show_in_app: form.value.show_in_app, live_room_id: form.value.mode === 'live' ? liveRoomId : null, live_display_title: (form.value as any).live_display_title || '', display_style: form.value.mode === 'recorded' ? (form.value as any).display_style : undefined, quiz_reward_cash_enabled: form.value.mode === 'recorded' ? (form.value as any).quiz_reward_cash_enabled : false, quiz_reward: form.value.mode === 'recorded' ? (form.value as any).quiz_reward : null, answer_reward_points_enabled: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points_enabled : false, answer_reward_points: form.value.mode === 'recorded' ? (form.value as any).answer_reward_points : 0, quiz_enabled: form.value.mode === 'recorded' ? (form.value as any).quiz_enabled : false, answer_reward_name: form.value.mode === 'recorded' ? ((form.value as any).answer_reward_name || '') : '', reward_name: (form.value as any).reward_name || '', camp_ref_enabled: (form.value as any).camp_ref_enabled } as any);
     MessagePlugin.success('课程已新增');
   }
   // D35 完课奖励同步营销域复刻观看奖励页（真实系统：课程表单保存→营销中心创建红包规则）；积分奖励走积分事件不建红包规则
   if (form.value.completion_reward_enabled && form.value.reward_cash_enabled) {
     import('../../../stores/saas-replica/marketing-replica-store').then(({ useMarketingReplicaStore }) => {
       const mk = useMarketingReplicaStore();
-      const name = `完课红包·${form.value.title}`;
+      const name = (form.value as any).reward_name?.trim() || `完课红包·${form.value.title}`;
       const existed = mk.rules.find(r => r.rule_name === name);
       if (existed) { existed.amount_yuan = form.value.reward_amount; return; }
       mk.rules.unshift({ id: 'WR-' + Date.now(), rule_no: 'HB' + Date.now().toString().slice(-9), rule_name: name, reward_type: '完课红包', bind_scene: '营期', scene_name: form.value.title, amount_yuan: form.value.reward_amount, total_count: 500, issued_count: 0, received_count: 0, status: 'enabled', created_at: Math.floor(Date.now() / 1000) });

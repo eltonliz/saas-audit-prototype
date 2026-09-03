@@ -144,6 +144,12 @@ export const CourseSchema = z.object({
   answer_reward_points: z.number().int().min(0).default(20),
   /** V2·0902 老板需求：录播课是否被营期引用（关=排课选课时不出现该课程课时） */
   camp_ref_enabled: z.boolean().default(true),
+  /** V2·0902 老板需求：是否答题（课程级全局，不再逐课时配置） */
+  quiz_enabled: z.boolean().default(false),
+  /** V2·0902 答题红包名称（空则默认「答题红包·课程名」） */
+  answer_reward_name: z.string().default(''),
+  /** V2·0902 完课红包名称（空则默认「完课红包·课程名」） */
+  reward_name: z.string().default(''),
   /** 课程可见性（public/camp_only） */
   visibility: CourseVisibilityEnum.default('public'),
 
@@ -450,6 +456,9 @@ export const CreateCourseInputSchema = CourseSchema.pick({
   answer_reward_points_enabled: true,
   answer_reward_points: true,
   camp_ref_enabled: true,
+  quiz_enabled: true,
+  answer_reward_name: true,
+  reward_name: true,
   visibility: true,
 }).extend({
   question_bank_id: z.string().optional(),
