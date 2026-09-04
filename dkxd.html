@@ -691,34 +691,21 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
 <!-- 屏7 · 支付成功 -->
 <div class="scr">
   <div class="phcol">
-  <div class="sec-title" style="margin-top:0">支付成功屏 · 支付成功（店员核对锚点 + 垫付提示）</div>
+  <div class="sec-title" style="margin-top:0">支付成功屏 · 支付成功（仅确认付款完成）</div>
   <div class="phone">
     <div class="p-body" style="padding-top:24px;text-align:center">
       <div style="width:64px;height:64px;margin:16px auto 14px;border-radius:50%;background:var(--g1);color:#fff;font-size:30px;display:flex;align-items:center;justify-content:center">✓</div>
       <div style="font-size:17px;font-weight:600">支付成功</div>
       <div class="small mut" style="margin-top:6px">实付 ¥218.50 · 微信支付</div>
-      <div class="card hl-add" style="text-align:left;margin-top:20px">
-        <div style="font-size:13px;color:var(--t2)">已为客户生成订单</div>
-        <div style="font-size:16px;font-weight:700;margin:4px 0 2px">橙橙（编号：260716000000005）</div>
-        <div class="small mut">订单号 ORD260902000030 · 认养一头牛 高钙牛奶 x1</div>
-      </div>
-      <div class="card hl-add" style="text-align:left;border:1px solid var(--warn-line);background:var(--warn-bg)">
-        <div style="font-size:13px;font-weight:600;color:var(--add)">本单由你垫付 ¥218.50，请向客户收款</div>
-        <div class="small" style="color:#8C6239;margin-top:4px">收款说明可一键复制 · 台账见「我垫付的订单」</div>
-        <button class="btn btn-ghost" style="width:100%;margin-top:10px;padding:8px 0;font-size:12.5px">复制收款说明</button>
-      </div>
-      <button class="btn btn-g1" style="width:100%;margin-top:6px">完成</button>
-      <div class="note" style="margin:12px 12px 0">订单进入「待发货/待自提」（<span class="prd">订单域状态流转规则</span>）；自提单生成提货码（YXKSA+6 位）。</div>
     </div>
   </div>
   </div>
-  <aside class="anno"><div class="ttl">屏7 · 支付成功<small>店员核对锚点 + 垫付提示</small></div>
+  <aside class="anno"><div class="ttl">屏7 · 支付成功<small>仅确认付款完成</small></div>
 <div class="ah">业务逻辑</div>
 <ol>
-<li>页面固定显示"已为哪位客户生成了订单"和订单号——这是多客户排队时，店员核对"这单到底是给谁下的"的最后防线。</li>
-<li>如果是店员垫付的，显示"本单由你垫付，请向客户收款"，可一键复制收款说明（金额/订单号/客户昵称），并记入垫付台账；之后退款时台账会同步更新并提醒店员。</li>
-<li>订单进入待发货或待自提；自提订单生成提货码（YXKSA+6位数字），由客户出示、店员扫码核销。</li>
-<li><b>付完款店员端就结束了</b>：这张单不会再出现在店员的任何订单列表里——查单去后台订单详情；客户在自己「我的订单」可见。</li>
+<li>这一页只做一件事：确认钱付完了（实付金额以系统记录为准）。</li>
+<li>「为哪个客户下的单」、垫付收款提示、提货码都不在此页展示——店员查单去后台订单详情；垫付收款跟进走「我垫付的订单」台账；客户在自己「我的订单」看订单和提货码（自提单到店出示给店员扫码）。</li>
+<li><b>付完款店员端就结束了</b>：这张单不会再出现在店员的任何订单列表里。</li>
 </ol>
 <div class="ah">数据流转</div>
 <div class="flow2">支付成功的事务内一次完成：更新支付单 → 推进订单状态 → 扣减库存 →（自提）生成提货码 → 作废这单所有支付凭证<br>垫付单写入垫付台账；0元单不走收银台，系统直接完成支付</div></aside></div><!-- 正向主链 end -->
