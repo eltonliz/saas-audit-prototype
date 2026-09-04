@@ -770,22 +770,22 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
         <div class="row" style="gap:10px"><div class="sku-img" style="width:48px;height:48px;font-size:18px;background:#FDF3E7">🥛</div>
           <div style="flex:1"><div style="font-size:13px;font-weight:500">认养一头牛 高钙牛奶 x1</div>
           <div class="small mut" style="margin-top:2px">买家：橙橙 · 提货码 <b style="color:var(--t1)">YXKSA483216</b></div></div></div>
-        <div class="btnrow"><span class="br-btn btn-gray">查看提货单</span><span class="br-btn btn-g1">扫码核销 / 部分提货</span></div>
+        <div class="btnrow"><span class="br-btn btn-gray">查看提货单</span><span class="br-btn btn-g1">扫码核销</span></div>
       </div>
-      <div class="notice">核销流程对齐 需求文档：扫<b>客户</b>提货码 → 反查整组提货单 → 勾选商品录应提/实提 → 支持部分提货 → 全部提货订单已完成；记录提货人/下单人/点货人（<span class="prd">订单域提货核销规则</span>）。<b>代客扩展</b>：客户报不出提货码时，店员经本列表核对身份后代客户端直接核销。</div>
+      <div class="notice">核销流程对齐 需求文档：扫<b>客户</b>提货码 → 反查整组提货单 → 核对商品清单 → 整单核销，订单已完成；记录提货人/下单人/点货人（<span class="prd">订单域提货核销规则</span>）。<b>代客扩展</b>：客户报不出提货码时，经后台订单详情查询提货码或由后台代核销。</div>
     </div>
   </div>
   </div>
   <aside class="anno"><div class="ttl">屏11 · 自提核销<small>现有能力 + 代客扩展</small></div>
 <div class="ah">业务逻辑</div>
 <ol>
-<li>标准流程：扫客户手机上的提货码 → 系统反查出整组提货单 → 逐个商品确认实提数量 → 支持部分提货 → 全部提完订单即完成。提货记录会记下三个角色：提货人、下单人、点货人（扫码的店员）。</li>
-<li>代客场景补充：客户可能根本说不出提货码（东西是店员代拍的），所以提货码同时显示在店员端；店员在列表里核对客户身份后可以直接核销。</li>
+<li>标准流程：扫客户出示的提货码 → 系统反查出整组提货单 → 核对商品清单 → 整单核销，订单即完成（<b>没有部分提货</b>）。提货记录会记下三个角色：提货人、下单人、点货人（扫码的店员）。</li>
+<li>代客场景补充：提货码在客户自己的「我的订单」里（后台订单详情也可查）；客户报不出提货码时，经后台查询或由后台代核销——已支付代客单不出现在店员端任何列表。</li>
 <li>授权按"订单所属门店"：本店任一店长/店员都能核销，不限当初下单的人，交接班不影响。</li>
 <li>防错设计：提货码查询有次数限制（防止有人试码套单）；两名店员同时核销同一单会被系统拦下。</li>
 </ol>
 <div class="ah">数据流转</div>
-<div class="flow2">提货码反查提货单（限次）→ 提交核销（商品明细+实提数量，防并发+防重复）<br>全部提货 → 订单完成 → 进入交易结算流程</div></aside></div><!-- 店员端 end -->
+<div class="flow2">提货码反查提货单（限次）→ 提交核销（整单，防并发+防重复）<br>核销完成 → 订单完成 → 进入交易结算流程</div></aside></div><!-- 店员端 end -->
 
 <!-- ======================= 逆向流 ======================= -->
 <div class="sec-title">第三段 · 逆向流（对齐订单域/售后域/营销域/分销域/财务域对账字段）</div>
@@ -806,7 +806,7 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
           <div style="flex:1"><div style="font-size:13px;font-weight:500">认养一头牛 高钙牛奶 x1 x1</div>
           <div class="small" style="margin-top:2px"><span class="orange-tag">店员代下单</span></div></div>
           <span class="price" style="font-size:14px">¥218.50</span></div>
-        <div class="btnrow"><span class="br-btn btn-gray">查看物流</span><span class="br-btn btn-ghost" style="border-color:#E8EAEC;color:#666">确认收货</span><span class="br-btn btn-g1">申请售后</span></div>
+        <div class="btnrow"><span class="br-btn btn-gray">查看物流</span><span class="br-btn btn-g1">申请售后</span></div>
       </div>
       <div class="order-li">
         <div class="ol-top"><span>百货商城 ›</span><span>已完成</span></div>
@@ -825,7 +825,7 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
 <ol>
 <li>代客下单的订单在客户自己的订单列表里也能看到，带"店员代下单"标识——钱货关系对客户透明，避免"我明明买了东西却查不到订单"的疑虑。</li>
 <li>待付款的代客单，客户可以自己付款（此时记为"买家本人付款"）。</li>
-<li>售后入口按状态出现：付过款就能申请"仅退款"；签收后才能申请"退货退款"；确认收货后的一段售后期内都可申请。</li>
+<li>售后入口按状态出现：付过款就能申请"仅退款"；签收后才能申请"退货退款"。买家视角<b>没有「确认收货」按钮</b>——代客单是店长/店员下的单，收货确认由他们在店员端操作。</li>
 <li>申请售后后订单被"挂起"：商家不能发货、不能签收，直到售后处理完。</li>
 </ol>
 <div class="ah">数据流转</div>
