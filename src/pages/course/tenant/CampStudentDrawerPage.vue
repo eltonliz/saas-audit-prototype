@@ -6,6 +6,7 @@
     </div>
     <div class="toolbar"><t-input v-model="search" placeholder="搜索学员" clearable style="width:180px" /></div>
     <t-table :data="filtered" row-key="student_id" :columns="studentColumns" bordered size="small">
+      <template #enroll_time="{ row }">{{ row.created_at ? new Date(row.created_at * 1000).toLocaleString() : '-' }}</template>
       <template #channel="{ row }">{{ channelLabel(row.channel) }}</template>
       <template #status="{ row }"><t-tag size="small">{{ enrollLabel(row.status) }}</t-tag></template>
       <template #completion="{ row }">{{ completionRate(row.student_id) }}</template>
@@ -50,12 +51,14 @@ const enrollLabel = (s: string) => ({ pending: '已报名', approved: '已报名
 function completionRate(sid: string) { const r = store.learningRecords.find((lr: any) => lr.student_id === sid && lr.camp_id === props.campId); return r ? (r.completion_rate * 100).toFixed(0) + '%' : '-'; }
 
 // 表格列定义（V2·0829：证书列已随发证功能去除）
+// V2·0902 用户裁决（0904）：报名需要报名记录（报名时间）和学习进度
 const studentColumns = [
   { colKey: 'student_name', title: '学员', width: 80 },
+  { colKey: 'enroll_time', title: '报名时间', width: 150 },
   { colKey: 'channel', title: '通道', width: 80 },
-  { colKey: 'status', title: '状态', width: 80 },
-  { colKey: 'completion', title: '完成率', width: 80 },
-  { colKey: 'op', title: '操作', width: 120, fixed: 'right' },
+  { colKey: 'status', title: '报名状态', width: 85 },
+  { colKey: 'completion', title: '学习进度', width: 85 },
+  { colKey: 'op', title: '操作', width: 110, fixed: 'right' },
 ];
 </script>
 

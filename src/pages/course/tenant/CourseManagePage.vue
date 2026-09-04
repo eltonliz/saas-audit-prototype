@@ -361,6 +361,19 @@
             <template #status="{ row }"><t-tag size="small" :theme="row.status === 'published' ? 'success' : 'primary'" variant="light">{{ statusLabel(row.status) }}</t-tag></template>
             <template #show_in_app="{ row }"><t-tag size="small" :theme="row.show_in_app ? 'success' : 'default'" variant="light">{{ row.show_in_app ? '展示' : '隐藏' }}</t-tag></template>
           </t-table>
+          <!-- V2·0902 用户裁决（0904）：独立录播课程的学员进度（按线上课程学员格式） -->
+          <div class="drawer-tip" style="margin:14px 0 8px">学员进度（独立学习的学员名单，数据源：课程开通记录）。</div>
+          <t-table :data="standaloneStudents" row-key="no" bordered size="small" max-height="260"
+            :columns="[
+              { colKey: 'no', title: '学员编号', width: 170 },
+              { colKey: 'name', title: '学员', width: 80 },
+              { colKey: 'phone', title: '手机号', width: 110 },
+              { colKey: 'time', title: '开通时间', width: 140 },
+              { colKey: 'status', title: '学习状态', width: 90 },
+              { colKey: 'progress', title: '进度', width: 70 },
+            ]">
+            <template #status="{ row }"><t-tag size="small" :theme="row.status === '已完成' ? 'success' : 'primary'" variant="light">{{ row.status }}</t-tag></template>
+          </t-table>
         </t-tab-panel>
         <t-tab-panel value="camps" label="营期课程">
           <div v-if="refCamps.length === 0" style="color:#98A2B3;font-size:13px;padding:12px 0">该课程暂未被营期引用排课（在「营期管理→排课表」选本课程课时后，这里会列出引用的营期）</div>
@@ -762,6 +775,12 @@ function delCourse(row: any) {
 const campRefVisible = ref(false);
 const campRefCourse = ref<any>(null);
 const campRefTab = ref('standalone');
+// 独立录播课程的学员进度（课程开通记录维度）
+const standaloneStudents = ref([
+  { no: '2606220068994001719', name: '王五', phone: '136****6969', time: '2026-08-12 10:32', status: '学习中', progress: '68%' },
+  { no: '2606220069034003061', name: '赵六', phone: '181****0002', time: '2026-08-15 14:20', status: '已完成', progress: '100%' },
+  { no: '2606240069021206680', name: '钱七', phone: '178****0003', time: '2026-08-19 09:15', status: '学习中', progress: '12%' },
+]);
 const standaloneRow = computed(() => campRefCourse.value ? [campRefCourse.value] : []);
 function openCampRef(row: any) { campRefCourse.value = row; campRefTab.value = 'standalone'; campRefVisible.value = true; }
 const refCamps = computed(() => {
