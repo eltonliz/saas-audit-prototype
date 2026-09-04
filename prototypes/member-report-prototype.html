@@ -527,11 +527,18 @@
         </table>
         <div class="legend"><b>主播类型</b>：门店主播=门店员工开播；总部主播=平台总部官方开播；供应商主播=供应商身份开播；个人主播=个人身份开播。<b>字段口径</b>：直播场数=该直播间关联场次数；累计观看(分)=该直播间会员观看时长求和÷60；动销商品=有成交的去重商品数；观看→成交=成交客户÷观看人数（小计/总计均为加权值）。</div>
       </div>
-
       </section>
+
       <!-- ============ Tab 2 门店报表 ============ -->
       <section class="pane" id="pane-store">
         <div class="subview active" id="store-list">
+          <div class="grid g5">
+            <div class="card tone-blue"><div class="card-label">门店总数</div><div class="card-value" data-def="项目下状态为营业中的门店数量。" data-calc="营业中门店数量" data-source="门店档案表">156<small>家</small></div></div>
+            <div class="card tone-violet"><div class="card-label">门店总会员</div><div class="card-value" data-def="全部门店名下的顾客总数，按顾客所属门店统计。" data-calc="状态正常的顾客数量" data-source="客户档案 · 所属门店">12,560</div></div>
+            <div class="card tone-green"><div class="card-label">门店贡献GMV</div><div class="card-value" data-def="全部门店会员已支付订单金额合计。" data-calc="已支付订单金额合计" data-source="订单表 × 客户所属门店">¥1.85M</div></div>
+            <div class="card tone-amber"><div class="card-label">门店复购率</div><div class="card-value" data-def="90 天内有 ≥2 次已支付订单的会员占同期有消费会员的比例。" data-calc="90 天内下单 ≥2 次的会员数 ÷ 有消费会员数" data-source="会员状态汇总 · 复购标记">38%</div></div>
+            <div class="card tone-cyan"><div class="card-label">活跃率</div><div class="card-value" data-def="活跃会员占会员总数的比例（每日凌晨预计算的前一日状态）。" data-calc="活跃会员数 ÷ 会员总数" data-source="会员状态汇总 · 活跃标记">85%</div></div>
+          </div>
           <div class="panel">
             <div class="panel-head"><div><div class="panel-title">门店会员对比</div><div class="panel-sub">点击门店名进入门店详情（示例数据）</div></div></div>
             <table>
@@ -540,21 +547,21 @@
                 <tr><td><button class="link" onclick="openStoreDetail('天河旗舰店')">天河旗舰店</button></td><td>486</td><td>36.5%</td><td>32</td><td>52</td><td>¥78,000</td><td>¥160</td><td>42%</td><td>89%</td><td><button class="link" onclick="openStoreDetail('天河旗舰店')">详情 →</button></td></tr>
                 <tr><td><button class="link" onclick="openStoreDetail('白云店')">白云店</button></td><td>380</td><td>32.1%</td><td>25</td><td>48</td><td>¥56,000</td><td>¥147</td><td>38%</td><td>85%</td><td><button class="link" onclick="openStoreDetail('白云店')">详情 →</button></td></tr>
                 <tr><td><button class="link" onclick="openStoreDetail('番禺店')">番禺店</button></td><td>320</td><td>28.8%</td><td>20</td><td>45</td><td>¥45,000</td><td>¥140</td><td>35%</td><td>82%</td><td><button class="link" onclick="openStoreDetail('番禺店')">详情 →</button></td></tr>
-                <tr class="tot"><td>汇总（3 家）</td><td>1,186</td><td>33.1%</td><td>77</td><td>145</td><td>¥179,000</td><td>¥151</td><td>38.8%</td><td>85.7%</td><td>—</td></tr>
+                <tr class="tot"><td>汇总（3 家）</td><td>1,186</td><td>33.1%</td><td>77</td><td>145</td><td>¥179,000</td><td>¥151</td><td>38.8%</td><td>85.8%</td><td>—</td></tr>
               </tbody>
             </table>
-            <div class="legend"><b>字段口径</b>：名下会员=store_id 归属该店的客户数；新增=首次绑定落在统计周期；沉睡=90 天无消费且无登录；人均贡献=门店GMV÷名下会员数；VIP占比=VIP会员数÷名下会员数。</div>
+            <div class="legend"><b>字段口径</b>：名下会员=store_id 归属该店的客户数；新增=first_bind_time 落在统计周期；沉睡=90 天无消费且无登录（is_dormant=1）；人均贡献=门店GMV÷名下会员数；VIP占比=VIP会员数÷名下会员数。</div>
           </div>
         </div>
 
         <div class="subview" id="store-detail">
           <div class="entity">
             <div class="avatar" id="sd-avatar">天</div>
-            <div><div class="t" id="sd-name">天河旗舰店</div><div class="d">归属快照 · 会员/订单数据 5 分钟前更新</div></div>
+            <div><div class="t" id="sd-name">天河旗舰店</div><div class="d">归属快照 2026-08-27 · 会员/订单数据 5 分钟前更新</div></div>
             <button class="btn ghost back" onclick="showSub('store','store-list')">← 返回门店列表</button>
           </div>
           <div class="grid g5">
-            <div class="card tone-blue"><div class="card-label">门店成员数</div><div class="card-value">31</div></div>
+            <div class="card tone-blue"><div class="card-label">门店成员数</div><div class="card-value" data-def="该门店在职员工数（店长＋店员）。" data-calc="该门店店长＋店员人数" data-source="员工档案表">31</div></div>
             <div class="card tone-violet"><div class="card-label">店长 / 店员</div><div class="card-value">3<small>/</small>28</div></div>
             <div class="card tone-green"><div class="card-label">门店会员总数</div><div class="card-value">1,480</div></div>
             <div class="card tone-amber"><div class="card-label">门店贡献GMV</div><div class="card-value">¥222,000</div></div>
@@ -571,18 +578,18 @@
                 <tr><td><span class="rank rn">4</span></td><td><b>刘总</b></td><td><span class="tag t-violet">店长</span></td><td>480</td><td>32</td><td>120</td><td>48</td><td>¥72,000</td><td>36%</td><td><button class="link" onclick="openMemberDetail('刘总','店长')">明细 →</button></td></tr>
               </tbody>
             </table>
-            <div class="legend"><b>字段口径</b>：名下会员=归属快照（查询时点，不追溯历史）；身份取员工档案（1=店员，2=店长）。</div>
+            <div class="legend"><b>字段口径</b>：名下会员=staff_id 归属快照（按查询时点，不追溯历史归属）；身份取 员工档案 · 身份（1=店员，2=店长）。</div>
           </div>
         </div>
 
         <div class="subview" id="member-detail">
           <div class="entity">
             <div class="avatar" id="md-avatar">张</div>
-            <div><div class="t" id="md-name">张三 · 店员</div><div class="d">归属快照 · 首次绑定 2026-03-15</div></div>
+            <div><div class="t" id="md-name">张三 · 店员</div><div class="d">归属快照 2026-08-27 · 首次绑定 2026-03-15</div></div>
             <button class="btn ghost back" onclick="openStoreDetail(document.getElementById('sd-name').textContent)">← 返回门店</button>
           </div>
           <div class="grid g5">
-            <div class="card tone-violet"><div class="card-label">名下会员</div><div class="card-value">186</div></div>
+            <div class="card tone-violet"><div class="card-label">名下会员</div><div class="card-value" data-def="归属在该成员名下且状态正常的客户数。" data-calc="归属该成员名下的正常客户数量" data-source="客户档案表">186</div></div>
             <div class="card tone-blue"><div class="card-label">新增会员</div><div class="card-value">12</div></div>
             <div class="card tone-amber"><div class="card-label">VIP占比</div><div class="card-value">36.5%</div></div>
             <div class="card tone-green"><div class="card-label">活跃会员</div><div class="card-value">152</div></div>
@@ -605,7 +612,7 @@
                   <tr><td>陈小姐</td><td class="num">137****5555</td><td><span class="tag t-gray">普通</span></td><td>50</td><td>¥0</td><td>¥0</td><td>05-10</td><td>05-12</td><td><span class="tag t-red">沉睡</span></td></tr>
                 </tbody>
               </table>
-              <div class="legend"><b>字段口径</b>：累计消费=历史已支付订单金额合计；沉睡=90 天无消费且无登录；积分/余额来自积分与钱包账户。</div>
+              <div class="legend"><b>字段口径</b>：累计消费=该会员历史已支付订单金额合计；沉睡=90 天无消费且无登录；积分/余额来自 积分账户 / 钱包账户。</div>
             </div>
             <div id="md-course" hidden>
               <table>
@@ -616,7 +623,7 @@
                   <tr><td>陈小姐</td><td>产品知识</td><td>8min</td><td>35%</td><td><span class="tag t-gray">否</span></td><td>40%</td><td>—</td><td><span class="tag t-gray">旧客</span></td></tr>
                 </tbody>
               </table>
-              <div class="legend"><b>字段口径</b>：学习进度=观看时长÷课程总时长；完播=达到课程完播阈值；红包=发放成功的答题红包。</div>
+              <div class="legend"><b>字段口径</b>：观看时长=watch_duration 累计（front_style=2 课程）；学习进度=观看时长÷课程总时长；完播=进度≥课程配置阈值（complete_percentage）；红包=已发放成功的答题红包金额。</div>
             </div>
             <div id="md-live" hidden>
               <table>
@@ -627,7 +634,7 @@
                   <tr><td>陈小姐</td><td>直播78</td><td>18.2</td><td><span class="tag t-gray">否</span></td><td><span class="tag t-green">是</span></td><td><span class="tag t-green">是</span></td><td>¥120</td><td><span class="tag t-gray">旧</span></td></tr>
                 </tbody>
               </table>
-              <div class="legend"><b>字段口径</b>：累计观看分钟=该会员在该场次观看时长累计÷60；下单=直播引导已支付订单；新客=首次参与直播。</div>
+              <div class="legend"><b>字段口径</b>：累计观看分钟=该会员在该场次 watch_duration 累计÷60；下单=live_id 非空已支付订单；新客=is_new_customer=1（首次参与直播）。</div>
             </div>
           </div>
         </div>
