@@ -545,11 +545,11 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
         <div class="card" style="margin:0"><div class="goods"><div class="gimg" style="background:#FDF3E7">🥛</div>
           <div class="ginfo"><div class="gn">认养一头牛 4.0g 蛋白高钙牛奶 全脂纯牛奶 400g 400g</div><div class="gs">已售 3.3万</div>
             <div class="row" style="margin-top:7px"><span class="price" style="font-size:15px">¥218.50 <span class="pj" style="color:var(--t2)">起</span></span><div class="gap"></div>
-            <button class="btn btn-g2 btn-sm" style="width:72px">下单</button></div></div></div></div>
+            <button class="btn btn-g2 btn-sm" style="width:72px">购买</button></div></div></div></div>
         <div class="card" style="margin:0"><div class="goods"><div class="gimg" style="background:#EAF4FD">🧴</div>
           <div class="ginfo"><div class="gn">沐浴露持久留香 72 小时香水祛痘嫩肤 绿豆饼; 12斤嫩肤 绿豆饼; 12 斤</div><div class="gs">已售 892</div>
             <div class="row" style="margin-top:7px"><span class="price" style="font-size:15px">¥218.50 <span class="pj" style="color:var(--t2)">券后价</span></span><div class="gap"></div>
-            <button class="btn btn-g2 btn-sm" style="width:72px">下单</button></div></div></div></div>
+            <button class="btn btn-g2 btn-sm" style="width:72px">购买</button></div></div></div></div>
       </div>
     </div>
     <div class="note-static" style="margin-bottom:12px">锁定上下文：提示条全程常驻；退出/30 分钟无操作自动解除；返回键回到客户管理页。</div>
@@ -560,7 +560,7 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
 <ol>
 <li>顶部提示条始终显示"正在为谁下单"，<b>固定在页面顶部、不随滚动消失</b>——这是防串单的主要防线。随时可点「退出」。</li>
 <li>商品列表做了准入过滤：<b>直播专享价、积分兑换、预售、已下架的商品不会出现</b>，避免代客下单绕过这些专属规则。</li>
-<li>点商品「下单」→ 弹出规格选择；选品过程不产生任何订单。</li>
+<li>点商品「购买」→ 弹出规格选择；选品过程不产生任何订单。</li>
 </ol>
 <div class="ah">数据流转</div>
 <div class="flow2">打开页面 → 按会话查询可代购的商品（服务端完成准入过滤）<br>店员持续操作时，会话有效期自动顺延<br>会话过期 → 所有请求被拒绝 → 自动回到客户管理页</div></aside>
@@ -604,7 +604,7 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
   <div class="phone">
     <div class="statusbar"><span>9:41</span><span>▮▮▮ ⌾ ▰ 77</span></div>
     <div class="nvbar"><span class="bk"><svg><use href="#i-back"/></svg></span><span class="t">确认订单</span></div>
-    <div class="proxy-bar hl-add" style="margin:0 12px 8px">ⓘ 正在为 <b>橙橙</b>（编号：260716000000005）客户下单<span class="sw">切换客户 · 退出</span></div>
+    <div class="proxy-bar hl-add" style="margin:0 12px 8px">ⓘ 正在为 <b>橙橙</b>（编号：260716000000005）客户下单<span class="sw">退出</span></div>
     <div class="p-body" style="padding-top:0">
       <div class="addr-card hl-add">
         <div class="addr-a1">广东省广州市天河区东英科技园9号楼5楼 ›</div>
@@ -635,12 +635,12 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
 <ol>
 <li><b>地址按客户来</b>：默认带出客户名下的默认地址，地址列表只有这个客户自己的地址；店员新增的地址也保存到客户名下。客户没有地址时进入无地址空态。</li>
 <li><b>优惠按客户来</b>：用的就是<b>客户账户里的券和积分</b>——客户有什么券、有多少积分，就按他的资格算，店员的券和积分完全不参与。优惠抵扣不能超过订单金额，超了按订单金额封顶。</li>
-<li><b>0元单</b>：优惠全额抵扣后实付为0时，不需要付款，系统直接完成支付，也不能选"他人支付"。</li>
+<li><b>0元单</b>：优惠全额抵扣后实付为0时，不需要付款，系统直接完成支付。</li>
 <li><b>防串单确认</b>：点「立即付款」先弹确认框，显示客户头像、编号后四位和金额；如果30分钟内刚给别的客户下过单，还会提示"上一单客户是谁"，防止记混。</li>
 <li>选「门店自提」时：自提点默认带出客户归属的门店，店员可以改，但不强制锁定。</li>
 </ol>
 <div class="ah">数据流转</div>
-<div class="flow2">打开页面 → 读取客户收货地址（需携带代客会话凭证）<br>优惠试算 → 服务端按客户资格实时计算，逐项返回优惠金额并单独记录（退款时按原样退回）<br>确认后提交订单 → 生成一张待付款订单+预占库存；同一店员短时间内重复点击只会生成一张</div></aside>
+<div class="flow2">打开页面 → 读取客户收货地址（需携带代客会话凭证）<br>优惠试算 → 服务端按客户资格实时计算，逐项返回优惠金额并单独记录（退款时按原样退回）<br>确认后提交订单 → 生成一张待付款订单+预占库存 → 直接收银台支付（与会员自助单同一路径）；同一店员短时间内重复点击只会生成一张</div></aside>
 </div>
 
 <!-- 确认订单无地址态 暂无地址 -->
@@ -650,7 +650,7 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
   <div class="phone">
     <div class="statusbar"><span>9:41</span><span>▮▮▮ ⌾ ▰ 77</span></div>
     <div class="nvbar"><span class="bk"><svg><use href="#i-back"/></svg></span><span class="t">确认订单</span></div>
-    <div class="proxy-bar hl-add" style="margin:0 12px 8px">ⓘ 正在为 <b>橙橙</b>（编号：260716000000005）客户下单<span class="sw">切换客户 · 退出</span></div>
+    <div class="proxy-bar hl-add" style="margin:0 12px 8px">ⓘ 正在为 <b>橙橙</b>（编号：260716000000005）客户下单<span class="sw">退出</span></div>
     <div class="p-body" style="padding-top:0">
       <div class="addr-card addr-empty hl-add">
         <div class="ae-t"><span style="color:var(--g1)">＋</span> 请填写收货地址</div>
@@ -686,82 +686,9 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
 <div class="flow2">保存地址 → 以客户为归属人写入地址簿（系统校验代客会话，防止店员往别的客户名下写地址）</div></aside>
 </div>
 
-<!-- 屏7 · 支付方式 -->
-<div class="scr">
-  <div class="phcol">
-  <div class="sec-title" style="margin-top:0">支付方式屏 · 支付方式（新增步骤 · 仅代客单显示）</div>
-  <div class="phone">
-    <div class="statusbar"><span>9:41</span><span>▮▮▮ ⌾ ▰ 77</span></div>
-    <div class="nvbar"><span class="bk"><svg><use href="#i-back"/></svg></span><span class="t">支付方式<span class="tag tag-add" style="vertical-align:3px">新增</span></span></div>
-    <div class="p-body" style="padding-top:16px">
-      <div style="text-align:center;margin:8px 0 18px">
-        <div style="font-size:16px;font-weight:600">订单创建完成，请选择支付方式</div>
-        <div class="small mut" style="margin-top:6px">正在为 橙橙（编号：260716000000005）下单 · 应付 ¥218.50</div>
-      </div>
-      <div class="pay-opt on"><div class="pay-ico pi-wx">微</div>
-        <div style="flex:1"><div style="font-size:14.5px;font-weight:600">本人支付</div><div class="small mut" style="margin-top:3px">使用当前登录微信支付</div></div><div class="radio on"></div></div>
-      <div class="pay-opt"><div class="pay-ico pi-other">友</div>
-        <div style="flex:1"><div style="font-size:14.5px;font-weight:600">他人支付</div><div class="small mut" style="margin-top:3px">发送支付卡片或出示二维码，由客户完成支付</div></div><div class="radio"></div></div>
-      <div class="note">仅 下单方式=店员代客 订单进入本页（待确认问题6 收窄落地）；会员自助下单保持「立即付款直达收银台」。支付方式枚举（微信/支付宝/银行卡）沿用现有 <span class="prd">交易域支付方式规则</span>。</div>
-    </div>
-    <div class="p-foot pay-bar"><span class="amt">应付金额: <b>¥218.50</b></span><div class="gap"></div>
-      <button class="btn btn-g2" style="width:150px">立即付款</button></div>
-  </div>
-  </div>
-  <aside class="anno"><div class="ttl">屏7 · 支付方式<small>新增步骤 · 只在代客单出现</small></div>
-<div class="ah">业务逻辑</div>
-<ol>
-<li><b>只有店员代客下单的订单才有这一页</b>；会员自己下单仍然直接进收银台，不多任何步骤。</li>
-<li>「本人支付」= 店员用自己的微信先付钱（垫付）。付完后页面提醒店员向客户收款，并记入"我垫付的订单"台账。</li>
-<li>「他人支付」= 生成支付卡片或二维码发给客户，由客户自己付。</li>
-</ol>
-<div class="ah">数据流转</div>
-<div class="flow2">本人支付 → 创建预支付单 → 拉起收银台 → 支付成功后订单进入待发货/待自提，同时记入垫付台账<br>他人支付 → 生成支付分享凭证（有效期与订单待付款时间一致）→ 进入他人支付页</div></aside>
-</div>
 
-<!-- 他人支付屏 他人支付 -->
-<div class="scr">
-  <div class="phcol">
-  <div class="sec-title" style="margin-top:0">他人支付屏 · 他人支付：卡片 + 现场二维码 → 客户代付页</div>
-  <div class="phone">
-    <div class="chat-wrap" style="background:#EDEDED;height:100%;padding:14px;overflow-y:auto">
-      <div style="font-size:11px;color:#9A9A9A;text-align:center;margin:4px 0 12px">形态一：微信卡片（发给客户）</div>
-      <div class="bubble-me" style="display:flex;justify-content:flex-end"><div class="chat-card" style="width:230px;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,.08)">
-        <div style="height:110px;background:#FDF3E7;display:flex;align-items:center;justify-content:center;font-size:36px">🥛</div>
-        <div style="font-size:13px;padding:8px 10px 2px;font-weight:500">认养一头牛 高钙牛奶</div>
-        <div style="font-size:12px;color:var(--t2);padding:0 10px 8px;font-weight:600">待支付<span class="tag tag-add">不展示金额</span></div>
-        <div style="border-top:1px solid var(--line);font-size:10.5px;color:var(--t2);text-align:center;padding:6px">「百货商城」订单待付款，帮我付一下</div>
-      </div></div>
-      <div style="font-size:11px;color:#9A9A9A;text-align:center;margin:14px 0 10px">形态二：现场二维码（店员出示）<span class="tag tag-add">新增</span></div>
-      <div class="row" style="gap:12px;background:#fff;border-radius:12px;padding:12px">
-        <div style="width:84px;height:84px;background:conic-gradient(#333 25%,#fff 0 50%,#333 0 75%,#fff 0);border-radius:8px;flex:none"></div>
-        <div style="font-size:12px;color:#555;line-height:1.7">客户微信扫码直达代付页<br><span class="mut">免加好友 · 支付凭证 时效=待付款 30 分钟窗口 · 可吊销重发</span></div>
-      </div>
-      <div style="background:#fff;border-radius:12px;padding:14px;margin-top:14px">
-        <div style="font-size:13px;font-weight:600;margin-bottom:10px">客户打开后（微信内 · 免登录）</div>
-        <div class="row" style="gap:10px"><div class="sku-img" style="width:56px;height:56px;font-size:20px;background:#FDF3E7">🥛</div>
-          <div><div style="font-size:13.5px;font-weight:500">认养一头牛 高钙牛奶</div><div class="small mut" style="margin-top:2px">全脂 400g · x1</div></div>
-          <div class="gap"></div><span class="price" style="font-size:16px">¥218.50</span></div>
-        <div class="kv" style="margin-top:10px"><span>应付款（以服务端实时校验为准）</span><span class="price"><b>¥218.50</b></span></div>
-        <button class="btn btn-g1" style="width:100%;margin-top:10px">去支付 → 收银台</button>
-      </div>
-    </div>
-  </div>
-  </div>
-  <aside class="anno"><div class="ttl">屏8 · 他人支付<small>微信卡片 + 现场二维码</small></div>
-<div class="ah">业务逻辑</div>
-<ol>
-<li>卡片上只有商品名、首图和"待支付"字样，<b>不显示金额</b>——金额在支付页以系统实时数据为准，防止改价后卡片金额对不上。</li>
-<li>两种形态：微信卡片（发给客户）和现场二维码（店员出示、客户扫码），用同一个支付凭证，客户不用加好友。</li>
-<li>客户打开支付页时系统实时校验：<b>订单还在待付款、金额没变才允许支付</b>；订单已取消/已支付/已改价，显示失效页。</li>
-<li>客户支付失败（如余额不足）会实时通知店员；连续失败两次，提示店员改用垫付或重新生成二维码。</li>
-<li>支付成功后，这单的所有支付凭证立即作废，从机制上杜绝重复支付。</li>
-</ol>
-<div class="ah">数据流转</div>
-<div class="flow2">客户打开支付页 → 校验支付凭证（匿名访问，有频次限制）→ 显示订单摘要与应付款<br>点「去支付」→ 此时才创建预支付单 → 收银台<br>支付成功 → 订单完成支付；若这单的其它支付方式已成功或订单已关闭，这笔钱自动原路退回并记为差错流水<br>支付失败 → 实时通知操作店员</div></aside>
-</div>
 
-<!-- 屏9 · 支付成功 -->
+<!-- 屏7 · 支付成功 -->
 <div class="scr">
   <div class="phcol">
   <div class="sec-title" style="margin-top:0">支付成功屏 · 支付成功（店员核对锚点 + 垫付提示）</div>
@@ -785,7 +712,7 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
     </div>
   </div>
   </div>
-  <aside class="anno"><div class="ttl">屏9 · 支付成功<small>店员核对锚点 + 垫付提示</small></div>
+  <aside class="anno"><div class="ttl">屏7 · 支付成功<small>店员核对锚点 + 垫付提示</small></div>
 <div class="ah">业务逻辑</div>
 <ol>
 <li>页面固定显示"已为哪位客户生成了订单"和订单号——这是多客户排队时，店员核对"这单到底是给谁下的"的最后防线。</li>
@@ -817,8 +744,8 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
           <span class="price" style="font-size:15px">¥218.50</span></div>
         <div class="btnrow">
           <span class="br-btn btn-red-ghost">取消订单</span>
-          <span class="br-btn btn-gray">催付</span>
-          <span class="br-btn btn-g1">代付 / 二维码</span>
+          <span class="br-btn btn-gray">确认收货</span>
+          <span class="br-btn btn-g1">去支付</span>
         </div>
       </div>
       <div class="notice">待付款超时 = <b>30 分钟自动关单</b>（<span class="prd">订单域超时关单规则</span>，硬编码 订单域待办006）；关单前 2 小时推送无意义——<b>关单前 10 分钟推送店员提醒</b>（新增建议）；已关闭代客单支持一键重下；列表<b>仅显示本人代下的订单</b>，店长与同店店员互不可见；<b>已支付的代客单不在店员端显示</b>——付完款店员端即结束，查单去后台订单详情。</div>
@@ -831,11 +758,11 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
 <li>列表只显示<b>当前登录人自己代下的</b>待付款订单：店长看不到店员代下的单，店员之间也互相看不到——谁下的单谁跟进到底。离职或账号停用时不移交：系统提醒客户自己付款，到期没付自动关单，需要兜底时由后台人工取消。</li>
 <li><b>付完款就结束</b>：已支付的代客单从店员端所有列表消失（这里只有未付款和已关闭的代客单），店长/店员要查单去后台订单详情；客户在自己「我的订单」能看到这张单。</li>
 <li>订单有30分钟支付倒计时，到期自动关闭并释放库存；关单前10分钟系统提醒店员去跟进。</li>
-<li>「取消」立即生效：同时作废发给客户的支付凭证、通知客户。</li>
+<li>「取消」立即生效：通知客户。</li>
 <li>「一键重下」：已关闭的订单按原来的商品数量重新走一遍下单流程，价格按当下重新计算，页面会说明与原单的差额原因。</li>
 </ol>
 <div class="ah">数据流转</div>
-<div class="flow2">打开列表 → 按「操作人=当前登录人」查询待付款订单（服务端过滤，别人代下的单查不到；含关单时间，手机本地倒计时）<br>取消订单 → 只有待付款状态才能取消（防止与支付同时发生）→ 释放库存 → 作废凭证 → 通知买家<br>关单由系统定时任务自动执行</div></aside>
+<div class="flow2">打开列表 → 按「操作人=当前登录人」查询待付款订单（服务端过滤，别人代下的单查不到；含关单时间，手机本地倒计时）<br>取消订单 → 只有待付款状态才能取消（防止与支付同时发生）→ 释放库存 → 通知买家<br>关单由系统定时任务自动执行</div></aside>
 </div>
 
 <!-- 自提核销屏 -->
@@ -960,7 +887,7 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
 <!-- 售后详情屏 -->
 <div class="scr">
   <div class="phcol">
-  <div class="sec-title" style="margin-top:0">售后详情屏 · 售后详情 · 退款去向（原路退回三分支）</div>
+  <div class="sec-title" style="margin-top:0">售后详情屏 · 售后详情 · 退款去向（原路退回两分支）</div>
   <div class="phone">
     <div class="statusbar"><span>9:41</span><span>▮▮▮ ⌾ ▰ 77</span></div>
     <div class="nvbar"><span class="bk"><svg><use href="#i-back"/></svg></span><span class="t">售后详情</span></div>
@@ -976,7 +903,7 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
       <div class="card hl-add">
         <div style="font-size:13.5px;font-weight:600;margin-bottom:8px">退款去向（原路退回，不可改收款方）</div>
         <div class="kv"><span>退款方式</span><span>原路退回至实际支付方</span></div>
-        <div class="kv"><span>本单付款方</span><span class="small">他人支付 · 微信（非买家付款）<span class="orange-tag">付款人与买家非同一人</span></span></div>
+        <div class="kv"><span>本单付款方</span><span class="small">店员垫付 · 微信<span class="orange-tag">付款人与买家非同一人</span></span></div>
         <div class="kv"><span>预计到账</span><span class="mut">1-3 个工作日（渠道原路）</span></div>
       </div>
       <div class="card">
@@ -992,7 +919,7 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
   <aside class="anno"><div class="ttl">逆向屏3 · 售后详情 · 退款去向<small>原路退回 · 谁付的退给谁</small></div>
 <div class="ah">业务逻辑</div>
 <ol>
-<li><b>退款一律原路退回，且不能改收款方</b>——谁付的钱退给谁，分三种情况：客户自己付的退给客户；店员垫付的退给店员（同时强提醒店员"钱已退回你账户，请与客户结清"）；陌生微信用户代付的退给那个微信。</li>
+<li><b>退款一律原路退回，且不能改收款方</b>——谁付的钱退给谁，分两种情况：客户自己付的退给客户；店员垫付的退给店员（同时强提醒店员"钱已退回你账户，请与客户结清"）。</li>
 <li>页面把"退给谁"写清楚，避免客服随口承诺"钱退给买家"造成差错。</li>
 <li>优惠券、红包按订单里记录的优惠明细退回；退回的券隔一天才能再用（防止"用券→退款→再用券"反复薅）；积分按退款比例退还。</li>
 <li>退款完成后通知财务侧冲减佣金：还没结算的暂停发放，已结算的从余额扣回。<b>佣金始终归客户归属的店员/门店，与谁操作下单无关</b>。</li>
@@ -1005,7 +932,7 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
 <div class="rowwrap">
 
 <div class="scr pcscr">
-  <div class="sec-title" style="width:100%;margin:0 0 12px;margin-top:0">后台 · 订单详情页（1:1 复刻 + 灰带新增「代下单信息」列）</div>
+  <div class="sec-title" style="width:100%;margin:0 0 12px;margin-top:0">后台 · 订单详情页（1:1 复刻 + 买家信息内「代」标记）</div>
   <div class="pcx">
     <div class="pcx-crumb">
       交易 › 订单管理
@@ -1047,16 +974,10 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
         <p>应付金额：￥218.50</p>
         <p>实付金额：￥218.50</p>
       </div>
-      <div class="gc">
-        <h5>买家信息</h5>
-        <p>买家：橙橙</p>
-      </div>
       <div class="gc hl-add" style="border-radius:8px;background:#fff;outline-offset:-2px;padding:2px 8px;margin:-4px 0">
-        <h5>代下单信息<span class="tag tag-add">新增列</span></h5>
-        <p>下单方式：<b>店员代客下单</b></p>
+        <h5>买家信息<span class="tag tag-add">代</span></h5>
+        <p>买家：橙橙</p>
         <p>代下单用户：门店3店员（CY26081900031）</p>
-        <p>代付人：橙橙（客户编号 260716000000005）</p>
-        <p style="color:#999;font-size:11px">非系统用户代付时此行不显示</p>
       </div>
       <div class="gc">
         <h5>营销信息</h5>
@@ -1081,16 +1002,15 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
       <div class="srow final"><i><b>订单应收总价：</b></i><span><b>￥218.50</b></span></div>
     </div>
   </div>
-  <aside class="anno anno-wide"><div class="ttl">后台屏 · 订单详情<small>1:1 骨架 · 唯一新增=灰带一列</small></div>
+  <aside class="anno anno-wide"><div class="ttl">后台屏 · 订单详情<small>1:1 骨架 · 买家信息内加「代」标记</small></div>
 <div class="ah">业务逻辑</div>
 <ol>
-<li>页面结构与现有后台完全一致，唯一的新增是灰色信息区里的「代下单信息」列：<b>这笔单是谁下的（下单方式）、哪个店员操作的、钱实际是谁付的</b>。</li>
-<li>「代付人」只显示付款人的公开信息；如果付款的就是买家本人，这一行不显示（付款信息里已经能看出）。陌生微信用户代付时不显示身份，但支付流水里留有加密的付款人标识，退款和对账都查得到。</li>
+<li>页面结构与现有后台完全一致，唯一的新增是买家信息区里的「代」标签和一行「代下单用户」——标明这单是哪个店员帮客户下的。</li>
 <li>操作按钮跟着订单状态走：待发货显示「发货」；已关闭的订单只剩查看和备注。</li>
 <li>店员信息是下单当时固化下来的——之后店员换门店、离职，历史订单的显示不受影响。</li>
 </ol>
 <div class="ah">数据流转</div>
-<div class="flow2">打开详情 → 后台读取订单（含下单方式、操作店员等代客字段快照）<br>列表页增量：可按下单方式、付款方式筛选；代客单带「代」角标；导出文件包含支付流水号和退款去向，供财务对账</div></aside>
+<div class="flow2">打开详情 → 后台读取订单（含下单方式、操作店员等代客字段快照）<br>列表页增量：可按下单方式筛选；代客单带「代」角标；导出文件包含支付流水号和退款去向，供财务对账</div></aside>
 </div>
 
 <div class="scr pcscr">
@@ -1192,15 +1112,9 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
         <p>物流状态：未发货</p>
       </div>
       <div class="ac hl-add" style="border-radius:0;background:#FFFDF7">
-        <h5>代下单信息<span class="tag tag-add">新增列</span></h5>
-        <p>下单方式：<b>店员代客下单</b></p>
-        <p>代下单用户：门店3店员（CY26081900031）</p>
-        <p>代付人：橙橙（客户编号 260716000000005）</p>
-        <p>退款原路：退回实际支付方</p>
-      </div>
-      <div class="ac">
-        <h5>客户信息</h5>
+        <h5>客户信息<span class="tag tag-add">代</span></h5>
         <p>申请人：橙橙</p>
+        <p>代下单用户：门店3店员（CY26081900031）</p>
         <p>收货人：橙橙</p>
         <p>联系电话：13800020002</p>
         <p>收货地址：广东省广州市天河区东英科技园9号楼5楼</p>
@@ -1220,14 +1134,14 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
         <span class="tm">2026-09-02 14:02:18</span></div>
       <div class="li"><div class="lt">商家已同意售后申请</div><span class="mut" style="font-size:11px">超时未处理 30 分钟系统自动同意（售后域超时自动处理规则）</span>
         <span class="tm">2026-09-02 14:32:18</span></div>
-      <div class="li" style="color:#999"><div class="lt" style="color:#999">待商家退款 → 原路退回实际支付方（他人支付·非买家付款）</div><span class="mut" style="font-size:11px">系统自动退款 &lt;1 分钟，人工 &lt;24 小时；退款完成→佣金按「谁的客户归谁」的归属规则冲减</span></div>
+      <div class="li" style="color:#999"><div class="lt" style="color:#999">待商家退款 → 原路退回实际支付方（店员垫付·退给店员）</div><span class="mut" style="font-size:11px">系统自动退款 &lt;1 分钟，人工 &lt;24 小时；退款完成→佣金按「谁的客户归谁」的归属规则冲减</span></div>
     </div>
   </div>
   <aside class="anno anno-wide"><div class="ttl">后台屏 · 售后详情<small>1:1 骨架 · 四步时间线+维权记录</small></div>
 <div class="ah">业务逻辑</div>
 <ol>
 <li>顶部是订单编号和维权编号；状态卡随阶段变化：<b>待商家处理时显示「拒绝申请/同意退款」</b>（30分钟不处理自动同意）；<b>同意后显示「原路退款」</b>。</li>
-<li>信息区在原有三列（售后申请信息/订单信息/客户信息）后，新增一列「代下单信息」，其中"退款原路"明确写清钱退给谁——避免客服随口承诺"退给买家"造成差错。</li>
+<li>信息区保持原有三列不新增；客户信息区多一行「代下单用户」+「代」标签，标明这单是店员帮客户下的。</li>
 <li>底部维权记录是完整日志：谁在什么时间做了什么，全程可追溯。</li>
 </ol>
 <div class="ah">数据流转</div>
