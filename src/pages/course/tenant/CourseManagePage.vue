@@ -58,7 +58,7 @@
         </template>
         <template #op="{ row }">
           <t-button variant="text" size="small" theme="primary" @click="openEditDrawer(row)">编辑</t-button>
-          <t-button variant="text" size="small" theme="primary" @click="openCampRef(row)">引用营期</t-button>
+          <t-button variant="text" size="small" theme="primary" @click="openCampRef(row)">关联营期</t-button>
           <t-button v-if="row.status === 'draft' || row.status === 'rejected'" variant="text" size="small" theme="primary" @click="submitForReview(row)">提交审核</t-button>
           <t-button v-if="row.status === 'pending_review'" variant="text" size="small" theme="success" @click="approveCourse(row)">审核通过</t-button>
           <t-button v-if="row.status === 'pending_review'" variant="text" size="small" theme="danger" @click="rejectCourse(row)">驳回</t-button>
@@ -346,7 +346,7 @@
     <!-- V2·0829 用户裁决：课时管理/题库管理抽屉入口已随操作列按钮删除（相关操作统一在编辑模块内完成） -->
 
     <!-- V2·0902 用户裁决（0904）：课程侧「引用营期」弹窗（原课程学员抽屉与营期进度口径冲突已移除） -->
-    <t-dialog v-model:visible="campRefVisible" :header="`引用营期 · ${campRefCourse?.title ?? ''}`" width="720px" :footer="false">
+    <t-dialog v-model:visible="campRefVisible" :header="`关联营期 · ${campRefCourse?.title ?? ''}`" width="720px" :footer="false">
       <div v-if="refCamps.length === 0" style="color:#98A2B3;font-size:13px;padding:12px 0">该课程暂未被营期引用排课（在「营期管理→排课表」选本课程课时后，这里会列出引用的营期）</div>
       <t-table v-else :data="refCamps" row-key="id" bordered size="small" max-height="380"
         :columns="[
