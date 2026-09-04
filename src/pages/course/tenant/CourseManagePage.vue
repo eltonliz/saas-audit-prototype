@@ -58,7 +58,7 @@
         </template>
         <template #op="{ row }">
           <t-button variant="text" size="small" theme="primary" @click="openEditDrawer(row)">编辑</t-button>
-          <t-button variant="text" size="small" theme="primary" @click="openCampRef(row)">关联营期</t-button>
+          <t-button variant="text" size="small" theme="primary" @click="openCampRef(row)">查看关联</t-button>
           <t-button v-if="row.status === 'draft' || row.status === 'rejected'" variant="text" size="small" theme="primary" @click="submitForReview(row)">提交审核</t-button>
           <t-button v-if="row.status === 'pending_review'" variant="text" size="small" theme="success" @click="approveCourse(row)">审核通过</t-button>
           <t-button v-if="row.status === 'pending_review'" variant="text" size="small" theme="danger" @click="rejectCourse(row)">驳回</t-button>
@@ -346,8 +346,24 @@
     <!-- V2·0829 用户裁决：课时管理/题库管理抽屉入口已随操作列按钮删除（相关操作统一在编辑模块内完成） -->
 
     <!-- V2·0902 用户裁决（0904）：课程侧「引用营期」弹窗（原课程学员抽屉与营期进度口径冲突已移除） -->
-    <t-dialog v-model:visible="campRefVisible" :header="`关联营期 · ${campRefCourse?.title ?? ''}`" width="720px" :footer="false">
-      <div v-if="refCamps.length === 0" style="color:#98A2B3;font-size:13px;padding:12px 0">该课程暂未被营期引用排课（在「营期管理→排课表」选本课程课时后，这里会列出引用的营期）</div>
+    <t-dialog v-model:visible="campRefVisible" :header="`查看关联 · ${campRefCourse?.title ?? ''}`" width="720px" :footer="false">
+      <t-tabs v-model="campRefTab">
+        <t-tab-panel value="standalone" label="独立录播课程">
+          <div class="drawer-tip" style="margin-bottom:10px">该课程以独立录播课形态存在（APP 独立展示）；被营期引用后，学员学习进度从「营期课程」维度查看。</div>
+          <t-table :data="standaloneRow" row-key="id" bordered size="small"
+            :columns="[
+              { colKey: 'course_no', title: '课程编号', width: 180 },
+              { colKey: 'title', title: '课程名称', minWidth: 140, ellipsis: true },
+              { colKey: 'category_name', title: '分类', width: 100 },
+              { colKey: 'status', title: '状态', width: 90 },
+              { colKey: 'show_in_app', title: 'C端展示', width: 90 },
+            ]">
+            <template #status="{ row }"><t-tag size="small" :theme="row.status === 'published' ? 'success' : 'primary'" variant="light">{{ statusLabel(row.status) }}</t-tag></template>
+            <template #show_in_app="{ row }"><t-tag size="small" :theme="row.show_in_app ? 'success' : 'default'" variant="light">{{ row.show_in_app ? '展示' : '隐藏' }}</t-tag></template>
+          </t-table>
+        </t-tab-panel>
+        <t-tab-panel value="camps" label="营期课程">
+          <div v-if="refCamps.length === 0" style="color:#98A2B3;font-size:13px;padding:12px 0">该课程暂未被营期引用排课（在「营期管理→排课表」选本课程课时后，这里会列出引用的营期）</div>
       <t-table v-else :data="refCamps" row-key="id" bordered size="small" max-height="380"
         :columns="[
           { colKey: 'camp_no', title: '营期编号', width: 170 },
@@ -360,6 +376,8 @@
         <template #status="{ row }"><t-tag size="small" :theme="row.status === 'in_progress' ? 'warning' : (row.status === 'ended' ? 'default' : 'success')" variant="light">{{ campStatusLabel(row.status) }}</t-tag></template>
         <template #op="{ row }"><t-button variant="text" size="small" theme="primary" @click="openCampRefStudents(row)">查看学员</t-button></template>
       </t-table>
+        </t-tab-panel>
+      </t-tabs>
     </t-dialog>
 
     <!-- 营期学员抽屉（从引用营期维度查看学习进度） -->
@@ -743,7 +761,9 @@ function delCourse(row: any) {
 // ─── V2·0902 用户裁决（0904）：课程维度「学员」与营期学习进度口径冲突——课程侧改为「引用营期」，学员从营期维度查看 ───
 const campRefVisible = ref(false);
 const campRefCourse = ref<any>(null);
-function openCampRef(row: any) { campRefCourse.value = row; campRefVisible.value = true; }
+const campRefTab = ref('standalone');
+const standaloneRow = computed(() => campRefCourse.value ? [campRefCourse.value] : []);
+function openCampRef(row: any) { campRefCourse.value = row; campRefTab.value = 'standalone'; campRefVisible.value = true; }
 const refCamps = computed(() => {
   if (!campRefCourse.value) return [];
   const ids = [...new Set(campStore.schedules.filter((s: any) => s.course_id === campRefCourse.value.id).map((s: any) => s.camp_id))];
