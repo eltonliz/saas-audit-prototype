@@ -345,25 +345,11 @@
 
     <!-- V2·0829 用户裁决：课时管理/题库管理抽屉入口已随操作列按钮删除（相关操作统一在编辑模块内完成） -->
 
-    <!-- V2·0902 用户裁决（0904）：课程侧「引用营期」弹窗（原课程学员抽屉与营期进度口径冲突已移除） -->
-    <t-dialog v-model:visible="campRefVisible" :header="`查看关联 · ${campRefCourse?.title ?? ''}`" width="720px" :footer="false">
+    <!-- V2·0902 用户裁决（0904 终版）：「查看关联」——独立录播课程/营期课程均为学员进度表，营期课程加报名相关列 -->
+    <t-dialog v-model:visible="campRefVisible" :header="`查看关联 · ${campRefCourse?.title ?? ''}`" width="760px" :footer="false">
       <t-tabs v-model="campRefTab">
         <t-tab-panel value="standalone" label="独立录播课程">
-          <div class="drawer-tip" style="margin-bottom:10px">该课程以独立录播课形态存在（APP 独立展示）；被营期引用后，学员学习进度从「营期课程」维度查看。</div>
-          <t-table :data="standaloneRow" row-key="id" bordered size="small"
-            :columns="[
-              { colKey: 'course_no', title: '课程编号', width: 180 },
-              { colKey: 'title', title: '课程名称', minWidth: 140, ellipsis: true },
-              { colKey: 'category_name', title: '分类', width: 100 },
-              { colKey: 'status', title: '状态', width: 90 },
-              { colKey: 'show_in_app', title: 'C端展示', width: 90 },
-            ]">
-            <template #status="{ row }"><t-tag size="small" :theme="row.status === 'published' ? 'success' : 'primary'" variant="light">{{ statusLabel(row.status) }}</t-tag></template>
-            <template #show_in_app="{ row }"><t-tag size="small" :theme="row.show_in_app ? 'success' : 'default'" variant="light">{{ row.show_in_app ? '展示' : '隐藏' }}</t-tag></template>
-          </t-table>
-          <!-- V2·0902 用户裁决（0904）：独立录播课程的学员进度（按线上课程学员格式） -->
-          <div class="drawer-tip" style="margin:14px 0 8px">学员进度（独立学习的学员名单，数据源：课程开通记录）。</div>
-          <t-table :data="standaloneStudents" row-key="no" bordered size="small" max-height="260"
+          <t-table :data="standaloneStudents" row-key="no" bordered size="small" max-height="380"
             :columns="[
               { colKey: 'no', title: '学员编号', width: 170 },
               { colKey: 'name', title: '学员', width: 80 },
@@ -376,25 +362,24 @@
           </t-table>
         </t-tab-panel>
         <t-tab-panel value="camps" label="营期课程">
-          <div v-if="refCamps.length === 0" style="color:#98A2B3;font-size:13px;padding:12px 0">该课程暂未被营期引用排课（在「营期管理→排课表」选本课程课时后，这里会列出引用的营期）</div>
-      <t-table v-else :data="refCamps" row-key="id" bordered size="small" max-height="380"
-        :columns="[
-          { colKey: 'camp_no', title: '营期编号', width: 170 },
-          { colKey: 'title', title: '营期名称', minWidth: 150, ellipsis: true },
-          { colKey: 'status', title: '状态', width: 90 },
-          { colKey: 'schedule_count', title: '排课数', width: 80 },
-          { colKey: 'enrolled_count', title: '已报名', width: 80 },
-          { colKey: 'op', title: '操作', width: 100 },
-        ]">
-        <template #status="{ row }"><t-tag size="small" :theme="row.status === 'in_progress' ? 'warning' : (row.status === 'ended' ? 'default' : 'success')" variant="light">{{ campStatusLabel(row.status) }}</t-tag></template>
-        <template #op="{ row }"><t-button variant="text" size="small" theme="primary" @click="openCampRefStudents(row)">查看学员</t-button></template>
-      </t-table>
+          <div v-if="campStudents.length === 0" style="color:#98A2B3;font-size:13px;padding:12px 0">暂无学员（该课程未被营期引用排课，或引用营期尚无报名；先到「营期管理→排课表」排课）</div>
+          <t-table v-else :data="campStudents" row-key="key" bordered size="small" max-height="380"
+            :columns="[
+              { colKey: 'no', title: '学员编号', width: 170 },
+              { colKey: 'name', title: '学员', width: 80 },
+              { colKey: 'phone', title: '手机号', width: 110 },
+              { colKey: 'camp', title: '营期', minWidth: 120, ellipsis: true },
+              { colKey: 'enroll_time', title: '报名时间', width: 140 },
+              { colKey: 'enroll_status', title: '报名状态', width: 90 },
+              { colKey: 'status', title: '学习状态', width: 90 },
+              { colKey: 'progress', title: '进度', width: 70 },
+            ]">
+            <template #enroll_status="{ row }"><t-tag size="small" :theme="row.enroll_status === '已报名' ? 'success' : 'danger'" variant="light">{{ row.enroll_status }}</t-tag></template>
+            <template #status="{ row }"><t-tag size="small" :theme="row.status === '已完成' ? 'success' : 'primary'" variant="light">{{ row.status }}</t-tag></template>
+          </t-table>
         </t-tab-panel>
       </t-tabs>
     </t-dialog>
-
-    <!-- 营期学员抽屉（从引用营期维度查看学习进度） -->
-    <CampStudentDrawerPage v-model="refStudentVisible" :camp-id="refStudentCampId" />
   </div>
 </template>
 
@@ -406,7 +391,6 @@ import { useCampStore } from '../../../stores/camp-store';
 import { useLiveStore } from '../../../stores/live-store';
 import LiveRoomConfigForm from './LiveRoomConfigForm.vue';
 import QuizPickerDialog from './QuizPickerDialog.vue';
-import CampStudentDrawerPage from './CampStudentDrawerPage.vue';
 import ReplicaMarker from '../../../components/replica/ReplicaMarker.vue';
 import { notifyModalOpen } from '../../../utils/modal-spec-bridge';
 import { COURSE_CATEGORIES } from '../../../contracts/constants/course-constants';
@@ -776,12 +760,30 @@ const campRefVisible = ref(false);
 const campRefCourse = ref<any>(null);
 const campRefTab = ref('standalone');
 // 独立录播课程的学员进度（课程开通记录维度）
+// 独立录播课程的学员进度（课程开通记录维度）
 const standaloneStudents = ref([
   { no: '2606220068994001719', name: '王五', phone: '136****6969', time: '2026-08-12 10:32', status: '学习中', progress: '68%' },
   { no: '2606220069034003061', name: '赵六', phone: '181****0002', time: '2026-08-15 14:20', status: '已完成', progress: '100%' },
   { no: '2606240069021206680', name: '钱七', phone: '178****0003', time: '2026-08-19 09:15', status: '学习中', progress: '12%' },
 ]);
-const standaloneRow = computed(() => campRefCourse.value ? [campRefCourse.value] : []);
+// 营期课程学员：引用营期的报名记录（报名时间/报名状态）+ 学习进度（learningRecords）
+const campStudents = computed(() => {
+  const campIds = refCamps.value.map((c: any) => c.id);
+  return campStore.enrollments
+    .filter((e: any) => campIds.includes(e.camp_id))
+    .map((e: any, i: number) => {
+      const camp = campStore.camps.find((c: any) => c.id === e.camp_id);
+      const lr = campStore.learningRecords.find((r: any) => r.student_id === e.student_id && r.camp_id === e.camp_id);
+      const rate = lr ? Math.round(lr.completion_rate * 100) + '%' : '-';
+      return {
+        key: (e as any).id || i, no: (e as any).student_no || e.student_id, name: e.student_name, phone: '—',
+        camp: camp?.title || e.camp_id,
+        enroll_time: e.created_at ? new Date(e.created_at * 1000).toLocaleString() : '-',
+        enroll_status: (e as any).status === 'rejected' ? '已驳回' : '已报名',
+        status: lr && lr.completion_rate >= 0.9 ? '已完成' : '学习中', progress: rate,
+      };
+    });
+});
 function openCampRef(row: any) { campRefCourse.value = row; campRefTab.value = 'standalone'; campRefVisible.value = true; }
 const refCamps = computed(() => {
   if (!campRefCourse.value) return [];
@@ -789,11 +791,6 @@ const refCamps = computed(() => {
   return campStore.camps.filter((c: any) => ids.includes(c.id));
 });
 const campStatusLabel = (s: string) => ({ draft: '草稿', pending_review: '待审核', published: '已发布', enrolling: '报名中', in_progress: '进行中', ended: '已结束', offline: '已下架', rejected: '已驳回' }[s] ?? s);
-// 从引用营期维度打开营期学员（学习进度以营期为口径）
-const refStudentVisible = ref(false);
-const refStudentCampId = ref('');
-const refStudentCampTitle = ref('');
-function openCampRefStudents(camp: any) { refStudentCampId.value = camp.id; refStudentCampTitle.value = camp.title; refStudentVisible.value = true; }
 
 // ─── 课时/题库抽屉（PC-003/PC-004 入口） ───
 import LessonDrawerPage from './LessonDrawerPage.vue';
