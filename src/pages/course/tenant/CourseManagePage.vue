@@ -58,7 +58,7 @@
         </template>
         <template #op="{ row }">
           <t-button variant="text" size="small" theme="primary" @click="openEditDrawer(row)">编辑</t-button>
-          <t-button variant="text" size="small" theme="primary" @click="openStudentDrawer(row)">学员</t-button>
+          <t-button variant="text" size="small" theme="primary" @click="openCampRef(row)">引用营期</t-button>
           <t-button v-if="row.status === 'draft' || row.status === 'rejected'" variant="text" size="small" theme="primary" @click="submitForReview(row)">提交审核</t-button>
           <t-button v-if="row.status === 'pending_review'" variant="text" size="small" theme="success" @click="approveCourse(row)">审核通过</t-button>
           <t-button v-if="row.status === 'pending_review'" variant="text" size="small" theme="danger" @click="rejectCourse(row)">驳回</t-button>
@@ -345,21 +345,25 @@
 
     <!-- V2·0829 用户裁决：课时管理/题库管理抽屉入口已随操作列按钮删除（相关操作统一在编辑模块内完成） -->
 
-    <!-- 课程学员查看抽屉（PC-002.5） -->
-    <t-drawer v-model:visible="studentDrawerVisible" :header="`课程学员 · ${studentDrawerCourse?.title ?? ''}`" size="720px" placement="right">
-      <div class="drawer-tip">已购/已开通该课程的学员名单（数据源：课程订单；免费课程=自动开通记录）。<ReplicaMarker :no="8" title="点击查看：课程学员查看为业务新增功能" /></div>
-      <t-table :data="courseStudents" row-key="no" :columns="[
-        { colKey: 'no', title: '学员编号', width: 150 },
-        { colKey: 'name', title: '学员', width: 80 },
-        { colKey: 'phone', title: '手机号', width: 110 },
-        { colKey: 'time', title: '开通时间', width: 130 },
-        { colKey: 'status', title: '学习状态', width: 85 },
-        { colKey: 'progress', title: '进度', width: 65 },
-      ]" bordered size="small">
-        <!-- V2·0829 用户裁决：支付方式/实付列删除（全免费） -->
-        <template #status="{ row }"><t-tag size="small" :theme="row.status === '已完成' ? 'success' : 'primary'" variant="light">{{ row.status }}</t-tag></template>
+    <!-- V2·0902 用户裁决（0904）：课程侧「引用营期」弹窗（原课程学员抽屉与营期进度口径冲突已移除） -->
+    <t-dialog v-model:visible="campRefVisible" :header="`引用营期 · ${campRefCourse?.title ?? ''}`" width="720px" :footer="false">
+      <div v-if="refCamps.length === 0" style="color:#98A2B3;font-size:13px;padding:12px 0">该课程暂未被营期引用排课（在「营期管理→排课表」选本课程课时后，这里会列出引用的营期）</div>
+      <t-table v-else :data="refCamps" row-key="id" bordered size="small" max-height="380"
+        :columns="[
+          { colKey: 'camp_no', title: '营期编号', width: 170 },
+          { colKey: 'title', title: '营期名称', minWidth: 150, ellipsis: true },
+          { colKey: 'status', title: '状态', width: 90 },
+          { colKey: 'schedule_count', title: '排课数', width: 80 },
+          { colKey: 'enrolled_count', title: '已报名', width: 80 },
+          { colKey: 'op', title: '操作', width: 100 },
+        ]">
+        <template #status="{ row }"><t-tag size="small" :theme="row.status === 'in_progress' ? 'warning' : (row.status === 'ended' ? 'default' : 'success')" variant="light">{{ campStatusLabel(row.status) }}</t-tag></template>
+        <template #op="{ row }"><t-button variant="text" size="small" theme="primary" @click="openCampRefStudents(row)">查看学员</t-button></template>
       </t-table>
-    </t-drawer>
+    </t-dialog>
+
+    <!-- 营期学员抽屉（从引用营期维度查看学习进度） -->
+    <CampStudentDrawerPage v-model="refStudentVisible" :camp-id="refStudentCampId" />
   </div>
 </template>
 
@@ -371,6 +375,7 @@ import { useCampStore } from '../../../stores/camp-store';
 import { useLiveStore } from '../../../stores/live-store';
 import LiveRoomConfigForm from './LiveRoomConfigForm.vue';
 import QuizPickerDialog from './QuizPickerDialog.vue';
+import CampStudentDrawerPage from './CampStudentDrawerPage.vue';
 import ReplicaMarker from '../../../components/replica/ReplicaMarker.vue';
 import { notifyModalOpen } from '../../../utils/modal-spec-bridge';
 import { COURSE_CATEGORIES } from '../../../contracts/constants/course-constants';
@@ -735,15 +740,21 @@ function delCourse(row: any) {
   });
 }
 
-// ─── 课程学员查看抽屉（PC-002.5：已购/已开通学员名单） ───
-const studentDrawerVisible = ref(false);
-const studentDrawerCourse = ref<any>(null);
-const courseStudents = ref([
-  { no: '2606220068994001719', name: '王五', phone: '136****6969', pay: '微信支付', amount: 199, time: '2026-08-12 10:32', status: '学习中', progress: '68%' },
-  { no: '2606220069034003061', name: '赵六', phone: '181****0002', pay: '支付宝', amount: 199, time: '2026-08-15 14:20', status: '已完成', progress: '100%' },
-  { no: '2606240069021206680', name: '钱七', phone: '178****0003', pay: '微信支付', amount: 0, time: '2026-08-19 09:15', status: '学习中', progress: '12%' },
-]);
-function openStudentDrawer(row: any) { studentDrawerCourse.value = row; studentDrawerVisible.value = true; notifyModalOpen('course-students'); }
+// ─── V2·0902 用户裁决（0904）：课程维度「学员」与营期学习进度口径冲突——课程侧改为「引用营期」，学员从营期维度查看 ───
+const campRefVisible = ref(false);
+const campRefCourse = ref<any>(null);
+function openCampRef(row: any) { campRefCourse.value = row; campRefVisible.value = true; }
+const refCamps = computed(() => {
+  if (!campRefCourse.value) return [];
+  const ids = [...new Set(campStore.schedules.filter((s: any) => s.course_id === campRefCourse.value.id).map((s: any) => s.camp_id))];
+  return campStore.camps.filter((c: any) => ids.includes(c.id));
+});
+const campStatusLabel = (s: string) => ({ draft: '草稿', pending_review: '待审核', published: '已发布', enrolling: '报名中', in_progress: '进行中', ended: '已结束', offline: '已下架', rejected: '已驳回' }[s] ?? s);
+// 从引用营期维度打开营期学员（学习进度以营期为口径）
+const refStudentVisible = ref(false);
+const refStudentCampId = ref('');
+const refStudentCampTitle = ref('');
+function openCampRefStudents(camp: any) { refStudentCampId.value = camp.id; refStudentCampTitle.value = camp.title; refStudentVisible.value = true; }
 
 // ─── 课时/题库抽屉（PC-003/PC-004 入口） ───
 import LessonDrawerPage from './LessonDrawerPage.vue';
