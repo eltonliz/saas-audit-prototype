@@ -484,6 +484,58 @@
           <div class="legend"><b>口径</b>：触达=收到直播推广/预约提醒/导购私发的会员数；观看≥1min=累计有效观看满 1 分钟；互动=点赞/评论/分享任一行为；点击商品=点击直播间购物袋；支付成交=订单完成支付。</div>
         </div>
 
+        <div class="sec">四维交叉矩阵<span class="chip c-blue">直播间落点</span></div>
+      <div class="panel">
+        <div class="panel-head">
+          <div><div class="panel-title">直播间 × 直播 × 客户 × 商品</div>
+          <div class="panel-sub">每行 = 一个直播间在四个维度上的表现；主播类型分门店 / 总部 / 供应商 / 个人四类（示例数据）</div></div>
+          <div style="display:flex;gap:6px;">
+            <button class="pill amber clickable" style="height:28px;font-size:11px;" onclick="toast('主播类型筛选：全部（演示）')">全部</button>
+            <button class="pill" style="height:28px;font-size:11px;cursor:pointer;" onclick="toast('筛选：门店主播（演示）')">门店</button>
+            <button class="pill" style="height:28px;font-size:11px;cursor:pointer;" onclick="toast('筛选：总部主播（演示）')">总部</button>
+            <button class="pill" style="height:28px;font-size:11px;cursor:pointer;" onclick="toast('筛选：供应商主播（演示）')">供应商</button>
+            <button class="pill" style="height:28px;font-size:11px;cursor:pointer;" onclick="toast('筛选：个人主播（演示）')">个人</button>
+          </div>
+        </div>
+        <table>
+          <thead><tr>
+            <th>直播间</th>
+            <th>主播类型</th>
+            <th>直播场数</th>
+            <th>观看人数</th>
+            <th>累计观看(分)</th>
+            <th>成交订单</th>
+            <th>直播GMV</th>
+            <th>动销商品</th>
+            <th>成交客户</th>
+            <th>观看→成交</th>
+            <th>操作</th>
+          </tr></thead>
+          <tbody>
+            <tr><td><button class="link" onclick="openStoreDetail('天河旗舰店')">天河旗舰日常场</button></td><td><span class="tag t-blue">门店主播</span></td><td class="num">1</td><td>198</td><td>2,860</td><td>52</td><td>¥15,600</td><td>24</td><td>48</td><td>24.2%</td><td><button class="link" onclick="switchTab('live')">直播明细 →</button></td></tr>
+            <tr><td><button class="link" onclick="openStoreDetail('白云店')">白云店福利场</button></td><td><span class="tag t-blue">门店主播</span></td><td class="num">1</td><td>120</td><td>1,540</td><td>28</td><td>¥8,400</td><td>18</td><td>26</td><td>21.7%</td><td><button class="link" onclick="switchTab('live')">直播明细 →</button></td></tr>
+            <tr><td><button class="link" onclick="openStoreDetail('番禺店')">番禺店好物场</button></td><td><span class="tag t-blue">门店主播</span></td><td class="num">1</td><td>120</td><td>1,540</td><td>28</td><td>¥8,400</td><td>18</td><td>26</td><td>21.7%</td><td><button class="link" onclick="switchTab('live')">直播明细 →</button></td></tr>
+            <tr><td><button class="link" onclick="openStoreDetail('总部溯源主推专场')">总部溯源主推专场</button></td><td><span class="tag t-violet">总部主播</span></td><td class="num">1</td><td>286</td><td>4,120</td><td>86</td><td>¥25,800</td><td>32</td><td>72</td><td>25.2%</td><td><button class="link" onclick="switchTab('live')">直播明细 →</button></td></tr>
+            <tr><td><button class="link" onclick="openStoreDetail('青海藏羊溯源专场')">青海藏羊溯源专场</button></td><td><span class="tag t-amber">供应商主播</span></td><td class="num">1</td><td>320</td><td>2,400</td><td>42</td><td>¥12,600</td><td>18</td><td>36</td><td>22.2%</td><td><button class="link" onclick="switchTab('live')">直播明细 →</button></td></tr>
+            <tr><td><button class="link" onclick="openStoreDetail('我本Putin家的黄金法则')">我本Putin家的黄金法则</button></td><td><span class="tag t-pink">个人主播</span></td><td class="num">1</td><td>260</td><td>1,860</td><td>28</td><td>¥8,400</td><td>14</td><td>30</td><td>25.0%</td><td><button class="link" onclick="switchTab('live')">直播明细 →</button></td></tr>
+            <tr class="tot"><td>小计 · 门店主播</td><td class="num">3</td><td class="num">438</td><td class="num">5,940</td><td class="num">108</td><td>¥32,400</td><td class="num">60</td><td class="num">100</td><td class="num">23.3%</td><td>—</td></tr>
+            <tr class="tot"><td>小计 · 总部主播</td><td class="num">1</td><td class="num">286</td><td class="num">4,120</td><td class="num">86</td><td>¥25,800</td><td class="num">32</td><td class="num">72</td><td class="num">25.2%</td><td>—</td></tr>
+            <tr class="tot"><td>小计 · 供应商主播</td><td class="num">1</td><td class="num">320</td><td class="num">2,400</td><td class="num">42</td><td>¥12,600</td><td class="num">18</td><td class="num">36</td><td class="num">22.2%</td><td>—</td></tr>
+            <tr class="tot"><td>小计 · 个人主播</td><td class="num">1</td><td class="num">260</td><td class="num">1,860</td><td class="num">28</td><td>¥8,400</td><td class="num">14</td><td class="num">30</td><td class="num">25.0%</td><td>—</td></tr>
+            <tr class="tot"><td>总计（6 个直播间）</td><td class="num">7</td><td class="num">1,504</td><td class="num">15,920</td><td class="num">264</td><td>¥90,600</td><td class="num">138</td><td class="num">284</td><td class="num">24.4%</td><td>—</td></tr>
+          </tbody>
+        </table>
+        <div class="legend"><b>主播类型</b>：门店主播=门店员工开播；总部主播=平台总部官方开播；供应商主播=供应商身份开播；个人主播=个人身份开播。<b>字段口径</b>：直播场数=该直播间关联场次数；累计观看(分)=该直播间会员观看时长求和÷60；动销商品=有成交的去重商品数；观看→成交=成交客户÷观看人数（小计/总计均为加权值）。</div>
+      </div>
+
+        <div class="sec">客户路径漏斗<span class="chip c-blue">转化</span></div>
+        <div class="panel">
+          <div class="panel-head"><div><div class="panel-title">直播触达 → 支付成交（示例数据）</div>
+          <div class="panel-sub">按「客户 × 直播场次」归集行为链，逐级标注留存率与流失量</div></div></div>
+          <div class="chart-wrap" id="tenantFunnel"></div>
+          <div class="legend"><b>口径</b>：触达=收到直播推广/预约提醒/导购私发的会员数；观看≥1min=累计有效观看满 1 分钟；互动=点赞/评论/分享任一行为；点击商品=点击直播间购物袋；支付成交=订单完成支付。</div>
+        </div>
+
         <div class="sec">四维交叉矩阵<span class="chip c-blue">门店落点</span></div>
         <div class="panel">
           <div class="panel-head"><div><div class="panel-title">门店 × 直播 × 客户 × 商品</div>
@@ -1430,7 +1482,7 @@ const SPECS={
   ['成交订单总金额','直播挂车商品订单中已支付部分的金额合计','已支付直播订单的支付金额相加','订单表'],
   ['会员总数','项目下状态正常的顾客总数，含 VIP 与普通会员','状态正常的顾客数量','客户档案表'],
   ['消耗总流量','直播推流/播放流量 ＋ 回放点播流量合计','直播流量 ＋ 回放流量','直播场次统计（对接直播流量成本模块）'],
-  ['四维交叉矩阵','门店为行落点，直播、客户、商品三个维度交叉汇总','以门店为行逐门店汇总','跨表关联汇总'],
+  ['四维交叉矩阵','直播间为行落点，直播、客户、商品三个维度交叉汇总；含主播类型（门店/总部/供应商/个人）小计','以直播间为行逐场汇总','跨表关联汇总'],
   ['路径漏斗','触达→预约/进入→观看≥1分钟→互动→点击商品→下单→支付，逐级标注留存率','按"客户 × 直播场次"归集行为链','行为明细归集'],
  ],
  '直播报表（线上口径）':[
@@ -1966,23 +2018,25 @@ function makePager(panel){
  const dataRows=all.filter(tr=>!tr.classList.contains('tot'));
  if(!dataRows.length) return;
  panel._pgRows=dataRows; panel._pgTot=tot; panel._pgPage=1;
+ panel._pgSize=dataRows.length>15?10:999;
  tb.dataset.pgInit='1';
  renderPg(panel,1);
 }
 function renderPg(panel,pg){
  const dataRows=panel._pgRows||[], tot=panel._pgTot, tb=panel.querySelector('table'), body=tb.querySelector('tbody');
- const pages=Math.max(1,Math.ceil(dataRows.length/10));
+ const size=panel._pgSize||10;
+ const pages=Math.max(1,Math.ceil(dataRows.length/size));
  panel._pgPage=Math.min(Math.max(1,pg),pages);
  const p=panel._pgPage;
  [...body.children].forEach(c=>c.remove());
- dataRows.slice((p-1)*10,p*10).forEach(tr=>body.appendChild(tr));
+ dataRows.slice((p-1)*size,p*size).forEach(tr=>body.appendChild(tr));
  if(tot) body.appendChild(tot);
  let foot=panel.querySelector('.pager');
  if(!foot){ foot=document.createElement('div'); foot.className='pager'; tb.after(foot); }
  let btns='<button class="pg-btn" onclick="jumpPg(this,'+(p-1)+')"'+(p<=1?' disabled':'')+'>‹</button>';
  for(let i=1;i<=pages;i++) btns+='<button class="pg-btn'+(i===p?' active':'')+'" onclick="jumpPg(this,'+i+')">'+i+'</button>';
  btns+='<button class="pg-btn" onclick="jumpPg(this,'+(p+1)+')"'+(p>=pages?' disabled':'')+'>›</button>';
- foot.innerHTML='<span>共 '+dataRows.length+' 条</span><span class="pg-info">每页 10 条 · 第 '+p+' / '+pages+' 页</span><span class="pg-btns">'+btns+'</span>';
+ foot.innerHTML='<span>共 '+dataRows.length+' 条</span><span class="pg-info">'+(pages>1?'每页 10 条 · 第 '+p+' / '+pages+' 页':'全部 '+dataRows.length+' 条')+'</span><span class="pg-btns">'+btns+'</span>';
 }
 function jumpPg(btn,pg){
  const panel=btn.closest('.panel'); if(!panel||!panel._pgRows) return;
