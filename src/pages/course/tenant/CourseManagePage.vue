@@ -355,12 +355,10 @@
               { colKey: 'title', title: '课程名称', minWidth: 140, ellipsis: true },
               { colKey: 'category_name', title: '分类', width: 100 },
               { colKey: 'status', title: '状态', width: 90 },
-              { colKey: 'show_in_app', title: 'C端展示', width: 90 },
             ]">
             <template #status="{ row }"><t-tag size="small" :theme="row.status === 'published' ? 'success' : 'primary'" variant="light">{{ statusLabel(row.status) }}</t-tag></template>
-            <template #show_in_app="{ row }"><t-tag size="small" :theme="row.show_in_app ? 'success' : 'default'" variant="light">{{ row.show_in_app ? '展示' : '隐藏' }}</t-tag></template>
           </t-table>
-          <div class="drawer-tip" style="margin:14px 0 8px">学员进度（独立学习的学员名单，数据源：课程开通记录）。</div>
+          <div class="drawer-tip" style="margin:14px 0 8px">学员进度</div>
           <t-table :data="standaloneStudents" row-key="no" bordered size="small" max-height="300"
             :columns="[
               { colKey: 'no', title: '学员编号', width: 170 },
