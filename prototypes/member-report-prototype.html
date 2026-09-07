@@ -118,12 +118,10 @@
   .donut-legend{display:grid;gap:8px;font-size:12px;flex:1;min-width:180px;}
   .donut-legend .dl{display:grid;grid-template-columns:12px 1fr auto auto;gap:8px;align-items:center;font-variant-numeric:tabular-nums;}
   .donut-legend .dl b{font-weight:600;} .donut-legend .dl span{color:var(--fg-3);}
-  .funnel-row{display:grid;grid-template-columns:84px 1fr 210px;align-items:center;gap:12px;padding:6px 0;}
+  .funnel-row{display:grid;grid-template-columns:84px 1fr;align-items:center;gap:12px;padding:6px 0;}
   .funnel-name{font-size:12px;color:var(--fg-2);text-align:right;}
   .funnel-track{height:24px;background:var(--muted);border-radius:6px;overflow:hidden;}
   .funnel-fill{height:100%;display:flex;align-items:center;padding-left:10px;border-radius:6px;color:#fff;font-size:11px;font-weight:600;min-width:52px;transition:width .4s ease-out;}
-  .funnel-meta{font-size:11px;color:var(--fg-3);font-variant-numeric:tabular-nums;}
-  .funnel-meta b{color:var(--fg-2);}
   [data-def]{cursor:help;border-bottom:1px dashed #93C5FD;}
   .tooltip{display:none;position:fixed;z-index:9999;max-width:400px;background:#0F172A;color:#E2E8F0;padding:11px 14px;border-radius:10px;font-size:12px;line-height:1.75;box-shadow:var(--shadow-2);pointer-events:none;}
   .tooltip .def{color:#fff;display:block;font-weight:600;}
@@ -292,7 +290,7 @@
   .app-report .sec{font-size:12px;margin:14px 0 8px;}
   .app-report .funnel-row{grid-template-columns:56px 1fr;}
   .app-report .funnel-name{font-size:11px;}
-  .app-report .funnel-meta{grid-column:1/-1;font-size:10px;padding-left:2px;margin-top:-2px;}
+  .app-report .funnel-row{grid-template-columns:70px 1fr;}
   .app-report .entity{padding:11px 12px;gap:10px;}
   .app-report .entity .t{font-size:14px;}
   .app-report .entity .back{position:static;margin-left:auto;}
@@ -475,10 +473,10 @@
 
         <div class="sec">客户路径漏斗<span class="chip c-blue">转化</span></div>
         <div class="panel">
-          <div class="panel-head"><div><div class="panel-title">直播触达 → 支付成交（示例数据）</div>
-          <div class="panel-sub">按「客户 × 直播场次」归集行为链，逐级标注留存率与流失量</div></div></div>
+          <div class="panel-head"><div><div class="panel-title">预约进入 → 支付成交（示例数据）</div>
+          <div class="panel-sub">按「客户 × 直播场次」归集行为链</div></div></div>
           <div class="chart-wrap" id="tenantFunnel"></div>
-          <div class="legend"><b>口径</b>：触达=收到直播推广/预约提醒/导购私发的会员数；观看≥1min=累计有效观看满 1 分钟；互动=点赞/评论/分享任一行为；点击商品=点击直播间购物袋；支付成交=订单完成支付。</div>
+          <div class="legend"><b>口径</b>：预约/进入=预约成功或进入直播间的会员数；观看≥1min=累计有效观看满 1 分钟；互动=点赞/评论/分享任一行为；点击商品=点击直播间购物袋；支付成交=订单完成支付。</div>
         </div>
 
         <div class="sec">四维交叉矩阵<span class="chip c-blue">直播间落点</span></div>
@@ -1362,7 +1360,7 @@ function openLiveDetail(orig){
       +'<tr><td>陈小姐</td><td>王五</td><td>18.2</td><td>10:40</td><td>5</td><td><span class="tag t-green">是</span></td><td>¥120</td><td><span class="tag t-gray">旧</span></td></tr></tbody></table>'
       +'<div class="legend"><b>字段口径</b>：累计观看分钟=该客户在本场多次进出观看时长之和÷60；归属店员按查询时点 staff_id 快照；新客=is_new_customer=1。</div>'
      :'<div class="empty" style="margin:10px 16px 16px;">本场暂无客户观看记录</div>');
-  if(hasWatch) funnel('liveFunnel',[['预约',48,'100%',''],['观看',4,'8.3%','44'],['签到',2,'50%','2'],['互动',3,'150%','—'],['下单',7,'233%','—'],['成交',6,'85.7%','1']]);
+  if(hasWatch) funnel('liveFunnel',[['预约',48],['观看',4],['签到',2],['互动',3],['下单',7],['成交',6]]);
   showSub('live','live-detail');
 }
 renderLive('start');
@@ -1418,11 +1416,9 @@ function funnel(id,stages){
   el(id).innerHTML=stages.map((s,i)=>{
     const w=(s[1]/max*100).toFixed(1);
     const dark=i<3;
-    const keep=i===0?'基数':'留存 <b>'+s[2]+'</b>'+(s[3]?' · 流失 '+s[3]:'');
     return '<div class="funnel-row">'
       +'<div class="funnel-name">'+s[0]+'</div>'
-      +'<div class="funnel-track"><div class="funnel-fill" style="width:'+w+'%;background:'+shades[Math.min(i,6)]+';color:'+(dark?'#1E3A8A':'#fff')+';">'+s[1].toLocaleString()+'</div></div>'
-      +'<div class="funnel-meta">'+keep+'</div></div>';
+      +'<div class="funnel-track"><div class="funnel-fill" style="width:'+w+'%;background:'+shades[Math.min(i,6)]+';color:'+(dark?'#1E3A8A':'#fff')+';">'+s[1].toLocaleString()+'</div></div></div>';
   }).join('');
 }
 function sparks(){
@@ -1447,7 +1443,7 @@ donut('watchDonut',
 donut('progressDonut',
  [{n:'0-25%',raw:'280',v:15,c:'#DC2626'},{n:'25-50%',raw:'360',v:19,c:'#D97706'},{n:'50-75%',raw:'420',v:23,c:'#2563EB'},{n:'75-100%',raw:'800',v:43,c:'#059669'}],
  '观看UV','1,860');
-funnel('tenantFunnel',[['触达',12560,'100%',''],['预约/进入',8920,'71.0%','3,640'],['观看≥1min',5540,'44.1%','3,380'],['互动',3260,'26.0%','2,280'],['点击商品',1760,'14.0%','1,500'],['下单',1004,'8.0%','756'],['支付成交',752,'6.0%','252']]);
+funnel('tenantFunnel',[['预约/进入',8920],['观看≥1min',5540],['互动',3260],['点击商品',1760],['下单',1004],['支付成交',752]]);
 hbars('storeBars',[['天河旗舰店',25800,"openStoreDetail('天河旗舰店')"],['白云店',15600,"openStoreDetail('白云店')"],['番禺店',8400,"openStoreDetail('番禺店')"]],'#059669',v=>'¥'+v.toLocaleString());
 hbars('productBars',[['玻尿酸精华液 30ml',25800,"openProductDetail('玻尿酸精华液 30ml')"],['修护面霜 50g',15600,"openProductDetail('修护面霜 50g')"],['洁面乳 120ml',2160,"openProductDetail('洁面乳 120ml')"]],'#D97706',v=>'¥'+v.toLocaleString());
 hbars('staffBars',[['张三',28000,"openMemberDetail('张三','店员')"],['李四',22500,"openMemberDetail('李四','店员')"],['王五',19200,"openMemberDetail('王五','店员')"],['赵六',18000,"openMemberDetail('赵六','店长')"],['孙七',15600,"openMemberDetail('孙七','店员')"]],'#2563EB',v=>'¥'+v.toLocaleString());
@@ -1480,7 +1476,7 @@ const SPECS={
   ['会员总数','项目下状态正常的顾客总数，含 VIP 与普通会员','状态正常的顾客数量','客户档案表','反映客户资产规模，是人均类、占比类指标的分母。'],
   ['消耗总流量','直播推流/播放流量 ＋ 回放点播流量合计','直播流量 ＋ 回放流量','直播场次统计（对接直播流量成本模块）','支撑流量成本核算、分摊与对账，避免成本争议。'],
   ['四维交叉矩阵','直播间为行落点，直播、客户、商品三个维度交叉汇总；含主播类型（门店/总部/供应商/个人）小计','以直播间为行逐场汇总','跨表关联汇总','一站看清每个直播间的综合表现，定位优秀与待改进场次。'],
-  ['路径漏斗','触达→预约/进入→观看≥1分钟→互动→点击商品→下单→支付，逐级标注留存率','按"客户 × 直播场次"归集行为链','行为明细归集','定位转化链路中流失最严重的环节，指导运营优化。'],
+  ['路径漏斗','预约/进入→观看≥1分钟→互动→点击商品→下单→支付，展示各环节人数','按"客户 × 直播场次"归集行为链','行为明细归集','定位转化链路中流失最严重的环节，指导运营优化。'],
  ],
  '直播报表（线上口径）':[
   ['直播场数','统计周期内创建的直播场次总数（含未开播）','去重后的直播场次数','直播场次表','反映开播频次与直播运营投入强度。'],
