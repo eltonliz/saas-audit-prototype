@@ -209,31 +209,7 @@
               <t-date-picker v-model="addForm.deadline" enable-time-picker placeholder="选择预计结束时间（可选）" style="width: 100%" />
             </t-form-item>
           </div>
-          <!-- V2·0902 用户裁决：红包奖励移除（排课层不再配置） -->
-          <!-- V2·0902 老板需求：播放控制（拖动进度条/暂停）排课级可配，选课时后跟随课程默认；仅录播——直播间无播放控制 -->
-          <div v-if="addForm.teach_mode === 'recorded'" class="form-col-full">
-            <t-form-item label="允许拖动进度条">
-              <t-radio-group v-model="addForm.allow_seek">
-                <t-radio value="allow">允许</t-radio>
-                <t-radio value="disallow">不允许</t-radio>
-              </t-radio-group>
-            </t-form-item>
-          </div>
-          <div v-if="addForm.teach_mode === 'recorded'" class="form-col-full">
-            <t-form-item label="允许暂停">
-              <t-radio-group v-model="addForm.allow_pause">
-                <t-radio value="allow">允许</t-radio>
-                <t-radio value="disallow">不允许</t-radio>
-              </t-radio-group>
-            </t-form-item>
-          </div>
-          <!-- 答题与奖励跟随课时配置（只读提示） -->
-          <div v-if="addForm.teach_mode === 'recorded'" class="form-col-full">
-            <div class="lesson-tip">
-              <t-icon name="info-circle" />
-              <span>触发答题与奖励跟随课时配置（在「课程库→课程设置」维护），排课不再重复配置{{ quizFollowTip }}</span>
-            </div>
-          </div>
+          <!-- V2·0902 用户裁决（0907）：播放控制（拖动/暂停）与答题/奖励提示移除——统一在课程库·课程设置维护，排课层不再配置 -->
         </div>
       </t-form>
     </t-dialog>
@@ -478,8 +454,6 @@ function doBatch() {
         client_visible: true,
         customer_scope_mode: 'all',
         customer_scope_staff_ids: [],
-        allow_seek: 'allow',
-        allow_pause: 'disallow',
         display_style: 'live_room',
       } as any;
     });
@@ -518,8 +492,6 @@ const addForm = ref({
   unlock_time: new Date(),
   deadline: null as Date | null,
   completion_criteria: '',
-  allow_seek: 'allow' as 'allow' | 'disallow',
-  allow_pause: 'disallow' as 'allow' | 'disallow',
   is_required: true,
 });
 // V2·0902 选课时后播放控制跟随课程设置（可调整）
@@ -527,24 +499,12 @@ watch(() => addForm.value.lesson_id, (lid) => {
   const lesson = lid ? courseStore.lessons.find(l => l.id === lid) : null;
   const course = lesson ? courseStore.loadCourse(lesson.course_id) : null;
   if (course) {
-    addForm.value.allow_pause = (course as any).allow_pause || 'disallow';
   }
 });
-// 答题与奖励跟随课时配置（只读提示摘要）
-const quizFollowTip = computed(() => {
-  if (addForm.value.teach_mode !== 'recorded') return '';
-  const lesson = addForm.value.lesson_id ? courseStore.lessons.find(l => l.id === addForm.value.lesson_id) : null;
-  const course = lesson ? courseStore.loadCourse(lesson.course_id) : null;
-  if (!course) return '';
-  const bank = course.question_bank_id ? courseStore.questionBanks.find(b => b.id === course.question_bank_id) : null;
-  if (!bank) return '';
-  const triggerLabel = ({ start: '课时开始时', half: '播放至50%', eighty: '播放至80%', end: '课时结束时' } as any)[course.quiz_trigger] || '播放至50%';
-  const pts = (course as any).answer_reward_points_enabled ? ` · 答题积分${course.answer_reward_points}分/次` : '';
-  return `（当前课时：${triggerLabel}触发 · ${bank.title}${pts}）`;
-});
+// V2·0902 用户裁决（0907）：答题跟随提示与 quizFollowTip 已移除
 function openAddDialog() {
   if (isLocked.value) { MessagePlugin.warning('营期已结束，排课锁定'); return; }
-  addForm.value = { day_number: 1, title: '', description: '', teach_mode: 'recorded', live_room_id: '', display_style: 'live_room', live_display_title: '', course_id: '', lesson_id: null, unlock_time: new Date(), deadline: null, completion_criteria: '', allow_seek: 'allow', allow_pause: 'disallow', is_required: true };
+  addForm.value = { day_number: 1, title: '', description: '', teach_mode: 'recorded', live_room_id: '', display_style: 'live_room', live_display_title: '', course_id: '', lesson_id: null, unlock_time: new Date(), deadline: null, completion_criteria: '', is_required: true };
   showAdd.value = true;
   notifyModalOpen('schedule-add');
 }
@@ -590,8 +550,8 @@ function doAdd() {
     quiz_reward_amount: 0,
     quiz_reward_points_enabled: (courseStore.loadCourse(autoCourseId) as any)?.answer_reward_points_enabled ?? false,
     quiz_reward_points: (courseStore.loadCourse(autoCourseId) as any)?.answer_reward_points ?? 0,
-    allow_seek: addForm.value.allow_seek,
-    allow_pause: addForm.value.allow_pause,
+    allow_seek: 'allow',
+    allow_pause: 'disallow',
     display_style: addForm.value.teach_mode === 'recorded' ? addForm.value.display_style : undefined,
     live_display_title: addForm.value.teach_mode === 'recorded' && addForm.value.display_style === 'live_room' ? addForm.value.live_display_title.trim() : '',
   } as any);
