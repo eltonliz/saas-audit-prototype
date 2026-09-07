@@ -724,12 +724,7 @@ export const REPLICA_REQUIREMENTS: Record<string, ReplicaPageRequirement> = {
     ],
   },
   // V2·0901：红包记录/场次管理（复刻）入口下线
-  '/tenant/replica/marketing/points-task': {
-    title: '课程结合 · 积分任务设置',
-    markers: [
-      { no: 3, title: '课程积分任务', type: 'new', description: '新增任务：课程报名(10分)/课时完课(20分)/课时答题(10分)。上游：课程报名/完课/答题事件；下游：客户积分余额、积分记录流水。' },
-    ],
-  },
+  // V2·0902 用户裁决（0907）：「课程结合·积分任务」菜单入口移除（积分记录仍保留，承接课程报名/完课/答题积分事件）
   '/tenant/replica/marketing/points-records': {
     title: '课程结合 · 积分记录',
     markers: [
@@ -807,12 +802,7 @@ export const REPLICA_REQUIREMENTS: Record<string, ReplicaPageRequirement> = {
     ],
   },
   // V2·0901：红包记录/场次管理（复刻）入口下线
-  '/tenant/replica/marketing/points-task': {
-    title: '课程结合 · 积分任务设置',
-    markers: [
-      { no: 3, title: '课程积分任务', type: 'new', description: '新增任务：课程报名(10分)/课时完课(20分)/课时答题(10分)。上游：课程报名/完课/答题事件；下游：客户积分余额、积分记录流水。' },
-    ],
-  },
+  // V2·0902 用户裁决（0907）：「课程结合·积分任务」菜单入口移除（积分记录仍保留，承接课程报名/完课/答题积分事件）
   '/tenant/replica/marketing/points-records': {
     title: '课程结合 · 积分记录',
     markers: [
