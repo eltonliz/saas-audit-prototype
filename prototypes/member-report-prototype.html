@@ -710,8 +710,8 @@
       <!-- ============ Tab 4 商品报表 ============ -->
       <section class="pane" id="pane-product">
         <div class="grid g5">
-          <div class="card tone-blue"><div class="card-label">在售商品</div><div class="card-value" data-def="商品状态为"上架中"的商品数量。" data-calc="处于"上架"状态的商品数" data-source="商品中心" data-use="反映当前可售商品池的规模。">1,286</div></div>
-          <div class="card tone-green"><div class="card-label">动销商品</div><div class="card-value" data-def="统计周期内产生成交（含直播引导）的去重商品数。" data-calc="有已支付订单的去重商品数" data-source="订单表" data-use="衡量商品实际产生销售的比例，占在售比例偏低提示选品或推广问题。">486</div></div>
+          <div class="card tone-blue"><div class="card-label">在售商品</div><div class="card-value" data-def="商品状态为"上架中"的商品款数量。按商品款统计：同款不同规格（如同款不同色号）算 1 个。" data-calc="处于"上架"状态的去重商品款数" data-source="商品中心 · 商品款档案" data-use="反映当前可售商品池的规模。">1,286</div></div>
+          <div class="card tone-green"><div class="card-label">动销商品</div><div class="card-value" data-def="统计周期内产生成交（含直播引导）的去重商品款数。按商品款统计：同款不同规格合并计 1，不重复计数。" data-calc="有已支付订单的去重商品款数" data-source="订单表（订单行挂规格，向上归并到商品款）" data-use="衡量商品实际产生销售的比例，占在售比例偏低提示选品或推广问题。">486</div></div>
           <div class="card tone-amber"><div class="card-label">直播带货GMV</div><div class="card-value" data-def="由直播间引导产生的已支付订单金额合计。" data-calc="直播引导的已支付订单金额合计" data-source="订单表" data-use="衡量直播渠道带来的商品成交产出。">¥58,600</div></div>
           <div class="card tone-amber"><div class="card-label">直播成交订单</div><div class="card-value" data-def="由直播间引导产生的已支付订单数。" data-calc="直播引导的已支付订单数" data-source="订单表" data-use="衡量直播渠道的订单转化结果，与金额交叉看客单价。">186</div></div>
           <div class="card tone-violet"><div class="card-label">直播引流成交占比</div><div class="card-value" data-def="直播成交额占全渠道成交额的比例，衡量直播渠道贡献。" data-calc="直播成交额 ÷ 全渠道成交额" data-source="由其他指标计算得出" data-use="评估直播作为成交渠道的整体贡献度。">31.5%</div></div>
@@ -731,7 +731,7 @@
               <tr class="tot"><td>汇总（3 个商品）</td><td>13</td><td>6,380</td><td>150</td><td>¥43,560</td><td>132</td><td>¥290</td><td>35.6%</td><td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:47%;background:var(--green);"></div></div>2.4%</div></td></tr>
             </tbody>
           </table>
-          <div class="legend"><b>字段口径</b>：带货场次数=该商品被挂车的去重场次（直播挂车明细）；商品点击UV=直播中点击购物袋该商品的去重客户数；新客占比=首次下单客户数÷成交客户数；点击→成交=成交订单数÷商品点击UV。</div>
+          <div class="legend"><b>统计维度</b>：本页商品一律按商品款（SPU）统计，同款不同规格（SKU）合并为 1 个，不重复计数。<b>字段口径</b>：带货场次数=该商品被挂车的去重场次（直播挂车明细）；商品点击UV=直播中点击购物袋该商品的去重客户数；新客占比=首次下单客户数÷成交客户数；点击→成交=成交订单数÷商品点击UV。</div>
         </div>
         <div class="panel">
           <div class="panel-head"><div><div class="panel-title">商品 × 客户交叉（客户看商品）</div><div class="panel-sub">直播引导的行为链，供店员按状态跟进转化（示例数据）</div></div></div>
@@ -1131,7 +1131,8 @@
         <table>
           <thead><tr><th style="width:18%">指标</th><th style="width:46%">公式</th><th>作用 / 口径说明</th></tr></thead>
           <tbody>
-            <tr><td>动销商品数</td><td class="num" style="font-family:var(--mono);font-size:11px;">周期内产生成交（含直播引导）的去重商品数量</td><td>—</td></tr>
+            <tr><td>统计维度</td><td class="num" style="font-family:var(--mono);font-size:11px;">商品报表一律按商品款（SPU）统计；同款不同规格（SKU）合并为 1 个，不重复计数</td><td>订单行挂在规格上，向上归并到商品款</td></tr>
+            <tr><td>动销商品数</td><td class="num" style="font-family:var(--mono);font-size:11px;">周期内产生成交（含直播引导）的去重商品款数量</td><td>同款不同规格合并计 1</td></tr>
             <tr><td>直播带货成交额</td><td class="num" style="font-family:var(--mono);font-size:11px;">直播引导产生的已支付订单金额合计</td><td>—</td></tr>
             <tr><td>直播引流成交占比</td><td class="num" style="font-family:var(--mono);font-size:11px;">直播成交额 ÷ 全渠道成交额 × 100%</td><td>衡量直播渠道贡献</td></tr>
             <tr><td>商品点击人数</td><td class="num" style="font-family:var(--mono);font-size:11px;">点击直播间购物袋该商品的客户去重数</td><td>去重客户数</td></tr>
@@ -1515,7 +1516,8 @@ const SPECS={
   ['更新机制','报表数据每日 11:00 前更新昨日；实时数据走单场分析','—','平台统一约定','明确数据时效预期，避免租户误判数据延迟。'],
  ],
  '商品报表':[
-  ['动销商品','周期内产生成交（含直播引导）的去重商品数','有已支付订单的去重商品数','订单表','衡量商品实际销售比例，占在售比例偏低提示选品问题。'],
+  ['统计维度','商品报表全部按商品款（SPU）统计；同款不同规格（SKU，如同款不同色号/容量）合并为 1 个，不重复计数','订单明细按规格记录，向上归并到商品款','商品中心 ＋ 订单表','运营看的是"哪款好卖"，规格库存属供应链视角，两层分开管理。'],
+  ['动销商品','周期内产生成交（含直播引导）的去重商品款数','有已支付订单的去重商品款数','订单表','衡量商品实际销售比例，占在售比例偏低提示选品问题。'],
   ['直播带货成交额','直播间引导的已支付订单金额合计','直播引导的已支付订单金额合计','订单表','衡量直播渠道带来的商品成交产出。'],
   ['直播引流成交占比','直播成交额占全渠道成交额的比例','直播成交额 ÷ 全渠道成交额','由其他指标计算得出','评估直播作为成交渠道的整体贡献度。'],
   ['商品点击人数','直播中点击购物袋该商品的去重客户数','点击购物袋该商品去重','直播场次统计 · 商品点击','反映商品在直播间的吸引力，是点击转化的分母。'],
