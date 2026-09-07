@@ -449,17 +449,13 @@
       <section class="pane active" id="pane-tenant">
         <div class="grid g4">
           <div class="card tone-blue clickable" onclick="switchTab('live')" title="点击进入直播报表"><div class="card-label">观看总人数<span class="demo">T+1 · 线上真实</span></div>
-            <div class="card-value" id="t-kpi-watch" data-def="统计周期内进入过直播间的去重客户数（UV）。同一客户多次进出、观看多场均只计 1 人。" data-calc="按"客户"去重计数（仅统计顾客）" data-source="直播观看明细" data-use="评估直播引流能力，是漏斗顶部基数与转化率计算的分母。">54</div>
-            <div class="card-foot"><svg class="spark" data-spark="6,8,7,9,8,10,6" data-color="#2563EB" width="64" height="20"></svg></div></div>
+            <div class="card-value" id="t-kpi-watch" data-def="统计周期内进入过直播间的去重客户数（UV）。同一客户多次进出、观看多场均只计 1 人。" data-calc="按"客户"去重计数（仅统计顾客）" data-source="直播观看明细" data-use="评估直播引流能力，是漏斗顶部基数与转化率计算的分母。">54</div></div>
           <div class="card tone-green clickable" onclick="switchTab('product')" title="点击进入商品报表"><div class="card-label">成交订单总金额<span class="demo">T+1 · 线上真实</span></div>
-            <div class="card-value" id="t-kpi-gmv" data-def="直播期间挂车商品订单中已完成支付部分的金额合计（元），不含未支付订单。" data-calc="直播引导的已支付订单金额合计" data-source="订单表 · 支付金额" data-use="衡量直播带货的最终产出，是最核心的业绩结果指标。">¥0.63</div>
-            <div class="card-foot"><svg class="spark" data-spark="0.2,0,0.1,0,0.6,0.03,0" data-color="#059669" width="64" height="20"></svg></div></div>
+            <div class="card-value" id="t-kpi-gmv" data-def="直播期间挂车商品订单中已完成支付部分的金额合计（元），不含未支付订单。" data-calc="直播引导的已支付订单金额合计" data-source="订单表 · 支付金额" data-use="衡量直播带货的最终产出，是最核心的业绩结果指标。">¥0.63</div></div>
           <div class="card tone-violet clickable" onclick="switchTab('customer')" title="点击进入客户报表"><div class="card-label">会员总数<span class="demo">5min · 示例</span></div>
-            <div class="card-value" id="t-kpi-member" data-def="项目下状态正常的顾客总数，含 VIP 与普通会员。" data-calc="状态正常的顾客数量" data-source="客户档案表" data-use="反映客户资产规模，是人均类与占比类指标的计算分母。">12,560</div>
-            <div class="card-foot"><svg class="spark" data-spark="9,9.4,10,10.5,11,12,12.5" data-color="#7C3AED" width="64" height="20"></svg></div></div>
+            <div class="card-value" id="t-kpi-member" data-def="项目下状态正常的顾客总数，含 VIP 与普通会员。" data-calc="状态正常的顾客数量" data-source="客户档案表" data-use="反映客户资产规模，是人均类与占比类指标的计算分母。">12,560</div></div>
           <div class="card tone-cyan clickable" onclick="openFlowCaliber()" title="点击查看流量口径"><div class="card-label">消耗总流量 (MB)<span class="demo">T+1 · 线上真实</span></div>
-            <div class="card-value" id="t-kpi-flow" data-def="全部直播场次产生的流量合计：直播推流/播放流量 + 回放点播流量。用于流量成本核算与对账。" data-calc="直播流量 ＋ 回放流量" data-source="直播场次统计（对接直播流量成本模块）" data-use="支撑流量成本核算、分摊与对账，避免成本争议。">644,141</div>
-            <div class="card-foot"><svg class="spark" data-spark="70,76,72,80,78,86,84" data-color="#0891B2" width="64" height="20"></svg></div></div>
+            <div class="card-value" id="t-kpi-flow" data-def="全部直播场次产生的流量合计：直播推流/播放流量 + 回放点播流量。用于流量成本核算与对账。" data-calc="直播流量 ＋ 回放流量" data-source="直播场次统计（对接直播流量成本模块）" data-use="支撑流量成本核算、分摊与对账，避免成本争议。">644,141</div></div>
         </div>
 
         <div class="grid g2">
@@ -1423,7 +1419,7 @@ function funnel(id,stages){
     const w=(s[1]/max*100).toFixed(1);
     const dark=i<3;
     const keep=i===0?'基数':'留存 <b>'+s[2]+'</b>'+(s[3]?' · 流失 '+s[3]:'');
-    return '<div class="funnel-row" onclick="openFunnelDetail(\''+s[0]+'\','+s[1]+')" title="点击查看该环节客户明细">'
+    return '<div class="funnel-row">'
       +'<div class="funnel-name">'+s[0]+'</div>'
       +'<div class="funnel-track"><div class="funnel-fill" style="width:'+w+'%;background:'+shades[Math.min(i,6)]+';color:'+(dark?'#1E3A8A':'#fff')+';">'+s[1].toLocaleString()+'</div></div>'
       +'<div class="funnel-meta">'+keep+'</div></div>';
@@ -1560,16 +1556,6 @@ function openModal(title,html){ el('gm-title').textContent=title; el('gm-body').
 function closeModal(){ el('gm').classList.remove('open'); }
 el('gm').addEventListener('click',e=>{ if(e.target.id==='gm') closeModal(); });
 
-/* 漏斗逐级明细 */
-const FUNNEL_SRC={'触达':'直播推广群发 / 预约提醒 / 导购私发','预约/进入':'预约成功或进入直播间','观看≥1min':'累计有效观看满 1 分钟','互动':'点赞 / 评论 / 分享','点击商品':'点击直播间购物袋','下单':'创建订单（含未支付）','支付成交':'订单完成支付'};
-function openFunnelDetail(stage,count){
-  const rows=[['王女士','张三','直播推广·群发','08-25'],['李先生','李四','预约提醒','08-25'],['陈小姐','王五','导购私发','08-24']];
-  openModal('「'+stage+'」环节客户明细 · 共 '+count.toLocaleString()+' 人（示例前 3 条）',
-    '<div class="caliber" style="margin-bottom:12px;">行为定义：'+(FUNNEL_SRC[stage]||'—')+'。明细按「客户 × 直播场次」归集。</div>'
-    +'<table><thead><tr><th>客户</th><th>归属店员</th><th>来源/行为</th><th>日期</th></tr></thead><tbody>'
-    +rows.map(r=>'<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td><td class="num">'+r[3]+'</td></tr>').join('')
-    +'</tbody></table><div class="legend">店长/店员视角仅见名下客户（归属快照隔离）；完整清单支持导出跟进。</div>');
-}
 /* 商品明细 */
 function openProductDetail(name){
   openModal('商品明细 · '+name,
