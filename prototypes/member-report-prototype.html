@@ -531,7 +531,7 @@
             <div class="card tone-blue"><div class="card-label">门店总数</div><div class="card-value" data-def="项目下状态为营业中的门店数量。" data-calc="营业中门店数量" data-source="门店档案表" data-use="反映经营网络规模。">156<small>家</small></div></div>
             <div class="card tone-violet"><div class="card-label">门店总会员</div><div class="card-value" data-def="全部门店名下的顾客总数，按顾客所属门店统计。" data-calc="状态正常的顾客数量" data-source="客户档案 · 所属门店" data-use="反映客户资产规模，是门店人均类指标的分母。">12,560</div></div>
             <div class="card tone-green"><div class="card-label">门店贡献GMV</div><div class="card-value" data-def="全部门店会员已支付订单金额合计。" data-calc="已支付订单金额合计" data-source="订单表 × 客户所属门店" data-use="衡量门店体系的整体业绩产出。">¥1.85M</div></div>
-            <div class="card tone-amber"><div class="card-label">门店复购率</div><div class="card-value" data-def="90 天内有 ≥2 次已支付订单的会员占同期有消费会员的比例。" data-calc="90 天内下单 ≥2 次的会员数 ÷ 有消费会员数" data-source="会员状态汇总 · 复购标记" data-use="衡量客户粘性与回头意愿，越高说明客户维护越好。">38%</div></div>
+            <div class="card tone-amber"><div class="card-label">门店复购率</div><div class="card-value" data-def="90 天内有 ≥2 笔已支付订单的会员占同期有消费会员的比例。" data-calc="90 天内已支付订单 ≥2 笔的会员数 ÷ 有消费会员数" data-source="会员状态汇总 · 复购标记" data-use="衡量客户粘性与回头意愿，越高说明客户维护越好。">38%</div></div>
             <div class="card tone-cyan"><div class="card-label">活跃率</div><div class="card-value" data-def="活跃会员占会员总数的比例（每日凌晨预计算的前一日状态）。" data-calc="活跃会员数 ÷ 会员总数" data-source="会员状态汇总 · 活跃标记" data-use="衡量会员整体活跃程度，持续下降提示流失风险。">85%</div></div>
           </div>
           <div class="panel">
@@ -587,7 +587,7 @@
             <div class="card tone-violet"><div class="card-label">名下会员</div><div class="card-value" data-def="归属在该成员名下且状态正常的客户数。" data-calc="归属该成员名下的正常客户数量" data-source="客户档案表" data-use="成员个人客户资产规模，是归属与业绩归因的基础。">186</div></div>
             <div class="card tone-blue"><div class="card-label">新增会员</div><div class="card-value" data-def="统计周期内首次绑定到该成员名下的客户数。" data-calc="首次绑定时间落在统计周期的客户数" data-source="客户档案 · 首次绑定时间" data-use="衡量成员拉新拓客能力。">12</div></div>
             <div class="card tone-amber"><div class="card-label">VIP占比</div><div class="card-value" data-def="名下会员中 VIP 等级会员的占比。" data-calc="VIP 会员数 ÷ 名下会员数" data-source="会员等级表" data-use="衡量名下客户质量，VIP 是消费贡献主力。">36.5%</div></div>
-            <div class="card tone-green"><div class="card-label">活跃会员</div><div class="card-value" data-def="名下会员中处于活跃状态的会员数（前一日状态）。" data-calc="名下活跃会员数量" data-source="会员状态汇总（每日凌晨预计算）" data-use="衡量实际可触达、有互动的客户规模。">152</div></div>
+            <div class="card tone-green"><div class="card-label">活跃会员</div><div class="card-value" data-def="名下会员中处于活跃状态的会员数（前一日状态）。" data-calc="名下活跃会员数量" data-source="会员状态汇总（每日凌晨预计算）" data-use="衡量实际可触达、有互动的客户规模。">168</div></div>
             <div class="card tone-cyan"><div class="card-label">贡献GMV</div><div class="card-value" data-def="名下会员已支付订单金额合计。" data-calc="已支付订单金额合计" data-source="订单表 × 客户归属店员" data-use="成员个人业绩结果指标，用于排名与激励。">¥28,000</div></div>
           </div>
           <div class="panel">
@@ -602,9 +602,9 @@
               <table>
                 <thead><tr><th>会员</th><th>手机号</th><th>等级</th><th>积分</th><th>余额</th><th>累计消费</th><th>末次消费</th><th>末次登录</th><th>状态</th></tr></thead>
                 <tbody>
-                  <tr><td>王女士</td><td class="num">138****8888</td><td><span class="tag t-amber">黑卡</span></td><td>580</td><td>¥120</td><td>¥3,200</td><td>08-24</td><td>08-25</td><td><span class="tag t-green">活跃</span></td></tr>
-                  <tr><td>李先生</td><td class="num">139****6666</td><td><span class="tag t-amber">金卡</span></td><td>320</td><td>¥80</td><td>¥1,800</td><td>08-22</td><td>08-23</td><td><span class="tag t-green">活跃</span></td></tr>
-                  <tr><td>陈小姐</td><td class="num">137****5555</td><td><span class="tag t-gray">普通</span></td><td>50</td><td>¥0</td><td>¥0</td><td>05-10</td><td>05-12</td><td><span class="tag t-red">沉睡</span></td></tr>
+                  <tr><td><button class="link" onclick="openCustomer360('王女士','张三')">王女士</button></td><td class="num">138****8888</td><td><span class="tag t-amber">黑卡</span></td><td>580</td><td>¥120</td><td>¥3,200</td><td>08-24</td><td>08-25</td><td><span class="tag t-green">活跃</span></td></tr>
+                  <tr><td><button class="link" onclick="openCustomer360('李先生','李四')">李先生</button></td><td class="num">139****6666</td><td><span class="tag t-amber">金卡</span></td><td>320</td><td>¥80</td><td>¥1,800</td><td>08-22</td><td>08-23</td><td><span class="tag t-green">活跃</span></td></tr>
+                  <tr><td><button class="link" onclick="openCustomer360('陈小姐','王五')">陈小姐</button></td><td class="num">137****5555</td><td><span class="tag t-gray">普通</span></td><td>50</td><td>¥0</td><td>¥0</td><td>05-10</td><td>05-12</td><td><span class="tag t-red">沉睡</span></td></tr>
                 </tbody>
               </table>
               <div class="legend"><b>字段口径</b>：累计消费=该会员历史已支付订单金额合计；沉睡=90 天无消费且无登录；积分/余额来自 积分账户 / 钱包账户。</div>
@@ -613,9 +613,9 @@
               <table>
                 <thead><tr><th>会员</th><th>课程</th><th>观看时长</th><th>学习进度</th><th>完播</th><th>答题正确率</th><th>红包</th><th>新客</th></tr></thead>
                 <tbody>
-                  <tr><td>王女士</td><td>产品知识</td><td>25min</td><td>100%</td><td><span class="tag t-green">是</span></td><td>100%</td><td>¥10</td><td><span class="tag t-amber">新客</span></td></tr>
-                  <tr><td>李先生</td><td>销售技巧</td><td>18min</td><td>78%</td><td><span class="tag t-gray">否</span></td><td>80%</td><td>¥5</td><td><span class="tag t-gray">旧客</span></td></tr>
-                  <tr><td>陈小姐</td><td>产品知识</td><td>8min</td><td>35%</td><td><span class="tag t-gray">否</span></td><td>40%</td><td>—</td><td><span class="tag t-gray">旧客</span></td></tr>
+                  <tr><td><button class="link" onclick="openCustomer360('王女士','张三')">王女士</button></td><td>产品知识</td><td>25min</td><td>100%</td><td><span class="tag t-green">是</span></td><td>100%</td><td>¥10</td><td><span class="tag t-amber">新客</span></td></tr>
+                  <tr><td><button class="link" onclick="openCustomer360('李先生','李四')">李先生</button></td><td>销售技巧</td><td>18min</td><td>78%</td><td><span class="tag t-gray">否</span></td><td>80%</td><td>¥5</td><td><span class="tag t-gray">旧客</span></td></tr>
+                  <tr><td><button class="link" onclick="openCustomer360('陈小姐','王五')">陈小姐</button></td><td>产品知识</td><td>8min</td><td>35%</td><td><span class="tag t-gray">否</span></td><td>40%</td><td>—</td><td><span class="tag t-gray">旧客</span></td></tr>
                 </tbody>
               </table>
               <div class="legend"><b>字段口径</b>：观看时长=watch_duration 累计（front_style=2 课程）；学习进度=观看时长÷课程总时长；完播=进度≥课程配置阈值（complete_percentage）；红包=已发放成功的答题红包金额。</div>
@@ -624,9 +624,9 @@
               <table>
                 <thead><tr><th>会员</th><th>直播场次</th><th>累计观看分钟</th><th>签到</th><th>互动</th><th>下单</th><th>金额</th><th>新客</th></tr></thead>
                 <tbody>
-                  <tr><td>王女士</td><td>直播76</td><td>45.0</td><td><span class="tag t-green">是</span></td><td><span class="tag t-green">是</span></td><td><span class="tag t-green">是</span></td><td>¥320</td><td><span class="tag t-amber">新</span></td></tr>
-                  <tr><td>李先生</td><td>直播76</td><td>32.0</td><td><span class="tag t-green">是</span></td><td><span class="tag t-gray">否</span></td><td><span class="tag t-gray">否</span></td><td>—</td><td><span class="tag t-amber">新</span></td></tr>
-                  <tr><td>陈小姐</td><td>直播78</td><td>18.2</td><td><span class="tag t-gray">否</span></td><td><span class="tag t-green">是</span></td><td><span class="tag t-green">是</span></td><td>¥120</td><td><span class="tag t-gray">旧</span></td></tr>
+                  <tr><td><button class="link" onclick="openCustomer360('王女士','张三')">王女士</button></td><td>直播76</td><td>45.0</td><td><span class="tag t-green">是</span></td><td><span class="tag t-green">是</span></td><td><span class="tag t-green">是</span></td><td>¥320</td><td><span class="tag t-amber">新</span></td></tr>
+                  <tr><td><button class="link" onclick="openCustomer360('李先生','李四')">李先生</button></td><td>直播76</td><td>32.0</td><td><span class="tag t-green">是</span></td><td><span class="tag t-gray">否</span></td><td><span class="tag t-gray">否</span></td><td>—</td><td><span class="tag t-amber">新</span></td></tr>
+                  <tr><td><button class="link" onclick="openCustomer360('陈小姐','王五')">陈小姐</button></td><td>直播78</td><td>18.2</td><td><span class="tag t-gray">否</span></td><td><span class="tag t-green">是</span></td><td><span class="tag t-green">是</span></td><td>¥120</td><td><span class="tag t-gray">旧</span></td></tr>
                 </tbody>
               </table>
               <div class="legend"><b>字段口径</b>：累计观看分钟=该会员在该场次 watch_duration 累计÷60；下单=live_id 非空已支付订单；新客=is_new_customer=1（首次参与直播）。</div>
@@ -738,9 +738,9 @@
           <table>
             <thead><tr><th>客户</th><th>归属店员</th><th>商品</th><th>来源直播</th><th>行为</th><th>下单金额</th><th>时间</th><th>跟进状态</th></tr></thead>
             <tbody>
-              <tr><td>王女士</td><td>张三</td><td>玻尿酸精华液 30ml</td><td>直播78</td><td>点击→下单</td><td>¥300</td><td>07-08 10:02</td><td><span class="tag t-green">已成交</span></td></tr>
-              <tr><td>李先生</td><td>李四</td><td>修护面霜 50g</td><td>直播76</td><td>仅点击</td><td>—</td><td>07-06 10:40</td><td><span class="tag t-blue">待跟进</span></td></tr>
-              <tr><td>陈小姐</td><td>王五</td><td>洁面乳 120ml</td><td>直播76</td><td>加购未付</td><td>—</td><td>07-06 11:20</td><td><span class="tag t-red">流失风险</span></td></tr>
+              <tr><td><button class="link" onclick=\"openCustomer360(\'王女士\',\'张三\')\">王女士</button></td><td>张三</td><td>玻尿酸精华液 30ml</td><td>直播78</td><td>点击→下单</td><td>¥300</td><td>07-08 10:02</td><td><span class="tag t-green">已成交</span></td></tr>
+              <tr><td><button class="link" onclick=\"openCustomer360(\'李先生\',\'李四\')\">李先生</button></td><td>李四</td><td>修护面霜 50g</td><td>直播76</td><td>仅点击</td><td>—</td><td>07-06 10:40</td><td><span class="tag t-blue">待跟进</span></td></tr>
+              <tr><td><button class="link" onclick=\"openCustomer360(\'陈小姐\',\'王五\')\">陈小姐</button></td><td>王五</td><td>洁面乳 120ml</td><td>直播76</td><td>加购未付</td><td>—</td><td>07-06 11:20</td><td><span class="tag t-red">流失风险</span></td></tr>
               <tr class="tot"><td>汇总</td><td>3 人</td><td colspan="2">3 个商品 · 2 场直播</td><td>已成交 1</td><td>¥300</td><td>—</td><td>待跟进 1 · 流失 1</td></tr>
             </tbody>
           </table>
@@ -763,13 +763,13 @@
             <table>
               <thead><tr><th>客户</th><th>归属店员</th><th>观看场次</th><th>累计观看分钟</th><th>最近观看</th><th>互动次数</th><th>直播下单数</th><th>直播消费</th><th>回放分钟</th></tr></thead>
               <tbody>
-                <tr><td>王女士</td><td>张三</td><td>8</td><td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:92%;background:var(--violet);"></div></div>326.5</div></td><td>08-27</td><td>46</td><td>3</td><td>¥920</td><td>120.0</td></tr>
-                <tr><td>李先生</td><td>李四</td><td>5</td><td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:40%;background:var(--violet);"></div></div>142.0</div></td><td>08-25</td><td>9</td><td>1</td><td>¥300</td><td>65.5</td></tr>
-                <tr><td>陈小姐</td><td>王五</td><td>2</td><td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:10%;background:var(--violet);"></div></div>36.2</div></td><td>08-24</td><td>2</td><td>0</td><td>—</td><td>18.0</td></tr>
-                <tr class="tot"><td>汇总</td><td>3 人</td><td>15</td><td>504.7</td><td>—</td><td>57</td><td>4</td><td>¥1,220</td><td>203.5</td></tr>
+                <tr><td><button class="link" onclick=\"openCustomer360(\'王女士\',\'张三\')\">王女士</button></td><td>张三</td><td>8</td><td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:92%;background:var(--violet);"></div></div>326.5</div></td><td>08-27</td><td>46</td><td>3</td><td>¥920</td><td>120.0</td></tr>
+                <tr><td><button class="link" onclick=\"openCustomer360(\'李先生\',\'李四\')\">李先生</button></td><td>李四</td><td>5</td><td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:40%;background:var(--violet);"></div></div>142.0</div></td><td>08-25</td><td>9</td><td>1</td><td>¥300</td><td>65.5</td></tr>
+                <tr><td><button class="link" onclick=\"openCustomer360(\'陈小姐\',\'王五\')\">陈小姐</button></td><td>王五</td><td>2</td><td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:10%;background:var(--violet);"></div></div>36.2</div></td><td>08-24</td><td>2</td><td>0</td><td>—</td><td>18.0</td></tr>
+                <tr class="tot"><td>汇总（客户 3 人）</td><td>3 人（去重）</td><td>15</td><td>504.7</td><td>—</td><td>57</td><td>4</td><td>¥1,220</td><td>203.5</td></tr>
               </tbody>
             </table>
-            <div class="legend"><b>字段口径</b>：累计观看分钟=该客户全部场次 watch_duration 求和÷60（直播+回放）；回放分钟仅统计回放观看部分；店长/店员视角仅见名下客户。</div>
+            <div class="legend"><b>统计维度</b>：每行 = 一个客户（按客户去重）；汇总行「归属店员」为涉及店员去重数——客户数与店员数不必相等，多个客户可同属一个店员。<b>字段口径</b>：累计观看分钟=该客户全部场次观看时长求和÷60（直播+回放）；回放分钟仅统计回放观看部分；店长/店员视角仅见名下客户。</div>
           </div>
           <div class="panel" style="margin-bottom:0;">
             <div class="panel-head"><div><div class="panel-title">观看深度分层<span class="chip c-violet" style="margin-left:4px;">结构</span></div><div class="panel-sub">按人均累计观看分钟分层（示例数据）</div></div></div>
@@ -782,13 +782,13 @@
           <table>
             <thead><tr><th>客户</th><th>归属店员</th><th>浏览商品数</th><th>下单商品数</th><th>直播引导金额</th><th>累计消费</th><th>直播贡献占比</th><th>最近购买</th></tr></thead>
             <tbody>
-              <tr><td>王女士</td><td>张三</td><td>26</td><td>9</td><td>¥920</td><td>¥3,200</td><td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:29%;background:var(--amber);"></div></div>28.8%</div></td><td>08-27</td></tr>
-              <tr><td>李先生</td><td>李四</td><td>14</td><td>3</td><td>¥300</td><td>¥1,800</td><td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:17%;background:var(--amber);"></div></div>16.7%</div></td><td>08-25</td></tr>
-              <tr><td>陈小姐</td><td>王五</td><td>5</td><td>0</td><td>¥0</td><td>¥0</td><td>—</td><td>—</td></tr>
-              <tr class="tot"><td>汇总</td><td>3 人</td><td>45</td><td>12</td><td>¥1,220</td><td>¥5,000</td><td>24.4%</td><td>—</td></tr>
+              <tr><td><button class="link" onclick=\"openCustomer360(\'王女士\',\'张三\')\">王女士</button></td><td>张三</td><td>26</td><td>9</td><td>¥920</td><td>¥3,200</td><td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:29%;background:var(--amber);"></div></div>28.8%</div></td><td>08-27</td></tr>
+              <tr><td><button class="link" onclick=\"openCustomer360(\'李先生\',\'李四\')\">李先生</button></td><td>李四</td><td>14</td><td>3</td><td>¥300</td><td>¥1,800</td><td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:17%;background:var(--amber);"></div></div>16.7%</div></td><td>08-25</td></tr>
+              <tr><td><button class="link" onclick=\"openCustomer360(\'陈小姐\',\'王五\')\">陈小姐</button></td><td>王五</td><td>5</td><td>0</td><td>¥0</td><td>¥0</td><td>—</td><td>—</td></tr>
+              <tr class="tot"><td>汇总（客户 3 人）</td><td>3 人（去重）</td><td>45</td><td>12</td><td>¥1,220</td><td>¥5,000</td><td>24.4%</td><td>—</td></tr>
             </tbody>
           </table>
-          <div class="legend"><b>字段口径</b>：浏览商品数=点击过购物袋商品的去重 SPU 数；直播引导金额=live_id 非空已支付订单合计；直播贡献占比=直播引导金额÷累计消费；用于沉淀客户商品偏好画像。</div>
+          <div class="legend"><b>统计维度</b>：每行 = 一个客户（按客户去重）；汇总行「归属店员」为涉及店员去重数——客户数与店员数不必相等。<b>字段口径</b>：浏览商品数=点击过购物袋商品的去重商品款数；直播引导金额=由直播引导的已支付订单金额合计；直播贡献占比=直播引导金额÷累计消费；用于沉淀客户商品偏好画像。</div>
         </div>
       </section>
       <!-- ============ Tab 6 课程报表 ============ -->
@@ -851,10 +851,10 @@
             <table>
               <thead><tr><th>学员</th><th>手机号</th><th>归属店员</th><th>报名营期</th><th>学习时长</th><th>平均完播率</th><th>获得证书</th></tr></thead>
               <tbody>
-                <tr><td>王女士</td><td class="num">138****8888</td><td>张三</td><td>2 期</td><td>42.0h</td><td>92%</td><td>1 张</td></tr>
+                <tr><td><button class="link" onclick="openCustomer360('王女士','张三')">王女士</button></td><td class="num">138****8888</td><td>张三</td><td>2 期</td><td>42.0h</td><td>92%</td><td>1 张</td></tr>
                 <tr><td>刘女士</td><td class="num">136****2222</td><td>张三</td><td>2 期</td><td>36.0h</td><td>85%</td><td>1 张</td></tr>
-                <tr><td>李先生</td><td class="num">139****6666</td><td>李四</td><td>1 期</td><td>18.0h</td><td>78%</td><td>—</td></tr>
-                <tr><td>陈小姐</td><td class="num">137****5555</td><td>王五</td><td>1 期</td><td>6.0h</td><td>40%</td><td>—</td></tr>
+                <tr><td><button class="link" onclick="openCustomer360('李先生','李四')">李先生</button></td><td class="num">139****6666</td><td>李四</td><td>1 期</td><td>18.0h</td><td>78%</td><td>—</td></tr>
+                <tr><td><button class="link" onclick="openCustomer360('陈小姐','王五')">陈小姐</button></td><td class="num">137****5555</td><td>王五</td><td>1 期</td><td>6.0h</td><td>40%</td><td>—</td></tr>
                 <tr class="tot"><td>汇总</td><td>4 人</td><td>—</td><td>6 期次</td><td>102.0h</td><td>平均 73.8%</td><td>2 张</td></tr>
               </tbody>
             </table>
@@ -907,9 +907,9 @@
             <table>
               <thead><tr><th>会员</th><th>等级</th><th>归属店员</th><th>观看时长</th><th>进度</th><th>答题</th><th>正确率</th><th>红包</th><th>状态</th></tr></thead>
               <tbody>
-                <tr><td>王女士</td><td><span class="tag t-amber">黑卡</span></td><td>张三</td><td>25min</td><td>100%</td><td>5/5</td><td>100%</td><td>¥10</td><td><span class="tag t-green">已完成</span></td></tr>
-                <tr><td>李先生</td><td><span class="tag t-amber">金卡</span></td><td>李四</td><td>18min</td><td>78%</td><td>4/5</td><td>80%</td><td>¥5</td><td><span class="tag t-gray">学习中</span></td></tr>
-                <tr><td>陈小姐</td><td><span class="tag t-gray">普通</span></td><td>王五</td><td>8min</td><td>35%</td><td>2/5</td><td>40%</td><td>—</td><td><span class="tag t-gray">学习中</span></td></tr>
+                <tr><td><button class="link" onclick="openCustomer360('王女士','张三')">王女士</button></td><td><span class="tag t-amber">黑卡</span></td><td>张三</td><td>25min</td><td>100%</td><td>5/5</td><td>100%</td><td>¥10</td><td><span class="tag t-green">已完成</span></td></tr>
+                <tr><td><button class="link" onclick="openCustomer360('李先生','李四')">李先生</button></td><td><span class="tag t-amber">金卡</span></td><td>李四</td><td>18min</td><td>78%</td><td>4/5</td><td>80%</td><td>¥5</td><td><span class="tag t-gray">学习中</span></td></tr>
+                <tr><td><button class="link" onclick="openCustomer360('陈小姐','王五')">陈小姐</button></td><td><span class="tag t-gray">普通</span></td><td>王五</td><td>8min</td><td>35%</td><td>2/5</td><td>40%</td><td>—</td><td><span class="tag t-gray">学习中</span></td></tr>
               </tbody>
             </table>
           </div>
@@ -923,11 +923,25 @@
           <div class="card tone-violet"><div class="card-label">名下会员总数</div><div class="card-value" data-def="全部店员名下会员合计（按归属快照）。" data-calc="各店员名下会员数相加" data-source="客户档案 · 归属店员" data-use="全体店员合计的客户资产规模。">1,256</div></div>
           <div class="card tone-green"><div class="card-label">贡献 GMV</div><div class="card-value" data-def="全部店员名下会员已支付订单金额合计。" data-calc="已支付订单金额合计" data-source="订单表 × 客户归属店员" data-use="全体店员合计的业绩产出，用于评估团队贡献。">¥185k</div></div>
           <div class="card tone-cyan"><div class="card-label">活跃会员</div><div class="card-value" data-def="全部店员名下活跃会员合计（每日 02:30 预计算）。" data-calc="活跃会员数量" data-source="会员状态汇总（每日凌晨预计算）" data-use="衡量实际可触达、有互动的客户规模。">1,058</div></div>
-          <div class="card tone-amber"><div class="card-label">复购率</div><div class="card-value" data-def="90 天消费 ≥2 次会员占同期有消费会员比例。" data-calc="90 天内下单 ≥2 次的会员数 ÷ 有消费会员数" data-source="会员状态汇总（每日凌晨预计算）" data-use="衡量客户粘性，评估整体客户维护质量。">38%</div></div>
+          <div class="card tone-amber"><div class="card-label">复购率</div><div class="card-value" data-def="90 天内有 ≥2 笔已支付订单的会员占同期有消费会员的比例。" data-calc="90 天内已支付订单 ≥2 笔的会员数 ÷ 有消费会员数" data-source="会员状态汇总（每日凌晨预计算）" data-use="衡量客户粘性，评估整体客户维护质量。">38%</div></div>
         </div>
         <div class="panel">
           <div class="panel-head"><div><div class="panel-title">店员贡献 Top（示例数据）</div><div class="panel-sub">按名下会员贡献 GMV 排序</div></div></div>
           <div class="chart-wrap" id="staffBars"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div><div class="panel-title">客户结构分析<span class="chip c-violet" style="margin-left:4px;">质量</span></div><div class="panel-sub">各店员名下客户的等级、状态与消费分层构成（示例数据）</div></div></div>
+          <table>
+            <thead><tr><th>店员</th><th>名下会员</th><th>VIP(占比)</th><th>活跃</th><th>沉睡</th><th>新增</th><th>高消费≥¥1,000</th><th>中 ¥300~1,000</th><th>低 ¥1~300</th><th>零消费</th><th>直播触达率</th></tr></thead>
+            <tbody>
+              <tr><td>张三</td><td>186</td><td>68 (36.6%)</td><td>168</td><td>18</td><td>12</td><td>22</td><td>45</td><td>71</td><td>48</td><td>51.6%</td></tr>
+              <tr><td>李四</td><td>152</td><td>52 (34.2%)</td><td>137</td><td>15</td><td>9</td><td>16</td><td>38</td><td>58</td><td>40</td><td>51.3%</td></tr>
+              <tr><td>王五</td><td>140</td><td>45 (32.1%)</td><td>118</td><td>22</td><td>8</td><td>15</td><td>33</td><td>52</td><td>40</td><td>47.1%</td></tr>
+              <tr><td>赵六</td><td>128</td><td>40 (31.3%)</td><td>112</td><td>16</td><td>6</td><td>14</td><td>30</td><td>48</td><td>36</td><td>48.4%</td></tr>
+              <tr class="tot"><td>汇总（前 4）</td><td>606</td><td>205 (33.8%)</td><td>535</td><td>71</td><td>35</td><td>67</td><td>146</td><td>229</td><td>164</td><td>49.8%</td></tr>
+            </tbody>
+          </table>
+          <div class="legend"><b>统计维度</b>：每行 = 一个店员，行为其名下会员（按客户去重）。<b>字段口径</b>：消费分层按累计已支付金额分档——高≥¥1,000；中¥300~1,000；低¥1~300；零=无已支付订单；直播触达率=名下会员中有直播观看记录的占比；活跃＋沉睡＝名下会员总数（两项互补且互斥）。</div>
         </div>
         <div class="panel">
           <div class="panel-head"><div><div class="panel-title">店员会员排行</div><div class="panel-sub">点击明细查看名下会员（示例数据）</div></div></div>
@@ -959,9 +973,9 @@
           <table>
             <thead><tr><th>店长</th><th>管辖店员</th><th>管辖门店</th><th>管辖会员</th><th>新增</th><th>VIP会员</th><th>贡献GMV</th><th>人均贡献</th><th>复购率</th><th>活跃率</th></tr></thead>
             <tbody>
-              <tr><td>陈总</td><td>8 人</td><td>3 家</td><td>620</td><td>45</td><td>180</td><td>¥98,000</td><td>¥158</td><td>40%</td><td>85%</td></tr>
-              <tr><td>刘总</td><td>6 人</td><td>2 家</td><td>480</td><td>32</td><td>120</td><td>¥72,000</td><td>¥150</td><td>36%</td><td>82%</td></tr>
-              <tr><td>周总</td><td>5 人</td><td>2 家</td><td>380</td><td>25</td><td>95</td><td>¥52,000</td><td>¥137</td><td>33%</td><td>78%</td></tr>
+              <tr><td><button class="link" onclick="openManagerDetail('陈总')">陈总</button></td><td>8 人</td><td>3 家</td><td>620</td><td>45</td><td>180</td><td>¥98,000</td><td>¥158</td><td>40%</td><td>85%</td></tr>
+              <tr><td><button class="link" onclick="openManagerDetail('刘总')">刘总</button></td><td>6 人</td><td>2 家</td><td>480</td><td>32</td><td>120</td><td>¥72,000</td><td>¥150</td><td>36%</td><td>82%</td></tr>
+              <tr><td><button class="link" onclick="openManagerDetail('周总')">周总</button></td><td>5 人</td><td>2 家</td><td>380</td><td>25</td><td>95</td><td>¥52,000</td><td>¥137</td><td>33%</td><td>78%</td></tr>
               <tr class="tot"><td>汇总（3 位店长）</td><td>19 人</td><td>7 家</td><td>1,480</td><td>102</td><td>395</td><td>¥222,000</td><td>¥150</td><td>36.3%</td><td>81.7%</td></tr>
             </tbody>
           </table>
@@ -1076,7 +1090,7 @@
             <tr><td>归属快照</td><td class="num">店员/店长归属按查询时点的归属关系快照统计，不追溯历史归属；换绑后历史数据不迁移</td></tr>
             <tr><td>查询窗口</td><td class="num">起止日期跨度 ≤ 30 天；<b>按月查</b>不可跨月（自然月结束后出数）；<b>按 30 天窗口查</b>可跨月</td></tr>
             <tr><td>成交口径</td><td class="num">订单类指标仅统计<b>已支付</b>；"下单"含未支付，仅在漏斗中区分标注</td></tr>
-            <tr><td>状态预计算</td><td class="num"><b>活跃</b>=90 天内有消费或有登录任一行为；<b>沉睡</b>=90 天无消费且无登录；<b>复购</b>=90 天内下单 ≥2 次。三项每日 02:30 预计算，为前一日（T-1）状态，活跃与沉睡互斥</td></tr>
+            <tr><td>状态预计算</td><td class="num"><b>活跃</b>=90 天内有消费或有登录任一行为；<b>沉睡</b>=90 天无消费且无登录；<b>复购</b>=90 天内已支付订单 ≥2 笔（退款成功订单扣减计数）。三项每日 02:30 预计算，为前一日（T-1）状态，活跃与沉睡互斥</td></tr>
             <tr><td>环比/同比</td><td class="num">暂不支持（计算需同周期差值再除以上周期，量大，列为后续评估项）</td></tr>
           </tbody>
         </table>
@@ -1173,7 +1187,7 @@
             <tr><td>活跃率</td><td class="num" style="font-family:var(--mono);font-size:11px;">活跃会员数 ÷ 会员总数 × 100%</td><td>每日 02:30 预计算</td></tr>
             <tr><td>贡献金额</td><td class="num" style="font-family:var(--mono);font-size:11px;">名下会员已支付订单金额合计</td><td>—</td></tr>
             <tr><td>人均贡献</td><td class="num" style="font-family:var(--mono);font-size:11px;">贡献金额 ÷ 名下会员数</td><td>—</td></tr>
-            <tr><td>复购率</td><td class="num" style="font-family:var(--mono);font-size:11px;">90 天内下单 ≥2 次的会员数 ÷ 有消费会员数 × 100%</td><td>预计算字段</td></tr>
+            <tr><td>复购率</td><td class="num" style="font-family:var(--mono);font-size:11px;">90 天内已支付订单 ≥2 笔的会员数 ÷ 有消费会员数 × 100%</td><td>预计算字段；退款成功订单扣减计数</td></tr>
             <tr><td>店长数据</td><td class="num" style="font-family:var(--mono);font-size:11px;">管辖门店内全部店员数据相加</td><td>按门店管辖关系</td></tr>
             <tr><td>四维矩阵</td><td class="num" style="font-family:var(--mono);font-size:11px;">以门店为行，直播、客户、商品三维度交叉汇总</td><td>观看→成交=成交客户÷观看人数</td></tr>
           </tbody>
@@ -1378,9 +1392,9 @@ function openLiveDetail(orig){
    +'<div class="legend"><b>字段口径</b>：挂车时长=商品在本场购物袋的上架时长；商品点击UV=点击该商品的去重客户数；客单价=成交金额÷成交订单数。</div>';
   el('ld-cust').innerHTML='<div class="panel-head"><div><div class="panel-title">本场客户观看明细<span class="chip c-violet" style="margin-left:4px;">客户×直播</span></div><div class="panel-sub">店长视角 ②：旗下客户在本场的参与深度'+(hasWatch?'（示例数据）':'')+'</div></div></div>'
    +(hasWatch?'<table><thead><tr><th>客户</th><th>归属店员</th><th>累计观看分钟</th><th>进入时间</th><th>互动次数</th><th>点击商品</th><th>下单金额</th><th>新客</th></tr></thead><tbody>'
-      +'<tr><td>王女士</td><td>张三</td><td>45.5</td><td>10:12</td><td>12</td><td><span class="tag t-green">是</span></td><td>¥320</td><td><span class="tag t-amber">新</span></td></tr>'
-      +'<tr><td>李先生</td><td>李四</td><td>32.0</td><td>10:15</td><td>3</td><td><span class="tag t-gray">否</span></td><td>—</td><td><span class="tag t-amber">新</span></td></tr>'
-      +'<tr><td>陈小姐</td><td>王五</td><td>18.2</td><td>10:40</td><td>5</td><td><span class="tag t-green">是</span></td><td>¥120</td><td><span class="tag t-gray">旧</span></td></tr></tbody></table>'
+      +'<tr><td><button class="link" onclick=\"openCustomer360(\'王女士\',\'张三\')\">王女士</button></td><td>张三</td><td>45.5</td><td>10:12</td><td>12</td><td><span class="tag t-green">是</span></td><td>¥320</td><td><span class="tag t-amber">新</span></td></tr>'
+      +'<tr><td><button class="link" onclick=\"openCustomer360(\'李先生\',\'李四\')\">李先生</button></td><td>李四</td><td>32.0</td><td>10:15</td><td>3</td><td><span class="tag t-gray">否</span></td><td>—</td><td><span class="tag t-amber">新</span></td></tr>'
+      +'<tr><td><button class="link" onclick=\"openCustomer360(\'陈小姐\',\'王五\')\">陈小姐</button></td><td>王五</td><td>18.2</td><td>10:40</td><td>5</td><td><span class="tag t-green">是</span></td><td>¥120</td><td><span class="tag t-gray">旧</span></td></tr></tbody></table>'
       +'<div class="legend"><b>字段口径</b>：累计观看分钟=该客户在本场多次进出观看时长之和÷60；归属店员按查询时点 staff_id 快照；新客=is_new_customer=1。</div>'
      :'<div class="empty" style="margin:10px 16px 16px;">本场暂无客户观看记录</div>');
   if(hasWatch) funnel('liveFunnel',[['预约',48],['观看',4],['签到',2],['互动',3],['下单',7],['成交',6]]);
@@ -1531,13 +1545,15 @@ const SPECS={
   ['回放分钟','回放观看时长合计换算为分钟','回放观看时长 ÷ 60','直播观看明细 · 回放记录','衡量客户回看行为，反映内容长尾价值。'],
   ['直播贡献占比','直播引导金额占累计消费的比例','直播引导金额 ÷ 累计消费','由其他指标计算得出','评估直播渠道对该客户消费的贡献度。'],
   ['归属隔离','店长/店员仅见名下客户，按查询时点归属快照','按查询时点归属关系过滤','客户档案 · 归属店员','保障数据安全，防止客户归属与业绩串号。'],
+  ['客户 360 档案','单客户全量数据视图：画像标签 ＋ 六项核心数 ＋ 消费订单/直播参与/课程学习/互动行为四类明细','按客户聚合全维度行为与交易数据（金额仅含已支付）','跨表关联汇总','店员跟进单个客户、店长检查维护效果时的一站式视图。'],
  ],
  '门店 / 店员 / 店长':[
   ['名下会员','归属在该成员名下的正常客户数量（不追溯历史归属）','归属该成员名下的正常客户数','客户档案 · 归属店员','成员个人客户资产规模，是归属与业绩归因的基础。'],
   ['贡献金额','名下会员已支付订单金额合计','名下会员已支付订单金额相加','订单表 ＋ 客户归属','成员个人业绩结果指标，用于排名与激励。'],
   ['沉睡会员','90 天无消费且无登录的会员（前一日状态）','90 天无消费且无登录的会员数','会员状态汇总（每日凌晨预计算）','识别需要唤回的客户，指导挽回动作优先级。'],
-  ['复购率','90 天内下单 ≥2 次会员占同期有消费会员的比例','90 天 ≥2 单会员数 ÷ 有消费会员数','会员状态汇总 · 复购标记','衡量客户粘性与客户维护质量。'],
+  ['复购率','90 天内有 ≥2 笔已支付订单的会员占同期有消费会员的比例','90 天内已支付订单 ≥2 笔的会员数 ÷ 有消费会员数','会员状态汇总 · 复购标记','衡量客户粘性与客户维护质量。'],
   ['店长数据','管辖门店内全部店员数据相加','各店员数据相加','员工档案聚合','店长管理成果的汇总视图，用于管理层评估。'],
+  ['消费分层','按客户累计已支付金额分档：高≥¥1,000；中¥300~1,000；低¥1~300；零=无已支付订单','按客户累计已支付金额分档计数','订单表 · 按客户聚合','识别名下客户的质量结构，指导店员差异化维护。'],
  ],
  '课程报表':[
   ['观看人数','有该课程观看记录的去重客户数','该课程观看记录去重','直播观看明细','反映课程触达规模，完播率的分母。'],
@@ -1576,12 +1592,72 @@ function openModal(title,html){ el('gm-title').textContent=title; el('gm-body').
 function closeModal(){ el('gm').classList.remove('open'); }
 el('gm').addEventListener('click',e=>{ if(e.target.id==='gm') closeModal(); });
 
+/* 客户 360 档案 */
+const C360={
+ '王女士':{lv:'黑卡 VIP',own:'张三',bind:'2026-03-15',st:'活跃',stc:'t-green',tags:['直播敏感型','高消费','高互动'],
+  kpi:[['¥3,200','累计消费'],['9 笔','订单总数'],['¥920 · 28.8%','直播消费 · 占比'],['326 分钟','直播观看'],['42 小时 · 2 门','课程学习'],['46 次','互动次数']],
+  orders:[['玻尿酸精华液 30ml','¥320','直播78 引导','08-24'],['修护面霜 50g','¥300','直播76 引导','08-20'],['洁面乳 120ml','¥300','直播76 引导','08-18'],['面霜套装','¥500','自然购买','08-12'],['精华水','¥420','自然购买','08-02'],['补水面膜','¥380','自然购买','07-28'],['身体乳','¥360','自然购买','07-15'],['洗发水','¥320','自然购买','07-02'],['护手霜','¥300','自然购买','06-20']],
+  live:[['直播78','45.0','是','是','¥320','08-24'],['直播76','32.0','是','是','¥300','08-20'],['直播72','28.5','否','是','¥300','08-12']],
+  course:[['产品知识','25 分钟','100%','是','100%','¥10'],['销售话术营（营期）','42 小时','92%','—','—','—']],
+  inter:[['评论','直播78','08-24'],['点赞','直播76','08-20'],['分享','直播76','08-18'],['点赞','直播72','08-12']]},
+ '李先生':{lv:'金卡 VIP',own:'李四',bind:'2026-04-02',st:'活跃',stc:'t-green',tags:['中消费','浅互动'],
+  kpi:[['¥1,800','累计消费'],['3 笔','订单总数'],['¥300 · 16.7%','直播消费 · 占比'],['142 分钟','直播观看'],['18 分钟 · 1 门','课程学习'],['9 次','互动次数']],
+  orders:[['修护面霜 50g','¥300','直播76 引导','08-22'],['精华水','¥800','自然购买','08-05'],['洁面乳','¥700','自然购买','07-18']],
+  live:[['直播76','32.0','是','否','¥300','08-22'],['直播72','58.0','是','否','—','08-12']],
+  course:[['销售技巧','18 分钟','78%','否','80%','¥5']],
+  inter:[['点赞','直播76','08-22'],['评论','直播72','08-12']]},
+ '陈小姐':{lv:'普通会员',own:'王五',bind:'2026-06-20',st:'沉睡',stc:'t-red',tags:['流失风险','待唤醒'],
+  kpi:[['¥0','累计消费'],['0 笔','订单总数'],['¥0 · —','直播消费 · 占比'],['36 分钟','直播观看'],['8 分钟 · 1 门','课程学习'],['2 次','互动次数']],
+  orders:[['洁面乳 120ml','—','加购未付 · 流失风险','07-06']],
+  live:[['直播78','18.2','否','是','—','08-24']],
+  course:[['产品知识','8 分钟','35%','否','40%','—']],
+  inter:[['点赞','直播78','08-24']]}
+};
+function openCustomer360(name,own){
+  const d=C360[name]||{lv:'普通会员',own:own||'—',bind:'—',st:'活跃',stc:'t-green',tags:['—'],
+   kpi:[['—','累计消费'],['—','订单总数'],['—','直播消费 · 占比'],['—','直播观看'],['—','课程学习'],['—','互动次数']],
+   orders:[],live:[],course:[],inter:[]};
+  const tagHtml=d.tags.map(t=>'<span class="tag t-amber">'+t+'</span>').join(' ');
+  const kpiHtml=d.kpi.map(k=>'<div class="card" style="padding:8px 10px;"><div style="font-size:15px;font-weight:700;">'+k[0]+'</div><div style="font-size:10.5px;color:var(--fg-3);margin-top:2px;">'+k[1]+'</div></div>').join('');
+  const tbl=(heads,rows,empty)=>rows.length?'<table><thead><tr>'+heads.map(h=>'<th>'+h+'</th>').join('')+'</tr></thead><tbody>'+rows.map(r=>'<tr>'+r.map(c=>'<td>'+c+'</td>').join('')+'</tr>').join('')+'</tbody></table>':'<div class="empty" style="margin:12px 16px;">'+empty+'</div>';
+  const panes=[
+   ['orders','消费订单',tbl(['商品','金额','渠道','时间'],d.orders,'暂无已支付订单')],
+   ['live','直播参与',tbl(['场次','观看分钟','签到','互动','消费','最近'],d.live,'暂无直播观看记录')],
+   ['course','课程学习',tbl(['课程/营期','时长','进度','完播','正确率','红包'],d.course,'暂无课程学习记录')],
+   ['inter','互动行为',tbl(['行为','场次','时间'],d.inter,'暂无互动行为')]];
+  const tabsHtml='<div style="display:flex;gap:6px;margin:14px 0 10px;">'+panes.map((p,i)=>'<button class="tab'+(i===0?' active':'')+'" style="flex:none;padding:5px 12px;" onclick="c360Tab(this,\''+p[0]+'\')">'+p[1]+'</button>').join('')+'</div>';
+  const panesHtml=panes.map((p,i)=>'<div class="c360-pane" data-k="'+p[0]+'"'+(i?' hidden':'')+'>'+p[2]+'</div>').join('');
+  openModal('客户 360 档案 · '+name,
+    '<div class="caliber" style="margin-bottom:12px;"><b>'+name+'</b> · '+d.lv+' · 归属店员 '+d.own+' · 绑定于 '+d.bind+' · 状态 <span class="tag '+d.stc+'">'+d.st+'</span> &nbsp;'+tagHtml+'</div>'
+    +'<div class="grid" style="grid-template-columns:repeat(6,1fr);margin-bottom:4px;">'+kpiHtml+'</div>'
+    +tabsHtml+panesHtml
+    +'<div class="legend"><b>统计维度</b>：本档案按客户聚合其全部行为与交易数据；金额类仅含已支付（退款冲减）；直播/课程/互动为周期内累计；店长/店员视角仅见名下客户。数据为示例。</div>');
+}
+function c360Tab(btn,key){
+  const root=btn.closest('.modal-body');
+  root.querySelectorAll('.c360-pane').forEach(p=>{p.hidden=p.dataset.k!==key;});
+  btn.parentElement.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t===btn));
+}
+/* 店长详情（下钻） */
+const MGR={
+ '陈总':{stores:3,staff:8,mem:620,vip:180,gmv:'¥98,000',rows:[['张三','天河旗舰店',186,68,168,18,'¥28,000','42%'],['孙七','天河旗舰店',156,54,142,14,'¥23,500','39%'],['周八','白云店',148,32,136,12,'¥24,000','38%'],['吴九','番禺店',130,26,114,16,'¥22,500','41%']]},
+ '刘总':{stores:2,staff:6,mem:480,vip:120,gmv:'¥72,000',rows:[['钱十','白云店',150,45,140,10,'¥20,000','37%'],['郑一','白云店',130,35,122,8,'¥18,000','35%'],['王二','番禺店',110,25,100,10,'¥17,500','38%'],['冯三','番禺店',90,15,82,8,'¥16,500','34%']]},
+ '周总':{stores:2,staff:5,mem:380,vip:95,gmv:'¥52,000',rows:[['褚四','天河旗舰店',110,30,100,10,'¥15,000','36%'],['卫五','天河旗舰店',100,25,90,10,'¥14,000','33%'],['蒋六','白云店',90,20,82,8,'¥12,000','31%'],['沈七','白云店',80,20,72,8,'¥11,000','32%']]}
+};
+function openManagerDetail(name){
+  const d=MGR[name]||MGR['陈总'];
+  const rows=d.rows.map(r=>'<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td><td>'+r[3]+'</td><td>'+r[4]+'</td><td>'+r[5]+'</td><td>'+r[6]+'</td><td>'+r[7]+'</td><td><button class="link" onclick="openMemberDetail(\''+r[0]+'\',\'店员\')">明细 →</button></td></tr>').join('');
+  openModal('店长详情 · '+name,
+    '<div class="caliber" style="margin-bottom:12px;"><b>'+name+'</b> · 管辖 '+d.stores+' 家门店 · '+d.staff+' 名店员 · 名下会员 '+d.mem+'（VIP '+d.vip+'）· 管辖贡献 '+d.gmv+'。下表为管辖店员明细（示例前 4 名，完整名单支持导出）。</div>'
+    +'<table><thead><tr><th>店员</th><th>所属门店</th><th>名下会员</th><th>VIP</th><th>活跃</th><th>沉睡</th><th>贡献GMV</th><th>复购率</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>'
+    +'<div class="legend"><b>统计维度</b>：每行 = 一名店员，行为其名下会员（按客户去重，归属快照）；店长数据 = 管辖门店内全部店员数据相加，不追溯历史归属。点击「明细」查看该店员名下会员，再点客户名可进入客户 360 档案。</div>');
+}
 /* 商品明细 */
 function openProductDetail(name){
   openModal('商品明细 · '+name,
     '<div class="caliber" style="margin-bottom:12px;">带货表现 = 挂车场次去重数、点击UV、成交订单与金额；转化链 = 点击购物袋 → 加购 → 下单 → 支付。</div>'
     +'<table><thead><tr><th>指标</th><th>数值</th><th>口径</th></tr></thead><tbody>'
-    +'<tr><td>直播成交金额</td><td>¥25,800</td><td>live_id 非空已支付订单合计</td></tr>'
+    +'<tr><td>直播成交金额</td><td>¥25,800</td><td>由直播引导的已支付订单金额合计</td></tr>'
     +'<tr><td>带货场次数</td><td>6</td><td>直播挂车明细 去重场次</td></tr>'
     +'<tr><td>商品点击UV</td><td>3,240</td><td>点击购物袋去重客户数</td></tr>'
     +'<tr><td>新客占比</td><td>38.9%</td><td>首次下单客户 ÷ 成交客户</td></tr></tbody></table>'
