@@ -742,7 +742,7 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
   <aside class="anno"><div class="ttl">屏10 · 订单管理 · 待付款<small>现有页增量改造（非新页）</small></div>
 <div class="ah">业务逻辑</div>
 <ol>
-<li>列表只显示<b>当前登录人自己代下的</b>待付款订单：店长看不到店员代下的单，店员之间也互相看不到——谁下的单谁跟进到底。离职或账号停用时不移交：系统提醒客户自己付款，到期没付自动关单，需要兜底时由后台人工取消。</li>
+<li>列表只显示<b>当前登录人自己代下的</b>待付款订单：店长看不到店员代下的单，店员之间也互相看不到——谁下的单谁跟进到底。离职或账号停用时不移交：到期没付自动关单，需要兜底时由后台人工取消。</li>
 <li><b>付完款就结束</b>：已支付的代客单从店员端所有列表消失（这里只有未付款和已关闭的代客单），店长/店员要查单去后台订单详情；客户在自己「我的订单」能看到这张单。</li>
 <li>订单有30分钟支付倒计时，到期自动关闭并释放库存；关单前10分钟系统提醒店员去跟进。</li>
 <li>「取消」立即生效：通知客户。</li>
@@ -816,7 +816,7 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
           <span class="price" style="font-size:14px">¥218.50</span></div>
         <div class="btnrow"><span class="br-btn btn-gray">再次购买</span><span class="br-btn btn-g1">申请售后</span></div>
       </div>
-      <div class="note-static" style="margin:0 0 12px">待付款代客单：买家可见（带「店员代下单」标识）且可自行支付（计 买家本人付款）。</div>
+      <div class="note-static" style="margin:0 0 12px">待付款代客单：买家可见（带「店员代下单」标识）但<b>买家不能支付</b>——付款只由下单的店长/店员在收银台完成，身份不串。</div>
     </div>
   </div>
   </div>
@@ -824,12 +824,12 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
 <div class="ah">业务逻辑</div>
 <ol>
 <li>代客下单的订单在客户自己的订单列表里也能看到，带"店员代下单"标识——钱货关系对客户透明，避免"我明明买了东西却查不到订单"的疑虑。</li>
-<li>待付款的代客单，客户可以自己付款（此时记为"买家本人付款"）。</li>
+<li>待付款的代客单，客户<b>不能自己付款</b>——下单和付款都只属于店长/店员这条身份线；客户这边只看到这张单挂着「待付款」。</li>
 <li>售后入口按状态出现：付过款就能申请"仅退款"；签收后才能申请"退货退款"。买家视角<b>没有「确认收货」按钮</b>——代客单是店长/店员下的单，收货确认由他们在店员端操作。</li>
 <li>申请售后后订单被"挂起"：商家不能发货、不能签收，直到售后处理完。</li>
 </ol>
 <div class="ah">数据流转</div>
-<div class="flow2">打开列表 → 查询客户自己的订单（带代下单标识）<br>买家自付 → 走现有收银台流程（付款方式记为买家本人付款）<br>提交售后 → 创建售后单 → 订单挂起</div></aside>
+<div class="flow2">打开列表 → 查询客户自己的订单（带代下单标识）<br>代客单无买家支付入口（付款由店长/店员完成）<br>提交售后 → 创建售后单 → 订单挂起</div></aside>
 </div>
 
 <!-- 售后申请屏 -->
