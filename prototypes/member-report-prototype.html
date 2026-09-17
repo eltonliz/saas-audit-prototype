@@ -929,6 +929,30 @@
           <div class="panel-head"><div><div class="panel-title">店员贡献 Top（示例数据）</div><div class="panel-sub">按名下会员贡献 GMV 排序</div></div></div>
           <div class="chart-wrap" id="staffBars"></div>
         </div>
+        <div class="grid g2e">
+          <div class="panel" style="margin-bottom:0;">
+            <div class="panel-head"><div><div class="panel-title">名下会员总数 · 近 30 天</div><div class="panel-sub">全体店员名下会员合计（按 5 天采样）</div></div></div>
+            <div class="chart-wrap" id="staffTrendMem"></div>
+          </div>
+          <div class="panel" style="margin-bottom:0;">
+            <div class="panel-head"><div><div class="panel-title">贡献 GMV 累计 · 近 30 天</div><div class="panel-sub">全体店员名下会员已支付金额累计（千元）</div></div></div>
+            <div class="chart-wrap" id="staffTrendGmv"></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div><div class="panel-title">店员行为投入对比<span class="chip c-blue" style="margin-left:4px;">过程</span></div><div class="panel-sub">结果指标之外的日常工作投入（示例数据）</div></div></div>
+          <table>
+            <thead><tr><th>店员</th><th>开播场次</th><th>累计直播时长</th><th>客户群发</th><th>跟进记录</th><th>邀约到店</th></tr></thead>
+            <tbody>
+              <tr><td>张三</td><td>6</td><td>18.5 小时</td><td>23 次</td><td>41 条</td><td>15 人</td></tr>
+              <tr><td>李四</td><td>5</td><td>14.0 小时</td><td>19 次</td><td>33 条</td><td>11 人</td></tr>
+              <tr><td>王五</td><td>4</td><td>11.0 小时</td><td>16 次</td><td>28 条</td><td>9 人</td></tr>
+              <tr><td>赵六</td><td>3</td><td>8.0 小时</td><td>12 次</td><td>21 条</td><td>7 人</td></tr>
+              <tr class="tot"><td>汇总（前 4）</td><td>18</td><td>51.5 小时</td><td>70 次</td><td>123 条</td><td>42 人</td></tr>
+            </tbody>
+          </table>
+          <div class="legend"><b>用途</b>：结果指标（GMV/会员数）回答“做得怎么样”，本表回答“有没有在做”——投入高但结果差的店员需要方法辅导，投入低的店员需要激励。<b>口径</b>：行为数据触发即更新；群发含直播推广群发；邀约到店按登记计数。</div>
+        </div>
         <div class="panel">
           <div class="panel-head"><div><div class="panel-title">客户结构分析<span class="chip c-violet" style="margin-left:4px;">质量</span></div><div class="panel-sub">各店员名下客户的等级、状态与消费分层构成（示例数据）</div></div></div>
           <table>
@@ -946,13 +970,13 @@
         <div class="panel">
           <div class="panel-head"><div><div class="panel-title">店员会员排行</div><div class="panel-sub">点击明细查看名下会员（示例数据）</div></div></div>
           <table>
-            <thead><tr><th>排名</th><th>店员</th><th>门店</th><th>身份</th><th>名下会员</th><th>新增</th><th>VIP</th><th>沉睡</th><th>贡献GMV</th><th>复购率</th><th></th></tr></thead>
+            <thead><tr><th>排名</th><th>店员</th><th>门店</th><th>身份</th><th>名下会员</th><th>新增</th><th>VIP</th><th>沉睡</th><th>贡献GMV</th><th>人均贡献</th><th>复购率</th><th>变化</th><th></th></tr></thead>
             <tbody>
-              <tr><td><span class="rank r1">1</span></td><td>张三</td><td>天河旗舰店</td><td><span class="tag t-blue">店员</span></td><td>186</td><td>12</td><td>68</td><td>18</td><td>¥28,000</td><td>42%</td><td><button class="link" onclick="openMemberDetail('张三','店员')">明细 →</button></td></tr>
-              <tr><td><span class="rank r2">2</span></td><td>李四</td><td>天河旗舰店</td><td><span class="tag t-blue">店员</span></td><td>152</td><td>9</td><td>52</td><td>15</td><td>¥22,500</td><td>38%</td><td><button class="link" onclick="openMemberDetail('李四','店员')">明细 →</button></td></tr>
-              <tr><td><span class="rank r3">3</span></td><td>王五</td><td>白云店</td><td><span class="tag t-blue">店员</span></td><td>140</td><td>8</td><td>45</td><td>22</td><td>¥19,200</td><td>35%</td><td><button class="link" onclick="openMemberDetail('王五','店员')">明细 →</button></td></tr>
-              <tr><td><span class="rank rn">4</span></td><td>赵六</td><td>番禺店</td><td><span class="tag t-violet">店长</span></td><td>128</td><td>6</td><td>40</td><td>16</td><td>¥18,000</td><td>31%</td><td><button class="link" onclick="openMemberDetail('赵六','店长')">明细 →</button></td></tr>
-              <tr class="tot"><td>汇总（前 4）</td><td>—</td><td>—</td><td>606</td><td>35</td><td>205</td><td>71</td><td>¥87,700</td><td>36.5%</td><td>—</td></tr>
+              <tr><td><span class="rank r1">1</span></td><td><button class="link" onclick="openStaffDetail('张三')">张三</button></td><td>天河旗舰店</td><td><span class="tag t-blue">店员</span></td><td>186</td><td>12</td><td>68</td><td>18</td><td>¥28,000</td><td>¥151</td><td>42%</td><td><span class="flat">持平</span></td><td><button class="link" onclick="openMemberDetail('张三','店员')">明细 →</button></td></tr>
+              <tr><td><span class="rank r2">2</span></td><td><button class="link" onclick="openStaffDetail('李四')">李四</button></td><td>天河旗舰店</td><td><span class="tag t-blue">店员</span></td><td>152</td><td>9</td><td>52</td><td>15</td><td>¥22,500</td><td>¥148</td><td>38%</td><td><span class="up">↑1</span></td><td><button class="link" onclick="openMemberDetail('李四','店员')">明细 →</button></td></tr>
+              <tr><td><span class="rank r3">3</span></td><td><button class="link" onclick="openStaffDetail('王五')">王五</button></td><td>白云店</td><td><span class="tag t-blue">店员</span></td><td>140</td><td>8</td><td>45</td><td>22</td><td>¥19,200</td><td>¥137</td><td>35%</td><td><span class="flat">持平</span></td><td><button class="link" onclick="openMemberDetail('王五','店员')">明细 →</button></td></tr>
+              <tr><td><span class="rank rn">4</span></td><td><button class="link" onclick="openStaffDetail('赵六')">赵六</button></td><td>番禺店</td><td><span class="tag t-violet">店长</span></td><td>128</td><td>6</td><td>40</td><td>16</td><td>¥18,000</td><td>¥141</td><td>31%</td><td><span class="down">↓1</span></td><td><button class="link" onclick="openMemberDetail('赵六','店长')">明细 →</button></td></tr>
+              <tr class="tot"><td>汇总（前 4）</td><td>—</td><td>—</td><td>606</td><td>35</td><td>205</td><td>71</td><td>¥87,700</td><td>¥145</td><td>36.5%</td><td>—</td><td>—</td></tr>
             </tbody>
           </table>
           <div class="legend"><b>字段口径</b>：归属口径=按查询时点 staff_id 快照，不追溯历史；新增=first_bind_time 在统计周期内；VIP=非普通等级会员。</div>
@@ -980,6 +1004,16 @@
             </tbody>
           </table>
           <div class="legend"><b>字段口径</b>：管辖关系按 员工档案表 所属门店聚合；人均贡献=管辖GMV÷管辖会员数；活跃率=活跃会员÷管辖会员数；管辖范围变动按查询时点快照，不追溯。</div>
+        </div>
+        <div class="grid g2e">
+          <div class="panel" style="margin-bottom:0;">
+            <div class="panel-head"><div><div class="panel-title">管辖会员总数 · 近 30 天</div><div class="panel-sub">全体店长管辖会员合计（按 5 天采样）</div></div></div>
+            <div class="chart-wrap" id="mgrTrendMem"></div>
+          </div>
+          <div class="panel" style="margin-bottom:0;">
+            <div class="panel-head"><div><div class="panel-title">管辖贡献 GMV 累计 · 近 30 天</div><div class="panel-sub">全体店长管辖会员已支付金额累计（千元）</div></div></div>
+            <div class="chart-wrap" id="mgrTrendGmv"></div>
+          </div>
         </div>
       </section>
      </div>
@@ -1470,6 +1504,10 @@ function sparks(){
 
 /* ================= 图表数据（示例标注见各面板） ================= */
 areaChart('trendWatch',[420,380,455,410,470,445,510],['08-21','08-22','08-23','08-24','08-25','08-26','08-27'],'#2563EB',v=>Math.round(v));
+areaChart('staffTrendMem',[1236,1239,1242,1244,1247,1250,1253,1256],['-30','-25','-20','-15','-10','-5','-3','今'],'#7C3AED',v=>Math.round(v));
+areaChart('staffTrendGmv',[158,163,167,171,175,179,182,185],['-30','-25','-20','-15','-10','-5','-3','今'],'#059669',v=>v.toFixed(0));
+areaChart('mgrTrendMem',[1240,1243,1246,1248,1251,1253,1255,1256],['-30','-25','-20','-15','-10','-5','-3','今'],'#2563EB',v=>Math.round(v));
+areaChart('mgrTrendGmv',[160,165,169,173,177,180,183,185],['-30','-25','-20','-15','-10','-5','-3','今'],'#0891B2',v=>v.toFixed(0));
 areaChart('trendDur',[320,180,660,120,910,306,660],['08-21','08-22','08-23','08-24','08-25','08-26','08-27'],'#0891B2',v=>Math.round(v));
 donut('memberDonut',
  [{n:'黑卡',raw:'620',v:620,c:'#7C3AED'},{n:'金卡',raw:'480',v:480,c:'#D97706'},{n:'银卡',raw:'320',v:320,c:'#94A3B8'},{n:'普通',raw:'140',v:140,c:'#CBD5E1'}],
@@ -1554,6 +1592,11 @@ const SPECS={
   ['复购率','90 天内有 ≥2 笔已支付订单的会员占同期有消费会员的比例','90 天内已支付订单 ≥2 笔的会员数 ÷ 有消费会员数','会员状态汇总 · 复购标记','衡量客户粘性与客户维护质量。'],
   ['店长数据','管辖门店内全部店员数据相加','各店员数据相加','员工档案聚合','店长管理成果的汇总视图，用于管理层评估。'],
   ['消费分层','按客户累计已支付金额分档：高≥¥1,000；中¥300~1,000；低¥1~300；零=无已支付订单','按客户累计已支付金额分档计数','订单表 · 按客户聚合','识别名下客户的质量结构，指导店员差异化维护。'],
+  ['开播场次','统计周期内该成员开播的直播场次','按成员关联场次去重计数','直播场次表','衡量一线的自播投入。'],
+  ['客户群发','统计周期内该成员向名下客户群发的消息次数','按成员＋群发任务计数','客户群发记录','衡量主动触达客户的频率。'],
+  ['跟进记录','统计周期内该成员录入的客户跟进条数','按成员＋跟进动作计数','客户跟进记录','衡量客户维护的过程投入。'],
+  ['邀约到店','统计周期内该成员邀约客户到店的登记数','按邀约登记计数','邀约记录','线下转化的过程指标。'],
+  ['排名变化','当前周期排名与上一周期排名的差值','上期排名 − 本期排名','由其他指标计算得出','快速识别进步与退步的店员。'],
  ],
  '课程报表':[
   ['观看人数','有该课程观看记录的去重客户数','该课程观看记录去重','直播观看明细','反映课程触达规模，完播率的分母。'],
@@ -1640,17 +1683,71 @@ function c360Tab(btn,key){
 }
 /* 店长详情（下钻） */
 const MGR={
- '陈总':{stores:3,staff:8,mem:620,vip:180,gmv:'¥98,000',rows:[['张三','天河旗舰店',186,68,168,18,'¥28,000','42%'],['孙七','天河旗舰店',156,54,142,14,'¥23,500','39%'],['周八','白云店',148,32,136,12,'¥24,000','38%'],['吴九','番禺店',130,26,114,16,'¥22,500','41%']]},
- '刘总':{stores:2,staff:6,mem:480,vip:120,gmv:'¥72,000',rows:[['钱十','白云店',150,45,140,10,'¥20,000','37%'],['郑一','白云店',130,35,122,8,'¥18,000','35%'],['王二','番禺店',110,25,100,10,'¥17,500','38%'],['冯三','番禺店',90,15,82,8,'¥16,500','34%']]},
- '周总':{stores:2,staff:5,mem:380,vip:95,gmv:'¥52,000',rows:[['褚四','天河旗舰店',110,30,100,10,'¥15,000','36%'],['卫五','天河旗舰店',100,25,90,10,'¥14,000','33%'],['蒋六','白云店',90,20,82,8,'¥12,000','31%'],['沈七','白云店',80,20,72,8,'¥11,000','32%']]}
+ '陈总':{stores:3,staff:8,mem:620,vip:180,gmv:'¥98,000',storesB:[['天河旗舰店',280,45000],['白云店',200,30000],['番禺店',140,23000]],trendM:[598,602,605,609,612,616,618,620],trendG:[62,68,74,80,85,90,94,98],
+  rows:[['张三','天河旗舰店',186,68,168,18,'¥28,000','42%'],['孙七','天河旗舰店',156,54,142,14,'¥23,500','39%'],['周八','白云店',148,32,136,12,'¥24,000','38%'],['吴九','番禺店',130,26,114,16,'¥22,500','41%']]},
+ '刘总':{stores:2,staff:6,mem:480,vip:120,gmv:'¥72,000',storesB:[['白云店',260,40000],['番禺店',220,32000]],trendM:[465,468,470,473,475,477,479,480],trendG:[45,50,55,60,64,68,70,72],
+  rows:[['钱十','白云店',150,45,140,10,'¥20,000','37%'],['郑一','白云店',130,35,122,8,'¥18,000','35%'],['王二','番禺店',110,25,100,10,'¥17,500','38%'],['冯三','番禺店',90,15,82,8,'¥16,500','34%']]},
+ '周总':{stores:2,staff:5,mem:380,vip:95,gmv:'¥52,000',storesB:[['天河旗舰店',200,28000],['白云店',180,24000]],trendM:[368,370,372,374,376,378,379,380],trendG:[33,36,39,42,45,48,50,52],
+  rows:[['褚四','天河旗舰店',110,30,100,10,'¥15,000','36%'],['卫五','天河旗舰店',100,25,90,10,'¥14,000','33%'],['蒋六','白云店',90,20,82,8,'¥12,000','31%'],['沈七','白云店',80,20,72,8,'¥11,000','32%']]}
 };
-function openManagerDetail(name){
+function openManagerDetail(name,idx){
   const d=MGR[name]||MGR['陈总'];
-  const rows=d.rows.map(r=>'<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td><td>'+r[3]+'</td><td>'+r[4]+'</td><td>'+r[5]+'</td><td>'+r[6]+'</td><td>'+r[7]+'</td><td><button class="link" onclick="openMemberDetail(\''+r[0]+'\',\'店员\')">明细 →</button></td></tr>').join('');
+  const rows=d.rows.map(r=>'<tr><td><button class="link" onclick="openStaffDetail(\''+r[0]+'\')">'+r[0]+'</button></td><td>'+r[1]+'</td><td>'+r[2]+'</td><td>'+r[3]+'</td><td>'+r[4]+'</td><td>'+r[5]+'</td><td>'+r[6]+'</td><td>'+r[7]+'</td><td><button class="link" onclick="openMemberDetail(\''+r[0]+'\',\'店员\')">明细 →</button></td></tr>').join('');
+  const storeRows=d.storesB.map(s=>{
+    const gm=Math.round(s[2]/d.mem*100)/100;
+    const pct=(s[1]/d.mem*100).toFixed(1);
+    return '<div class="dist-row"><div class="dist-name">'+s[0]+'</div><div class="dist-track"><div class="dist-fill" style="width:'+(s[2]/Math.max(...d.storesB.map(x=>x[2]))*100).toFixed(1)+'%;background:var(--blue);"></div></div><div class="dist-num">'+s[1]+' 人 · ¥'+s[2].toLocaleString()+'</div></div>';
+  }).join('');
+  const uid='mgr'+(idx||name.length)+name.charCodeAt(0);
   openModal('店长详情 · '+name,
     '<div class="caliber" style="margin-bottom:12px;"><b>'+name+'</b> · 管辖 '+d.stores+' 家门店 · '+d.staff+' 名店员 · 名下会员 '+d.mem+'（VIP '+d.vip+'）· 管辖贡献 '+d.gmv+'。下表为管辖店员明细（示例前 4 名，完整名单支持导出）。</div>'
+    +'<div class="grid g2e" style="margin-bottom:14px;">'
+    +'<div class="panel" style="margin-bottom:0;"><div class="panel-head"><div><div class="panel-title">管辖会员 · 近 30 天</div></div></div><div class="chart-wrap" id="'+uid+'M"></div></div>'
+    +'<div class="panel" style="margin-bottom:0;"><div class="panel-head"><div><div class="panel-title">贡献 GMV 累计（千元）</div></div></div><div class="chart-wrap" id="'+uid+'G"></div></div></div>'
+    +'<div class="panel" style="margin-bottom:14px;"><div class="panel-head"><div><div class="panel-title">管辖门店构成</div><div class="panel-sub">会员数与贡献 GMV 按门店拆分</div></div></div><div class="chart-wrap">'+storeRows+'</div></div>'
     +'<table><thead><tr><th>店员</th><th>所属门店</th><th>名下会员</th><th>VIP</th><th>活跃</th><th>沉睡</th><th>贡献GMV</th><th>复购率</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>'
-    +'<div class="legend"><b>统计维度</b>：每行 = 一名店员，行为其名下会员（按客户去重，归属快照）；店长数据 = 管辖门店内全部店员数据相加，不追溯历史归属。点击「明细」查看该店员名下会员，再点客户名可进入客户 360 档案。</div>');
+    +'<div class="legend"><b>统计维度</b>：每行 = 一名店员，行为其名下会员（按客户去重，归属快照）；店长数据 = 管辖门店内全部店员数据相加，不追溯历史归属。点击店员名查看其详情，再点客户名可进入客户 360 档案。</div>');
+  areaChart(uid+'M',d.trendM,['-30','-25','-20','-15','-10','-5','-3','今'],'#2563EB',v=>Math.round(v));
+  areaChart(uid+'G',d.trendG,['-30','-25','-20','-15','-10','-5','-3','今'],'#059669',v=>v.toFixed(0));
+}
+/* 店员详情（下钻） */
+const STAFF={
+ '张三':{store:'天河旗舰店',mem:186,newM:12,act:168,slp:18,vip:68,gmv:'¥28,000',rep:'42%',reach:'51.6%',
+  trendM:[172,175,177,179,181,183,185,186],trendG:[8.2,10.5,12.8,15.2,17.6,20.1,22.0,28.0],
+  beh:[['开播场次','6'],['累计直播时长','18.5 小时'],['客户群发','23 次'],['跟进记录','41 条'],['邀约到店','15 人']],
+  cust:[['王女士','黑卡 VIP','¥3,200','活跃','08-24'],['李女士','金卡 VIP','¥1,600','活跃','08-21'],['周女士','普通会员','¥0','沉睡','06-12']]},
+ '李四':{store:'天河旗舰店',mem:152,newM:9,act:137,slp:15,vip:52,gmv:'¥22,500',rep:'38%',reach:'51.3%',
+  trendM:[144,146,147,148,149,150,151,152],trendG:[6.5,8.4,10.2,12.0,13.8,15.6,17.5,22.5],
+  beh:[['开播场次','5'],['累计直播时长','14.0 小时'],['客户群发','19 次'],['跟进记录','33 条'],['邀约到店','11 人']],
+  cust:[['李先生','金卡 VIP','¥1,800','活跃','08-22'],['吴女士','普通会员','¥900','活跃','08-18'],['郑女士','普通会员','¥0','沉睡','05-30']]},
+ '王五':{store:'白云店',mem:140,newM:8,act:118,slp:22,vip:45,gmv:'¥19,200',rep:'35%',reach:'47.1%',
+  trendM:[133,134,135,136,137,138,139,140],trendG:[5.5,7.2,9.0,10.8,12.6,14.4,16.8,19.2],
+  beh:[['开播场次','4'],['累计直播时长','11.0 小时'],['客户群发','16 次'],['跟进记录','28 条'],['邀约到店','9 人']],
+  cust:[['陈小姐','普通会员','¥0','沉睡','08-24'],['孙女士','普通会员','¥1,200','活跃','08-20'],['钱女士','普通会员','¥650','活跃','08-15']]},
+ '赵六':{store:'番禺店',mem:128,newM:6,act:112,slp:16,vip:40,gmv:'¥18,000',rep:'31%',reach:'48.4%',
+  trendM:[122,123,124,125,126,127,127,128],trendG:[5.0,6.6,8.2,9.8,11.4,13.0,15.5,18.0],
+  beh:[['开播场次','3'],['累计直播时长','8.0 小时'],['客户群发','12 次'],['跟进记录','21 条'],['邀约到店','7 人']],
+  cust:[['何先生','普通会员','¥980','活跃','08-19'],['许先生','普通会员','¥720','活跃','08-11'],['卢女士','普通会员','¥0','沉睡','05-22']]}
+};
+function openStaffDetail(name,idx){
+  const d=STAFF[name]||STAFF['张三'];
+  const kpi=[['186','名下会员'],[d.mem,'名下会员'],[d.newM,'新增会员'],[d.act,'活跃会员'],[d.slp,'沉睡会员'],[d.vip,'VIP 会员'],[d.gmv,'贡献 GMV'],[d.rep,'复购率'],[d.reach,'直播触达率']].slice(1);
+  const kpiHtml=kpi.map(k=>'<div class="card" style="padding:8px 10px;"><div style="font-size:15px;font-weight:700;">'+k[0]+'</div><div style="font-size:10.5px;color:var(--fg-3);margin-top:2px;">'+k[1]+'</div></div>').join('');
+  const behHtml=d.beh.map(b=>'<div class="dist-row"><div class="dist-name">'+b[0]+'</div><div class="dist-track"></div><div class="dist-num"><b>'+b[1]+'</b></div></div>').join('');
+  const custHtml=d.cust.map(c=>'<tr><td><button class="link" onclick="openCustomer360(\''+c[0]+'\',\''+name+'\')">'+c[0]+'</button></td><td>'+c[1]+'</td><td>'+c[2]+'</td><td><span class="tag '+(c[3]==='活跃'?'t-green':'t-red')+'">'+c[3]+'</span></td><td>'+c[4]+'</td></tr>').join('');
+  const uid='st'+(idx||name.length)+name.charCodeAt(0);
+  openModal('店员详情 · '+name,
+    '<div class="caliber" style="margin-bottom:12px;"><b>'+name+'</b> · '+d.store+' · 店员 · 归属快照（不追溯历史）。以下为该店员名下客户的完整视图，客户数可继续点开 360 档案。</div>'
+    +'<div class="grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:14px;">'+kpiHtml+'</div>'
+    +'<div class="grid g2e" style="margin-bottom:14px;">'
+    +'<div class="panel" style="margin-bottom:0;"><div class="panel-head"><div><div class="panel-title">名下会员 · 近 30 天</div></div></div><div class="chart-wrap" id="'+uid+'M"></div></div>'
+    +'<div class="panel" style="margin-bottom:0;"><div class="panel-head"><div><div class="panel-title">贡献 GMV 累计（千元）</div></div></div><div class="chart-wrap" id="'+uid+'G"></div></div></div>'
+    +'<div class="grid g2e" style="margin-bottom:14px;">'
+    +'<div class="panel" style="margin-bottom:0;"><div class="panel-head"><div><div class="panel-title">行为投入（周期内）</div><div class="panel-sub">过程指标，触发即更新</div></div></div><div class="chart-wrap">'+behHtml+'</div></div>'
+    +'<div class="panel" style="margin-bottom:0;"><div class="panel-head"><div><div class="panel-title">名下客户（示例前 3）</div></div></div><table><thead><tr><th>客户</th><th>等级</th><th>累计消费</th><th>状态</th><th>末次消费</th></tr></thead><tbody>'+custHtml+'</tbody></table></div></div>'
+    +'<div class="legend"><b>统计维度</b>：名下会员按客户去重（归属快照）；金额仅含已支付（退款冲减）；行为投入=该店员在直播/群发/跟进/邀约的动作量，与结果指标对照使用。</div>');
+  areaChart(uid+'M',d.trendM,['-30','-25','-20','-15','-10','-5','-3','今'],'#7C3AED',v=>Math.round(v));
+  areaChart(uid+'G',d.trendG,['-30','-25','-20','-15','-10','-5','-3','今'],'#D97706',v=>v.toFixed(1));
 }
 /* 商品明细 */
 function openProductDetail(name){
