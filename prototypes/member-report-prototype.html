@@ -123,6 +123,13 @@
   .funnel-track{height:24px;background:var(--muted);border-radius:6px;overflow:hidden;}
   .funnel-fill{height:100%;display:flex;align-items:center;padding-left:10px;border-radius:6px;color:#fff;font-size:11px;font-weight:600;min-width:52px;transition:width .4s ease-out;}
   [data-def]{cursor:help;border-bottom:1px dashed #93C5FD;}
+  /* 新增内容红框标注（相对 SaaS 线上现状） */
+  .new-hl{outline:2px dashed #DC2626;outline-offset:2px;border-radius:6px;position:relative;}
+  .new-hl::after{content:"新增";position:absolute;top:4px;right:8px;background:#DC2626;color:#fff;font-size:9px;font-weight:600;padding:0 6px;border-radius:99px;line-height:15px;z-index:6;}
+  th.new-hl{position:relative;}
+  th.new-hl::after{top:-2px;right:4px;}
+  body.hide-new .new-hl{outline:none;}
+  body.hide-new .new-hl::after{display:none;}
   .tooltip{display:none;position:fixed;z-index:9999;max-width:400px;background:#0F172A;color:#E2E8F0;padding:11px 14px;border-radius:10px;font-size:12px;line-height:1.75;box-shadow:var(--shadow-2);pointer-events:none;}
   .tooltip .def{color:#fff;display:block;font-weight:600;}
   .tooltip .use{color:#93C5FD;display:block;margin-top:4px;}
@@ -437,6 +444,7 @@
       <span class="page-title" id="pageTitle">租户总览</span>
       <div class="topbar-right">
         <span class="pill amber clickable" id="periodPill" onclick="openPeriodMenu(event)" title="点击选择统计周期（下拉选择，窗口上限 30 天）"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> 统计周期 <b class="num" id="periodText">2026-09-01</b></span>
+        <button class="btn ghost" id="newHlBtn" onclick="toggleNewHl()" title="红框 = 相对 SaaS 线上店员/店长报表新增的内容，点击可开关标注">新增标注：开</button>
         <button class="btn ghost" onclick="openSpecs()">指标字典</button>
       </div>
     </header>
@@ -600,9 +608,9 @@
             </div>
             <div id="md-list">
               <table>
-                <thead><tr><th>会员</th><th>手机号</th><th>等级</th><th>积分</th><th>余额</th><th>累计消费</th><th>末次消费</th><th>末次登录</th><th>状态</th></tr></thead>
+                <thead><tr><th class="new-hl">会员</th><th>手机号</th><th>等级</th><th>积分</th><th>余额</th><th>累计消费</th><th>末次消费</th><th>末次登录</th><th>状态</th></tr></thead>
                 <tbody>
-                  <tr><td><button class="link" onclick="openCustomer360('王女士','张三')">王女士</button></td><td class="num">138****8888</td><td><span class="tag t-amber">黑卡</span></td><td>580</td><td>¥120</td><td>¥3,200</td><td>08-24</td><td>08-25</td><td><span class="tag t-green">活跃</span></td></tr>
+                  <tr><td><button class="link new-hl" onclick="openCustomer360('王女士','张三')">王女士</button></td><td class="num">138****8888</td><td><span class="tag t-amber">黑卡</span></td><td>580</td><td>¥120</td><td>¥3,200</td><td>08-24</td><td>08-25</td><td><span class="tag t-green">活跃</span></td></tr>
                   <tr><td><button class="link" onclick="openCustomer360('李先生','李四')">李先生</button></td><td class="num">139****6666</td><td><span class="tag t-amber">金卡</span></td><td>320</td><td>¥80</td><td>¥1,800</td><td>08-22</td><td>08-23</td><td><span class="tag t-green">活跃</span></td></tr>
                   <tr><td><button class="link" onclick="openCustomer360('陈小姐','王五')">陈小姐</button></td><td class="num">137****5555</td><td><span class="tag t-gray">普通</span></td><td>50</td><td>¥0</td><td>¥0</td><td>05-10</td><td>05-12</td><td><span class="tag t-red">沉睡</span></td></tr>
                 </tbody>
@@ -930,16 +938,16 @@
           <div class="chart-wrap" id="staffBars"></div>
         </div>
         <div class="grid g2e">
-          <div class="panel" style="margin-bottom:0;">
+          <div class="panel new-hl" style="margin-bottom:0;">
             <div class="panel-head"><div><div class="panel-title">名下会员总数 · 近 30 天</div><div class="panel-sub">全体店员名下会员合计（按 5 天采样）</div></div></div>
             <div class="chart-wrap" id="staffTrendMem"></div>
           </div>
-          <div class="panel" style="margin-bottom:0;">
+          <div class="panel new-hl" style="margin-bottom:0;">
             <div class="panel-head"><div><div class="panel-title">贡献 GMV 累计 · 近 30 天</div><div class="panel-sub">全体店员名下会员已支付金额累计（千元）</div></div></div>
             <div class="chart-wrap" id="staffTrendGmv"></div>
           </div>
         </div>
-        <div class="panel">
+        <div class="panel new-hl">
           <div class="panel-head"><div><div class="panel-title">店员行为投入对比<span class="chip c-blue" style="margin-left:4px;">过程</span></div><div class="panel-sub">结果指标之外的日常工作投入（示例数据）</div></div></div>
           <table>
             <thead><tr><th>店员</th><th>开播场次</th><th>累计直播时长</th><th>客户群发</th></tr></thead>
@@ -953,7 +961,7 @@
           </table>
           <div class="legend"><b>用途</b>：结果指标（GMV/会员数）回答“做得怎么样”，本表回答“有没有在做”——投入高但结果差的店员需要方法辅导，投入低的店员需要激励。<b>口径</b>：行为数据触发即更新；群发含直播推广群发。</div>
         </div>
-        <div class="panel">
+        <div class="panel new-hl">
           <div class="panel-head"><div><div class="panel-title">客户结构分析<span class="chip c-violet" style="margin-left:4px;">质量</span></div><div class="panel-sub">各店员名下客户的等级、状态与消费分层构成（示例数据）</div></div></div>
           <table>
             <thead><tr><th>店员</th><th>名下会员</th><th>VIP(占比)</th><th>活跃</th><th>沉睡</th><th>新增</th><th>高消费≥¥1,000</th><th>中 ¥300~1,000</th><th>低 ¥1~300</th><th>零消费</th><th>直播触达率</th></tr></thead>
@@ -970,9 +978,9 @@
         <div class="panel">
           <div class="panel-head"><div><div class="panel-title">店员会员排行</div><div class="panel-sub">点击明细查看名下会员（示例数据）</div></div></div>
           <table>
-            <thead><tr><th>排名</th><th>店员</th><th>门店</th><th>身份</th><th>名下会员</th><th>新增</th><th>VIP</th><th>沉睡</th><th>贡献GMV</th><th>人均贡献</th><th>复购率</th><th>变化</th><th></th></tr></thead>
+            <thead><tr><th>排名</th><th>店员</th><th>门店</th><th>身份</th><th>名下会员</th><th>新增</th><th class="new-hl">VIP</th><th>沉睡</th><th>贡献GMV</th><th class="new-hl">人均贡献</th><th class="new-hl">复购率</th><th class="new-hl">变化</th><th></th></tr></thead>
             <tbody>
-              <tr><td><span class="rank r1">1</span></td><td><button class="link" onclick="openStaffDetail('张三')">张三</button></td><td>天河旗舰店</td><td><span class="tag t-blue">店员</span></td><td>186</td><td>12</td><td>68</td><td>18</td><td>¥28,000</td><td>¥151</td><td>42%</td><td><span class="flat">持平</span></td><td><button class="link" onclick="openMemberDetail('张三','店员')">明细 →</button></td></tr>
+              <tr><td><span class="rank r1">1</span></td><td><button class="link new-hl" onclick="openStaffDetail('张三')">张三</button></td><td>天河旗舰店</td><td><span class="tag t-blue">店员</span></td><td>186</td><td>12</td><td>68</td><td>18</td><td>¥28,000</td><td>¥151</td><td>42%</td><td><span class="flat">持平</span></td><td><button class="link" onclick="openMemberDetail('张三','店员')">明细 →</button></td></tr>
               <tr><td><span class="rank r2">2</span></td><td><button class="link" onclick="openStaffDetail('李四')">李四</button></td><td>天河旗舰店</td><td><span class="tag t-blue">店员</span></td><td>152</td><td>9</td><td>52</td><td>15</td><td>¥22,500</td><td>¥148</td><td>38%</td><td><span class="up">↑1</span></td><td><button class="link" onclick="openMemberDetail('李四','店员')">明细 →</button></td></tr>
               <tr><td><span class="rank r3">3</span></td><td><button class="link" onclick="openStaffDetail('王五')">王五</button></td><td>白云店</td><td><span class="tag t-blue">店员</span></td><td>140</td><td>8</td><td>45</td><td>22</td><td>¥19,200</td><td>¥137</td><td>35%</td><td><span class="flat">持平</span></td><td><button class="link" onclick="openMemberDetail('王五','店员')">明细 →</button></td></tr>
               <tr><td><span class="rank rn">4</span></td><td><button class="link" onclick="openStaffDetail('赵六')">赵六</button></td><td>番禺店</td><td><span class="tag t-violet">店长</span></td><td>128</td><td>6</td><td>40</td><td>16</td><td>¥18,000</td><td>¥141</td><td>31%</td><td><span class="down">↓1</span></td><td><button class="link" onclick="openMemberDetail('赵六','店长')">明细 →</button></td></tr>
@@ -988,29 +996,29 @@
         <div class="grid g5">
           <div class="card tone-violet"><div class="card-label">店长人数</div><div class="card-value" data-def="项目下在职店长总数。" data-calc="在职店长人数" data-source="员工档案表" data-use="反映管理团队规模。">18<small>人</small></div></div>
           <div class="card tone-blue"><div class="card-label">管辖会员总数</div><div class="card-value" data-def="店长管辖门店内全部店员名下会员之和。客户归属于店员，再按店长管辖的门店向上汇总。" data-calc="各管辖门店店员名下会员数相加" data-source="客户档案 · 归属店员 ＋ 员工档案管辖关系" data-use="店长层级的客户资产规模，是管辖人均贡献的分母。">1,256</div></div>
-          <div class="card tone-amber"><div class="card-label">管辖 VIP 会员</div><div class="card-value" data-def="管辖范围内会员等级为 VIP 的客户数。" data-calc="管辖会员中 VIP 等级会员数量" data-source="会员等级表 ＋ 管辖关系" data-use="衡量店长团队掌握的高价值客户规模，与管辖贡献 GMV 相互印证。">320</div></div>
+          <div class="card tone-amber new-hl"><div class="card-label">管辖 VIP 会员</div><div class="card-value" data-def="管辖范围内会员等级为 VIP 的客户数。" data-calc="管辖会员中 VIP 等级会员数量" data-source="会员等级表 ＋ 管辖关系" data-use="衡量店长团队掌握的高价值客户规模，与管辖贡献 GMV 相互印证。">320</div></div>
           <div class="card tone-green"><div class="card-label">管辖贡献 GMV</div><div class="card-value" data-def="管辖范围内全部会员已支付订单金额合计（不含未支付与已退款）。" data-calc="管辖会员已支付订单金额相加" data-source="订单表 × 管辖关系" data-use="店长团队最核心的业绩结果指标，回答“管的人一共卖了多少钱”。">¥185k</div></div>
           <div class="card tone-cyan"><div class="card-label">管辖人均贡献</div><div class="card-value" data-def="管辖范围内平均每个会员贡献的成交金额。" data-calc="管辖贡献 GMV ÷ 管辖会员总数" data-source="由其他指标计算得出" data-use="剔除会员规模差异后衡量单客产出质量，店长之间横向可比。">¥147</div></div>
         </div>
         <div class="panel">
           <div class="panel-head"><div><div class="panel-title">店长管辖总览</div><div class="panel-sub">店长数据 = 管辖门店内所有店员名下会员数据之和（示例数据）</div></div></div>
           <table>
-            <thead><tr><th>店长</th><th>管辖店员</th><th>管辖门店</th><th>管辖会员</th><th>新增</th><th>VIP会员</th><th>贡献GMV</th><th>人均贡献</th><th>复购率</th><th>活跃率</th></tr></thead>
+            <thead><tr><th>店长</th><th>管辖店员</th><th>管辖门店</th><th>管辖会员</th><th>新增</th><th class="new-hl">VIP会员</th><th>贡献GMV</th><th>人均贡献</th><th class="new-hl">复购率</th><th>活跃率</th><th class="new-hl">操作</th></tr></thead>
             <tbody>
-              <tr><td><button class="link" onclick="openManagerDetail('陈总')">陈总</button></td><td>8 人</td><td>3 家</td><td>620</td><td>45</td><td>180</td><td>¥98,000</td><td>¥158</td><td>40%</td><td>85%</td></tr>
-              <tr><td><button class="link" onclick="openManagerDetail('刘总')">刘总</button></td><td>6 人</td><td>2 家</td><td>480</td><td>32</td><td>120</td><td>¥72,000</td><td>¥150</td><td>36%</td><td>82%</td></tr>
-              <tr><td><button class="link" onclick="openManagerDetail('周总')">周总</button></td><td>5 人</td><td>2 家</td><td>380</td><td>25</td><td>95</td><td>¥52,000</td><td>¥137</td><td>33%</td><td>78%</td></tr>
-              <tr class="tot"><td>汇总（3 位店长）</td><td>19 人</td><td>7 家</td><td>1,480</td><td>102</td><td>395</td><td>¥222,000</td><td>¥150</td><td>36.3%</td><td>81.7%</td></tr>
+              <tr><td><button class="link new-hl" onclick="openManagerDetail('陈总')">陈总</button></td><td>8 人</td><td>3 家</td><td>620</td><td>45</td><td>180</td><td>¥98,000</td><td>¥158</td><td>40%</td><td>85%</td><td class="new-hl"><button class="link" onclick="openManagerDetail('陈总')">详情 →</button></td></tr>
+              <tr><td><button class="link" onclick="openManagerDetail('刘总')">刘总</button></td><td>6 人</td><td>2 家</td><td>480</td><td>32</td><td>120</td><td>¥72,000</td><td>¥150</td><td>36%</td><td>82%</td><td><button class="link" onclick="openManagerDetail('刘总')">详情 →</button></td></tr>
+              <tr><td><button class="link" onclick="openManagerDetail('周总')">周总</button></td><td>5 人</td><td>2 家</td><td>380</td><td>25</td><td>95</td><td>¥52,000</td><td>¥137</td><td>33%</td><td>78%</td><td><button class="link" onclick="openManagerDetail('周总')">详情 →</button></td></tr>
+              <tr class="tot"><td>汇总（3 位店长）</td><td>19 人</td><td>7 家</td><td>1,480</td><td>102</td><td>395</td><td>¥222,000</td><td>¥150</td><td>36.3%</td><td>81.7%</td><td>—</td></tr>
             </tbody>
           </table>
           <div class="legend"><b>字段口径</b>：管辖关系按 员工档案表 所属门店聚合；店长本人直接名下的客户同样计入其管辖会员（因此管辖店员数为 0 时仍可能有管辖会员）；人均贡献=管辖GMV÷管辖会员数；活跃率=活跃会员÷管辖会员数；管辖范围变动按查询时点快照，不追溯。</div>
         </div>
         <div class="grid g2e">
-          <div class="panel" style="margin-bottom:0;">
+          <div class="panel new-hl" style="margin-bottom:0;">
             <div class="panel-head"><div><div class="panel-title">管辖会员总数 · 近 30 天</div><div class="panel-sub">全体店长管辖会员合计（按 5 天采样）</div></div></div>
             <div class="chart-wrap" id="mgrTrendMem"></div>
           </div>
-          <div class="panel" style="margin-bottom:0;">
+          <div class="panel new-hl" style="margin-bottom:0;">
             <div class="panel-head"><div><div class="panel-title">管辖贡献 GMV 累计 · 近 30 天</div><div class="panel-sub">全体店长管辖会员已支付金额累计（千元）</div></div></div>
             <div class="chart-wrap" id="mgrTrendGmv"></div>
           </div>
@@ -1624,6 +1632,10 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeSpecs(); clo
 
 /* ================= v5.1 全量交互 ================= */
 let currentTabKey='tenant';
+function toggleNewHl(){
+  document.body.classList.toggle('hide-new');
+  el('newHlBtn').textContent='新增标注：'+(document.body.classList.contains('hide-new')?'关':'开');
+}
 function toast(msg){
   const w=el('toastWrap');
   const t=document.createElement('div'); t.className='toast'; t.innerHTML='<i></i>'+msg;
