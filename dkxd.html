@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>代客下单原型（业务逻辑与数据流转旁注版）V1.2.0 — STR-SAAS-005</title>
+<title>代客下单原型（业务逻辑与数据流转旁注版）V1.3.0 — STR-SAAS-005</title>
 <style>
 :root{
   --g1:#10B981; --g1-deep:#0BA876; --g2:#3DDBB4; --gw:#EAF9F1;
@@ -152,6 +152,9 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
 .pay-bar .amt b{color:var(--price);font-size:18px;font-weight:700}
 .proxy-bar{background:var(--warn-bg);border:1px solid var(--warn-line);border-radius:10px;padding:8px 12px;font-size:12px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
 .proxy-bar .sw{margin-left:auto;color:var(--add);font-weight:600}
+/* 代付前红色收款警示（代客下单新增） */
+.proxy-alert{background:#FFF1F0;border:1px solid #FFCCC7;color:#F5222D;border-radius:8px;padding:9px 12px;font-size:12.5px;line-height:1.7;font-weight:600}
+.proxy-alert b{font-weight:700}
 /* 弹层 */
 .mask{position:absolute;inset:0;background:rgba(0,0,0,.45);z-index:5}
 .sheet{position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:14px 14px 0 0;z-index:6;padding:16px 16px 14px}
@@ -317,8 +320,8 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
 </svg>
 
 <div class="doc-head">
-  <h1>代客下单原型（业务逻辑与数据流转旁注版）V1.2.0</h1>
-  <div class="sub">需求流 代客下单需求流 · 脑暴文档 V1.3.0 配套原型 · 2026-09-03<br>本版变更：①去除全部演示数据，页面按正式环境风格填充示例数据；②每屏旁挂两块注解——<b>业务逻辑</b>（编号规则，引 BR/需求文档 章节）与<b>数据流转</b>（<span style="color:#后台售后列表690E;font-weight:600">接口</span> / 状态与写库链路）；③三端骨架 1:1（APP 16 屏 + 后台订单详情/售后列表/售后详情）<br>走查依据：SaaS 现有 APP 下单页 4 屏 + 后台订单详情 + 售后列表/售后详情+ 微赞代客下单 5 屏 + 百货商城原型 v1.3.9.0</div>
+  <h1>代客下单原型（业务逻辑与数据流转旁注版）V1.3.0</h1>
+  <div class="sub">代客下单需求流 · 脑暴文档 V1.3.0 配套原型 · 修订 2026-09-19<br>本版变更（V1.3.0）：①<b>支付双路</b>——订单归属人是客户，客户可登录自己账号直接支付；店员也能在工作台代付，代付前必须二次确认「已收到客户转账」；②明示<b>创建者 / 归属人</b>——创建者=店员/店长，归属人=客户；③新增 屏6c 付款确认弹框；④补齐屏号、示例数据自洽<br>上版（V1.2.0）：每屏旁挂 <b>业务逻辑</b>（引需求文档章节）与 <b>数据流转</b>（<span style="color:#B4690E;font-weight:600">接口</span> / 状态与写库链路）两块注解；页面按正式环境风格填充示例数据<br>走查依据：SaaS 现有 APP 下单页 4 屏 + 后台订单详情 + 售后列表/售后详情 + 微赞代客下单 5 屏 + 百货商城原型 v1.3.9.0</div>
   <div class="legend"><span>页面数据为正式环境风格示例</span>
     <span><i class="lg-cur"></i>现有页面 1:1 复刻（无改动）</span>
     <span><i class="lg-add"></i><b class="a">橙框/橙标 = 代客下单新增</b></span>
@@ -329,7 +332,7 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
 <div class="board">
 
 <!-- ======================= 正向主链 ======================= -->
-<div class="sec-title">第一段 · 正向主链：我的 → 工作台 → 客户管理 → 代客下单 → 商品选择 → 确认订单 → 支付</div>
+<div class="sec-title">第一段 · 正向主链：我的 → 工作台 → 客户管理 → 代客下单 → 商品选择 → 确认订单 → 付款确认 → 支付成功</div>
 <div class="rowwrap">
 
 <!-- 屏1 · 我的页面 -->
@@ -618,7 +621,7 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
         <div class="msg-row"><span>买家留言</span><span class="mut">请输入 ›</span></div>
       </div>
       <div class="card">
-        <div class="kv"><span>商品总金额</span><span>¥0</span></div>
+        <div class="kv"><span>商品总金额</span><span>¥218.50</span></div>
         <div class="kv"><span>运费</span><span>¥0</span></div>
         <div class="kv"><span>订单总金额</span><span>¥218.50</span></div>
         <div class="kv"><span>选择满减券</span><span class="mut">暂无 ›</span></div>
@@ -630,17 +633,18 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
       <button class="btn btn-g2" style="width:150px">立即付款</button></div>
   </div>
   </div>
-  <aside class="anno"><div class="ttl">屏6 · 确认订单 · 快递<small>1:1 骨架 + 顶部代客标识条</small></div>
+  <aside class="anno"><div class="ttl">屏6 · 确认订单 · 快递<small>1:1 骨架 + 顶部代客标识条 + 支付双路</small></div>
 <div class="ah">业务逻辑</div>
 <ol>
 <li><b>地址按客户来</b>：默认带出客户名下的默认地址，地址列表只有这个客户自己的地址；店员新增的地址也保存到客户名下。客户没有地址时进入无地址空态。</li>
 <li><b>优惠按客户来</b>：用的就是<b>客户账户里的券和积分</b>——客户有什么券、有多少积分，就按他的资格算，店员的券和积分完全不参与。优惠抵扣不能超过订单金额，超了按订单金额封顶。</li>
 <li><b>0元单</b>：优惠全额抵扣后实付为0时，不需要付款，系统直接完成支付。</li>
-<li><b>防串单确认</b>：点「立即付款」先弹确认框，显示客户头像、编号后四位和金额；如果30分钟内刚给别的客户下过单，还会提示"上一单客户是谁"，防止记混。</li>
+<li><b>支付有两条路</b>：订单生成后挂在<b>客户</b>名下——①客户登录自己的账号直接支付；②店员在这一页点「立即付款」代付，付款前必须先确认已收到客户转账（见 屏6c 红色警示）。<b>两条路走的是同一个收银台</b>，系统记下实际是谁付的钱。</li>
+<li><b>防串单确认</b>：点「立即付款」的弹框里显示客户头像、编号后四位和金额；如果30分钟内刚给别的客户下过单，还会提示"上一单客户是谁"，防止记混。</li>
 <li>选「门店自提」时：自提点默认带出客户归属的门店，店员可以改，但不强制锁定。</li>
 </ol>
 <div class="ah">数据流转</div>
-<div class="flow2">打开页面 → 读取客户收货地址（需携带代客会话凭证）<br>优惠试算 → 服务端按客户资格实时计算，逐项返回优惠金额并单独记录（退款时按原样退回）<br>确认后提交订单 → 生成一张待付款订单+预占库存 → 直接收银台支付（与会员自助单同一路径）；同一店员短时间内重复点击只会生成一张</div></aside>
+<div class="flow2">打开页面 → 读取客户收货地址（需携带代客会话凭证）<br>优惠试算 → 服务端按客户资格实时计算，逐项返回优惠金额并单独记录（退款时按原样退回）<br>确认后提交订单 → 生成一张待付款订单+预占库存，订单<b>落在客户名下</b>、同时记下<b>创建者=当前店员</b><br>付款两条路都走同一个收银台，服务端记下<b>实际支付方</b>（客户本人 / 店员垫付）——退款时按实际支付方原路退回<br>同一店员短时间内重复点击只会生成一张</div></aside>
 </div>
 
 <!-- 确认订单无地址态 暂无地址 -->
@@ -664,7 +668,7 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
         <div class="msg-row"><span>买家留言</span><span class="mut">请输入 ›</span></div>
       </div>
       <div class="card">
-        <div class="kv"><span>商品总金额</span><span>¥0</span></div>
+        <div class="kv"><span>商品总金额</span><span>¥218.50</span></div>
         <div class="kv"><span>运费</span><span>¥0</span></div>
         <div class="kv"><span>订单总金额</span><span>¥218.50</span></div>
         <div class="kv"><span>选择满减券</span><span class="mut">暂无 ›</span></div>
@@ -686,7 +690,52 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
 <div class="flow2">保存地址 → 以客户为归属人写入地址簿（系统校验代客会话，防止店员往别的客户名下写地址）</div></aside>
 </div>
 
-
+<!-- 屏6c · 付款确认弹框（红色收款警示） -->
+<div class="scr">
+  <div class="phcol">
+  <div class="sec-title" style="margin-top:0">屏6c · 付款确认弹框（店员代付路径 · 红色收款警示）</div>
+  <div class="phone">
+    <div class="statusbar"><span>9:41</span><span>▮▮▮ ⌾ ▰ 77</span></div>
+    <div class="nvbar"><span class="bk"><svg><use href="#i-back"/></svg></span><span class="t">确认订单</span></div>
+    <div class="proxy-bar" style="margin:0 12px 8px">ⓘ 正在为 <b>橙橙</b>（编号：260716000000005）客户下单<span class="sw">退出</span></div>
+    <div class="p-body" style="padding-top:0">
+      <div class="addr-card">
+        <div class="addr-a1">广东省广州市天河区东英科技园9号楼5楼 ›</div>
+        <div class="addr-a2">橙橙 138****0002<span class="locked-tag">会员名下地址</span></div>
+      </div>
+    </div>
+    <div class="mask"></div>
+    <div class="sheet">
+      <div class="close">✕</div>
+      <div style="font-size:15px;font-weight:700;margin-bottom:12px">确认付款</div>
+      <div class="row" style="gap:10px">
+        <div class="ava" style="width:38px;height:38px;background:#F3D9C4;color:#8A5A2B;font-size:15px">橙</div>
+        <div><div style="font-size:13.5px;font-weight:600">橙橙 <span class="small mut" style="font-weight:400">编号后四位 0005</span></div>
+          <div class="small mut" style="margin-top:2px">30 分钟内上一单客户：门店3店员1</div></div>
+      </div>
+      <div class="kv" style="margin-top:8px"><span>支付金额</span><span class="price" style="font-size:17px">¥218.50</span></div>
+      <div class="kv"><span>支付方式</span><span>微信支付</span></div>
+      <div class="proxy-alert" style="margin:12px 0 4px">收款提醒：请先让客户把货款 ¥218.50 转给您，再完成支付</div>
+      <div class="row" style="gap:8px;margin:12px 0 4px">
+        <span class="radio on"></span><span style="font-size:12.5px;font-weight:600">已收到客户转账</span>
+      </div>
+      <button class="btn btn-g1" style="width:100%;margin-top:10px">确认支付 ¥218.50</button>
+      <div class="small mut" style="text-align:center;margin-top:8px;line-height:1.7">未勾选「已收到客户转账」时本条置灰不可点<br>不想垫付？可让客户登录自己的账号支付</div>
+    </div>
+  </div>
+  </div>
+  <aside class="anno"><div class="ttl">屏6c · 付款确认弹框<small>新增 · 只在店员代付路径出现</small></div>
+<div class="ah">业务逻辑</div>
+<ol>
+<li>这个弹框<b>只在店员代付路径出现</b>——客户登录自己账号付款时不会看到它，也没有这个勾选。</li>
+<li>红色警示的作用是防"店员垫了钱、客户不知道要还"：付款前必须先把货款收回来。文案里的金额取本单实付金额，避免说错数。</li>
+<li>「已收到客户转账」没勾选时，「确认支付」置灰不可点——这是<b>硬拦截，不是提示语</b>。</li>
+<li>防串单：弹框里同时显示客户头像、编号后四位，以及"30 分钟内刚给谁下过单"，防止给 A 客户付了 B 客户的单。</li>
+<li>底部留了另一条出口："不想垫付？可让客户登录自己的账号支付"——订单归属人是客户，这条永远成立。</li>
+</ol>
+<div class="ah">数据流转</div>
+<div class="flow2">点「立即付款」→ 弹本框 → 校验代客会话凭证 + 勾选状态<br>确认支付 → 进收银台 → 支付成功事务内写入：代付标记、<b>实际支付方=当前店员</b>、垫付台账记一条（收款状态=<b>未收回</b>）<br>客户自付路径：客户在自己「我的订单」点去支付 → 同一个收银台 → 实际支付方=<b>客户</b>，不写垫付台账</div></aside>
+</div>
 
 <!-- 屏7 · 支付成功 -->
 <div class="scr">
@@ -700,18 +749,19 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
     </div>
   </div>
   </div>
-  <aside class="anno"><div class="ttl">屏7 · 支付成功<small>仅确认付款完成</small></div>
+  <aside class="anno"><div class="ttl">屏7 · 支付成功<small>按实际支付方分支</small></div>
 <div class="ah">业务逻辑</div>
 <ol>
 <li>这一页只做一件事：确认钱付完了（实付金额以系统记录为准）。</li>
-<li>「为哪个客户下的单」、垫付收款提示、提货码都不在此页展示——店员查单去后台订单详情；垫付收款跟进走「我垫付的订单」台账；客户在自己「我的订单」看订单和提货码（自提单到店出示给店员扫码）。</li>
+<li><b>谁付的钱系统记谁</b>：客户自己付的记客户，店员代付的记店员。这一页不区分展示，后台订单详情和导出明细里看得到。</li>
+<li>「为哪个客户下的单」、垫付收款提示、提货码都不在此页展示——店员查单去后台订单详情；<b>店员代付那部分的收款跟进走工作台「我垫付的订单」台账</b>（现有能力）；客户在自己「我的订单」看订单和提货码（自提单到店出示给店员扫码）。</li>
 <li><b>付完款店员端就结束了</b>：这张单不会再出现在店员的任何订单列表里。</li>
 </ol>
 <div class="ah">数据流转</div>
-<div class="flow2">支付成功的事务内一次完成：更新支付单 → 推进订单状态 → 扣减库存 →（自提）生成提货码 → 作废这单所有支付凭证<br>垫付单写入垫付台账；0元单不走收银台，系统直接完成支付</div></aside></div><!-- 正向主链 end -->
+<div class="flow2">支付成功的事务内一次完成：更新支付单 → 推进订单状态 → 扣减库存 →（自提）生成提货码 → 作废这单所有支付凭证<br>同时写入<b>实际支付方</b>：客户自付 → 记客户，不写台账；店员代付 → 记当前店员 + 垫付台账记一条（收款状态=<b>未收回</b>）<br>0元单不走收银台，系统直接完成支付</div></aside></div><!-- 正向主链 end -->
 
 <!-- ======================= 店员端跟进 ======================= -->
-<div class="sec-title">第二段 · 店员端跟进与核销（工作台入口）</div>
+<div class="sec-title">第二段 · 店员端跟进与核销（工作台入口）：订单管理-待付款 → 自提核销</div>
 <div class="rowwrap">
 
 <!-- 店员待付款屏 -->
@@ -724,10 +774,10 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
     <div class="p-body" style="padding-top:12px">
       <div class="dc-tabs" style="padding:0 2px 10px"><span class="on">待付款 (1)</span><span>已关闭</span></div>
       <div class="order-li hl-add">
-        <div class="ol-top"><span>订单号 ORD260902000030</span><span class="countdown">剩余 18:26</span></div>
+        <div class="ol-top"><span>订单号 ORD260902000032</span><span class="countdown">剩余 18:26</span></div>
         <div class="row" style="gap:10px"><div class="sku-img" style="width:48px;height:48px;font-size:18px;background:#FDF3E7">🥛</div>
-          <div style="flex:1"><div style="font-size:13px;font-weight:500">认养一头牛 高钙牛奶 x1 x1</div>
-          <div class="small mut" style="margin-top:2px">为 <b style="color:var(--t1)">橙橙</b> 代下单</div></div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:500">认养一头牛 高钙牛奶 x1</div>
+          <div class="small mut" style="margin-top:2px">为 <b style="color:var(--t1)">橙橙</b> 代下单 · 客户自付或我垫付</div></div>
           <span class="price" style="font-size:15px">¥218.50</span></div>
         <div class="btnrow">
           <span class="br-btn btn-red-ghost">取消订单</span>
@@ -735,21 +785,22 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
           <span class="br-btn btn-g1">去支付</span>
         </div>
       </div>
-      <div class="notice">待付款超时 = <b>30 分钟自动关单</b>（<span class="prd">订单域超时关单规则</span>，硬编码 订单域待办006）；关单前 2 小时推送无意义——<b>关单前 10 分钟推送店员提醒</b>（新增建议）；已关闭代客单支持一键重下；列表<b>仅显示本人代下的订单</b>，店长与同店店员互不可见；<b>已支付的代客单不在店员端显示</b>——付完款店员端即结束，查单去后台订单详情。</div>
+      <div class="notice">待付款超时 = <b>30 分钟自动关单</b>（订单域超时关单规则）；关单前 2 小时推送无意义——<b>关单前 10 分钟推送店员提醒</b>（新增建议）；已关闭代客单支持一键重下；列表<b>仅显示本人代下的订单</b>，店长与同店店员互不可见；<b>已支付的代客单不在店员端显示</b>——付完款店员端即结束，查单去后台订单详情。<br>这一单<b>客户可以自己付</b>（在他自己账号的「我的订单」里），也可以由我点「去支付」垫付——垫付前会弹红色收款警示（屏6c），垫付后进工作台「我垫付的订单」台账跟进收回。</div>
     </div>
   </div>
   </div>
-  <aside class="anno"><div class="ttl">屏10 · 订单管理 · 待付款<small>现有页增量改造（非新页）</small></div>
+  <aside class="anno"><div class="ttl">屏8 · 订单管理 · 待付款<small>现有页增量改造（非新页）</small></div>
 <div class="ah">业务逻辑</div>
 <ol>
 <li>列表只显示<b>当前登录人自己代下的</b>待付款订单：店长看不到店员代下的单，店员之间也互相看不到——谁下的单谁跟进到底。离职或账号停用时不移交：到期没付自动关单，需要兜底时由后台人工取消。</li>
-<li><b>付完款就结束</b>：已支付的代客单从店员端所有列表消失（这里只有未付款和已关闭的代客单），店长/店员要查单去后台订单详情；客户在自己「我的订单」能看到这张单。</li>
-<li>订单有30分钟支付倒计时，到期自动关闭并释放库存；关单前10分钟系统提醒店员去跟进。</li>
+<li><b>这一单谁付都行</b>：客户可以在自己账号的「我的订单」里付；我也可以在这里点「去支付」代付——代付前必须先确认已收到客户的转账（屏6c 红色警示）。</li>
+<li><b>付完款就结束</b>：已支付的代客单从店员端所有列表消失（这里只有未付款和已关闭的代客单），店长/店员要查单去后台订单详情；客户在自己「我的订单」能看到这张单。<b>但我垫付的那部分没结束——转工作台「我垫付的订单」台账跟进收回。</b></li>
+<li>订单有 30 分钟支付倒计时，到期自动关闭并释放库存；关单前 10 分钟系统提醒店员去跟进。</li>
 <li>「取消」立即生效：通知客户。</li>
 <li>「一键重下」：已关闭的订单按原来的商品数量重新走一遍下单流程，价格按当下重新计算，页面会说明与原单的差额原因。</li>
 </ol>
 <div class="ah">数据流转</div>
-<div class="flow2">打开列表 → 按「操作人=当前登录人」查询待付款订单（服务端过滤，别人代下的单查不到；含关单时间，手机本地倒计时）<br>取消订单 → 只有待付款状态才能取消（防止与支付同时发生）→ 释放库存 → 通知买家<br>关单由系统定时任务自动执行</div></aside>
+<div class="flow2">打开列表 → 按「操作人=当前登录人」查询待付款订单（服务端过滤，别人代下的单查不到；含关单时间，手机本地倒计时）<br>点「去支付」→ 弹付款确认框（屏6c）→ 勾选已收到转账 → 收银台 → 实际支付方=<b>当前店员</b>，写垫付台账<br>客户自付 → 走<b>同一个收银台</b>，实际支付方=<b>客户</b>，不写垫付台账<br>取消订单 → 只有待付款状态才能取消（防止与支付同时发生）→ 释放库存 → 通知买家<br>关单由系统定时任务自动执行</div></aside>
 </div>
 
 <!-- 自提核销屏 -->
@@ -763,7 +814,7 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
       <div class="card hl-add" style="text-align:center;padding:20px">
         <div style="width:56px;height:56px;margin:0 auto 10px;border-radius:14px;background:var(--gw);display:flex;align-items:center;justify-content:center"><svg width="28" height="28" style="color:var(--g1)"><use href="#i-scan"/></svg></div>
         <div style="font-size:14px;font-weight:600">扫描客户提货码核销</div>
-        <div class="small mut" style="margin-top:4px">提货码 YXKSA + 6 位随机数（订单域 订单域功能004）</div>
+        <div class="small mut" style="margin-top:4px">提货码 YXKSA + 6 位随机数（订单域提货码规则）</div>
       </div>
       <div class="order-li hl-add">
         <div class="ol-top"><span>订单号 ORD260902000031</span><span class="pill-b" style="font-size:10.5px;border-radius:4px;padding:1px 6px">代客下单</span></div>
@@ -776,7 +827,7 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
     </div>
   </div>
   </div>
-  <aside class="anno"><div class="ttl">屏11 · 自提核销<small>现有能力 + 代客扩展</small></div>
+  <aside class="anno"><div class="ttl">屏9 · 自提核销<small>现有能力 + 代客扩展</small></div>
 <div class="ah">业务逻辑</div>
 <ol>
 <li>标准流程：扫客户出示的提货码 → 系统反查出整组提货单 → 核对商品清单 → 整单核销，订单即完成（<b>没有部分提货</b>）。提货记录会记下三个角色：提货人、下单人、点货人（扫码的店员）。</li>
@@ -794,16 +845,24 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
 <!-- 买家订单屏 -->
 <div class="scr">
   <div class="phcol">
-  <div class="sec-title" style="margin-top:0">买家订单屏 · 买家视角 · 我的订单（代客单可见 + 售后入口）</div>
+  <div class="sec-title" style="margin-top:0">买家订单屏 · 买家视角 · 我的订单（代客单可见 + 客户可支付 + 售后入口）</div>
   <div class="phone">
     <div class="statusbar"><span>9:41</span><span>▮▮▮ ⌾ ▰ 77</span></div>
     <div class="nvbar"><span class="bk"><svg><use href="#i-back"/></svg></span><span class="t">我的订单</span></div>
     <div class="p-body" style="padding-top:12px">
       <div class="dc-tabs" style="padding:0 2px 10px"><span class="on">全部</span><span>待付款</span><span>待发货</span><span>待收货</span><span>售后</span></div>
       <div class="order-li hl-add">
+        <div class="ol-top"><span>百货商城 ›</span><span style="color:var(--add)">待付款</span></div>
+        <div class="row" style="gap:10px"><div class="sku-img" style="width:48px;height:48px;font-size:18px;background:#FDF3E7">🥛</div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:500">认养一头牛 高钙牛奶 x1</div>
+          <div class="small" style="margin-top:2px"><span class="orange-tag">店员代下单</span></div></div>
+          <span class="price" style="font-size:14px">¥218.50</span></div>
+        <div class="btnrow"><span class="br-btn btn-gray">查看详情</span><span class="br-btn btn-g1 hl-add">去支付</span></div>
+      </div>
+      <div class="order-li hl-add">
         <div class="ol-top"><span>百货商城 ›</span><span style="color:var(--add)">待收货</span></div>
         <div class="row" style="gap:10px"><div class="sku-img" style="width:48px;height:48px;font-size:18px;background:#FDF3E7">🥛</div>
-          <div style="flex:1"><div style="font-size:13px;font-weight:500">认养一头牛 高钙牛奶 x1 x1</div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:500">认养一头牛 高钙牛奶 x1</div>
           <div class="small" style="margin-top:2px"><span class="orange-tag">店员代下单</span></div></div>
           <span class="price" style="font-size:14px">¥218.50</span></div>
         <div class="btnrow"><span class="br-btn btn-gray">查看物流</span><span class="br-btn btn-g1">申请售后</span></div>
@@ -816,20 +875,20 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
           <span class="price" style="font-size:14px">¥218.50</span></div>
         <div class="btnrow"><span class="br-btn btn-gray">再次购买</span><span class="br-btn btn-g1">申请售后</span></div>
       </div>
-      <div class="note-static" style="margin:0 0 12px">待付款代客单：买家可见（带「店员代下单」标识）但<b>买家不能支付</b>——付款只由下单的店长/店员在收银台完成，身份不串。</div>
+      <div class="note-static" style="margin:0 0 12px">订单的<b>归属人是客户</b>——代客单带「店员代下单」标识出现在这里。<b>待付款的代客单，客户可以直接点「去支付」自己完成付款</b>；也可以让店员在工作台代付。两条路走同一个收银台，系统记录实际是谁付的钱。</div>
     </div>
   </div>
   </div>
-  <aside class="anno"><div class="ttl">逆向屏1 · 买家我的订单<small>代客单对客户透明</small></div>
+  <aside class="anno"><div class="ttl">逆向屏1 · 买家我的订单<small>代客单对客户透明 · 客户可自主支付</small></div>
 <div class="ah">业务逻辑</div>
 <ol>
-<li>代客下单的订单在客户自己的订单列表里也能看到，带"店员代下单"标识——钱货关系对客户透明，避免"我明明买了东西却查不到订单"的疑虑。</li>
-<li>待付款的代客单，客户<b>不能自己付款</b>——下单和付款都只属于店长/店员这条身份线；客户这边只看到这张单挂着「待付款」。</li>
-<li>售后入口按状态出现：付过款就能申请"仅退款"；签收后才能申请"退货退款"。买家视角<b>没有「确认收货」按钮</b>——代客单是店长/店员下的单，收货确认由他们在店员端操作。</li>
+<li>代客下单的订单在客户自己的订单列表里也能看到，带"店员代下单"标识——<b>订单的归属人本来就是客户</b>，钱货关系对客户透明，避免"我明明买了东西却查不到订单"的疑虑。</li>
+<li><b>待付款的代客单，客户可以自己付款</b>：订单挂在客户名下，客户点「去支付」即可完成，和普通自助单走同一个收银台。也可以让店员在工作台代付——两条路系统都记下<b>实际支付方</b>。</li>
+<li>售后入口按状态出现：付过款就能申请"仅退款"；签收后才能申请"退货退款"。买家视角<b>没有「确认收货」按钮</b>——这单的<b>创建者是店长/店员</b>，收货确认由他们在店员端操作。</li>
 <li>申请售后后订单被"挂起"：商家不能发货、不能签收，直到售后处理完。</li>
 </ol>
 <div class="ah">数据流转</div>
-<div class="flow2">打开列表 → 查询客户自己的订单（带代下单标识）<br>代客单无买家支付入口（付款由店长/店员完成）<br>提交售后 → 创建售后单 → 订单挂起</div></aside>
+<div class="flow2">打开列表 → 查询<b>归属人=当前客户</b>的订单（代客单带"店员代下单"标识，另记创建者）<br>点「去支付」→ 收银台 → 实际支付方=<b>客户本人</b>，不写垫付台账<br>提交售后 → 创建售后单 → 订单挂起</div></aside>
 </div>
 
 <!-- 售后申请屏 -->
@@ -856,7 +915,7 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
         <div class="kv"><span>联系电话</span><span class="mut">请填写</span></div>
       </div>
       <button class="btn btn-g1" style="width:100%;margin-top:4px">提交申请</button>
-      <div class="note" style="margin:10px 12px 0">售后类型当前实现=仅退款/退货退款（换货/补发/部分退货为 二期待建，<span class="prd">售后域实体001/§3</span>）；客服代客操作时主语仍=买家橙橙。</div>
+      <div class="note" style="margin:10px 12px 0">售后类型当前实现=仅退款/退货退款（换货/补发/部分退货为二期待建）；客服代客操作时主语仍=买家橙橙。</div>
     </div>
   </div>
   </div>
@@ -890,8 +949,9 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
       <div class="card hl-add">
         <div style="font-size:13.5px;font-weight:600;margin-bottom:8px">退款去向（原路退回，不可改收款方）</div>
         <div class="kv"><span>退款方式</span><span>原路退回至实际支付方</span></div>
-        <div class="kv"><span>本单付款方</span><span class="small">店员垫付 · 微信<span class="orange-tag">付款人与买家非同一人</span></span></div>
+        <div class="kv"><span>本单实际支付方</span><span class="small">店员垫付 · 微信<span class="orange-tag">付款人与买家非同一人</span></span></div>
         <div class="kv"><span>预计到账</span><span class="mut">1-3 个工作日（渠道原路）</span></div>
+        <div class="small mut" style="padding-top:9px;line-height:1.7">客户自付的单同样是原路退回——<b style="color:#666">退给客户本人</b>，无垫付提醒。</div>
       </div>
       <div class="card">
         <div style="font-size:13.5px;font-weight:600;margin-bottom:8px">优惠与权益返还</div>
@@ -899,7 +959,7 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
         <div class="kv"><span>满减券</span><span class="mut">按订单优惠独立记录退回</span></div>
         <div class="kv"><span>积分抵现</span><span class="mut">按退款比例退还</span></div>
       </div>
-      <div class="notice">佣金冲减：退款完成 → 财务域佣金回滚——未结算（退款中暂停）/已结算（扣减 <span class="prd">财务域功能009、财务域实体010</span>）；<b>代客单佣金归属=客户业绩归属人</b>（按分销域客户归属规则：永久锁客，不因代客下单改变）。</div>
+      <div class="notice">佣金冲减：退款完成 → 财务侧佣金回滚——未结算（退款中暂停）/已结算（扣减）；<b>代客单佣金归属=客户业绩归属人</b>（按分销域客户归属规则：永久锁客，不因代客下单改变）。</div>
     </div>
   </div>
   </div>
@@ -919,7 +979,7 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
 <div class="rowwrap">
 
 <div class="scr pcscr">
-  <div class="sec-title" style="width:100%;margin:0 0 12px;margin-top:0">后台 · 订单详情页（1:1 复刻 + 买家信息内「代」标记）</div>
+  <div class="sec-title" style="width:100%;margin:0 0 12px;margin-top:0">后台 · 订单详情页（1:1 复刻 + 归属人 / 创建者字段）</div>
   <div class="pcx">
     <div class="pcx-crumb">
       交易 › 订单管理
@@ -930,7 +990,7 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
         <div class="st-big">待发货</div>
         <div class="st-sub">买家已付款，待商家发货</div>
         <span class="btn-ship">发货</span>
-        <div class="st-note">商家备注: <b>备注</b></div>
+        <div class="st-note">商家备注: <b>-</b></div>
       </div>
       <div class="tlh">
         <div class="step"><div class="dot done">1</div><div class="sn">买家下单</div><div class="sd">2026-09-02 10:21:08</div></div>
@@ -944,7 +1004,7 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
         <div class="step"><div class="dot">5</div><div class="sn gray">交易完成</div></div>
       </div>
     </div>
-    <div style="margin:8px 22px;background:#FFFCCF;border:1px solid #F7EFA8;border-radius:4px;padding:9px 12px;font-size:12px;color:#8C6239">买家备注:</div>
+    <div style="margin:8px 22px;background:#FFFCCF;border:1px solid #F7EFA8;border-radius:4px;padding:9px 12px;font-size:12px;color:#8C6239">买家备注：-</div>
     <div class="gray-strip">
       <div class="gc">
         <h5>收货人信息</h5>
@@ -962,9 +1022,10 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
         <p>实付金额：￥218.50</p>
       </div>
       <div class="gc hl-add" style="border-radius:8px;background:#fff;outline-offset:-2px;padding:2px 8px;margin:-4px 0">
-        <h5>买家信息<span class="tag tag-add">代</span></h5>
-        <p>买家：橙橙</p>
-        <p>代下单用户：门店3店员（CY26081900031）</p>
+        <h5>归属人 / 创建者<span class="tag tag-add">代</span></h5>
+        <p>归属人：<b>橙橙</b>（客户）</p>
+        <p>创建者：门店3店员（CY26081900031）</p>
+        <p>创建时间：2026-09-02 10:21:08</p>
       </div>
       <div class="gc">
         <h5>营销信息</h5>
@@ -989,10 +1050,10 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
       <div class="srow final"><i><b>订单应收总价：</b></i><span><b>￥218.50</b></span></div>
     </div>
   </div>
-  <aside class="anno anno-wide"><div class="ttl">后台屏 · 订单详情<small>1:1 骨架 · 买家信息内加「代」标记</small></div>
+  <aside class="anno anno-wide"><div class="ttl">后台屏 · 订单详情<small>1:1 骨架 · 归属人 / 创建者字段</small></div>
 <div class="ah">业务逻辑</div>
 <ol>
-<li>页面结构与现有后台完全一致，唯一的新增是买家信息区里的「代」标签和一行「代下单用户」——标明这单是哪个店员帮客户下的。</li>
+<li>页面结构与现有后台完全一致，唯一的新增是买家信息区——拆成明确的<b>归属人</b>、<b>创建者</b>、创建时间三行。这是本需求的核心数据规则：<b>创建者=店员/店长（谁操作的），归属人=客户（订单算谁的）</b>。</li>
 <li>操作按钮跟着订单状态走：待发货显示「发货」；已关闭的订单只剩查看和备注。</li>
 <li>店员信息是下单当时固化下来的——之后店员换门店、离职，历史订单的显示不受影响。</li>
 </ol>
@@ -1030,7 +1091,7 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
       <tr>
         <td><div style="font-size:11.5px;color:#0FC6A0;margin-bottom:4px">订单号：ORD260818000054</div>
           <div class="row" style="gap:8px"><div class="sku-img" style="width:36px;height:36px;font-size:14px;background:#EAF4FD">🍇</div><span style="font-size:12.5px;color:#333">葡萄<br><span class="mut" style="font-size:11px">500g</span><br><span class="mut" style="font-size:11px">全脂 400g</span></span></div></td>
-        <td style="font-size:11.5px">R20260902000030</td>
+        <td style="font-size:11.5px">R20260818000054</td>
         <td>仅退款</td><td>暂无</td><td>¥0.01</td><td>1</td><td style="color:#0FC6A0">¥0.00</td><td>0</td>
         <td style="font-size:11.5px">2026-08-18 15:02:18</td><td>-</td><td>快递长时间未送达</td>
         <td><span style="color:#FA8C16">待退款</span></td>
@@ -1039,7 +1100,7 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
       <tr>
         <td><div style="font-size:11.5px;color:#0FC6A0;margin-bottom:4px">订单号：ORD260715000176</div>
           <div class="row" style="gap:8px"><div class="sku-img" style="width:36px;height:36px;font-size:14px;background:#FBEAEA">榴</div><span style="font-size:12.5px;color:#333">榴莲<br><span class="mut" style="font-size:11px">500g/金枕</span><br><span class="mut" style="font-size:11px">全脂 400g/金枕</span></span></div></td>
-        <td style="font-size:11.5px">售后申请屏0260723000488</td>
+        <td style="font-size:11.5px">R202607230000488</td>
         <td>仅退款</td><td>暂无</td><td>¥0.02</td><td>1</td><td style="color:#0FC6A0">¥0.02</td><td>0</td>
         <td style="font-size:11.5px">2026-07-23 16:41:01</td><td>-</td><td>其他</td>
         <td><span style="color:#666">售后完成</span></td>
@@ -1100,8 +1161,8 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
       </div>
       <div class="ac hl-add" style="border-radius:0;background:#FFFDF7">
         <h5>客户信息<span class="tag tag-add">代</span></h5>
-        <p>申请人：橙橙</p>
-        <p>代下单用户：门店3店员（CY26081900031）</p>
+        <p>归属人：<b>橙橙</b>（客户 / 售后申请人）</p>
+        <p>创建者：门店3店员（CY26081900031）</p>
         <p>收货人：橙橙</p>
         <p>联系电话：13800020002</p>
         <p>收货地址：广东省广州市天河区东英科技园9号楼5楼</p>
@@ -1119,16 +1180,15 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
       <div class="li"><div class="lt">买家发起退款申请 <span class="tag tag-add">代客单：主语=买家橙橙</span></div>
         售后类型：仅退款<br>申请退款金额：￥218.50<br>退款原因：不想要了<br>退款说明：-
         <span class="tm">2026-09-02 14:02:18</span></div>
-      <div class="li"><div class="lt">商家已同意售后申请</div><span class="mut" style="font-size:11px">超时未处理 30 分钟系统自动同意（售后域超时自动处理规则）</span>
-        <span class="tm">2026-09-02 14:32:18</span></div>
-      <div class="li" style="color:#999"><div class="lt" style="color:#999">待商家退款 → 原路退回实际支付方（店员垫付·退给店员）</div><span class="mut" style="font-size:11px">系统自动退款 &lt;1 分钟，人工 &lt;24 小时；退款完成→佣金按「谁的客户归谁」的归属规则冲减</span></div>
+      <div class="li" style="color:#999"><div class="lt" style="color:#999">商家处理中（未处理则 30 分钟后系统自动同意）</div><span class="mut" style="font-size:11px">超时时间 2026-09-02 14:32:18，剩余 18:26</span></div>
+      <div class="li" style="color:#999"><div class="lt" style="color:#999">待商家退款 → 原路退回实际支付方（本单为店员垫付·退给店员；客户自付的单则退回客户）</div><span class="mut" style="font-size:11px">系统自动退款 &lt;1 分钟，人工 &lt;24 小时；退款完成→佣金按「谁的客户归谁」的归属规则冲减</span></div>
     </div>
   </div>
   <aside class="anno anno-wide"><div class="ttl">后台屏 · 售后详情<small>1:1 骨架 · 四步时间线+维权记录</small></div>
 <div class="ah">业务逻辑</div>
 <ol>
 <li>顶部是订单编号和维权编号；状态卡随阶段变化：<b>待商家处理时显示「拒绝申请/同意退款」</b>（30分钟不处理自动同意）；<b>同意后显示「原路退款」</b>。</li>
-<li>信息区保持原有三列不新增；客户信息区多一行「代下单用户」+「代」标签，标明这单是店员帮客户下的。</li>
+<li>信息区保持原有三列不新增；客户信息区把「买家 / 代下单用户」改成明确的<b>归属人</b>（客户 / 售后申请人）与<b>创建者</b>（下单店员）两行，跟后台订单详情同一套口径。</li>
 <li>底部维权记录是完整日志：谁在什么时间做了什么，全程可追溯。</li>
 </ol>
 <div class="ah">数据流转</div>
