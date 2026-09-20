@@ -467,7 +467,7 @@
           <div class="card tone-green clickable" onclick="switchTab('product')" title="点击进入商品报表"><div class="card-label">成交订单总金额<span class="demo">T+1 · 线上真实</span></div>
             <div class="card-value" id="t-kpi-gmv" data-def="直播期间挂车商品订单中已完成支付部分的金额合计（元），不含未支付订单。" data-calc="直播引导的已支付订单金额合计" data-source="订单表 · 支付金额" data-use="衡量直播带货的最终产出，是最核心的业绩结果指标。">¥0.63</div></div>
           <div class="card tone-violet clickable" onclick="switchTab('customer')" title="点击进入客户报表"><div class="card-label">会员总数<span class="demo">5min · 示例</span></div>
-            <div class="card-value" id="t-kpi-member" data-def="项目下状态正常的顾客总数，含 VIP 与普通会员。" data-calc="状态正常的顾客数量" data-source="客户档案表" data-use="反映客户资产规模，是人均类与占比类指标的计算分母。">12,560</div></div>
+            <div class="card-value" id="t-kpi-member" data-def="项目下状态正常的顾客总数，含高等级与普通会员。" data-calc="状态正常的顾客数量" data-source="客户档案表" data-use="反映客户资产规模，是人均类与占比类指标的计算分母。">12,560</div></div>
           <div class="card tone-cyan clickable" onclick="openFlowCaliber()" title="点击查看流量口径"><div class="card-label">消耗总流量 (MB)<span class="demo">T+1 · 线上真实</span></div>
             <div class="card-value" id="t-kpi-flow" data-def="全部直播场次产生的流量合计：直播推流/播放流量 + 回放点播流量。用于流量成本核算与对账。" data-calc="直播流量 ＋ 回放流量" data-source="直播场次统计（对接直播流量成本模块）" data-use="支撑流量成本核算、分摊与对账，避免成本争议。">644,141</div></div>
         </div>
@@ -481,9 +481,9 @@
           </div>
           <div class="panel" style="margin-bottom:0;">
             <div class="panel-head"><div><div class="panel-title">会员等级构成<span class="chip c-violet" style="margin-left:4px;">结构</span></div>
-            <div class="panel-sub">全部会员按 VIP 等级分布（示例数据）</div></div></div>
+            <div class="panel-sub">全部会员按会员等级分布（示例数据）</div></div></div>
             <div class="chart-wrap"><div class="donut-flex" id="memberDonut"></div></div>
-            <div class="legend"><b>口径</b>：等级取 会员等级表，level&gt;1 为 VIP；占比分母为会员总数。</div>
+            <div class="legend"><b>口径</b>：等级取 会员等级表，高于注册会员的等级（铂金、黑卡等）；占比分母为会员总数。</div>
           </div>
         </div>
 
@@ -553,7 +553,7 @@
           <div class="panel">
             <div class="panel-head"><div><div class="panel-title">门店会员对比</div><div class="panel-sub">点击门店名进入门店详情（示例数据）</div></div></div>
             <table>
-              <thead><tr><th>门店</th><th>名下会员</th><th>VIP占比</th><th>新增</th><th>沉睡</th><th>贡献GMV</th><th>人均贡献</th><th>复购率</th><th>活跃率</th><th></th></tr></thead>
+              <thead><tr><th>门店</th><th>名下会员</th><th>高等级占比</th><th>新增</th><th>沉睡</th><th>贡献GMV</th><th>人均贡献</th><th>复购率</th><th>活跃率</th><th></th></tr></thead>
               <tbody>
                 <tr><td><button class="link" onclick="openStoreDetail('天河旗舰店')">天河旗舰店</button></td><td>486</td><td>36.5%</td><td>32</td><td>52</td><td>¥78,000</td><td>¥160</td><td>42%</td><td>89%</td><td><button class="link" onclick="openStoreDetail('天河旗舰店')">详情 →</button></td></tr>
                 <tr><td><button class="link" onclick="openStoreDetail('白云店')">白云店</button></td><td>380</td><td>32.1%</td><td>25</td><td>48</td><td>¥56,000</td><td>¥147</td><td>38%</td><td>85%</td><td><button class="link" onclick="openStoreDetail('白云店')">详情 →</button></td></tr>
@@ -561,7 +561,7 @@
                 <tr class="tot"><td>汇总（3 家）</td><td>1,186</td><td>33.1%</td><td>77</td><td>145</td><td>¥179,000</td><td>¥151</td><td>38.8%</td><td>85.8%</td><td>—</td></tr>
               </tbody>
             </table>
-            <div class="legend"><b>字段口径</b>：名下会员=store_id 归属该店的客户数；新增=first_bind_time 落在统计周期；沉睡=90 天无消费且无登录（is_dormant=1）；人均贡献=门店GMV÷名下会员数；VIP占比=VIP会员数÷名下会员数。</div>
+            <div class="legend"><b>字段口径</b>：名下会员=store_id 归属该店的客户数；新增=first_bind_time 落在统计周期；沉睡=90 天无消费且无登录（is_dormant=1）；人均贡献=门店GMV÷名下会员数；高等级占比=高等级会员数÷名下会员数。</div>
           </div>
         </div>
 
@@ -581,7 +581,7 @@
           <div class="panel">
             <div class="panel-head"><div><div class="panel-title">门店成员列表（店长 + 店员）</div><div class="panel-sub">点击「明细」查看该成员名下会员的明细 / 课程参与 / 直播参与</div></div></div>
             <table>
-              <thead><tr><th>排名</th><th>成员</th><th>身份</th><th>名下会员</th><th>新增</th><th>VIP</th><th>沉睡</th><th>贡献GMV</th><th>复购率</th><th></th></tr></thead>
+              <thead><tr><th>排名</th><th>成员</th><th>身份</th><th>名下会员</th><th>新增</th><th>高等级</th><th>沉睡</th><th>贡献GMV</th><th>复购率</th><th></th></tr></thead>
               <tbody>
                 <tr><td><span class="rank r1">1</span></td><td><b>陈总</b></td><td><span class="tag t-violet">店长</span></td><td>620</td><td>45</td><td>180</td><td>52</td><td>¥98,000</td><td>40%</td><td><button class="link" onclick="openMemberDetail('陈总','店长')">明细 →</button></td></tr>
                 <tr><td><span class="rank r2">2</span></td><td><b>张三</b></td><td><span class="tag t-blue">店员</span></td><td>186</td><td>12</td><td>68</td><td>18</td><td>¥28,000</td><td>42%</td><td><button class="link" onclick="openMemberDetail('张三','店员')">明细 →</button></td></tr>
@@ -602,7 +602,7 @@
           <div class="grid g5">
             <div class="card tone-violet"><div class="card-label">名下会员</div><div class="card-value" data-def="归属在该成员名下且状态正常的客户数。" data-calc="归属该成员名下的正常客户数量" data-source="客户档案表" data-use="成员个人客户资产规模，是归属与业绩归因的基础。">186</div></div>
             <div class="card tone-blue"><div class="card-label">新增会员</div><div class="card-value" data-def="统计周期内首次绑定到该成员名下的客户数。" data-calc="首次绑定时间落在统计周期的客户数" data-source="客户档案 · 首次绑定时间" data-use="衡量成员拉新拓客能力。">12</div></div>
-            <div class="card tone-amber"><div class="card-label">VIP占比</div><div class="card-value" data-def="名下会员中 VIP 等级会员的占比。" data-calc="VIP 会员数 ÷ 名下会员数" data-source="会员等级表" data-use="衡量名下客户质量，VIP 是消费贡献主力。">36.5%</div></div>
+            <div class="card tone-amber"><div class="card-label">高等级占比</div><div class="card-value" data-def="名下会员中高等级会员（非注册会员）的占比。" data-calc="高等级会员数 ÷ 名下会员数" data-source="会员等级表" data-use="衡量名下客户质量，高等级会员是消费贡献主力。">36.5%</div></div>
             <div class="card tone-green"><div class="card-label">活跃会员</div><div class="card-value" data-def="名下会员中处于活跃状态的会员数（前一日状态）。" data-calc="名下活跃会员数量" data-source="会员状态汇总（每日凌晨预计算）" data-use="衡量实际可触达、有互动的客户规模。">168</div></div>
             <div class="card tone-cyan"><div class="card-label">贡献GMV</div><div class="card-value" data-def="名下会员已支付订单金额合计。" data-calc="已支付订单金额合计" data-source="订单表 × 客户归属店员" data-use="成员个人业绩结果指标，用于排名与激励。">¥28,000</div></div>
           </div>
@@ -958,13 +958,13 @@
         <div class="panel new-hl">
           <div class="panel-head"><div><div class="panel-title">店员行为投入对比<span class="chip c-blue" style="margin-left:4px;">过程</span></div><div class="panel-sub">结果指标之外的日常工作投入（示例数据）</div></div></div>
           <table>
-            <thead><tr><th>店员</th><th>开播场次</th><th>累计直播时长</th><th>客户群发</th></tr></thead>
+            <thead><tr><th>店员</th><th>客户群发</th></tr></thead>
             <tbody>
-              <tr><td>张三</td><td>6</td><td>18.5 小时</td><td>23 次</td></tr>
-              <tr><td>李四</td><td>5</td><td>14.0 小时</td><td>19 次</td></tr>
-              <tr><td>王五</td><td>4</td><td>11.0 小时</td><td>16 次</td></tr>
-              <tr><td>赵六</td><td>3</td><td>8.0 小时</td><td>12 次</td></tr>
-              <tr class="tot"><td>汇总（前 4）</td><td>18</td><td>51.5 小时</td><td>70 次</td></tr>
+              <tr><td>张三</td><td>23 次</td></tr>
+              <tr><td>李四</td><td>19 次</td></tr>
+              <tr><td>王五</td><td>16 次</td></tr>
+              <tr><td>赵六</td><td>12 次</td></tr>
+              <tr class="tot"><td>汇总（前 4）</td><td>70 次</td></tr>
             </tbody>
           </table>
           <div class="legend"><b>用途</b>：结果指标（GMV/会员数）回答“做得怎么样”，本表回答“有没有在做”——投入高但结果差的店员需要方法辅导，投入低的店员需要激励。<b>口径</b>：行为数据触发即更新；群发含直播推广群发。</div>
@@ -972,7 +972,7 @@
         <div class="panel new-hl">
           <div class="panel-head"><div><div class="panel-title">客户结构分析<span class="chip c-violet" style="margin-left:4px;">质量</span></div><div class="panel-sub">各店员名下客户的等级、状态与消费分层构成（示例数据）</div></div></div>
           <table>
-            <thead><tr><th>店员</th><th>名下会员</th><th>VIP(占比)</th><th>活跃</th><th>沉睡</th><th>新增</th><th>高消费≥¥1,000</th><th>中 ¥300~1,000</th><th>低 ¥1~300</th><th>零消费</th><th>直播触达率</th></tr></thead>
+            <thead><tr><th>店员</th><th>名下会员</th><th>高等级(占比)</th><th>活跃</th><th>沉睡</th><th>新增</th><th>高消费≥¥1,000</th><th>中 ¥300~1,000</th><th>低 ¥1~300</th><th>零消费</th><th>直播触达率</th></tr></thead>
             <tbody>
               <tr><td>张三</td><td>186</td><td>68 (36.6%)</td><td>168</td><td>18</td><td>12</td><td>22</td><td>45</td><td>71</td><td>48</td><td>51.6%</td></tr>
               <tr><td>李四</td><td>152</td><td>52 (34.2%)</td><td>137</td><td>15</td><td>9</td><td>16</td><td>38</td><td>58</td><td>40</td><td>51.3%</td></tr>
@@ -986,7 +986,7 @@
         <div class="panel">
           <div class="panel-head"><div><div class="panel-title">店员会员排行</div><div class="panel-sub">点击明细查看名下会员（示例数据）</div></div></div>
           <table>
-            <thead><tr><th>排名</th><th>店员</th><th>门店</th><th>身份</th><th>名下会员</th><th>新增</th><th class="new-hl">VIP</th><th>沉睡</th><th>贡献GMV</th><th class="new-hl">人均贡献</th><th class="new-hl">复购率</th><th class="new-hl">变化</th><th></th></tr></thead>
+            <thead><tr><th>排名</th><th>店员</th><th>门店</th><th>身份</th><th>名下会员</th><th>新增</th><th class="new-hl">高等级</th><th>沉睡</th><th>贡献GMV</th><th class="new-hl">人均贡献</th><th class="new-hl">复购率</th><th class="new-hl">变化</th><th></th></tr></thead>
             <tbody>
               <tr><td><span class="rank r1">1</span></td><td><button class="link new-hl" onclick="openStaffDetail('张三')">张三</button></td><td>天河旗舰店</td><td><span class="tag t-blue">店员</span></td><td>186</td><td>12</td><td>68</td><td>18</td><td>¥28,000</td><td>¥151</td><td>42%</td><td><span class="flat">持平</span></td><td><button class="link" onclick="openMemberDetail('张三','店员')">明细 →</button></td></tr>
               <tr><td><span class="rank r2">2</span></td><td><button class="link" onclick="openStaffDetail('李四')">李四</button></td><td>天河旗舰店</td><td><span class="tag t-blue">店员</span></td><td>152</td><td>9</td><td>52</td><td>15</td><td>¥22,500</td><td>¥148</td><td>38%</td><td><span class="up">↑1</span></td><td><button class="link" onclick="openMemberDetail('李四','店员')">明细 →</button></td></tr>
@@ -995,7 +995,7 @@
               <tr class="tot"><td>汇总（前 4）</td><td>—</td><td>—</td><td>606</td><td>35</td><td>205</td><td>71</td><td>¥87,700</td><td>¥145</td><td>36.5%</td><td>—</td><td>—</td></tr>
             </tbody>
           </table>
-          <div class="legend"><b>字段口径</b>：归属口径=按查询时点 staff_id 快照，不追溯历史；新增=first_bind_time 在统计周期内；VIP=非普通等级会员。</div>
+          <div class="legend"><b>字段口径</b>：归属口径=按查询时点 staff_id 快照，不追溯历史；新增=first_bind_time 在统计周期内；高等级=注册会员以外的等级（铂金、黑卡等）。</div>
         </div>
       </section>
 
@@ -1004,14 +1004,14 @@
         <div class="grid g5">
           <div class="card tone-violet"><div class="card-label">店长人数</div><div class="card-value" data-def="项目下在职店长总数。" data-calc="在职店长人数" data-source="员工档案表" data-use="反映管理团队规模。">18<small>人</small></div></div>
           <div class="card tone-blue"><div class="card-label">管辖会员总数</div><div class="card-value" data-def="店长管辖门店内全部店员名下会员之和。客户归属于店员，再按店长管辖的门店向上汇总。" data-calc="各管辖门店店员名下会员数相加" data-source="客户档案 · 归属店员 ＋ 员工档案管辖关系" data-use="店长层级的客户资产规模，是管辖人均贡献的分母。">1,256</div></div>
-          <div class="card tone-amber new-hl"><div class="card-label">管辖 VIP 会员</div><div class="card-value" data-def="管辖范围内会员等级为 VIP 的客户数。" data-calc="管辖会员中 VIP 等级会员数量" data-source="会员等级表 ＋ 管辖关系" data-use="衡量店长团队掌握的高价值客户规模，与管辖贡献 GMV 相互印证。">320</div></div>
+          <div class="card tone-amber new-hl"><div class="card-label">管辖高等级会员</div><div class="card-value" data-def="管辖范围内高等级会员（非注册会员）的客户数。" data-calc="管辖会员中高等级会员数量" data-source="会员等级表 ＋ 管辖关系" data-use="衡量店长团队掌握的高价值客户规模，与管辖贡献 GMV 相互印证。">320</div></div>
           <div class="card tone-green"><div class="card-label">管辖贡献 GMV</div><div class="card-value" data-def="管辖范围内全部会员已支付订单金额合计（不含未支付与已退款）。" data-calc="管辖会员已支付订单金额相加" data-source="订单表 × 管辖关系" data-use="店长团队最核心的业绩结果指标，回答“管的人一共卖了多少钱”。">¥185k</div></div>
           <div class="card tone-cyan"><div class="card-label">管辖人均贡献</div><div class="card-value" data-def="管辖范围内平均每个会员贡献的成交金额。" data-calc="管辖贡献 GMV ÷ 管辖会员总数" data-source="由其他指标计算得出" data-use="剔除会员规模差异后衡量单客产出质量，店长之间横向可比。">¥147</div></div>
         </div>
         <div class="panel">
           <div class="panel-head"><div><div class="panel-title">店长管辖总览</div><div class="panel-sub">店长数据 = 管辖门店内所有店员名下会员数据之和（示例数据）</div></div></div>
           <table>
-            <thead><tr><th>店长</th><th>管辖店员</th><th>管辖门店</th><th>管辖会员</th><th>新增</th><th class="new-hl">VIP会员</th><th>贡献GMV</th><th>人均贡献</th><th>活跃率</th><th class="new-hl">操作</th></tr></thead>
+            <thead><tr><th>店长</th><th>管辖店员</th><th>管辖门店</th><th>管辖会员</th><th>新增</th><th class="new-hl">高等级会员</th><th>贡献GMV</th><th>人均贡献</th><th>活跃率</th><th class="new-hl">操作</th></tr></thead>
             <tbody>
               <tr><td><button class="link new-hl" onclick="openManagerDetail('陈总')">陈总</button></td><td>8 人</td><td>3 家</td><td>620</td><td>45</td><td>180</td><td>¥98,000</td><td>¥158</td><td>85%</td><td class="new-hl"><button class="link" onclick="openManagerDetail('陈总')">详情 →</button></td></tr>
               <tr><td><button class="link" onclick="openManagerDetail('刘总')">刘总</button></td><td>6 人</td><td>2 家</td><td>480</td><td>32</td><td>120</td><td>¥72,000</td><td>¥150</td><td>82%</td><td><button class="link" onclick="openManagerDetail('刘总')">详情 →</button></td></tr>
@@ -1154,7 +1154,7 @@
             <tr><td>店长人数<br>店员人数</td><td>新员工入职且档案生效（店长/店员身份）</td><td>离职、停用、转岗离开当前项目</td><td>只统计在职人员，非在职不计</td></tr>
             <tr><td>名下会员总数<br>管辖会员总数</td><td>新客户归属到该成员名下：扫码绑定、新客建档、换绑转入</td><td>①客户换绑转出给其他成员；②成员离职且客户未转移；③客户状态异常（注销/删除）；④门店调整出管辖范围</td><td>按查询时点快照、不追溯历史——数值"变少"多数来自归属转移，不是客户消失</td></tr>
             <tr><td>新增会员</td><td>统计周期内首次绑定到名下的客户</td><td>期间数不会因后续事件减少；更换查询周期后数值随之变化</td><td>只算周期内"首次绑定"，不等于周期内净增减</td></tr>
-            <tr><td>VIP 会员数<br>VIP 占比</td><td>普通会员升级为 VIP（消费/充值达标）；VIP 客户新绑定归属</td><td>VIP 降级或等级到期；VIP 客户换绑转出或状态异常；占比另受分母影响——大量普通新客进入会稀释占比</td><td>人数看规模、占比看质量，两者结合读；占比下降不一定 VIP 流失</td></tr>
+            <tr><td>高等级会员数<br>高等级占比</td><td>注册会员升级为高等级（消费/充值达标）；高等级客户新绑定归属</td><td>等级降级或到期；高等级客户换绑转出或状态异常；占比另受分母影响——大量普通新客进入会稀释占比</td><td>人数看规模、占比看质量，两者结合读；占比下降不一定高等级流失</td></tr>
             <tr><td>贡献 GMV<br>（成员/门店/管辖）</td><td>名下会员产生新的已支付订单</td><td>订单退款成功后按退款发生日冲减当期金额；会员换绑转出后其后续消费不再计入</td><td>未支付、已取消订单不计入；退款按退款时间冲减，不改历史入账</td></tr>
             <tr><td>人均贡献</td><td>GMV 增长快于会员数增长</td><td>低消费新客大量进入（分母涨得比分子快）；会员转出带走 GMV</td><td>分子分母联动，需与 GMV、会员数两个绝对值一起读</td></tr>
             <tr><td>活跃会员<br>活跃率</td><td>会员近 90 天内发生消费或登录（任一行为即回活跃）</td><td>超过 90 天无消费且无登录，转为沉睡（与沉睡互斥）</td><td>每日凌晨预计算，显示前一日状态——当天行为次日才反映</td></tr>
@@ -1232,7 +1232,7 @@
           <tbody>
             <tr><td>名下会员数</td><td class="num" style="font-family:var(--mono);font-size:11px;">归属在该成员名下的正常客户数量</td><td>归属快照</td></tr>
             <tr><td>新增会员</td><td class="num" style="font-family:var(--mono);font-size:11px;">周期内首次绑定的客户数量</td><td>首次绑定即新增</td></tr>
-            <tr><td>VIP 占比</td><td class="num" style="font-family:var(--mono);font-size:11px;">VIP会员数 ÷ 名下会员数 × 100%</td><td>—</td></tr>
+            <tr><td>高等级占比</td><td class="num" style="font-family:var(--mono);font-size:11px;">高等级会员数 ÷ 名下会员数 × 100%</td><td>—</td></tr>
             <tr><td>沉睡会员</td><td class="num" style="font-family:var(--mono);font-size:11px;">90 天无消费且无登录的会员数</td><td>每日 02:30 预计算</td></tr>
             <tr><td>活跃率</td><td class="num" style="font-family:var(--mono);font-size:11px;">活跃会员数 ÷ 会员总数 × 100%</td><td>每日 02:30 预计算</td></tr>
             <tr><td>贡献金额</td><td class="num" style="font-family:var(--mono);font-size:11px;">名下会员已支付订单金额合计</td><td>—</td></tr>
@@ -1264,7 +1264,7 @@
         <table>
           <thead><tr><th style="width:14%">类型</th><th style="width:44%">采集机制</th><th>标签与归属</th></tr></thead>
           <tbody>
-            <tr><td>直播</td><td class="num">实时进入/退出；互动行为（点赞/评论/分享）触发即上报</td><td rowspan="3" style="vertical-align:top;">事件统一携带：<b>用户标签</b>（customer_id、VIP 等级）与<b>归属标签</b>（租户、项目、门店、直播间/课程、场次），标签在打点时写入，用于主题报表的多维聚合与归属隔离</td></tr>
+            <tr><td>直播</td><td class="num">实时进入/退出；互动行为（点赞/评论/分享）触发即上报</td><td rowspan="3" style="vertical-align:top;">事件统一携带：<b>用户标签</b>（customer_id、会员等级）与<b>归属标签</b>（租户、项目、门店、直播间/课程、场次），标签在打点时写入，用于主题报表的多维聚合与归属隔离</td></tr>
             <tr><td>点播（录播视频）</td><td class="num">播放器记录进入/退出时刻；同一用户在视频时间轴上多次打点，标记已看/未看区间；多次观看累计</td></tr>
             <tr><td>事件上报</td><td class="num">行为通过点播/播放器上传事件记录，事件即事实明细，进入行为指标（触发即更新）</td></tr>
           </tbody>
@@ -1571,7 +1571,7 @@ const SPECS={
  '总览':[
   ['观看总人数','统计周期内进入过直播间的去重客户数（同一客户多场次只计 1 次）','各场次"进入直播间客户"去重后相加','直播观看明细','评估直播引流能力，是漏斗顶部基数与转化率的分母。'],
   ['成交订单总金额','直播挂车商品订单中已支付部分的金额合计','已支付直播订单的支付金额相加','订单表','衡量直播带货最终产出，最核心的业绩结果指标。'],
-  ['会员总数','项目下状态正常的顾客总数，含 VIP 与普通会员','状态正常的顾客数量','客户档案表','反映客户资产规模，是人均类、占比类指标的分母。'],
+  ['会员总数','项目下状态正常的顾客总数，含高等级与普通会员','状态正常的顾客数量','客户档案表','反映客户资产规模，是人均类、占比类指标的分母。'],
   ['消耗总流量','直播推流/播放流量 ＋ 回放点播流量合计','直播流量 ＋ 回放流量','直播场次统计（对接直播流量成本模块）','支撑流量成本核算、分摊与对账，避免成本争议。'],
   ['四维交叉矩阵','直播间为行落点，直播、客户、商品三个维度交叉汇总；含主播类型（门店/总部/供应商/个人）小计','以直播间为行逐场汇总','跨表关联汇总','一站看清每个直播间的综合表现，定位优秀与待改进场次。'],
   ['路径漏斗','预约/进入→观看≥1分钟→互动→点击商品→下单→支付，展示各环节人数','按"客户 × 直播场次"归集行为链','行为明细归集','定位转化链路中流失最严重的环节，指导运营优化。'],
@@ -1615,7 +1615,6 @@ const SPECS={
   ['复购率','90 天内有 ≥2 笔已支付订单的会员占同期有消费会员的比例','90 天内已支付订单 ≥2 笔的会员数 ÷ 有消费会员数','会员状态汇总 · 复购标记','衡量客户粘性与客户维护质量。'],
   ['店长数据','管辖门店内全部店员数据相加','各店员数据相加','员工档案聚合','店长管理成果的汇总视图，用于管理层评估。'],
   ['消费分层','按客户累计已支付金额分档：高≥¥1,000；中¥300~1,000；低¥1~300；零=无已支付订单','按客户累计已支付金额分档计数','订单表 · 按客户聚合','识别名下客户的质量结构，指导店员差异化维护。'],
-  ['开播场次','统计周期内该成员开播的直播场次（主播类型仅门店/个人/总部/供应商四类，无店员/店长直播分类；场次需记录开播人并关联员工档案，方可归属到人，否则此指标挂门店维度统计）','按开播人关联场次去重计数','直播场次表 · 开播人','衡量一线的自播投入。'],
   ['客户群发','统计周期内该成员向名下客户群发的消息次数','按成员＋群发任务计数','客户群发记录','衡量主动触达客户的频率。'],
   ['排名变化','当前周期排名与上一周期排名的差值','上期排名 − 本期排名','由其他指标计算得出','快速识别进步与退步的店员。'],
  ],
@@ -1673,13 +1672,13 @@ el('gm').addEventListener('click',e=>{ if(e.target.id==='gm') closeModal(); });
 
 /* 客户 360 档案 */
 const C360={
- '王女士':{lv:'黑卡 VIP',own:'张三',bind:'2026-03-15',st:'活跃',stc:'t-green',tags:['直播敏感型','高消费','高互动'],
+ '王女士':{lv:'黑卡',own:'张三',bind:'2026-03-15',st:'活跃',stc:'t-green',tags:['直播敏感型','高消费','高互动'],
   kpi:[['¥3,200','累计消费','该客户全部已支付订单的金额合计（含直播与自然购买）。','已支付订单金额相加，退款冲减'],['9 笔','订单总数','该客户已完成支付的订单笔数。','已支付订单计数，退款成功扣减'],['¥920 · 28.8%','直播消费 · 占比','该客户从直播间购买的花费，及其占累计消费的比例。','直播引导已支付订单金额 ÷ 累计消费'],['326 分钟','直播观看','该客户在直播间与回放的累计观看时长。','各场次观看时长累加 ÷ 60 换算为分钟'],['42 小时 · 2 门','课程学习','该客户参加的课程与营期学习总时长及去重课程数。','各课程观看时长累加；课程按去重计数'],['46 次','互动次数','该客户点赞、评论、分享的行为总次数。','三类行为条数相加（不去重），按天聚合明细见互动行为页签']],
   orders:[['玻尿酸精华液 30ml','¥320','直播78 引导','08-24'],['修护面霜 50g','¥300','直播76 引导','08-20'],['洁面乳 120ml','¥300','直播76 引导','08-18'],['面霜套装','¥500','自然购买','08-12'],['精华水','¥420','自然购买','08-02'],['补水面膜','¥380','自然购买','07-28'],['身体乳','¥360','自然购买','07-15'],['洗发水','¥320','自然购买','07-02'],['护手霜','¥300','自然购买','06-20']],
   live:[['直播78','45.0','是','是','¥320','08-24'],['直播76','32.0','是','是','¥300','08-20'],['直播72','28.5','否','是','¥300','08-12']],
   course:[['产品知识','25 分钟','100%','是','100%','¥10'],['销售话术营（营期）','42 小时','92%','—','—','—']],
   inter:[['评论','直播78','08-24','6'],['点赞','直播76','08-20','18'],['分享','直播76','08-18','4'],['点赞','直播72','08-12','12'],['点赞','直播70','08-05','6']]},
- '李先生':{lv:'金卡 VIP',own:'李四',bind:'2026-04-02',st:'活跃',stc:'t-green',tags:['中消费','浅互动'],
+ '李先生':{lv:'金卡',own:'李四',bind:'2026-04-02',st:'活跃',stc:'t-green',tags:['中消费','浅互动'],
   kpi:[['¥1,800','累计消费','该客户全部已支付订单的金额合计（含直播与自然购买）。','已支付订单金额相加，退款冲减'],['3 笔','订单总数','该客户已完成支付的订单笔数。','已支付订单计数，退款成功扣减'],['¥300 · 16.7%','直播消费 · 占比','该客户从直播间购买的花费，及其占累计消费的比例。','直播引导已支付订单金额 ÷ 累计消费'],['142 分钟','直播观看','该客户在直播间与回放的累计观看时长。','各场次观看时长累加 ÷ 60 换算为分钟'],['18 分钟 · 1 门','课程学习','该客户参加的课程与营期学习总时长及去重课程数。','各课程观看时长累加；课程按去重计数'],['9 次','互动次数','该客户点赞、评论、分享的行为总次数。','三类行为条数相加（不去重），按天聚合明细见互动行为页签']],
   orders:[['修护面霜 50g','¥300','直播76 引导','08-22'],['精华水','¥800','自然购买','08-05'],['洁面乳','¥700','自然购买','07-18']],
   live:[['直播76','32.0','是','否','¥300','08-22'],['直播72','58.0','是','否','—','08-12']],
@@ -1736,12 +1735,12 @@ function openManagerDetail(name,idx){
   }).join('');
   const uid='mgr'+(idx||name.length)+name.charCodeAt(0);
   openDrawer('店长详情 · '+name,
-    '<div class="caliber" style="margin-bottom:12px;"><b>'+name+'</b> · 管辖 '+d.stores+' 家门店 · '+d.staff+' 名店员 · 名下会员 '+d.mem+'（VIP '+d.vip+'）· 管辖贡献 '+d.gmv+'。下表为管辖店员明细（示例前 4 名，完整名单支持导出）。</div>'
+    '<div class="caliber" style="margin-bottom:12px;"><b>'+name+'</b> · 管辖 '+d.stores+' 家门店 · '+d.staff+' 名店员 · 名下会员 '+d.mem+'（高等级 '+d.vip+'）· 管辖贡献 '+d.gmv+'。下表为管辖店员明细（示例前 4 名，完整名单支持导出）。</div>'
     +'<div class="grid g2e" style="margin-bottom:14px;">'
     +'<div class="panel" style="margin-bottom:0;"><div class="panel-head"><div><div class="panel-title">管辖会员 · 近 30 天</div></div></div><div class="chart-wrap" id="'+uid+'M"></div></div>'
     +'<div class="panel" style="margin-bottom:0;"><div class="panel-head"><div><div class="panel-title">贡献 GMV 累计（千元）</div></div></div><div class="chart-wrap" id="'+uid+'G"></div></div></div>'
     +'<div class="panel" style="margin-bottom:14px;"><div class="panel-head"><div><div class="panel-title">管辖门店构成</div><div class="panel-sub">会员数与贡献 GMV 按门店拆分</div></div></div><div class="chart-wrap">'+storeRows+'</div></div>'
-    +'<table><thead><tr><th>店员</th><th>所属门店</th><th>名下会员</th><th>VIP</th><th>活跃</th><th>沉睡</th><th>贡献GMV</th><th>复购率</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>'
+    +'<table><thead><tr><th>店员</th><th>所属门店</th><th>名下会员</th><th>高等级</th><th>活跃</th><th>沉睡</th><th>贡献GMV</th><th>复购率</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>'
     +'<div class="legend"><b>统计维度</b>：每行 = 一名店员，行为其名下会员（按客户去重，归属快照）；店长数据 = 管辖门店内全部店员数据相加，不追溯历史归属。点击店员名查看其详情，再点客户名可进入客户 360 档案。</div>');
   areaChart(uid+'M',d.trendM,['-30','-25','-20','-15','-10','-5','-3','今'],'#2563EB',v=>Math.round(v));
   areaChart(uid+'G',d.trendG,['-30','-25','-20','-15','-10','-5','-3','今'],'#059669',v=>v.toFixed(0));
@@ -1750,24 +1749,24 @@ function openManagerDetail(name,idx){
 const STAFF={
  '张三':{store:'天河旗舰店',mem:186,newM:12,act:168,slp:18,vip:68,gmv:'¥28,000',rep:'42%',reach:'51.6%',
   trendM:[172,175,177,179,181,183,185,186],trendG:[8.2,10.5,12.8,15.2,17.6,20.1,22.0,28.0],
-  beh:[['开播场次','6'],['累计直播时长','18.5 小时'],['客户群发','23 次']],
-  cust:[['王女士','黑卡 VIP','¥3,200','活跃','08-24'],['李女士','金卡 VIP','¥1,600','活跃','08-21'],['周女士','普通会员','¥0','沉睡','06-12']]},
+  beh:[['客户群发','23 次']],
+  cust:[['王女士','黑卡','¥3,200','活跃','08-24'],['李女士','金卡','¥1,600','活跃','08-21'],['周女士','普通会员','¥0','沉睡','06-12']]},
  '李四':{store:'天河旗舰店',mem:152,newM:9,act:137,slp:15,vip:52,gmv:'¥22,500',rep:'38%',reach:'51.3%',
   trendM:[144,146,147,148,149,150,151,152],trendG:[6.5,8.4,10.2,12.0,13.8,15.6,17.5,22.5],
-  beh:[['开播场次','5'],['累计直播时长','14.0 小时'],['客户群发','19 次']],
-  cust:[['李先生','金卡 VIP','¥1,800','活跃','08-22'],['吴女士','普通会员','¥900','活跃','08-18'],['郑女士','普通会员','¥0','沉睡','05-30']]},
+  beh:[['客户群发','19 次']],
+  cust:[['李先生','金卡','¥1,800','活跃','08-22'],['吴女士','普通会员','¥900','活跃','08-18'],['郑女士','普通会员','¥0','沉睡','05-30']]},
  '王五':{store:'白云店',mem:140,newM:8,act:118,slp:22,vip:45,gmv:'¥19,200',rep:'35%',reach:'47.1%',
   trendM:[133,134,135,136,137,138,139,140],trendG:[5.5,7.2,9.0,10.8,12.6,14.4,16.8,19.2],
-  beh:[['开播场次','4'],['累计直播时长','11.0 小时'],['客户群发','16 次']],
+  beh:[['客户群发','16 次']],
   cust:[['陈小姐','普通会员','¥0','沉睡','08-24'],['孙女士','普通会员','¥1,200','活跃','08-20'],['钱女士','普通会员','¥650','活跃','08-15']]},
  '赵六':{store:'番禺店',mem:128,newM:6,act:112,slp:16,vip:40,gmv:'¥18,000',rep:'31%',reach:'48.4%',
   trendM:[122,123,124,125,126,127,127,128],trendG:[5.0,6.6,8.2,9.8,11.4,13.0,15.5,18.0],
-  beh:[['开播场次','3'],['累计直播时长','8.0 小时'],['客户群发','12 次']],
+  beh:[['客户群发','12 次']],
   cust:[['何先生','普通会员','¥980','活跃','08-19'],['许先生','普通会员','¥720','活跃','08-11'],['卢女士','普通会员','¥0','沉睡','05-22']]}
 };
 function openStaffDetail(name,idx){
   const d=STAFF[name]||STAFF['张三'];
-  const kpi=[['186','名下会员'],[d.mem,'名下会员'],[d.newM,'新增会员'],[d.act,'活跃会员'],[d.slp,'沉睡会员'],[d.vip,'VIP 会员'],[d.gmv,'贡献 GMV'],[d.rep,'复购率'],[d.reach,'直播触达率']].slice(1);
+  const kpi=[['186','名下会员'],[d.mem,'名下会员'],[d.newM,'新增会员'],[d.act,'活跃会员'],[d.slp,'沉睡会员'],[d.vip,'高等级会员'],[d.gmv,'贡献 GMV'],[d.rep,'复购率'],[d.reach,'直播触达率']].slice(1);
   const kpiHtml=kpi.map(k=>'<div class="card" style="padding:8px 10px;"><div style="font-size:15px;font-weight:700;">'+k[0]+'</div><div style="font-size:10.5px;color:var(--fg-3);margin-top:2px;">'+k[1]+'</div></div>').join('');
   const behHtml=d.beh.map(b=>'<div class="dist-row"><div class="dist-name">'+b[0]+'</div><div class="dist-track"></div><div class="dist-num"><b>'+b[1]+'</b></div></div>').join('');
   const custHtml=d.cust.map(c=>'<tr><td><button class="link" onclick="openCustomer360(\''+c[0]+'\',\''+name+'\')">'+c[0]+'</button></td><td>'+c[1]+'</td><td>'+c[2]+'</td><td><span class="tag '+(c[3]==='活跃'?'t-green':'t-red')+'">'+c[3]+'</span></td><td>'+c[4]+'</td></tr>').join('');
@@ -2008,7 +2007,7 @@ function staffBody(){
   +'<div class="dist-row"><div class="dist-name">普通</div><div class="dist-track"><div class="dist-fill" style="width:20%;background:#CBD5E1;"></div></div><div class="dist-num">26</div></div></div>';
  if(appTabKey==='members'){
   const mine=APP_MEMBERS.filter(m=>m.staff==='张三');
-  const chips=[['all','全部 '+mine.length],['vip','VIP'],['active','活跃'],['dormant','沉睡']];
+  const chips=[['all','全部 '+mine.length],['vip','高等级'],['active','活跃'],['dormant','沉睡']];
   const list=mine.filter(m=> appMFilterKey==='all' || (appMFilterKey==='vip'&&m.lvl!=='普通') || (appMFilterKey==='active'&&m.active) || (appMFilterKey==='dormant'&&!m.active));
   return '<div class="a-chips">'+chips.map(c=>'<button class="a-chip'+(appMFilterKey===c[0]?' active':'')+'" onclick="appMFilter(\''+c[0]+'\')">'+c[1]+'</button>').join('')+'</div>'
    +'<div class="a-card">'+(list.length?list.map(m=>'<div class="a-row clickable" onclick="openAppMember('+APP_MEMBERS.indexOf(m)+')"><div class="av">'+m.n.slice(0,1)+'</div>'
